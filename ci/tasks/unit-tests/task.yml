@@ -1,0 +1,9 @@
+---
+platform: linux
+image: docker:///golang
+inputs:
+  - name: task-repo
+  - name: code-repo
+    path: go/src/github.com/pivotal-cf/cm-cli
+run:
+  path: task-repo/ci/tasks/unit-tests/task.sh
