@@ -1,0 +1,6 @@
+{
+	"ImportPath": "github.com/pivotal-cf/cm-cli",
+	"GoVersion": "go1.6",
+	"GodepVersion": "v62",
+	"Deps": []
+}
