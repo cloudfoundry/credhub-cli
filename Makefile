@@ -1,4 +1,5 @@
 ginkgo_cli :
+		go get github.com/onsi/ginkgo/ginkgo
 		go install github.com/onsi/ginkgo/ginkgo
 
 build :
