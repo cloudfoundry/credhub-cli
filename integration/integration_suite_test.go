@@ -1,4 +1,4 @@
-package cmclitest_test
+package integration_test
 
 import (
 	. "github.com/onsi/ginkgo"
@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestCmclitest(t *testing.T) {
+func TestCmCli(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Cmclitest Suite")
+	RunSpecs(t, "Integration Suite")
 }

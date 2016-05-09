@@ -1,4 +1,4 @@
-package cmclitest
+package integration_test
 
 import (
 	"os/exec"
