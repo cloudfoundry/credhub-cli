@@ -7,7 +7,7 @@ import (
 )
 
 type GetCommand struct {
-	SecretIdentifier string `short:"n" long:"name" description:"Selects the secret being set"`
+	SecretIdentifier string `short:"n" long:"name" description:"Selects the secret to retrieve"`
 }
 
 func (cmd GetCommand) Execute([]string) error {
