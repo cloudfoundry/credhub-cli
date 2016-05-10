@@ -3,7 +3,7 @@ dependencies :
 		go get golang.org/x/tools/cmd/goimports
 
 build :
-		go build -v .
+		go build -v ./...
 
 format :
 		goimports -w .
