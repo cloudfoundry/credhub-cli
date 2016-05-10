@@ -1,8 +1,7 @@
 package commands
 
 import (
-	"encoding/json"
-	"fmt"
+	"net/http"
 
 	"github.com/pivotal-cf/cm-cli/client"
 )
@@ -13,10 +12,11 @@ type SetCommand struct {
 }
 
 func (cmd SetCommand) Execute([]string) error {
-	secret := client.SecretRequest{Value: cmd.SecretContent}
+	request := client.NewPutSecretRequest(CM.ApiURL, cmd.SecretIdentifier, cmd.SecretContent)
 
-	secretJson, _ := json.MarshalIndent(secret, "", "  ")
+	response, _ := http.DefaultClient.Do(request)
 
-	fmt.Println(string(secretJson))
+	PrintResponse(response.Body)
+
 	return nil
 }
