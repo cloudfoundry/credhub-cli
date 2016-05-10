@@ -29,3 +29,11 @@ func NewGetSecretRequest(apiTarget, secretIdentifier string) *http.Request {
 
 	return request
 }
+
+func NewDeleteSecretRequest(apiTarget, secretIdentifier string) *http.Request {
+	url := apiTarget + "/api/v1/secret/" + secretIdentifier
+
+	request, _ := http.NewRequest("DELETE", url, nil)
+
+	return request
+}
