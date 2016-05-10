@@ -10,6 +10,6 @@ format :
 		go fmt .
 
 test : dependencies format build
-		go get -v -t .
+		go get -v -t ./...
 		ginkgo -r -randomizeSuites -randomizeAllSpecs -race
 
