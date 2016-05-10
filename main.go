@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/pivotal-cf/cm-cli/commands"
-	flags "github.com/jessevdk/go-flags"
+	"github.com/jessevdk/go-flags"
 	"fmt"
 	"os"
 )
