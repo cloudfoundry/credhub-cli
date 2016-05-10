@@ -1,11 +1,15 @@
-ginkgo_cli :
+dependencies :
 		go get github.com/onsi/ginkgo/ginkgo
-		go install github.com/onsi/ginkgo/ginkgo
+		go get golang.org/x/tools/cmd/goimports
 
 build :
-		go build -v ./...
+		go build -v .
 
-test : ginkgo_cli build
-		go get -v -t ./...
-		ginkgo -v -r -randomizeSuites -randomizeAllSpecs -race
+format :
+		goimports -w .
+		go fmt .
+
+test : dependencies format build
+		go get -v -t .
+		ginkgo -r -randomizeSuites -randomizeAllSpecs -race
 
