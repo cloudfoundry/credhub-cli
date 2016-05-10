@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -exu
+set -eux
 
 export GOPATH=$PWD/go
 export PATH=$PATH:$GOPATH/bin

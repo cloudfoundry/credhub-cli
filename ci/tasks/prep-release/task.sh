@@ -1,4 +1,6 @@
-#!/bin/bash -eu
+#!/bin/bash
+
+set -eux
 
 export GOPATH=$PWD/go
 export GOARCH=amd64
