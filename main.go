@@ -1,10 +1,11 @@
 package main
 
 import (
-	"github.com/pivotal-cf/cm-cli/commands"
-	"github.com/jessevdk/go-flags"
 	"fmt"
 	"os"
+
+	"github.com/jessevdk/go-flags"
+	"github.com/pivotal-cf/cm-cli/commands"
 )
 
 func main() {
