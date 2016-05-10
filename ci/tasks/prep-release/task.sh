@@ -14,7 +14,8 @@ cd ${GOPATH}/src/github.com/pivotal-cf/cm-cli
 
 make dependencies
 
-for GOOS in linux darwin windows; do
-  GOOS=${GOOS} make build
-  mv ${binary_name} ${BUILD_ROOT}/${PREP_RELEASE_OUTPUT_PATH}/cm-${GOOS}
-done
+GOOS=linux go build -o cm-linux
+GOOS=darwin go build -o cm-darwin
+GOOS=windows go build -o cm-windows.exe
+
+mv cm-* ${BUILD_ROOT}/${PREP_RELEASE_OUTPUT_PATH}
