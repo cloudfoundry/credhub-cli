@@ -16,6 +16,6 @@ make dependencies
 
 for os in linux darwin windows; do
   GOOS=${os} make build
-  tar -C build -cvzf ~/Desktop/"cm-${os}.tgz" .
+  tar -C build -cvzf ${BUILD_ROOT}/${PREP_RELEASE_OUTPUT_PATH}/"cm-${os}.tgz" .
   rm -rf build
 done
