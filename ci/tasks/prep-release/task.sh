@@ -13,6 +13,6 @@ date +'%s' > ${PREP_RELEASE_OUTPUT_PATH}/tag
 cd ${GOPATH}/src/github.com/pivotal-cf/cm-cli
 
 for GOOS in linux darwin windows; do
-  export GOOS=${GOOS} make build
+  GOOS=${GOOS} make build
   mv ${binary_name} ${BUILD_ROOT}/${PREP_RELEASE_OUTPUT_PATH}/cm-${GOOS}
 done
