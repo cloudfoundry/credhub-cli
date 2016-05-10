@@ -21,3 +21,11 @@ func NewPutSecretRequest(apiTarget, secretIdentifier, secretContent string) *htt
 
 	return request
 }
+
+func NewGetSecretRequest(apiTarget, secretIdentifier string) *http.Request {
+	url := apiTarget + "/api/v1/secret/" + secretIdentifier
+
+	request, _ := http.NewRequest("GET", url, nil)
+
+	return request
+}
