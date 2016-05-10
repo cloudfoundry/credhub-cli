@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := test
 
-build : dependencies
+build :
 		go build
 
 dependencies :
