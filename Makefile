@@ -15,3 +15,11 @@ ginkgo : dependencies
 test : format ginkgo
 
 ci : ginkgo
+
+build :
+		mkdir -p build
+ifeq ($(GOOS),windows)
+		go build -o build/cm.exe
+else
+		go build -o build/cm
+endif

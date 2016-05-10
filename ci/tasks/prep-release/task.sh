@@ -14,8 +14,8 @@ cd ${GOPATH}/src/github.com/pivotal-cf/cm-cli
 
 make dependencies
 
-GOOS=linux go build -o cm-linux
-GOOS=darwin go build -o cm-darwin
-GOOS=windows go build -o cm-windows.exe
-
-mv cm-* ${BUILD_ROOT}/${PREP_RELEASE_OUTPUT_PATH}
+for os in linux darwin windows; do
+  GOOS=${os} make build
+  tar -C build -cvzf ~/Desktop/"cm-${os}.tgz" .
+  rm -rf build
+done
