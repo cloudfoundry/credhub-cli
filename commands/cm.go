@@ -1,9 +1,9 @@
 package commands
 
 type CMCommand struct {
-	ApiURL string `long:"api" description:"The Credential Manager API Location"`
+	ApiURL string `long:"api" description:"Credential Manager API URL"`
 
-	SetSecret SetSecretCommand `command:"set-secret" alias:"ss" description:"Sets secret value"`
+	Set SetCommand `command:"set" description:"Set a secret value"`
 }
 
 var CM CMCommand

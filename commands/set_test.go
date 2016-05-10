@@ -7,23 +7,22 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 )
 
-var _ = Describe("Set-Secret", func() {
+var _ = Describe("Set", func() {
 	Describe("Help", func() {
 		It("displays help for user", func() {
-			session := runCommand("set-secret", "-h")
+			session := runCommand("set", "-h")
 
 			Eventually(session).ShouldNot(Exit(0))
-			Expect(session.Err).To(Say("set-secret"))
+			Expect(session.Err).To(Say("set"))
+			Expect(session.Err).To(Say("--identifier"))
 			Expect(session.Err).To(Say("--secret"))
-			Expect(session.Err).To(Say("--key"))
 		})
 	})
 
 	It("puts a secret", func() {
-		session := runCommand("set-secret", "-s", "foo-secret", "-k", "key1:value1")
+		session := runCommand("set", "-i", "my-secret", "-s", "super secret thing")
 
 		Eventually(session).Should(Exit(0))
-		Eventually(session.Out).Should(Say(`"values":`))
-		Eventually(session.Out).Should(Say(`"key1": "value1"`))
+		Eventually(session.Out).Should(Say(`"value": "super secret thing"`))
 	})
 })

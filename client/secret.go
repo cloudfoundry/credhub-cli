@@ -1,9 +1,9 @@
 package client
 
 type SecretRequest struct {
-	Values map[string]string `json:"values"`
+	Value string `json:"value"`
 }
 
 type SecretResponse struct {
-	Values map[string]string  `json:"values"`
+	Value string `json:"value"`
 }
