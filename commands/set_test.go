@@ -16,7 +16,7 @@ var _ = Describe("Set", func() {
 
 		Eventually(session).Should(Exit(1))
 		Expect(session.Err).To(Say("set"))
-		Expect(session.Err).To(Say("--identifier"))
+		Expect(session.Err).To(Say("--name"))
 		Expect(session.Err).To(Say("--secret"))
 	})
 
@@ -32,7 +32,7 @@ var _ = Describe("Set", func() {
 			),
 		)
 
-		session := runCommand("set", "-i", "my-secret", "-s", "super-secret-thing")
+		session := runCommand("set", "-n", "my-secret", "-s", "super-secret-thing")
 
 		Eventually(session).Should(Exit(0))
 		Eventually(session.Out).Should(Say(`"potatoes": "delicious"`))

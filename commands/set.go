@@ -7,8 +7,8 @@ import (
 )
 
 type SetCommand struct {
-	SecretIdentifier string `short:"i" long:"identifier" description:"The Identifier of the Secret"`
-	SecretContent    string `short:"s" long:"secret" description:"The Content of the Secret"`
+	SecretIdentifier string `short:"n" long:"name" description:"Selects the secret being set"`
+	SecretContent    string `short:"s" long:"secret" description:"Sets a value for a secret name"`
 }
 
 func (cmd SetCommand) Execute([]string) error {
