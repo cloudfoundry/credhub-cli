@@ -25,7 +25,7 @@ func (cmd DeleteCommand) Execute([]string) error {
 
 	_, err = http.DefaultClient.Do(request)
 	if err != nil {
-		return err
+		return NewNetworkError()
 	}
 
 	fmt.Println("Secret successfully deleted")

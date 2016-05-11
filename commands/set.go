@@ -24,7 +24,7 @@ func (cmd SetCommand) Execute([]string) error {
 
 	response, err := http.DefaultClient.Do(request)
 	if err != nil {
-		return err
+		return NewNetworkError()
 	}
 
 	PrintResponse(response.Body)

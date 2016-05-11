@@ -58,6 +58,6 @@ var _ = Describe("Set", func() {
 		session := runCommand("set", "-n", "me", "-s", "my-secret")
 
 		Eventually(session).Should(Exit(1))
-		Eventually(session.Err).Should(Say("unsupported protocol scheme"))
+		Eventually(session.Err).Should(Say("No response received for the command"))
 	})
 })
