@@ -21,7 +21,10 @@ func (cmd GetCommand) Execute([]string) error {
 
 	request := client.NewGetSecretRequest(cfg.ApiURL, cmd.SecretIdentifier)
 
-	response, _ := http.DefaultClient.Do(request)
+	response, err := http.DefaultClient.Do(request)
+	if err != nil {
+		return err
+	}
 
 	PrintResponse(response.Body)
 

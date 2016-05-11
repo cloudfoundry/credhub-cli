@@ -22,7 +22,10 @@ func (cmd SetCommand) Execute([]string) error {
 
 	request := client.NewPutSecretRequest(cfg.ApiURL, cmd.SecretIdentifier, cmd.SecretContent)
 
-	response, _ := http.DefaultClient.Do(request)
+	response, err := http.DefaultClient.Do(request)
+	if err != nil {
+		return err
+	}
 
 	PrintResponse(response.Body)
 

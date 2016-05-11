@@ -23,7 +23,10 @@ func (cmd DeleteCommand) Execute([]string) error {
 
 	request := client.NewDeleteSecretRequest(cfg.ApiURL, cmd.SecretIdentifier)
 
-	http.DefaultClient.Do(request)
+	_, err = http.DefaultClient.Do(request)
+	if err != nil {
+		return err
+	}
 
 	fmt.Println("Secret successfully deleted")
 

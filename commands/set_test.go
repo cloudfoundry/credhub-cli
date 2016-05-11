@@ -49,4 +49,15 @@ var _ = Describe("Set", func() {
 		Eventually(session).Should(Exit(1))
 		Eventually(session.Err).Should(Say("API location is not set"))
 	})
+
+	It("prints an error when the network request fails", func() {
+		cfg := config.ReadConfig()
+		cfg.ApiURL = "mashed://potatoes"
+		config.WriteConfig(cfg)
+
+		session := runCommand("set", "-n", "me", "-s", "my-secret")
+
+		Eventually(session).Should(Exit(1))
+		Eventually(session.Err).Should(Say("unsupported protocol scheme"))
+	})
 })
