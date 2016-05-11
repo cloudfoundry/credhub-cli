@@ -27,4 +27,37 @@ var _ = Describe("API", func() {
 		Eventually(session).Should(Exit(0))
 		Eventually(session.Out).Should(Say(apiServer))
 	})
+
+	It("sets the target URL without http", func() {
+		session := runCommand("api", "-s", "example.com")
+
+		Eventually(session).Should(Exit(0))
+
+		session = runCommand("api")
+
+		Eventually(session).Should(Exit(0))
+		Eventually(session.Out).Should(Say("http://example.com"))
+	})
+
+	It("handles domains that start with http", func() {
+		session := runCommand("api", "-s", "httpotatoes.com")
+
+		Eventually(session).Should(Exit(0))
+
+		session = runCommand("api")
+
+		Eventually(session).Should(Exit(0))
+		Eventually(session.Out).Should(Say("http://httpotatoes.com"))
+	})
+
+	It("handles https URLs", func() {
+		session := runCommand("api", "-s", "https://example.com")
+
+		Eventually(session).Should(Exit(0))
+
+		session = runCommand("api")
+
+		Eventually(session).Should(Exit(0))
+		Eventually(session.Out.Contents()).Should(MatchRegexp("^https://example.com"))
+	})
 })
