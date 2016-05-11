@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/pivotal-cf/cm-cli/client"
+	"github.com/pivotal-cf/cm-cli/config"
 )
 
 type GetCommand struct {
@@ -11,7 +12,9 @@ type GetCommand struct {
 }
 
 func (cmd GetCommand) Execute([]string) error {
-	request := client.NewGetSecretRequest(CM.ApiURL, cmd.SecretIdentifier)
+	config := config.ReadConfig()
+
+	request := client.NewGetSecretRequest(config.ApiURL, cmd.SecretIdentifier)
 
 	response, _ := http.DefaultClient.Do(request)
 

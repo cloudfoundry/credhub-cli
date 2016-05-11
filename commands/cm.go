@@ -1,7 +1,7 @@
 package commands
 
 type CMCommand struct {
-	ApiURL string `long:"api" description:"Credential Manager API URL" default:"https://pivotal-credential-manager.cfapps.io/"`
+	Api ApiCommand `command:"api" description:"Set the API server to use"`
 
 	Get    GetCommand    `command:"get" description:"Get a secret value"`
 	Set    SetCommand    `command:"set" description:"Set a secret value"`

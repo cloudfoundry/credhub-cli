@@ -7,6 +7,10 @@ import (
 	"os/exec"
 	"testing"
 
+	"io/ioutil"
+	"os"
+	"runtime"
+
 	. "github.com/onsi/gomega/gexec"
 	. "github.com/onsi/gomega/ghttp"
 )
@@ -18,15 +22,29 @@ func TestCommands(t *testing.T) {
 
 var (
 	commandPath string
+	homeDir     string
 	server      *Server
 )
 
 var _ = BeforeEach(func() {
+	var err error
+	homeDir, err = ioutil.TempDir("", "cm-test")
+	Expect(err).NotTo(HaveOccurred())
+
+	if runtime.GOOS == "windows" {
+		os.Setenv("USERPROFILE", homeDir)
+	} else {
+		os.Setenv("HOME", homeDir)
+	}
+
 	server = NewServer()
+
+	runCommand("api", "-s", server.URL())
 })
 
 var _ = AfterEach(func() {
 	server.Close()
+	os.RemoveAll(homeDir)
 })
 
 var _ = SynchronizedBeforeSuite(func() []byte {
@@ -42,8 +60,7 @@ var _ = SynchronizedAfterSuite(func() {}, func() {
 })
 
 func runCommand(args ...string) *Session {
-	cmdArgs := append([]string{"--api", server.URL()}, args...)
-	cmd := exec.Command(commandPath, cmdArgs...)
+	cmd := exec.Command(commandPath, args...)
 
 	session, err := Start(cmd, GinkgoWriter, GinkgoWriter)
 	Expect(err).NotTo(HaveOccurred())

@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/pivotal-cf/cm-cli/client"
+	"github.com/pivotal-cf/cm-cli/config"
 )
 
 type DeleteCommand struct {
@@ -13,7 +14,9 @@ type DeleteCommand struct {
 }
 
 func (cmd DeleteCommand) Execute([]string) error {
-	request := client.NewDeleteSecretRequest(CM.ApiURL, cmd.SecretIdentifier)
+	config := config.ReadConfig()
+
+	request := client.NewDeleteSecretRequest(config.ApiURL, cmd.SecretIdentifier)
 
 	http.DefaultClient.Do(request)
 
