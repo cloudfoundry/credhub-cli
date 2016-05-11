@@ -1,5 +1,7 @@
 .DEFAULT_GOAL := test
 
+.PHONY : build
+
 dependencies :
 		go get github.com/onsi/ginkgo/ginkgo
 		go get golang.org/x/tools/cmd/goimports
