@@ -14,9 +14,14 @@ type DeleteCommand struct {
 }
 
 func (cmd DeleteCommand) Execute([]string) error {
-	config := config.ReadConfig()
+	cfg := config.ReadConfig()
 
-	request := client.NewDeleteSecretRequest(config.ApiURL, cmd.SecretIdentifier)
+	err := config.ValidateConfig(cfg)
+	if err != nil {
+		return err
+	}
+
+	request := client.NewDeleteSecretRequest(cfg.ApiURL, cmd.SecretIdentifier)
 
 	http.DefaultClient.Do(request)
 

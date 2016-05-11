@@ -13,9 +13,14 @@ type SetCommand struct {
 }
 
 func (cmd SetCommand) Execute([]string) error {
-	config := config.ReadConfig()
+	cfg := config.ReadConfig()
 
-	request := client.NewPutSecretRequest(config.ApiURL, cmd.SecretIdentifier, cmd.SecretContent)
+	err := config.ValidateConfig(cfg)
+	if err != nil {
+		return err
+	}
+
+	request := client.NewPutSecretRequest(cfg.ApiURL, cmd.SecretIdentifier, cmd.SecretContent)
 
 	response, _ := http.DefaultClient.Do(request)
 

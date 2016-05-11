@@ -8,6 +8,7 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
 	. "github.com/onsi/gomega/ghttp"
+	"github.com/pivotal-cf/cm-cli/config"
 )
 
 var _ = Describe("Get", func() {
@@ -33,5 +34,16 @@ var _ = Describe("Get", func() {
 
 		Eventually(session).Should(Exit(0))
 		Eventually(session.Out).Should(Say(`"potatoes": "delicious"`))
+	})
+
+	It("prints an error when API URL is not set", func() {
+		cfg := config.ReadConfig()
+		cfg.ApiURL = ""
+		config.WriteConfig(cfg)
+
+		session := runCommand("get", "-n", "my-secret")
+
+		Eventually(session).Should(Exit(1))
+		Eventually(session.Err).Should(Say("API location is not set"))
 	})
 })

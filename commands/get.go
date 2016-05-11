@@ -12,9 +12,14 @@ type GetCommand struct {
 }
 
 func (cmd GetCommand) Execute([]string) error {
-	config := config.ReadConfig()
+	cfg := config.ReadConfig()
 
-	request := client.NewGetSecretRequest(config.ApiURL, cmd.SecretIdentifier)
+	err := config.ValidateConfig(cfg)
+	if err != nil {
+		return err
+	}
+
+	request := client.NewGetSecretRequest(cfg.ApiURL, cmd.SecretIdentifier)
 
 	response, _ := http.DefaultClient.Do(request)
 
