@@ -23,12 +23,16 @@ func (cmd DeleteCommand) Execute([]string) error {
 
 	request := client.NewDeleteSecretRequest(cfg.ApiURL, cmd.SecretIdentifier)
 
-	_, err = http.DefaultClient.Do(request)
+	response, err := http.DefaultClient.Do(request)
 	if err != nil {
 		return NewNetworkError()
 	}
 
-	fmt.Println("Secret successfully deleted")
+	if response.StatusCode == 404 {
+		return NewSecretNotFoundError()
+	} else {
+		fmt.Println("Secret successfully deleted")
+	}
 
 	return nil
 }

@@ -34,25 +34,41 @@ var _ = Describe("Get", func() {
 		Eventually(session.Out).Should(Say("Secret successfully deleted"))
 	})
 
-	It("prints an error when API URL is not set", func() {
-		cfg := config.ReadConfig()
-		cfg.ApiURL = ""
-		config.WriteConfig(cfg)
+	Describe("Errors", func() {
+		It("handles no existing secret", func() {
+			server.AppendHandlers(
+				CombineHandlers(
+					VerifyRequest("DELETE", "/api/v1/secret/non-existent-secret"),
+					RespondWith(http.StatusNotFound, ""),
+				),
+			)
 
-		session := runCommand("delete", "-n", "my-secret")
+			session := runCommand("delete", "-n", "non-existent-secret")
 
-		Eventually(session).Should(Exit(1))
-		Eventually(session.Err).Should(Say("API location is not set"))
-	})
+			Eventually(session).Should(Exit(1))
+			Eventually(session.Err).Should(Say("Secret not found"))
+		})
 
-	It("prints an error when the network request fails", func() {
-		cfg := config.ReadConfig()
-		cfg.ApiURL = "mashed://potatoes"
-		config.WriteConfig(cfg)
+		It("prints an error when API URL is not set", func() {
+			cfg := config.ReadConfig()
+			cfg.ApiURL = ""
+			config.WriteConfig(cfg)
 
-		session := runCommand("delete", "-n", "my-secret")
+			session := runCommand("delete", "-n", "my-secret")
 
-		Eventually(session).Should(Exit(1))
-		Eventually(session.Err).Should(Say("No response received for the command"))
+			Eventually(session).Should(Exit(1))
+			Eventually(session.Err).Should(Say("API location is not set"))
+		})
+
+		It("prints an error when the network request fails", func() {
+			cfg := config.ReadConfig()
+			cfg.ApiURL = "mashed://potatoes"
+			config.WriteConfig(cfg)
+
+			session := runCommand("delete", "-n", "my-secret")
+
+			Eventually(session).Should(Exit(1))
+			Eventually(session.Err).Should(Say("No response received for the command"))
+		})
 	})
 })
