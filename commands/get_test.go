@@ -36,6 +36,20 @@ var _ = Describe("Get", func() {
 		Eventually(session.Out).Should(Say(`"potatoes": "delicious"`))
 	})
 
+	It("handles no present secret", func() {
+		server.AppendHandlers(
+			CombineHandlers(
+				VerifyRequest("GET", "/api/v1/secret/my-secret"),
+				RespondWith(http.StatusNotFound, ""),
+			),
+		)
+
+		session := runCommand("get", "-n", "my-secret")
+
+		Eventually(session).Should(Exit(1))
+		Eventually(session.Err).Should(Say("Secret not found"))
+	})
+
 	It("prints an error when API URL is not set", func() {
 		cfg := config.ReadConfig()
 		cfg.ApiURL = ""

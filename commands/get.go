@@ -26,7 +26,11 @@ func (cmd GetCommand) Execute([]string) error {
 		return NewNetworkError()
 	}
 
-	PrintResponse(response.Body)
+	if response.StatusCode == 404 {
+		return NewSecretNotFoundError()
+	} else {
+		PrintResponse(response.Body)
+	}
 
 	return nil
 }
