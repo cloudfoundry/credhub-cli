@@ -12,12 +12,14 @@ import (
 )
 
 var _ = Describe("Get", func() {
-	It("displays help", func() {
-		session := runCommand("delete", "-h")
+	Describe("Help", func() {
+		It("displays help", func() {
+			session := runCommand("delete", "-h")
 
-		Eventually(session).Should(Exit(1))
-		Expect(session.Err).To(Say("delete"))
-		Expect(session.Err).To(Say("--name"))
+			Eventually(session).Should(Exit(1))
+			Expect(session.Err).To(Say("delete"))
+			Expect(session.Err).To(Say("--name"))
+		})
 	})
 
 	It("deletes a secret", func() {

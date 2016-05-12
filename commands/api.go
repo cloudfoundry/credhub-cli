@@ -8,24 +8,39 @@ import (
 )
 
 type ApiCommand struct {
-	Server string `short:"s" long:"server" description:"API endpoint"`
+	Server ApiPositionalArgs `positional-args:"yes"`
+	ServerFlagUrl string `short:"s" long:"server" description:"API endpoint"`
+}
+
+type ApiPositionalArgs struct {
+	ServerUrl string `positional-arg-name:"SERVER_URL" description:"The app name"`
 }
 
 func (cmd ApiCommand) Execute([]string) error {
 	c := config.ReadConfig()
+	serverUrl := targetUrl(cmd)
 
-	if cmd.Server == "" {
+	if serverUrl == "" {
 		fmt.Println(c.ApiURL)
 	} else {
-		if strings.HasPrefix(cmd.Server, "http://") || strings.HasPrefix(cmd.Server, "https://") {
-			c.ApiURL = cmd.Server
+		fmt.Println("HERERERE", cmd.Server.ServerUrl)
+		if strings.HasPrefix(serverUrl, "http://") || strings.HasPrefix(serverUrl, "https://") {
+			c.ApiURL = serverUrl
 		} else {
-			c.ApiURL = "http://" + cmd.Server
+			c.ApiURL = "http://" + serverUrl
 		}
-
+		fmt.Println("Setting the target url:", c.ApiURL)
 		config.WriteConfig(c)
 
 	}
 
 	return nil
+}
+
+func targetUrl(cmd ApiCommand) string {
+	if cmd.Server.ServerUrl != "" {
+		return cmd.Server.ServerUrl
+	} else {
+		return cmd.ServerFlagUrl
+	}
 }

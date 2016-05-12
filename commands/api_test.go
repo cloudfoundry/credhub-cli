@@ -8,15 +8,29 @@ import (
 )
 
 var _ = Describe("API", func() {
-	It("displays help", func() {
-		session := runCommand("api", "-h")
+	Describe("Help", func() {
+		It("displays help", func() {
+			session := runCommand("api", "-h")
 
-		Eventually(session).Should(Exit(1))
-		Expect(session.Err).To(Say("api"))
-		Expect(session.Err).To(Say("--server"))
+			Eventually(session).Should(Exit(1))
+			Expect(session.Err).To(Say("api"))
+			Expect(session.Err).To(Say("SERVER_URL"))
+		})
 	})
 
 	It("sets the target URL", func() {
+		apiServer := "http://example.com"
+		session := runCommand("api", apiServer)
+
+		Eventually(session).Should(Exit(0))
+
+		session = runCommand("api")
+
+		Eventually(session).Should(Exit(0))
+		Eventually(session.Out).Should(Say(apiServer))
+	})
+
+	It("sets the target URL using a flag", func() {
 		apiServer := "http://example.com"
 		session := runCommand("api", "-s", apiServer)
 
@@ -28,19 +42,32 @@ var _ = Describe("API", func() {
 		Eventually(session.Out).Should(Say(apiServer))
 	})
 
-	It("sets the target URL without http", func() {
-		session := runCommand("api", "-s", "example.com")
+	It("will prefer the arguement URL over the flag", func() {
+		apiServer := "http://example.com"
+		session := runCommand("api", "-s", "woooo.com", apiServer)
 
 		Eventually(session).Should(Exit(0))
+		Eventually(session.Out).Should(Say(apiServer))
 
 		session = runCommand("api")
 
 		Eventually(session).Should(Exit(0))
+		Eventually(session.Out).Should(Say(apiServer))
+	})
+
+	It("sets the target URL without http", func() {
+		session := runCommand("api", "example.com")
+
+		Eventually(session).Should(Exit(0))
+		Eventually(session.Out).Should(Say("http://example.com"))
+
+		session = runCommand("api")
+
 		Eventually(session.Out).Should(Say("http://example.com"))
 	})
 
 	It("handles domains that start with http", func() {
-		session := runCommand("api", "-s", "httpotatoes.com")
+		session := runCommand("api", "httpotatoes.com")
 
 		Eventually(session).Should(Exit(0))
 
@@ -51,7 +78,7 @@ var _ = Describe("API", func() {
 	})
 
 	It("handles https URLs", func() {
-		session := runCommand("api", "-s", "https://example.com")
+		session := runCommand("api", "https://example.com")
 
 		Eventually(session).Should(Exit(0))
 

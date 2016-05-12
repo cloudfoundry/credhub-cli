@@ -39,7 +39,7 @@ var _ = BeforeEach(func() {
 
 	server = NewServer()
 
-	runCommand("api", "-s", server.URL())
+	runCommand("api", server.URL())
 })
 
 var _ = AfterEach(func() {
