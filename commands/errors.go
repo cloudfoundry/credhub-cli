@@ -9,3 +9,7 @@ func NewNetworkError() error {
 func NewSecretNotFoundError() error {
 	return errors.New("Secret not found. Please validate your input and retry your request.")
 }
+
+func NewInvalidTargetError() error {
+	return errors.New("The targeted API does not appear to be valid. Please validate the API address and retry your request.")
+}

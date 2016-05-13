@@ -2,14 +2,17 @@ package commands
 
 import (
 	"fmt"
-	"strings"
 
+	"net/http"
+	"net/url"
+
+	"github.com/pivotal-cf/cm-cli/client"
 	"github.com/pivotal-cf/cm-cli/config"
 )
 
 type ApiCommand struct {
-	Server ApiPositionalArgs `positional-args:"yes"`
-	ServerFlagUrl string `short:"s" long:"server" description:"API endpoint"`
+	Server        ApiPositionalArgs `positional-args:"yes"`
+	ServerFlagUrl string            `short:"s" long:"server" description:"API endpoint"`
 }
 
 type ApiPositionalArgs struct {
@@ -23,15 +26,39 @@ func (cmd ApiCommand) Execute([]string) error {
 	if serverUrl == "" {
 		fmt.Println(c.ApiURL)
 	} else {
-		fmt.Println("HERERERE", cmd.Server.ServerUrl)
-		if strings.HasPrefix(serverUrl, "http://") || strings.HasPrefix(serverUrl, "https://") {
-			c.ApiURL = serverUrl
-		} else {
-			c.ApiURL = "http://" + serverUrl
+		parsedUrl, err := url.Parse(serverUrl)
+		if err != nil {
+			return err
+		}
+		if parsedUrl.Scheme == "" {
+			parsedUrl.Scheme = "http"
+		}
+
+		c.ApiURL = parsedUrl.String()
+
+		err = validateTarget(c.ApiURL)
+		if err != nil {
+			return err
 		}
 		fmt.Println("Setting the target url:", c.ApiURL)
+
 		config.WriteConfig(c)
 
+	}
+
+	return nil
+}
+
+func validateTarget(targetUrl string) error {
+	request := client.NewInfoRequest(targetUrl)
+
+	response, err := http.DefaultClient.Do(request)
+	if err != nil {
+		return NewNetworkError()
+	}
+
+	if response.StatusCode != 200 {
+		return NewInvalidTargetError()
 	}
 
 	return nil

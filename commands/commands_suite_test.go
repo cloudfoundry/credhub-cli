@@ -11,6 +11,8 @@ import (
 	"os"
 	"runtime"
 
+	"net/http"
+
 	. "github.com/onsi/gomega/gexec"
 	. "github.com/onsi/gomega/ghttp"
 )
@@ -38,6 +40,13 @@ var _ = BeforeEach(func() {
 	}
 
 	server = NewServer()
+
+	server.AppendHandlers(
+		CombineHandlers(
+			VerifyRequest("GET", "/info"),
+			RespondWith(http.StatusOK, ""),
+		),
+	)
 
 	runCommand("api", server.URL())
 })

@@ -1,10 +1,13 @@
 package commands_test
 
 import (
+	"net/http"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
+	. "github.com/onsi/gomega/ghttp"
 )
 
 var _ = Describe("API", func() {
@@ -18,8 +21,27 @@ var _ = Describe("API", func() {
 		})
 	})
 
+	var (
+		goodServer *Server
+	)
+
+	BeforeEach(func() {
+		goodServer = NewServer()
+
+		goodServer.AppendHandlers(
+			CombineHandlers(
+				VerifyRequest("GET", "/info"),
+				RespondWith(http.StatusOK, ""),
+			),
+		)
+	})
+
+	AfterEach(func() {
+		goodServer.Close()
+	})
+
 	It("sets the target URL", func() {
-		apiServer := "http://example.com"
+		apiServer := goodServer.URL()
 		session := runCommand("api", apiServer)
 
 		Eventually(session).Should(Exit(0))
@@ -31,7 +53,7 @@ var _ = Describe("API", func() {
 	})
 
 	It("sets the target URL using a flag", func() {
-		apiServer := "http://example.com"
+		apiServer := goodServer.URL()
 		session := runCommand("api", "-s", apiServer)
 
 		Eventually(session).Should(Exit(0))
@@ -43,7 +65,7 @@ var _ = Describe("API", func() {
 	})
 
 	It("will prefer the arguement URL over the flag", func() {
-		apiServer := "http://example.com"
+		apiServer := goodServer.URL()
 		session := runCommand("api", "-s", "woooo.com", apiServer)
 
 		Eventually(session).Should(Exit(0))
@@ -56,35 +78,42 @@ var _ = Describe("API", func() {
 	})
 
 	It("sets the target URL without http", func() {
-		session := runCommand("api", "example.com")
+		session := runCommand("api", goodServer.Addr())
 
 		Eventually(session).Should(Exit(0))
-		Eventually(session.Out).Should(Say("http://example.com"))
+		Eventually(session.Out).Should(Say(goodServer.URL()))
 
 		session = runCommand("api")
 
-		Eventually(session.Out).Should(Say("http://example.com"))
+		Eventually(session.Out).Should(Say(goodServer.URL()))
 	})
 
-	It("handles domains that start with http", func() {
-		session := runCommand("api", "httpotatoes.com")
+	Describe("Validating the target API URL", func() {
+		It("fails to set the target when the url is not valid", func() {
+			apiServer := goodServer.URL()
+			session := runCommand("api", apiServer)
 
-		Eventually(session).Should(Exit(0))
+			Eventually(session).Should(Exit(0))
 
-		session = runCommand("api")
+			badServer := NewServer()
+			badServer.AppendHandlers(
+				CombineHandlers(
+					VerifyRequest("GET", "/info"),
+					RespondWith(http.StatusNotFound, ""),
+				),
+			)
 
-		Eventually(session).Should(Exit(0))
-		Eventually(session.Out).Should(Say("http://httpotatoes.com"))
-	})
+			session = runCommand("api", badServer.URL())
 
-	It("handles https URLs", func() {
-		session := runCommand("api", "https://example.com")
+			Eventually(session).Should(Exit(1))
+			Eventually(session.Err).Should(Say("The targeted API does not appear to be valid."))
 
-		Eventually(session).Should(Exit(0))
+			session = runCommand("api")
 
-		session = runCommand("api")
+			Eventually(session).Should(Exit(0))
+			Eventually(session.Out).Should(Say(goodServer.URL()))
 
-		Eventually(session).Should(Exit(0))
-		Eventually(session.Out.Contents()).Should(MatchRegexp("^https://example.com"))
+			badServer.Close()
+		})
 	})
 })

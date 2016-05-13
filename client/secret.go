@@ -37,3 +37,11 @@ func NewDeleteSecretRequest(apiTarget, secretIdentifier string) *http.Request {
 
 	return request
 }
+
+func NewInfoRequest(apiTarget string) *http.Request {
+	url := apiTarget + "/info"
+
+	request, _ := http.NewRequest("GET", url, nil)
+
+	return request
+}
