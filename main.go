@@ -9,6 +9,10 @@ import (
 )
 
 func main() {
+	if os.Args[1] == "--version" {
+		os.Args[1] = "version"
+	}
+
 	parser := flags.NewParser(&commands.CM, flags.HelpFlag)
 
 	_, err := parser.Parse()
