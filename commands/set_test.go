@@ -17,8 +17,8 @@ var _ = Describe("Set", func() {
 
 		Eventually(session).Should(Exit(1))
 		Expect(session.Err).To(Say("set"))
-		Expect(session.Err).To(Say("--name"))
-		Expect(session.Err).To(Say("--secret"))
+		Expect(session.Err).To(Say("name"))
+		Expect(session.Err).To(Say("secret"))
 	})
 
 	It("puts a secret", func() {
