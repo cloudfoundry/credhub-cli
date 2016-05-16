@@ -13,3 +13,7 @@ func NewSecretNotFoundError() error {
 func NewInvalidTargetError() error {
 	return errors.New("The targeted API does not appear to be valid. Please validate the API address and retry your request.")
 }
+
+func NewInvalidStatusError() error {
+	return errors.New("Unable to perform the request. Please validate your input and retry your request.")
+}

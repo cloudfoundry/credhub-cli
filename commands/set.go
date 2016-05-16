@@ -27,6 +27,10 @@ func (cmd SetCommand) Execute([]string) error {
 		return NewNetworkError()
 	}
 
+	if response.StatusCode < 200 || response.StatusCode > 299 {
+		return NewInvalidStatusError()
+	}
+
 	PrintResponse(response.Body)
 
 	return nil

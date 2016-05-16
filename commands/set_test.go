@@ -39,6 +39,34 @@ var _ = Describe("Set", func() {
 		Eventually(session.Out).Should(Say(`"potatoes": "delicious"`))
 	})
 
+	It("prints an error when the request fails", func() {
+		server.AppendHandlers(
+			CombineHandlers(
+				VerifyRequest("PUT", "/api/v1/secret/my-secret"),
+				RespondWith(http.StatusInternalServerError, nil),
+			),
+		)
+
+		session := runCommand("set", "-n", "my-secret", "-s", "super-secret-thing")
+
+		Eventually(session).Should(Exit(1))
+		Eventually(session.Err).Should(Say("Unable to perform the request"))
+	})
+
+	It("prints an error when the request fails 400", func() {
+		server.AppendHandlers(
+			CombineHandlers(
+				VerifyRequest("PUT", "/api/v1/secret/my-secret"),
+				RespondWith(http.StatusBadRequest, nil),
+			),
+		)
+
+		session := runCommand("set", "-n", "my-secret", "-s", "super-secret-thing")
+
+		Eventually(session).Should(Exit(1))
+		Eventually(session.Err).Should(Say("Unable to perform the request"))
+	})
+
 	It("prints an error when API URL is not set", func() {
 		cfg := config.ReadConfig()
 		cfg.ApiURL = ""
