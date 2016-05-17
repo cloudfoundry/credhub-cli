@@ -7,7 +7,7 @@ dependencies :
 		go get golang.org/x/tools/cmd/goimports
 		go get -v -t ./...
 
-format :
+format : dependencies
 		goimports -w .
 		go fmt .
 
