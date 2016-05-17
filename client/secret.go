@@ -6,14 +6,19 @@ import (
 	"net/http"
 )
 
-type secretRequest struct {
+type secretPutRequest struct {
+	Value string `json:"value"`
+}
+
+type Secret struct {
+	Name string `json:"name"`
 	Value string `json:"value"`
 }
 
 func NewPutSecretRequest(apiTarget, secretIdentifier, secretContent string) *http.Request {
 	url := apiTarget + "/api/v1/secret/" + secretIdentifier
 
-	secret := secretRequest{Value: secretContent}
+	secret := secretPutRequest{Value: secretContent}
 	body, _ := json.Marshal(secret)
 
 	request, _ := http.NewRequest("PUT", url, bytes.NewReader(body))

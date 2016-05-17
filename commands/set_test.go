@@ -9,6 +9,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 	. "github.com/onsi/gomega/ghttp"
 	"github.com/pivotal-cf/cm-cli/config"
+	"fmt"
 )
 
 var _ = Describe("Set", func() {
@@ -22,8 +23,9 @@ var _ = Describe("Set", func() {
 	})
 
 	It("puts a secret", func() {
-		requestJson := `{"value":"super-secret-thing"}`
-		responseJson := `{"potatoes":"delicious"}`
+		responseJson := `{"name":"my-secret","value":"potatoes"}`
+		responseTable := fmt.Sprintf(`Name:	my-secret\nValue:	potatoes`)
+		requestJson := `{"value":"potatoes"}`
 
 		server.AppendHandlers(
 			CombineHandlers(
@@ -33,10 +35,10 @@ var _ = Describe("Set", func() {
 			),
 		)
 
-		session := runCommand("set", "-n", "my-secret", "-s", "super-secret-thing")
+		session := runCommand("set", "-n", "my-secret", "-s", "potatoes")
 
 		Eventually(session).Should(Exit(0))
-		Eventually(session.Out).Should(Say(`"potatoes": "delicious"`))
+		Eventually(session.Out).Should(Say(responseTable))
 	})
 
 	It("prints an error when the request fails", func() {

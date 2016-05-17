@@ -5,6 +5,7 @@ import (
 
 	"github.com/pivotal-cf/cm-cli/client"
 	"github.com/pivotal-cf/cm-cli/config"
+	"io/ioutil"
 )
 
 type GetCommand struct {
@@ -28,9 +29,14 @@ func (cmd GetCommand) Execute([]string) error {
 
 	if response.StatusCode == 404 {
 		return NewSecretNotFoundError()
-	} else {
-		PrintResponse(response.Body)
 	}
+
+	responseMsg, _ := ioutil.ReadAll(response.Body)
+	//if err != nil {
+	//	return NewResponseError()
+	//}
+
+	PrintResponse(responseMsg)
 
 	return nil
 }

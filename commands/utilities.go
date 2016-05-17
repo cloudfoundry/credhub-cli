@@ -1,18 +1,15 @@
 package commands
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
+	"github.com/pivotal-cf/cm-cli/client"
 )
 
-func PrintResponse(responseBody io.Reader) {
-	responseBuffer := new(bytes.Buffer)
-	responseBuffer.ReadFrom(responseBody)
+func PrintResponse(responseBytes []byte) {
+	secret := new(client.Secret)
 
-	jsonBuffer := new(bytes.Buffer)
-	json.Indent(jsonBuffer, responseBuffer.Bytes(), "", "  ")
+	json.Unmarshal(responseBytes, &secret)
 
-	fmt.Println(jsonBuffer)
+	fmt.Println(fmt.Sprintf("Name:	%s\nValue:	%s", secret.Name, secret.Value))
 }

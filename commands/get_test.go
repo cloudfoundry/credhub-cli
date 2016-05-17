@@ -9,6 +9,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 	. "github.com/onsi/gomega/ghttp"
 	"github.com/pivotal-cf/cm-cli/config"
+	"fmt"
 )
 
 var _ = Describe("Get", func() {
@@ -21,7 +22,8 @@ var _ = Describe("Get", func() {
 	})
 
 	It("gets a secret", func() {
-		responseJson := `{"potatoes":"delicious"}`
+		responseJson := `{"name":"my-secret","value":"potatoes"}`
+		responseTable := fmt.Sprintf(`Name:	my-secret\nValue:	potatoes`)
 
 		server.AppendHandlers(
 			CombineHandlers(
@@ -33,7 +35,7 @@ var _ = Describe("Get", func() {
 		session := runCommand("get", "-n", "my-secret")
 
 		Eventually(session).Should(Exit(0))
-		Eventually(session.Out).Should(Say(`"potatoes": "delicious"`))
+		Eventually(session.Out).Should(Say(responseTable))
 	})
 
 	Describe("Errors", func() {

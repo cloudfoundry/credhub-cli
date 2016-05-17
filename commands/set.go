@@ -5,6 +5,7 @@ import (
 
 	"github.com/pivotal-cf/cm-cli/client"
 	"github.com/pivotal-cf/cm-cli/config"
+	"io/ioutil"
 )
 
 type SetCommand struct {
@@ -31,7 +32,12 @@ func (cmd SetCommand) Execute([]string) error {
 		return NewInvalidStatusError()
 	}
 
-	PrintResponse(response.Body)
+	responseMsg, _ :=ioutil.ReadAll(response.Body)
+	//if err != nil {
+		//return NewResponseError()
+	//}
+
+	PrintResponse(responseMsg)
 
 	return nil
 }
