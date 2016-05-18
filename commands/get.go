@@ -3,11 +3,8 @@ package commands
 import (
 	"net/http"
 
-	"encoding/json"
-
-	"github.com/pivotal-cf/cm-cli/client"
+	"github.com/pivotal-cf/cm-cli/actions"
 	"github.com/pivotal-cf/cm-cli/config"
-	. "github.com/pivotal-cf/cm-cli/errors"
 )
 
 type GetCommand struct {
@@ -15,33 +12,13 @@ type GetCommand struct {
 }
 
 func (cmd GetCommand) Execute([]string) error {
-	cfg := config.ReadConfig()
+	config := config.ReadConfig()
 
-	err := config.ValidateConfig(cfg)
+	action := actions.Get{HttpClient: http.DefaultClient, Config: config}
+	secret, err := action.GetSecret(cmd.SecretIdentifier)
 	if err != nil {
 		return err
 	}
-
-	request := client.NewGetSecretRequest(cfg.ApiURL, cmd.SecretIdentifier)
-
-	response, err := http.DefaultClient.Do(request)
-	if err != nil {
-		return NewNetworkError()
-	}
-
-	if response.StatusCode == 404 {
-		return NewSecretNotFoundError()
-	}
-
-	secretBody := new(client.SecretBody)
-
-	decoder := json.NewDecoder(response.Body)
-	err = decoder.Decode(secretBody)
-	if err != nil {
-		return NewResponseError()
-	}
-
-	secret := client.NewSecret(cmd.SecretIdentifier, *secretBody)
 
 	secret.PrintSecret()
 

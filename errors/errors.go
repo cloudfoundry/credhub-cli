@@ -21,3 +21,7 @@ func NewInvalidTargetError() error {
 func NewInvalidStatusError() error {
 	return errors.New("Unable to perform the request. Please validate your input and retry your request.")
 }
+
+func NewNoTargetUrlError() error {
+	return errors.New("Credential Manager API location is not set. Please target the location of your credential manager with `cm api` to continue.")
+}

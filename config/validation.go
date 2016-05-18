@@ -1,10 +1,10 @@
 package config
 
-import "errors"
+import "github.com/pivotal-cf/cm-cli/errors"
 
 func ValidateConfig(c Config) error {
 	if c.ApiURL == "" {
-		return errors.New("Credential Manager API location is not set. Please target the location of your credential manager with `cm api` to continue.")
+		return errors.NewNoTargetUrlError()
 	}
 
 	return nil
