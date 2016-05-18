@@ -23,6 +23,27 @@ var _ = Describe("Set", func() {
 		Expect(session.Err).To(Say("secret"))
 	})
 
+	It("displays missing -s required parameter", func() {
+		session := runCommand("set", "-n", "my-secret")
+
+		Eventually(session).Should(Exit(1))
+		Expect(session.Err).To(Say("the required flag `-s, --secret' was not specified"))
+	})
+
+	It("displays missing -n required parameter", func() {
+		session := runCommand("set", "-s", "potatoes")
+
+		Eventually(session).Should(Exit(1))
+		Expect(session.Err).To(Say("the required flag `-n, --name' was not specified"))
+	})
+
+	It("displays missing -n and -s required parameter", func() {
+		session := runCommand("set")
+
+		Eventually(session).Should(Exit(1))
+		Expect(session.Err).To(Say("the required flags `-n, --name' and `-s, --secret' were not specified"))
+	})
+
 	It("puts a secret", func() {
 		responseJson := `{"value":"potatoes"}`
 		responseTable := fmt.Sprintf(`Name:	my-secret\nValue:	potatoes`)
