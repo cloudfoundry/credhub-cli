@@ -11,7 +11,7 @@ import (
 	"github.com/pivotal-cf/cm-cli/config"
 )
 
-var _ = Describe("Get", func() {
+var _ = Describe("Delete", func() {
 	Describe("Help", func() {
 		It("displays help", func() {
 			session := runCommand("delete", "-h")
@@ -34,6 +34,34 @@ var _ = Describe("Get", func() {
 
 		Eventually(session).Should(Exit(0))
 		Eventually(session.Out).Should(Say("Secret successfully deleted"))
+	})
+
+	It("deletes a secret and returns 400", func() {
+		server.AppendHandlers(
+			CombineHandlers(
+				VerifyRequest("DELETE", "/api/v1/secret/my-secret"),
+				RespondWith(http.StatusBadRequest, ""),
+			),
+		)
+
+		session := runCommand("delete", "-n", "my-secret")
+
+		Eventually(session).Should(Exit(1))
+		Eventually(session.Err).Should(Say("Unable to perform the request. Please validate your input and retry your request."))
+	})
+
+	It("deletes a secret and returns 500", func() {
+		server.AppendHandlers(
+			CombineHandlers(
+				VerifyRequest("DELETE", "/api/v1/secret/my-secret"),
+				RespondWith(http.StatusInternalServerError, ""),
+			),
+		)
+
+		session := runCommand("delete", "-n", "my-secret")
+
+		Eventually(session).Should(Exit(1))
+		Eventually(session.Err).Should(Say("Unable to perform the request. Please validate your input and retry your request."))
 	})
 
 	Describe("Errors", func() {
