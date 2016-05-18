@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"encoding/json"
-	"io/ioutil"
 
 	"github.com/pivotal-cf/cm-cli/client"
 	"github.com/pivotal-cf/cm-cli/config"
@@ -34,15 +33,11 @@ func (cmd SetCommand) Execute([]string) error {
 		return NewInvalidStatusError()
 	}
 
-	responseMsg, _ := ioutil.ReadAll(response.Body)
-
-	//if err != nil {
-	//return NewResponseError()
-	//}
-
 	secretBody := new(client.SecretBody)
 
-	if json.Unmarshal(responseMsg, &secretBody) != nil {
+	decoder := json.NewDecoder(response.Body)
+	err = decoder.Decode(secretBody)
+	if err != nil {
 		return NewResponseError()
 	}
 
