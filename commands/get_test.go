@@ -21,6 +21,13 @@ var _ = Describe("Get", func() {
 		Expect(session.Err).To(Say("cm-cli \\[OPTIONS\\] get \\[get-OPTIONS\\]"))
 	})
 
+	It("displays missing required parameter", func() {
+		session := runCommand("get")
+
+		Eventually(session).Should(Exit(1))
+		Expect(session.Err).To(Say("the required flag `-n, --name' was not specified"))
+	})
+
 	It("gets a secret", func() {
 		responseJson := `{"value":"potatoes"}`
 		responseTable := fmt.Sprintf(`Name:	my-secret\nValue:	potatoes`)
