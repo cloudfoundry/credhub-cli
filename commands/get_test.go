@@ -3,13 +3,14 @@ package commands_test
 import (
 	"net/http"
 
+	"fmt"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
 	. "github.com/onsi/gomega/ghttp"
 	"github.com/pivotal-cf/cm-cli/config"
-	"fmt"
 )
 
 var _ = Describe("Get", func() {

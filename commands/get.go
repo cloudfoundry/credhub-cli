@@ -3,10 +3,11 @@ package commands
 import (
 	"net/http"
 
+	"encoding/json"
+	"io/ioutil"
+
 	"github.com/pivotal-cf/cm-cli/client"
 	"github.com/pivotal-cf/cm-cli/config"
-	"io/ioutil"
-	"encoding/json"
 )
 
 type GetCommand struct {

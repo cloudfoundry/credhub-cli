@@ -3,8 +3,8 @@ package client
 import (
 	"bytes"
 	"encoding/json"
-	"net/http"
 	"fmt"
+	"net/http"
 )
 
 type SecretBody struct {
@@ -12,18 +12,18 @@ type SecretBody struct {
 }
 
 type Secret struct {
-	Name        string
+	Name       string
 	SecretBody SecretBody
 }
 
 func NewSecret(name string, secretBody SecretBody) Secret {
 	return Secret{
-		Name: name,
+		Name:       name,
 		SecretBody: secretBody,
 	}
 }
 
-func (secret *Secret) PrintSecret(){
+func (secret *Secret) PrintSecret() {
 	fmt.Println(fmt.Sprintf("Name:	%s\nValue:	%s", secret.Name, secret.SecretBody.Value))
 }
 
