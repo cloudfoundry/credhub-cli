@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"net/http"
+	"fmt"
 )
 
 type secretPutRequest struct {
@@ -13,6 +14,10 @@ type secretPutRequest struct {
 type Secret struct {
 	Name string `json:"name"`
 	Value string `json:"value"`
+}
+
+func (secret *Secret) PrintSecret(){
+	fmt.Println(fmt.Sprintf("Name:	%s\nValue:	%s", secret.Name, secret.Value))
 }
 
 func NewPutSecretRequest(apiTarget, secretIdentifier, secretContent string) *http.Request {

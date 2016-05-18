@@ -74,5 +74,21 @@ var _ = Describe("Get", func() {
 			Eventually(session).Should(Exit(1))
 			Eventually(session.Err).Should(Say("No response received for the command"))
 		})
+
+		It("returns error when the response json is invalid", func() {
+			responseJson := `{"name":"my-secret","blah"}`
+
+			server.AppendHandlers(
+				CombineHandlers(
+					//VerifyRequest("GET", "/api/v1/secret/my-secret"),
+					RespondWith(http.StatusOK, responseJson),
+				),
+			)
+
+			session := runCommand("get", "-n", "my-secret")
+
+			Eventually(session).Should(Exit(1))
+			Eventually(session.Err).Should(Say("An error occurred when processing the response. Please validate your input and retry your request."))
+		})
 	})
 })

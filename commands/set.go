@@ -6,6 +6,7 @@ import (
 	"github.com/pivotal-cf/cm-cli/client"
 	"github.com/pivotal-cf/cm-cli/config"
 	"io/ioutil"
+	"encoding/json"
 )
 
 type SetCommand struct {
@@ -33,11 +34,18 @@ func (cmd SetCommand) Execute([]string) error {
 	}
 
 	responseMsg, _ :=ioutil.ReadAll(response.Body)
+
 	//if err != nil {
 		//return NewResponseError()
 	//}
 
-	PrintResponse(responseMsg)
+	secret := new(client.Secret)
+
+	if json.Unmarshal(responseMsg, &secret) != nil {
+		return NewResponseError()
+	}
+
+	secret.PrintSecret()
 
 	return nil
 }
