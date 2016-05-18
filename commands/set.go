@@ -39,11 +39,13 @@ func (cmd SetCommand) Execute([]string) error {
 		//return NewResponseError()
 	//}
 
-	secret := new(client.Secret)
+	secretBody := new(client.SecretBody)
 
-	if json.Unmarshal(responseMsg, &secret) != nil {
+	if json.Unmarshal(responseMsg, &secretBody) != nil {
 		return NewResponseError()
 	}
+
+	secret := client.NewSecret(cmd.SecretIdentifier, *secretBody)
 
 	secret.PrintSecret()
 

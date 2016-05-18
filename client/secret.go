@@ -7,23 +7,30 @@ import (
 	"fmt"
 )
 
-type secretPutRequest struct {
+type SecretBody struct {
 	Value string `json:"value"`
 }
 
 type Secret struct {
-	Name string `json:"name"`
-	Value string `json:"value"`
+	Name        string
+	SecretBody SecretBody
+}
+
+func NewSecret(name string, secretBody SecretBody) Secret {
+	return Secret{
+		Name: name,
+		SecretBody: secretBody,
+	}
 }
 
 func (secret *Secret) PrintSecret(){
-	fmt.Println(fmt.Sprintf("Name:	%s\nValue:	%s", secret.Name, secret.Value))
+	fmt.Println(fmt.Sprintf("Name:	%s\nValue:	%s", secret.Name, secret.SecretBody.Value))
 }
 
 func NewPutSecretRequest(apiTarget, secretIdentifier, secretContent string) *http.Request {
 	url := apiTarget + "/api/v1/secret/" + secretIdentifier
 
-	secret := secretPutRequest{Value: secretContent}
+	secret := SecretBody{Value: secretContent}
 	body, _ := json.Marshal(secret)
 
 	request, _ := http.NewRequest("PUT", url, bytes.NewReader(body))

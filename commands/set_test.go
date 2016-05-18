@@ -23,7 +23,7 @@ var _ = Describe("Set", func() {
 	})
 
 	It("puts a secret", func() {
-		responseJson := `{"name":"my-secret","value":"potatoes"}`
+		responseJson := `{"value":"potatoes"}`
 		responseTable := fmt.Sprintf(`Name:	my-secret\nValue:	potatoes`)
 		requestJson := `{"value":"potatoes"}`
 

@@ -22,7 +22,7 @@ var _ = Describe("Get", func() {
 	})
 
 	It("gets a secret", func() {
-		responseJson := `{"name":"my-secret","value":"potatoes"}`
+		responseJson := `{"value":"potatoes"}`
 		responseTable := fmt.Sprintf(`Name:	my-secret\nValue:	potatoes`)
 
 		server.AppendHandlers(
