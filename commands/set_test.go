@@ -30,7 +30,7 @@ var _ = Describe("Set", func() {
 
 		server.AppendHandlers(
 			CombineHandlers(
-				VerifyRequest("PUT", "/api/v1/secret/my-secret"),
+				VerifyRequest("PUT", "/api/v1/data/my-secret"),
 				VerifyJSON(requestJson),
 				RespondWith(http.StatusOK, responseJson),
 			),
@@ -45,7 +45,7 @@ var _ = Describe("Set", func() {
 	It("prints an error when the request fails", func() {
 		server.AppendHandlers(
 			CombineHandlers(
-				VerifyRequest("PUT", "/api/v1/secret/my-secret"),
+				VerifyRequest("PUT", "/api/v1/data/my-secret"),
 				RespondWith(http.StatusInternalServerError, nil),
 			),
 		)
@@ -59,7 +59,7 @@ var _ = Describe("Set", func() {
 	It("prints an error when the request fails 400", func() {
 		server.AppendHandlers(
 			CombineHandlers(
-				VerifyRequest("PUT", "/api/v1/secret/my-secret"),
+				VerifyRequest("PUT", "/api/v1/data/my-secret"),
 				RespondWith(http.StatusBadRequest, nil),
 			),
 		)
@@ -99,7 +99,7 @@ var _ = Describe("Set", func() {
 
 		server.AppendHandlers(
 			CombineHandlers(
-				VerifyRequest("PUT", "/api/v1/secret/my-secret"),
+				VerifyRequest("PUT", "/api/v1/data/my-secret"),
 				VerifyJSON(requestJson),
 				RespondWith(http.StatusOK, responseJson),
 			),

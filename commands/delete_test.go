@@ -25,7 +25,7 @@ var _ = Describe("Delete", func() {
 	It("deletes a secret", func() {
 		server.AppendHandlers(
 			CombineHandlers(
-				VerifyRequest("DELETE", "/api/v1/secret/my-secret"),
+				VerifyRequest("DELETE", "/api/v1/data/my-secret"),
 				RespondWith(http.StatusOK, ""),
 			),
 		)
@@ -39,7 +39,7 @@ var _ = Describe("Delete", func() {
 	It("deletes a secret and returns 400", func() {
 		server.AppendHandlers(
 			CombineHandlers(
-				VerifyRequest("DELETE", "/api/v1/secret/my-secret"),
+				VerifyRequest("DELETE", "/api/v1/data/my-secret"),
 				RespondWith(http.StatusBadRequest, ""),
 			),
 		)
@@ -53,7 +53,7 @@ var _ = Describe("Delete", func() {
 	It("deletes a secret and returns 500", func() {
 		server.AppendHandlers(
 			CombineHandlers(
-				VerifyRequest("DELETE", "/api/v1/secret/my-secret"),
+				VerifyRequest("DELETE", "/api/v1/data/my-secret"),
 				RespondWith(http.StatusInternalServerError, ""),
 			),
 		)
@@ -68,7 +68,7 @@ var _ = Describe("Delete", func() {
 		It("handles no existing secret", func() {
 			server.AppendHandlers(
 				CombineHandlers(
-					VerifyRequest("DELETE", "/api/v1/secret/non-existent-secret"),
+					VerifyRequest("DELETE", "/api/v1/data/non-existent-secret"),
 					RespondWith(http.StatusNotFound, ""),
 				),
 			)

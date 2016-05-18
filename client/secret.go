@@ -28,7 +28,7 @@ func (secret *Secret) PrintSecret() {
 }
 
 func NewPutSecretRequest(apiTarget, secretIdentifier, secretContent string) *http.Request {
-	url := apiTarget + "/api/v1/secret/" + secretIdentifier
+	url := apiTarget + "/api/v1/data/" + secretIdentifier
 
 	secret := SecretBody{Value: secretContent}
 	body, _ := json.Marshal(secret)
@@ -40,7 +40,7 @@ func NewPutSecretRequest(apiTarget, secretIdentifier, secretContent string) *htt
 }
 
 func NewGetSecretRequest(apiTarget, secretIdentifier string) *http.Request {
-	url := apiTarget + "/api/v1/secret/" + secretIdentifier
+	url := apiTarget + "/api/v1/data/" + secretIdentifier
 
 	request, _ := http.NewRequest("GET", url, nil)
 
@@ -48,7 +48,7 @@ func NewGetSecretRequest(apiTarget, secretIdentifier string) *http.Request {
 }
 
 func NewDeleteSecretRequest(apiTarget, secretIdentifier string) *http.Request {
-	url := apiTarget + "/api/v1/secret/" + secretIdentifier
+	url := apiTarget + "/api/v1/data/" + secretIdentifier
 
 	request, _ := http.NewRequest("DELETE", url, nil)
 

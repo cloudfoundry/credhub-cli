@@ -27,7 +27,7 @@ var _ = Describe("Get", func() {
 
 		server.AppendHandlers(
 			CombineHandlers(
-				VerifyRequest("GET", "/api/v1/secret/my-secret"),
+				VerifyRequest("GET", "/api/v1/data/my-secret"),
 				RespondWith(http.StatusOK, responseJson),
 			),
 		)
