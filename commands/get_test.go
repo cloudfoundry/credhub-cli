@@ -17,8 +17,8 @@ var _ = Describe("Get", func() {
 		session := runCommand("get", "-h")
 
 		Eventually(session).Should(Exit(1))
-		Expect(session.Err).To(Say("get"))
-		Expect(session.Err).To(Say("name"))
+		Expect(session.Err).To(Say("Usage"))
+		Expect(session.Err).To(Say("cm-cli \\[OPTIONS\\] get \\[get-OPTIONS\\]"))
 	})
 
 	It("gets a secret", func() {
