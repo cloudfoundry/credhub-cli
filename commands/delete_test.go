@@ -3,6 +3,8 @@ package commands_test
 import (
 	"net/http"
 
+	"runtime"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -99,6 +101,18 @@ var _ = Describe("Delete", func() {
 
 			Eventually(session).Should(Exit(1))
 			Eventually(session.Err).Should(Say("No response received for the command"))
+		})
+
+		It("displays missing required parameter", func() {
+			session := runCommand("delete")
+
+			Eventually(session).Should(Exit(1))
+
+			if runtime.GOOS == "windows" {
+				Expect(session.Err).To(Say("the required flag `/n, /name' was not specified"))
+			} else {
+				Expect(session.Err).To(Say("the required flag `-n, --name' was not specified"))
+			}
 		})
 	})
 })
