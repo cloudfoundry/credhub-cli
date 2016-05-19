@@ -54,7 +54,7 @@ var _ = Describe("Get", func() {
 
 				_, error := subject.GetSecret("my-secret")
 
-				Expect(error).To(Equal(NewNoTargetUrlError()))
+				Expect(error).To(MatchError(NewNoTargetUrlError()))
 			})
 
 			It("returns a not-found error when response is 404", func() {
@@ -66,14 +66,14 @@ var _ = Describe("Get", func() {
 				httpClient.DoReturns(&responseObj, nil)
 
 				_, error := subject.GetSecret("my-secret")
-				Expect(error).To(Equal(NewSecretNotFoundError()))
+				Expect(error).To(MatchError(NewSecretNotFoundError()))
 			})
 
 			It("returns NewNetworkError when there is a network error", func() {
 				httpClient.DoReturns(nil, errors.New("hello"))
 
 				_, error := subject.GetSecret("my-secret")
-				Expect(error).To(Equal(NewNetworkError()))
+				Expect(error).To(MatchError(NewNetworkError()))
 			})
 
 			It("returns a response error when response json cannot be parsed", func() {
@@ -85,7 +85,7 @@ var _ = Describe("Get", func() {
 				httpClient.DoReturns(&responseObj, nil)
 
 				_, error := subject.GetSecret("my-secret")
-				Expect(error).To(Equal(NewResponseError()))
+				Expect(error).To(MatchError(NewResponseError()))
 			})
 		})
 	})
