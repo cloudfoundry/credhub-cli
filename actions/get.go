@@ -2,7 +2,6 @@ package actions
 
 import (
 	"encoding/json"
-	"net/http"
 
 	"github.com/pivotal-cf/cm-cli/client"
 	"github.com/pivotal-cf/cm-cli/config"
@@ -12,12 +11,6 @@ import (
 type Get struct {
 	HttpClient HttpClient
 	Config     config.Config
-}
-
-//go:generate counterfeiter . HttpClient
-
-type HttpClient interface {
-	Do(req *http.Request) (resp *http.Response, err error)
 }
 
 func (get Get) GetSecret(secretIdentifier string) (client.Secret, error) {

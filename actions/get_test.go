@@ -48,6 +48,7 @@ var _ = Describe("Get", func() {
 			}
 
 			secret, _ := subject.GetSecret("my-secret")
+
 			Expect(secret).To(Equal(client.NewSecret("my-secret", client.SecretBody{Value: "potatoes"})))
 		})
 
