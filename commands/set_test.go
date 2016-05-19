@@ -5,6 +5,8 @@ import (
 
 	"fmt"
 
+	"runtime"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -23,25 +25,38 @@ var _ = Describe("Set", func() {
 		Expect(session.Err).To(Say("secret"))
 	})
 
-	It("displays missing -s required parameter", func() {
+	It("displays missing 's' option as required parameter", func() {
 		session := runCommand("set", "-n", "my-secret")
 
 		Eventually(session).Should(Exit(1))
-		Expect(session.Err).To(Say("the required flag `-s, --secret' was not specified"))
+		if runtime.GOOS == "windows" {
+			Expect(session.Err).To(Say("the required flag `/s, /secret' was not specified"))
+		} else {
+			Expect(session.Err).To(Say("the required flag `-s, --secret' was not specified"))
+		}
 	})
 
-	It("displays missing -n required parameter", func() {
+	It("displays missing 'n' option as required parameter", func() {
 		session := runCommand("set", "-s", "potatoes")
 
 		Eventually(session).Should(Exit(1))
-		Expect(session.Err).To(Say("the required flag `-n, --name' was not specified"))
+		if runtime.GOOS == "windows" {
+			Expect(session.Err).To(Say("the required flag `/n, /name' was not specified"))
+		} else {
+			Expect(session.Err).To(Say("the required flag `-n, --name' was not specified"))
+		}
 	})
 
-	It("displays missing -n and -s required parameter", func() {
+	It("displays missing 'n' option and 's' option as required parameters", func() {
 		session := runCommand("set")
 
 		Eventually(session).Should(Exit(1))
-		Expect(session.Err).To(Say("the required flags `-n, --name' and `-s, --secret' were not specified"))
+
+		if runtime.GOOS == "windows" {
+			Expect(session.Err).To(Say("the required flags `/n, /name' and `/s, /secret' were not specified"))
+		} else {
+			Expect(session.Err).To(Say("the required flags `-n, --name' and `-s, --secret' were not specified"))
+		}
 	})
 
 	It("puts a secret", func() {

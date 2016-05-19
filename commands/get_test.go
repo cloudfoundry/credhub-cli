@@ -5,6 +5,8 @@ import (
 
 	"fmt"
 
+	"runtime"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -18,14 +20,23 @@ var _ = Describe("Get", func() {
 
 		Eventually(session).Should(Exit(1))
 		Expect(session.Err).To(Say("Usage"))
-		Expect(session.Err).To(Say("cm-cli \\[OPTIONS\\] get \\[get-OPTIONS\\]"))
+		if runtime.GOOS == "windows" {
+			Expect(session.Err).To(Say("cm-cli.exe \\[OPTIONS\\] get \\[get-OPTIONS\\]"))
+		} else {
+			Expect(session.Err).To(Say("cm-cli \\[OPTIONS\\] get \\[get-OPTIONS\\]"))
+		}
 	})
 
 	It("displays missing required parameter", func() {
 		session := runCommand("get")
 
 		Eventually(session).Should(Exit(1))
-		Expect(session.Err).To(Say("the required flag `-n, --name' was not specified"))
+
+		if runtime.GOOS == "windows" {
+			Expect(session.Err).To(Say("the required flag `/n, /name' was not specified"))
+		} else {
+			Expect(session.Err).To(Say("the required flag `-n, --name' was not specified"))
+		}
 	})
 
 	It("gets a secret", func() {
