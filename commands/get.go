@@ -14,7 +14,7 @@ type GetCommand struct {
 func (cmd GetCommand) Execute([]string) error {
 	config := config.ReadConfig()
 
-	action := actions.Get{HttpClient: http.DefaultClient, Config: config}
+	action := actions.NewGet(http.DefaultClient, config)
 
 	secret, err := action.GetSecret(cmd.SecretIdentifier)
 	if err != nil {

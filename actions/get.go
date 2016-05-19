@@ -9,20 +9,24 @@ import (
 )
 
 type Get struct {
-	HttpClient HttpClient
-	Config     config.Config
+	httpClient HttpClient
+	config     config.Config
+}
+
+func NewGet(httpClient HttpClient, config config.Config) Get {
+	return Get{httpClient: httpClient, config: config}
 }
 
 func (get Get) GetSecret(secretIdentifier string) (client.Secret, error) {
-	err := config.ValidateConfig(get.Config)
+	err := config.ValidateConfig(get.config)
 
 	if err != nil {
 		return client.Secret{}, err
 	}
 
-	request := client.NewGetSecretRequest(get.Config.ApiURL, secretIdentifier)
+	request := client.NewGetSecretRequest(get.config.ApiURL, secretIdentifier)
 
-	response, err := get.HttpClient.Do(request)
+	response, err := get.httpClient.Do(request)
 	if err != nil {
 		return client.Secret{}, NewNetworkError()
 	}

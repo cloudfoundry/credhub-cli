@@ -24,12 +24,8 @@ var _ = Describe("Get", func() {
 	)
 
 	BeforeEach(func() {
-		config := config.Config{ApiURL: "pivotal.io"}
-
-		subject = Get{
-			HttpClient: &httpClient,
-			Config:     config,
-		}
+		myConfig := config.Config{ApiURL: "pivotal.io"}
+		subject = NewGet(&httpClient, myConfig)
 	})
 
 	Describe("GetSecret", func() {
@@ -54,9 +50,10 @@ var _ = Describe("Get", func() {
 
 		Describe("Errors", func() {
 			It("returns a invalid target error when no api is set", func() {
-				subject.Config = config.Config{}
+				subject = NewGet(&httpClient, config.Config{})
 
 				_, error := subject.GetSecret("my-secret")
+
 				Expect(error).To(Equal(NewNoTargetUrlError()))
 			})
 
