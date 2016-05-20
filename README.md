@@ -58,11 +58,11 @@ CREDENTIAL MANAGEMENT:
 		--st, --state						Sets the state/province of the generated certificate*
 		--co, --country						Sets the country of the generated certificate*
 
-	get --name <credential name>
+	get --name <cred name>
 		Get the value and attributes of a credential. 
 		-n, --name							Selects the credential to retrieve
 
-	delete --name <credential name>
+	delete --name <cred name>
 		Delete a credential. 
 		-n, --name							Selects the credential to delete
 ```
