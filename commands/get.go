@@ -12,9 +12,7 @@ type GetCommand struct {
 }
 
 func (cmd GetCommand) Execute([]string) error {
-	config := config.ReadConfig()
-
-	action := actions.NewGet(http.DefaultClient, config)
+	action := actions.NewGet(http.DefaultClient, config.ReadConfig())
 
 	secret, err := action.GetSecret(cmd.SecretIdentifier)
 	if err != nil {

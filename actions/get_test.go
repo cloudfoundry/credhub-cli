@@ -43,8 +43,9 @@ var _ = Describe("Get", func() {
 				return &responseObj, nil
 			}
 
-			secret, _ := subject.GetSecret("my-secret")
+			secret, err := subject.GetSecret("my-secret")
 
+			Expect(err).ToNot(HaveOccurred())
 			Expect(secret).To(Equal(client.NewSecret("my-secret", client.SecretBody{Value: "potatoes"})))
 		})
 
