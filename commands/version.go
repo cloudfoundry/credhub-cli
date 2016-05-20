@@ -6,6 +6,8 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"os"
+
 	"github.com/pivotal-cf/cm-cli/client"
 	"github.com/pivotal-cf/cm-cli/config"
 	"github.com/pivotal-cf/cm-cli/version"
@@ -14,7 +16,7 @@ import (
 type VersionCommand struct {
 }
 
-func (cmd VersionCommand) Execute([]string) error {
+func (cmd VersionCommand) Execute() error {
 	cfg := config.ReadConfig()
 
 	request := client.NewInfoRequest(cfg.ApiURL)
@@ -35,4 +37,11 @@ func (cmd VersionCommand) Execute([]string) error {
 	fmt.Println("CM Version:", cmVersion)
 
 	return nil
+}
+
+func init() {
+	CM.Version = func() {
+		VersionCommand{}.Execute()
+		os.Exit(0)
+	}
 }
