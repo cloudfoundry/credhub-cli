@@ -43,9 +43,9 @@ CREDENTIAL MANAGEMENT:
 		--is, --include-special FALSE		Sets whether to include special characters (Default: TRUE)*
 
 		Parameters for setting credential type 'certificate'
-		--ca								Sets the CA value of a certificate credential
-		--public-key						Sets the public key value of a certificate credential
-		--private-key						Sets the private key value of a certificate credential
+		--ca								Sets the CA value of a certificate credential*
+		--public-key						Sets the public key value of a certificate credential*
+		--private-key						Sets the private key value of a certificate credential*
 		-o, --out							Sets the location to output the generated pem file*
 		
 		--sca, --signing-ca					Sets the CA used to sign the generated certificate*
