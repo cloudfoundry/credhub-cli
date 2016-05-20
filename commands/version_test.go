@@ -8,7 +8,6 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
 	. "github.com/onsi/gomega/ghttp"
-	"github.com/pivotal-cf/cm-cli/config"
 )
 
 var _ = Describe("Version", func() {
@@ -31,32 +30,13 @@ var _ = Describe("Version", func() {
 			Eventually(session.Out).Should(Say("CLI Version: 0.1.0"))
 			Eventually(session.Out).Should(Say("CM Version: 0.2.0"))
 		})
-	})
 
-	It("displays an error when not targeting an API", func() {
-		cfg := config.ReadConfig()
-		cfg.ApiURL = ""
-		config.WriteConfig(cfg)
+		It("displays the version with -v", func() {
+			session := runCommand("-v")
 
-		session := runCommand("--version")
-
-		Eventually(session).Should(Exit(0))
-		Eventually(session.Out).Should(Say("CLI Version: 0.1.0"))
-		Eventually(session.Out).Should(Say("CM Version: Not Found"))
-	})
-
-	It("displays an error when the request fails", func() {
-		server.AppendHandlers(
-			CombineHandlers(
-				VerifyRequest("GET", "/info"),
-				RespondWith(http.StatusInternalServerError, nil),
-			),
-		)
-
-		session := runCommand("--version")
-
-		Eventually(session).Should(Exit(0))
-		Eventually(session.Out).Should(Say("CLI Version: 0.1.0"))
-		Eventually(session.Out).Should(Say("CM Version: Not Found"))
+			Eventually(session).Should(Exit(0))
+			Eventually(session.Out).Should(Say("CLI Version: 0.1.0"))
+			Eventually(session.Out).Should(Say("CM Version: 0.2.0"))
+		})
 	})
 })
