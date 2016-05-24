@@ -17,7 +17,7 @@ func PrintVersion() error {
 
 	cmVersion := actions.NewVersion(http.DefaultClient, cfg).GetServerVersion()
 
-	fmt.Println("CLI Version:", version.Version)
+	fmt.Println("CLI Version:", version.Version+" build "+version.BuildNumber)
 	fmt.Println("CM Version:", cmVersion)
 
 	return nil
