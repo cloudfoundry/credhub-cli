@@ -9,11 +9,11 @@ import (
 )
 
 type Get struct {
-	httpClient HttpClient
+	httpClient client.HttpClient
 	config     config.Config
 }
 
-func NewGet(httpClient HttpClient, config config.Config) Get {
+func NewGet(httpClient client.HttpClient, config config.Config) Get {
 	return Get{httpClient: httpClient, config: config}
 }
 

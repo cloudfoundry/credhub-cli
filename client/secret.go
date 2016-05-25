@@ -39,6 +39,18 @@ func NewPutSecretRequest(apiTarget, secretIdentifier, secretContent string) *htt
 	return request
 }
 
+func NewGenerateSecretRequest(apiTarget, secretIdentifier string) *http.Request {
+	url := apiTarget + "/api/v1/data/" + secretIdentifier
+
+	secret := new(struct{})
+	body, _ := json.Marshal(secret)
+
+	request, _ := http.NewRequest("PUT", url, bytes.NewReader(body))
+	request.Header.Set("Content-Type", "application/json")
+
+	return request
+}
+
 func NewGetSecretRequest(apiTarget, secretIdentifier string) *http.Request {
 	url := apiTarget + "/api/v1/data/" + secretIdentifier
 

@@ -10,8 +10,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/pivotal-cf/cm-cli/actions/actionsfakes"
 	"github.com/pivotal-cf/cm-cli/client"
+	"github.com/pivotal-cf/cm-cli/client/clientfakes"
 	"github.com/pivotal-cf/cm-cli/config"
 	. "github.com/pivotal-cf/cm-cli/errors"
 )
@@ -20,7 +20,7 @@ var _ = Describe("Get", func() {
 
 	var (
 		subject    Get
-		httpClient actionsfakes.FakeHttpClient
+		httpClient clientfakes.FakeHttpClient
 	)
 
 	BeforeEach(func() {

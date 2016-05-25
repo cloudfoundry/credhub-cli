@@ -9,11 +9,11 @@ import (
 )
 
 type Version struct {
-	httpClient HttpClient
+	httpClient client.HttpClient
 	config     config.Config
 }
 
-func NewVersion(httpClient HttpClient, config config.Config) Version {
+func NewVersion(httpClient client.HttpClient, config config.Config) Version {
 	return Version{httpClient: httpClient, config: config}
 }
 

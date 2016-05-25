@@ -3,46 +3,31 @@ package commands
 import (
 	"net/http"
 
-	"encoding/json"
-
-	"github.com/pivotal-cf/cm-cli/client"
+	"github.com/pivotal-cf/cm-cli/actions"
 	"github.com/pivotal-cf/cm-cli/config"
 	. "github.com/pivotal-cf/cm-cli/errors"
+	"github.com/pivotal-cf/cm-cli/repositories"
 )
 
 type SetCommand struct {
 	SecretIdentifier string `short:"n" required:"yes" long:"name" description:"Selects the secret being set"`
-	SecretContent    string `short:"s" required:"yes" long:"secret" description:"Sets a value for a secret name"`
+	SecretContent    string `short:"s" long:"secret" description:"Sets a value for a secret name"`
+	Generate         bool   `short:"g" long:"generate" description:"System will generate random credential. Cannot be used in combination with --secret."`
 }
 
 func (cmd SetCommand) Execute([]string) error {
-	cfg := config.ReadConfig()
+	if !cmd.Generate && cmd.SecretContent == "" {
+		return NewSetOptionMissingError()
+	}
 
-	err := config.ValidateConfig(cfg)
+	secretRepository := repositories.NewSecretRepository(http.DefaultClient)
+
+	action := actions.NewSet(secretRepository, config.ReadConfig())
+
+	secret, err := action.SetSecret(cmd.SecretIdentifier, cmd.SecretContent)
 	if err != nil {
 		return err
 	}
-
-	request := client.NewPutSecretRequest(cfg.ApiURL, cmd.SecretIdentifier, cmd.SecretContent)
-
-	response, err := http.DefaultClient.Do(request)
-	if err != nil {
-		return NewNetworkError()
-	}
-
-	if response.StatusCode < 200 || response.StatusCode > 299 {
-		return NewInvalidStatusError()
-	}
-
-	secretBody := new(client.SecretBody)
-
-	decoder := json.NewDecoder(response.Body)
-	err = decoder.Decode(secretBody)
-	if err != nil {
-		return NewResponseError()
-	}
-
-	secret := client.NewSecret(cmd.SecretIdentifier, *secretBody)
 
 	secret.PrintSecret()
 

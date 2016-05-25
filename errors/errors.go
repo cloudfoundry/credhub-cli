@@ -29,3 +29,7 @@ func NewInvalidStatusError() error {
 func NewNoTargetUrlError() error {
 	return errors.New("Credential Manager API location is not set. Please target the location of your credential manager with `cm api` to continue.")
 }
+
+func NewSetOptionMissingError() error {
+	return errors.New("One of the flags 's' or 'g' must be specified.")
+}

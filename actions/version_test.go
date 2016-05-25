@@ -9,15 +9,15 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/pivotal-cf/cm-cli/actions"
-	"github.com/pivotal-cf/cm-cli/actions/actionsfakes"
 	"github.com/pivotal-cf/cm-cli/client"
+	"github.com/pivotal-cf/cm-cli/client/clientfakes"
 	"github.com/pivotal-cf/cm-cli/config"
 )
 
 var _ = Describe("Version", func() {
 	var (
 		subject    actions.Version
-		httpClient actionsfakes.FakeHttpClient
+		httpClient clientfakes.FakeHttpClient
 	)
 
 	BeforeEach(func() {

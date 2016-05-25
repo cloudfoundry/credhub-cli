@@ -5,92 +5,103 @@ import (
 	. "github.com/onsi/gomega"
 	. "github.com/pivotal-cf/cm-cli/actions"
 
-	"bytes"
-	"io/ioutil"
 	"net/http"
 
 	"errors"
 
-	"github.com/pivotal-cf/cm-cli/actions/actionsfakes"
 	"github.com/pivotal-cf/cm-cli/client"
 	"github.com/pivotal-cf/cm-cli/config"
 	cmcli_errors "github.com/pivotal-cf/cm-cli/errors"
+	"github.com/pivotal-cf/cm-cli/repositories/repositoriesfakes"
 )
 
 var _ = Describe("Set", func() {
 
 	var (
-		subject    Set
-		httpClient actionsfakes.FakeHttpClient
+		subject          Set
+		secretRepository repositoriesfakes.FakeSecretRepository
 	)
 
 	BeforeEach(func() {
 		config := config.Config{ApiURL: "pivotal.io"}
 
-		subject = NewSet(&httpClient, config)
+		subject = NewSet(&secretRepository, config)
 	})
 
 	Describe("SetSecret", func() {
 		It("sets and returns a secret from the server", func() {
 			request := client.NewPutSecretRequest("pivotal.io", "my-secret", "my-value")
-
-			responseObj := http.Response{
-				StatusCode: 200,
-				Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"value":"my-value"}`))),
-			}
-
-			httpClient.DoStub = func(req *http.Request) (resp *http.Response, err error) {
+			expectedBody := client.SecretBody{Value: "my-value"}
+			expectedSecret := client.NewSecret("my-secret", expectedBody)
+			secretRepository.SendRequestStub = func(req *http.Request) (client.SecretBody, error) {
 				Expect(req).To(Equal(request))
-
-				return &responseObj, nil
+				return expectedBody, nil
 			}
 
 			secret, err := subject.SetSecret("my-secret", "my-value")
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(secret).To(Equal(client.NewSecret("my-secret", client.SecretBody{Value: "my-value"})))
+			Expect(secret).To(Equal(expectedSecret))
 		})
 
-		Describe("Errors", func() {
+		It("generates a secret", func() {
+			request := client.NewGenerateSecretRequest("pivotal.io", "my-name")
+			expectedBody := client.SecretBody{Value: "my-value"}
+			expectedSecret := client.NewSecret("my-name", expectedBody)
+			secretRepository.SendRequestStub = func(req *http.Request) (client.SecretBody, error) {
+				Expect(req).To(Equal(request))
+				return expectedBody, nil
+			}
+
+			secret, err := subject.GenerateSecret("my-name")
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(secret).To(Equal(expectedSecret))
+		})
+
+		Describe("Errors when Setting", func() {
 			It("returns a invalid target error when no api is set", func() {
-				subject = NewSet(&httpClient, config.Config{})
+				subject = NewSet(&secretRepository, config.Config{})
 
 				_, error := subject.SetSecret("my-secret", "my-value")
 
 				Expect(error).To(MatchError(cmcli_errors.NewNoTargetUrlError()))
 			})
 
-			It("returns NewNetworkError when there is a network error", func() {
-				httpClient.DoReturns(nil, errors.New("hello"))
-
-				_, error := subject.SetSecret("my-secret", "my-value")
-				Expect(error).To(MatchError(cmcli_errors.NewNetworkError()))
-			})
-
-			It("returns a error when response is 400", func() {
-				responseObj := http.Response{
-					StatusCode: 400,
-					Body:       ioutil.NopCloser(bytes.NewReader([]byte(``))),
+			It("returns an error if the request fails", func() {
+				request := client.NewPutSecretRequest("pivotal.io", "my-secret", "my-value")
+				expectedError := errors.New("My Special Error")
+				secretRepository.SendRequestStub = func(req *http.Request) (client.SecretBody, error) {
+					Expect(req).To(Equal(request))
+					return client.SecretBody{}, expectedError
 				}
 
-				httpClient.DoReturns(&responseObj, nil)
+				_, err := subject.SetSecret("my-secret", "my-value")
 
-				_, error := subject.SetSecret("my-secret", "my-value")
+				Expect(err).To(Equal(expectedError))
+			})
+		})
 
-				Expect(error).To(MatchError(cmcli_errors.NewInvalidStatusError()))
+		Describe("Errors when Generating", func() {
+			It("returns a invalid target error when no api is set", func() {
+				subject = NewSet(&secretRepository, config.Config{})
+
+				_, error := subject.GenerateSecret("my-secret")
+
+				Expect(error).To(MatchError(cmcli_errors.NewNoTargetUrlError()))
 			})
 
-			It("returns a response error when response json cannot be parsed", func() {
-				responseObj := http.Response{
-					StatusCode: 200,
-					Body:       ioutil.NopCloser(bytes.NewReader([]byte("adasdasdasasd"))),
+			It("returns an error if the request fails", func() {
+				request := client.NewGenerateSecretRequest("pivotal.io", "my-secret")
+				expectedError := errors.New("My Special Error")
+				secretRepository.SendRequestStub = func(req *http.Request) (client.SecretBody, error) {
+					Expect(req).To(Equal(request))
+					return client.SecretBody{}, expectedError
 				}
 
-				httpClient.DoReturns(&responseObj, nil)
+				_, err := subject.GenerateSecret("my-secret")
 
-				_, error := subject.SetSecret("my-secret", "my-value")
-
-				Expect(error).To(Equal(cmcli_errors.NewResponseError()))
+				Expect(err).To(Equal(expectedError))
 			})
 		})
 	})

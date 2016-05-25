@@ -25,15 +25,11 @@ var _ = Describe("Set", func() {
 	})
 
 	Describe("Flags", func() {
-		It("displays missing 's' option as required parameter", func() {
+		It("displays missing options message when neither generating or setting", func() {
 			session := runCommand("set", "-n", "my-secret")
 
 			Eventually(session).Should(Exit(1))
-			if runtime.GOOS == "windows" {
-				Expect(session.Err).To(Say("the required flag `/s, /secret' was not specified"))
-			} else {
-				Expect(session.Err).To(Say("the required flag `-s, --secret' was not specified"))
-			}
+			Expect(session.Err).To(Say("One of the flags 's' or 'g' must be specified"))
 		})
 
 		It("displays missing 'n' option as required parameter", func() {
@@ -53,9 +49,9 @@ var _ = Describe("Set", func() {
 			Eventually(session).Should(Exit(1))
 
 			if runtime.GOOS == "windows" {
-				Expect(session.Err).To(Say("the required flags `/n, /name' and `/s, /secret' were not specified"))
+				Expect(session.Err).To(Say("the required flag `/n, /name' was not specified"))
 			} else {
-				Expect(session.Err).To(Say("the required flags `-n, --name' and `-s, --secret' were not specified"))
+				Expect(session.Err).To(Say("the required flag `-n, --name' was not specified"))
 			}
 		})
 	})
