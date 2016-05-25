@@ -16,6 +16,7 @@ GOFLAGS := $(GOFLAGS) -ldflags "-X github.com/pivotal-cf/cm-cli/version.BuildNum
 dependencies :
 		go get github.com/onsi/ginkgo/ginkgo
 		go get golang.org/x/tools/cmd/goimports
+		go get github.com/maxbrunsfeld/counterfeiter
 		go get -v -t ./...
 
 format : dependencies
