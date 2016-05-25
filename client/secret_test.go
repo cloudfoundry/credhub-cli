@@ -37,7 +37,7 @@ var _ = Describe("API", func() {
 	Describe("NewGenerateSecretRequest", func() {
 		It("Returns a request for the generate-secret endpoint", func() {
 			requestBody := bytes.NewReader([]byte(`{}`))
-			httpRequest, _ := http.NewRequest("PUT", "sample.com/api/v1/data/my-name", requestBody)
+			httpRequest, _ := http.NewRequest("POST", "sample.com/api/v1/data/my-name", requestBody)
 			httpRequest.Header.Set("Content-Type", "application/json")
 
 			request := NewGenerateSecretRequest("sample.com", "my-name")
