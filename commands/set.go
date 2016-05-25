@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/pivotal-cf/cm-cli/actions"
+	"github.com/pivotal-cf/cm-cli/client"
 	"github.com/pivotal-cf/cm-cli/config"
 	. "github.com/pivotal-cf/cm-cli/errors"
 	"github.com/pivotal-cf/cm-cli/repositories"
@@ -24,7 +25,14 @@ func (cmd SetCommand) Execute([]string) error {
 
 	action := actions.NewSet(secretRepository, config.ReadConfig())
 
-	secret, err := action.SetSecret(cmd.SecretIdentifier, cmd.SecretContent)
+	var secret client.Secret
+	var err error
+	if cmd.Generate {
+		secret, err = action.GenerateSecret(cmd.SecretIdentifier)
+	} else {
+		secret, err = action.SetSecret(cmd.SecretIdentifier, cmd.SecretContent)
+	}
+
 	if err != nil {
 		return err
 	}

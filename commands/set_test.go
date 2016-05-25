@@ -74,4 +74,23 @@ var _ = Describe("Set", func() {
 		Eventually(session).Should(Exit(0))
 		Eventually(session.Out).Should(Say(responseTable))
 	})
+
+	It("generates a secret", func() {
+		responseJson := `{"value":"potatoes"}`
+		responseTable := fmt.Sprintf(`Name:	my-secret\nValue:	potatoes`)
+		requestJson := `{}`
+
+		server.AppendHandlers(
+			CombineHandlers(
+				VerifyRequest("POST", "/api/v1/data/my-secret"),
+				VerifyJSON(requestJson),
+				RespondWith(http.StatusOK, responseJson),
+			),
+		)
+
+		session := runCommand("set", "-n", "my-secret", "-g")
+
+		Eventually(session).Should(Exit(0))
+		Eventually(session.Out).Should(Say(responseTable))
+	})
 })
