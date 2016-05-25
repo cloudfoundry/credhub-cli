@@ -8,8 +8,6 @@ else
 DEST = build/cm
 endif
 
-BUILD_NUMBER := $(shell date +%s)
-
 GOFLAGS := -o $(DEST)
 GOFLAGS := $(GOFLAGS) -ldflags "-X github.com/pivotal-cf/cm-cli/version.BuildNumber=$(BUILD_NUMBER)"
 
