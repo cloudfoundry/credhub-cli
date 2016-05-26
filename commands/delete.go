@@ -3,9 +3,9 @@ package commands
 import (
 	"fmt"
 
+	"github.com/pivotal-cf/cm-cli/actions"
 	"github.com/pivotal-cf/cm-cli/client"
 	"github.com/pivotal-cf/cm-cli/config"
-	. "github.com/pivotal-cf/cm-cli/errors"
 )
 
 type DeleteCommand struct {
@@ -13,28 +13,13 @@ type DeleteCommand struct {
 }
 
 func (cmd DeleteCommand) Execute([]string) error {
-	cfg := config.ReadConfig()
+	action := actions.NewDelete(client.NewHttpClient(), config.ReadConfig())
 
-	err := config.ValidateConfig(cfg)
-	if err != nil {
-		return err
-	}
+	err := action.Delete(cmd.SecretIdentifier)
 
-	request := client.NewDeleteSecretRequest(cfg.ApiURL, cmd.SecretIdentifier)
-
-	response, err := client.NewHttpClient().Do(request)
-
-	if err != nil {
-		return NewNetworkError()
-	}
-
-	if response.StatusCode == 404 {
-		return NewSecretNotFoundError()
-	} else if response.StatusCode == 200 {
+	if err == nil {
 		fmt.Println("Secret successfully deleted")
-	} else {
-		return NewSecretBadRequestError()
 	}
 
-	return nil
+	return err
 }
