@@ -1,8 +1,6 @@
 package commands
 
 import (
-	"net/http"
-
 	"fmt"
 
 	"github.com/pivotal-cf/cm-cli/client"
@@ -24,7 +22,7 @@ func (cmd DeleteCommand) Execute([]string) error {
 
 	request := client.NewDeleteSecretRequest(cfg.ApiURL, cmd.SecretIdentifier)
 
-	response, err := http.DefaultClient.Do(request)
+	response, err := client.NewHttpClient().Do(request)
 
 	if err != nil {
 		return NewNetworkError()

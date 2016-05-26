@@ -3,7 +3,6 @@ package commands
 import (
 	"fmt"
 
-	"net/http"
 	"net/url"
 
 	"github.com/pivotal-cf/cm-cli/client"
@@ -53,7 +52,7 @@ func (cmd ApiCommand) Execute([]string) error {
 func validateTarget(targetUrl string) error {
 	request := client.NewInfoRequest(targetUrl)
 
-	response, err := http.DefaultClient.Do(request)
+	response, err := client.NewHttpClient().Do(request)
 	if err != nil {
 		return NewNetworkError()
 	}

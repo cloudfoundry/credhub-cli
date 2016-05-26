@@ -1,11 +1,10 @@
 package commands
 
 import (
-	"net/http"
-
 	"fmt"
 
 	"github.com/pivotal-cf/cm-cli/actions"
+	"github.com/pivotal-cf/cm-cli/client"
 	"github.com/pivotal-cf/cm-cli/config"
 	"github.com/pivotal-cf/cm-cli/errors"
 	"github.com/pivotal-cf/cm-cli/models"
@@ -24,7 +23,7 @@ func (cmd SetCommand) Execute([]string) error {
 		return errors.NewSetOptionMissingError()
 	}
 
-	secretRepository := repositories.NewSecretRepository(http.DefaultClient)
+	secretRepository := repositories.NewSecretRepository(client.NewHttpClient())
 
 	var secret models.Secret
 	var err error

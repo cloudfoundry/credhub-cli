@@ -1,11 +1,10 @@
 package commands
 
 import (
-	"net/http"
-
 	"fmt"
 
 	"github.com/pivotal-cf/cm-cli/actions"
+	"github.com/pivotal-cf/cm-cli/client"
 	"github.com/pivotal-cf/cm-cli/config"
 )
 
@@ -14,7 +13,7 @@ type GetCommand struct {
 }
 
 func (cmd GetCommand) Execute([]string) error {
-	action := actions.NewGet(http.DefaultClient, config.ReadConfig())
+	action := actions.NewGet(client.NewHttpClient(), config.ReadConfig())
 
 	secret, err := action.GetSecret(cmd.SecretIdentifier)
 	if err != nil {

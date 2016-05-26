@@ -3,11 +3,10 @@ package commands
 import (
 	"fmt"
 
-	"net/http"
-
 	"os"
 
 	"github.com/pivotal-cf/cm-cli/actions"
+	"github.com/pivotal-cf/cm-cli/client"
 	"github.com/pivotal-cf/cm-cli/config"
 	"github.com/pivotal-cf/cm-cli/version"
 )
@@ -15,7 +14,7 @@ import (
 func PrintVersion() error {
 	cfg := config.ReadConfig()
 
-	cmVersion := actions.NewVersion(http.DefaultClient, cfg).GetServerVersion()
+	cmVersion := actions.NewVersion(client.NewHttpClient(), cfg).GetServerVersion()
 
 	fmt.Println("CLI Version:", version.Version+" build "+version.BuildNumber)
 	fmt.Println("CM Version:", cmVersion)
