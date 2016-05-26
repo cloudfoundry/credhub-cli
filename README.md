@@ -1,22 +1,22 @@
-**Pivotal Cloud Foundry credential manager CLI helps you configure and interact with deployed credential managers.**
+**Pivotal Cloud Foundry CredHub CLI helps you configure and interact with deployed CredHub APIs.**
 
 *Starred commands and parameters are planned, but not yet implemented*
 
 ```
 Usage: cm [<options>] <command> [<args>]
-		-v, --version						Show version of CLI and CM API
+		-v, --version						Show version of CLI and API
 		-h, --help							Displays help menu
 
 
 GETTING STARTED: 
 
  	api -s <server URI>
-		View or set the targeted credential manager api
-		-s, --server URI					Sets URI for server
+		View or set the targeted CredHub API
+		-s, --server URI					Sets URI for API server
 		--skip-ssl-validation				Skip verification of the API endpoint. Not recommended!*
 
 	login*
-		Authenticates interactively with credential manager.
+		Authenticates interactively with CredHub.
 		-s, --server URL					Sets API target*
 		-u, --user USER           			Sets username*
     	-p, --password PASSWORD				Sets password*
@@ -31,7 +31,7 @@ CREDENTIAL MANAGEMENT:
 		Set the value and attributes of a credential.
 		-t, --type							Sets the type of credential to store or generate. Default: 'value'*
 		-n, --name							Selects the credential being set
-		-g, --generate        				System will generate random credential. Cannot be used in combination with --secret.*
+		-g, --generate        				System will generate random credential value. Cannot be used in combination with --secret.
 
 		Parameters for setting credential type 'value'
 		-s, --secret 						Sets a value for a credential.
