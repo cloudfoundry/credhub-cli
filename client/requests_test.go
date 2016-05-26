@@ -62,6 +62,21 @@ var _ = Describe("API", func() {
 
 			Expect(request).To(Equal(httpRequest))
 		})
+
+		It("returns a request with exclude upper", func() {
+			requestBody := bytes.NewReader([]byte(`{"parameters":{"exclude_upper":true}}`))
+
+			httpRequest, _ := http.NewRequest("POST", "sample.com/api/v1/data/my-name", requestBody)
+			httpRequest.Header.Set("Content-Type", "application/json")
+
+			withExcludeUpperParameters := models.SecretParameters{
+				ExcludeUpper: true,
+			}
+
+			request := NewGenerateSecretRequest("sample.com", "my-name", withExcludeUpperParameters)
+
+			Expect(request).To(Equal(httpRequest))
+		})
 	})
 
 	Describe("NewGetSecretRequest", func() {
