@@ -11,9 +11,9 @@ import (
 
 	"errors"
 
-	"github.com/pivotal-cf/cm-cli/client"
 	"github.com/pivotal-cf/cm-cli/client/clientfakes"
 	cmcli_errors "github.com/pivotal-cf/cm-cli/errors"
+	"github.com/pivotal-cf/cm-cli/models"
 )
 
 var _ = Describe("SecretRepository", func() {
@@ -42,10 +42,12 @@ var _ = Describe("SecretRepository", func() {
 				return &responseObj, nil
 			}
 
-			secret, err := subject.SendRequest(request)
+			expectedSecretBody := models.SecretBody{Value: "my-value"}
+
+			secretBody, err := subject.SendRequest(request)
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(secret).To(Equal(client.NewSecret("my-secret", client.SecretBody{Value: "my-value"})))
+			Expect(secretBody).To(Equal(expectedSecretBody))
 		})
 
 		Describe("Errors", func() {

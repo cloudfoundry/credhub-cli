@@ -7,28 +7,28 @@ import (
 	"github.com/pivotal-cf/cm-cli/repositories"
 )
 
-type Set struct {
+type Generate struct {
 	secretRepository repositories.SecretRepository
 	config           config.Config
 }
 
-func NewSet(secretRepository repositories.SecretRepository, config config.Config) Set {
-	return Set{
+func NewGenerate(secretRepository repositories.SecretRepository, config config.Config) Generate {
+	return Generate{
 		secretRepository: secretRepository,
 		config:           config,
 	}
 }
 
-func (set Set) SetSecret(secretIdentifier string, value string) (models.Secret, error) {
-	err := config.ValidateConfig(set.config)
+func (g Generate) GenerateSecret(secretIdentifier string) (models.Secret, error) {
+	err := config.ValidateConfig(g.config)
 
 	if err != nil {
 		return models.Secret{}, err
 	}
 
-	request := client.NewPutSecretRequest(set.config.ApiURL, secretIdentifier, value)
+	request := client.NewGenerateSecretRequest(g.config.ApiURL, secretIdentifier)
 
-	secretBody, err := set.secretRepository.SendRequest(request)
+	secretBody, err := g.secretRepository.SendRequest(request)
 	if err != nil {
 		return models.Secret{}, err
 	}

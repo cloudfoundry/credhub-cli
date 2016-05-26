@@ -3,10 +3,12 @@ package commands
 import (
 	"net/http"
 
+	"fmt"
+
 	"github.com/pivotal-cf/cm-cli/actions"
-	"github.com/pivotal-cf/cm-cli/client"
 	"github.com/pivotal-cf/cm-cli/config"
-	. "github.com/pivotal-cf/cm-cli/errors"
+	"github.com/pivotal-cf/cm-cli/errors"
+	"github.com/pivotal-cf/cm-cli/models"
 	"github.com/pivotal-cf/cm-cli/repositories"
 )
 
@@ -18,18 +20,19 @@ type SetCommand struct {
 
 func (cmd SetCommand) Execute([]string) error {
 	if !cmd.Generate && cmd.SecretContent == "" {
-		return NewSetOptionMissingError()
+		return errors.NewSetOptionMissingError()
 	}
 
 	secretRepository := repositories.NewSecretRepository(http.DefaultClient)
 
-	action := actions.NewSet(secretRepository, config.ReadConfig())
-
-	var secret client.Secret
+	var secret models.Secret
 	var err error
+
 	if cmd.Generate {
+		action := actions.NewGenerate(secretRepository, config.ReadConfig())
 		secret, err = action.GenerateSecret(cmd.SecretIdentifier)
 	} else {
+		action := actions.NewSet(secretRepository, config.ReadConfig())
 		secret, err = action.SetSecret(cmd.SecretIdentifier, cmd.SecretContent)
 	}
 
@@ -37,7 +40,7 @@ func (cmd SetCommand) Execute([]string) error {
 		return err
 	}
 
-	secret.PrintSecret()
+	fmt.Println(secret)
 
 	return nil
 }

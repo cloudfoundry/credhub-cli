@@ -13,7 +13,8 @@ import (
 	"github.com/pivotal-cf/cm-cli/client"
 	"github.com/pivotal-cf/cm-cli/client/clientfakes"
 	"github.com/pivotal-cf/cm-cli/config"
-	. "github.com/pivotal-cf/cm-cli/errors"
+	cm_errors "github.com/pivotal-cf/cm-cli/errors"
+	"github.com/pivotal-cf/cm-cli/models"
 )
 
 var _ = Describe("Get", func() {
@@ -46,7 +47,7 @@ var _ = Describe("Get", func() {
 			secret, err := subject.GetSecret("my-secret")
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(secret).To(Equal(client.NewSecret("my-secret", client.SecretBody{Value: "potatoes"})))
+			Expect(secret).To(Equal(models.NewSecret("my-secret", models.SecretBody{Value: "potatoes"})))
 		})
 
 		Describe("Errors", func() {
@@ -55,7 +56,7 @@ var _ = Describe("Get", func() {
 
 				_, error := subject.GetSecret("my-secret")
 
-				Expect(error).To(MatchError(NewNoTargetUrlError()))
+				Expect(error).To(MatchError(cm_errors.NewNoTargetUrlError()))
 			})
 
 			It("returns a not-found error when response is 404", func() {
@@ -67,14 +68,14 @@ var _ = Describe("Get", func() {
 				httpClient.DoReturns(&responseObj, nil)
 
 				_, error := subject.GetSecret("my-secret")
-				Expect(error).To(MatchError(NewSecretNotFoundError()))
+				Expect(error).To(MatchError(cm_errors.NewSecretNotFoundError()))
 			})
 
 			It("returns NewNetworkError when there is a network error", func() {
 				httpClient.DoReturns(nil, errors.New("hello"))
 
 				_, error := subject.GetSecret("my-secret")
-				Expect(error).To(MatchError(NewNetworkError()))
+				Expect(error).To(MatchError(cm_errors.NewNetworkError()))
 			})
 
 			It("returns a response error when response json cannot be parsed", func() {
@@ -86,7 +87,7 @@ var _ = Describe("Get", func() {
 				httpClient.DoReturns(&responseObj, nil)
 
 				_, error := subject.GetSecret("my-secret")
-				Expect(error).To(MatchError(NewResponseError()))
+				Expect(error).To(MatchError(cm_errors.NewResponseError()))
 			})
 		})
 	})

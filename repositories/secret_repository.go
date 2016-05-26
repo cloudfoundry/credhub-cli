@@ -6,10 +6,11 @@ import (
 
 	"github.com/pivotal-cf/cm-cli/client"
 	"github.com/pivotal-cf/cm-cli/errors"
+	"github.com/pivotal-cf/cm-cli/models"
 )
 
 type SecretRepository interface {
-	SendRequest(request *http.Request) (client.SecretBody, error)
+	SendRequest(request *http.Request) (models.SecretBody, error)
 }
 
 type secretRepository struct {
@@ -20,8 +21,8 @@ func NewSecretRepository(httpClient client.HttpClient) SecretRepository {
 	return secretRepository{httpClient: httpClient}
 }
 
-func (r secretRepository) SendRequest(request *http.Request) (client.SecretBody, error) {
-	secretBody := client.SecretBody{}
+func (r secretRepository) SendRequest(request *http.Request) (models.SecretBody, error) {
+	secretBody := models.SecretBody{}
 
 	response, err := r.httpClient.Do(request)
 

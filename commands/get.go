@@ -3,6 +3,8 @@ package commands
 import (
 	"net/http"
 
+	"fmt"
+
 	"github.com/pivotal-cf/cm-cli/actions"
 	"github.com/pivotal-cf/cm-cli/config"
 )
@@ -19,7 +21,7 @@ func (cmd GetCommand) Execute([]string) error {
 		return err
 	}
 
-	secret.PrintSecret()
+	fmt.Println(secret)
 
 	return nil
 }

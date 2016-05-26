@@ -1,4 +1,4 @@
-package client
+package models
 
 type infoApp struct {
 	Name    string `json:"name"`

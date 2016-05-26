@@ -6,6 +6,7 @@ import (
 
 	"github.com/pivotal-cf/cm-cli/client"
 	"github.com/pivotal-cf/cm-cli/config"
+	"github.com/pivotal-cf/cm-cli/models"
 )
 
 type Version struct {
@@ -23,7 +24,7 @@ func (version Version) GetServerVersion() string {
 
 	response, err := version.httpClient.Do(request)
 	if err == nil && response.StatusCode == http.StatusOK {
-		info := new(client.Info)
+		info := new(models.Info)
 
 		decoder := json.NewDecoder(response.Body)
 		err = decoder.Decode(info)

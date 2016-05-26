@@ -5,24 +5,24 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/pivotal-cf/cm-cli/client"
+	"github.com/pivotal-cf/cm-cli/models"
 	"github.com/pivotal-cf/cm-cli/repositories"
 )
 
 type FakeSecretRepository struct {
-	SendRequestStub        func(request *http.Request) (client.SecretBody, error)
+	SendRequestStub        func(request *http.Request) (models.SecretBody, error)
 	sendRequestMutex       sync.RWMutex
 	sendRequestArgsForCall []struct {
 		request *http.Request
 	}
 	sendRequestReturns struct {
-		result1 client.SecretBody
+		result1 models.SecretBody
 		result2 error
 	}
 	invocations map[string][][]interface{}
 }
 
-func (fake *FakeSecretRepository) SendRequest(request *http.Request) (client.SecretBody, error) {
+func (fake *FakeSecretRepository) SendRequest(request *http.Request) (models.SecretBody, error) {
 	fake.sendRequestMutex.Lock()
 	fake.sendRequestArgsForCall = append(fake.sendRequestArgsForCall, struct {
 		request *http.Request
@@ -49,10 +49,10 @@ func (fake *FakeSecretRepository) SendRequestArgsForCall(i int) *http.Request {
 	return fake.sendRequestArgsForCall[i].request
 }
 
-func (fake *FakeSecretRepository) SendRequestReturns(result1 client.SecretBody, result2 error) {
+func (fake *FakeSecretRepository) SendRequestReturns(result1 models.SecretBody, result2 error) {
 	fake.SendRequestStub = nil
 	fake.sendRequestReturns = struct {
-		result1 client.SecretBody
+		result1 models.SecretBody
 		result2 error
 	}{result1, result2}
 }
