@@ -9,6 +9,7 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/pivotal-cf/cm-cli/models"
 )
 
 var _ = Describe("API", func() {
@@ -35,12 +36,29 @@ var _ = Describe("API", func() {
 	})
 
 	Describe("NewGenerateSecretRequest", func() {
-		It("Returns a request for the generate-secret endpoint", func() {
-			requestBody := bytes.NewReader([]byte(`{}`))
+		It("returns a request with no parameters", func() {
+			requestBody := bytes.NewReader([]byte(`{"parameters":{}}`))
+
 			httpRequest, _ := http.NewRequest("POST", "sample.com/api/v1/data/my-name", requestBody)
 			httpRequest.Header.Set("Content-Type", "application/json")
 
-			request := NewGenerateSecretRequest("sample.com", "my-name")
+			emptyParameters := models.SecretParameters{}
+			request := NewGenerateSecretRequest("sample.com", "my-name", emptyParameters)
+
+			Expect(request).To(Equal(httpRequest))
+		})
+
+		It("returns a request with length", func() {
+			requestBody := bytes.NewReader([]byte(`{"parameters":{"length":42}}`))
+
+			httpRequest, _ := http.NewRequest("POST", "sample.com/api/v1/data/my-name", requestBody)
+			httpRequest.Header.Set("Content-Type", "application/json")
+
+			withLengthParameters := models.SecretParameters{
+				Length: 42,
+			}
+
+			request := NewGenerateSecretRequest("sample.com", "my-name", withLengthParameters)
 
 			Expect(request).To(Equal(httpRequest))
 		})

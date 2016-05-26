@@ -31,15 +31,21 @@ var _ = Describe("Generate", func() {
 
 	Describe("GenerateSecret", func() {
 		It("generates a secret", func() {
-			request := client.NewGenerateSecretRequest("pivotal.io", "my-name")
+			parameters := models.SecretParameters{
+				Length: 42,
+			}
+
+			request := client.NewGenerateSecretRequest("pivotal.io", "my-name", parameters)
+
 			expectedBody := models.SecretBody{Value: "my-value"}
 			expectedSecret := models.NewSecret("my-name", expectedBody)
+
 			secretRepository.SendRequestStub = func(req *http.Request) (models.SecretBody, error) {
 				Expect(req).To(Equal(request))
 				return expectedBody, nil
 			}
 
-			secret, err := subject.GenerateSecret("my-name")
+			secret, err := subject.GenerateSecret("my-name", parameters)
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(secret).To(Equal(expectedSecret))
@@ -49,20 +55,24 @@ var _ = Describe("Generate", func() {
 			It("returns a invalid target error when no api is set", func() {
 				subject = NewGenerate(&secretRepository, config.Config{})
 
-				_, error := subject.GenerateSecret("my-secret")
+				emptyParameters := models.SecretParameters{}
+				_, error := subject.GenerateSecret("my-secret", emptyParameters)
 
 				Expect(error).To(MatchError(cmcli_errors.NewNoTargetUrlError()))
 			})
 
 			It("returns an error if the request fails", func() {
-				request := client.NewGenerateSecretRequest("pivotal.io", "my-secret")
+				emptyParameters := models.SecretParameters{}
+				request := client.NewGenerateSecretRequest("pivotal.io", "my-secret", emptyParameters)
+
 				expectedError := errors.New("My Special Error")
+
 				secretRepository.SendRequestStub = func(req *http.Request) (models.SecretBody, error) {
 					Expect(req).To(Equal(request))
 					return models.SecretBody{}, expectedError
 				}
 
-				_, err := subject.GenerateSecret("my-secret")
+				_, err := subject.GenerateSecret("my-secret", emptyParameters)
 
 				Expect(err).To(Equal(expectedError))
 			})

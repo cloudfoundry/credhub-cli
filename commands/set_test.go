@@ -15,16 +15,73 @@ import (
 )
 
 var _ = Describe("Set", func() {
-	It("displays help", func() {
-		session := runCommand("set", "-h")
+	It("puts a secret", func() {
+		responseJson := `{"value":"potatoes"}`
+		responseTable := fmt.Sprintf(`Name:	my-secret\nValue:	potatoes`)
+		requestJson := `{"value":"potatoes"}`
 
-		Eventually(session).Should(Exit(1))
-		Expect(session.Err).To(Say("set"))
-		Expect(session.Err).To(Say("name"))
-		Expect(session.Err).To(Say("secret"))
+		server.AppendHandlers(
+			CombineHandlers(
+				VerifyRequest("PUT", "/api/v1/data/my-secret"),
+				VerifyJSON(requestJson),
+				RespondWith(http.StatusOK, responseJson),
+			),
+		)
+
+		session := runCommand("set", "-n", "my-secret", "-s", "potatoes")
+
+		Eventually(session).Should(Exit(0))
+		Eventually(session.Out).Should(Say(responseTable))
 	})
 
-	Describe("Flags", func() {
+	It("generates a secret without parameters", func() {
+		responseJson := `{"value":"potatoes"}`
+		responseTable := fmt.Sprintf(`Name:	my-secret\nValue:	potatoes`)
+		requestJson := `{"parameters":{}}`
+
+		server.AppendHandlers(
+			CombineHandlers(
+				VerifyRequest("POST", "/api/v1/data/my-secret"),
+				VerifyJSON(requestJson),
+				RespondWith(http.StatusOK, responseJson),
+			),
+		)
+
+		session := runCommand("set", "-n", "my-secret", "-g")
+
+		Eventually(session).Should(Exit(0))
+		Eventually(session.Out).Should(Say(responseTable))
+	})
+
+	It("generates a secret with length", func() {
+		responseJson := `{"value":"potatoes"}`
+		responseTable := fmt.Sprintf(`Name:	my-secret\nValue:	potatoes`)
+		requestJson := `{"parameters":{"length":42}}`
+
+		server.AppendHandlers(
+			CombineHandlers(
+				VerifyRequest("POST", "/api/v1/data/my-secret"),
+				VerifyJSON(requestJson),
+				RespondWith(http.StatusOK, responseJson),
+			),
+		)
+
+		session := runCommand("set", "-n", "my-secret", "-g", "-l", "42")
+
+		Eventually(session).Should(Exit(0))
+		Eventually(session.Out).Should(Say(responseTable))
+	})
+
+	Describe("Help", func() {
+		It("displays help", func() {
+			session := runCommand("set", "-h")
+
+			Eventually(session).Should(Exit(1))
+			Expect(session.Err).To(Say("set"))
+			Expect(session.Err).To(Say("name"))
+			Expect(session.Err).To(Say("secret"))
+		})
+
 		It("displays missing options message when neither generating or setting", func() {
 			session := runCommand("set", "-n", "my-secret")
 
@@ -54,43 +111,5 @@ var _ = Describe("Set", func() {
 				Expect(session.Err).To(Say("the required flag `-n, --name' was not specified"))
 			}
 		})
-	})
-
-	It("puts a secret", func() {
-		responseJson := `{"value":"potatoes"}`
-		responseTable := fmt.Sprintf(`Name:	my-secret\nValue:	potatoes`)
-		requestJson := `{"value":"potatoes"}`
-
-		server.AppendHandlers(
-			CombineHandlers(
-				VerifyRequest("PUT", "/api/v1/data/my-secret"),
-				VerifyJSON(requestJson),
-				RespondWith(http.StatusOK, responseJson),
-			),
-		)
-
-		session := runCommand("set", "-n", "my-secret", "-s", "potatoes")
-
-		Eventually(session).Should(Exit(0))
-		Eventually(session.Out).Should(Say(responseTable))
-	})
-
-	It("generates a secret", func() {
-		responseJson := `{"value":"potatoes"}`
-		responseTable := fmt.Sprintf(`Name:	my-secret\nValue:	potatoes`)
-		requestJson := `{}`
-
-		server.AppendHandlers(
-			CombineHandlers(
-				VerifyRequest("POST", "/api/v1/data/my-secret"),
-				VerifyJSON(requestJson),
-				RespondWith(http.StatusOK, responseJson),
-			),
-		)
-
-		session := runCommand("set", "-n", "my-secret", "-g")
-
-		Eventually(session).Should(Exit(0))
-		Eventually(session.Out).Should(Say(responseTable))
 	})
 })

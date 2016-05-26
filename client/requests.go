@@ -20,11 +20,14 @@ func NewPutSecretRequest(apiTarget, secretIdentifier, secretContent string) *htt
 	return request
 }
 
-func NewGenerateSecretRequest(apiTarget, secretIdentifier string) *http.Request {
+func NewGenerateSecretRequest(apiTarget, secretIdentifier string, parameters models.SecretParameters) *http.Request {
 	url := apiTarget + "/api/v1/data/" + secretIdentifier
 
-	secret := new(struct{})
-	body, _ := json.Marshal(secret)
+	generateRequest := models.GenerateRequest{
+		Parameters: parameters,
+	}
+
+	body, _ := json.Marshal(generateRequest)
 
 	request, _ := http.NewRequest("POST", url, bytes.NewReader(body))
 	request.Header.Set("Content-Type", "application/json")
