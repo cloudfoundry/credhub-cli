@@ -1,6 +1,11 @@
 package client
 
-import "net/http"
+import (
+	"net/http"
+	"time"
+)
+
+const TIMEOUT_SECS = 30
 
 //go:generate counterfeiter . HttpClient
 
@@ -9,5 +14,5 @@ type HttpClient interface {
 }
 
 func NewHttpClient() HttpClient {
-	return http.DefaultClient
+	return &http.Client{Timeout: time.Second * TIMEOUT_SECS}
 }
