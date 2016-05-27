@@ -48,34 +48,30 @@ var _ = Describe("API", func() {
 			Expect(request).To(Equal(httpRequest))
 		})
 
-		It("returns a request with length", func() {
-			requestBody := bytes.NewReader([]byte(`{"parameters":{"length":42}}`))
-
-			httpRequest, _ := http.NewRequest("POST", "sample.com/api/v1/data/my-name", requestBody)
-			httpRequest.Header.Set("Content-Type", "application/json")
-
-			withLengthParameters := models.SecretParameters{
-				Length: 42,
-			}
-
-			request := NewGenerateSecretRequest("sample.com", "my-name", withLengthParameters)
-
-			Expect(request).To(Equal(httpRequest))
-		})
-
-		It("returns a request with exclude upper", func() {
-			requestBody := bytes.NewReader([]byte(`{"parameters":{"exclude_upper":true}}`))
-
-			httpRequest, _ := http.NewRequest("POST", "sample.com/api/v1/data/my-name", requestBody)
-			httpRequest.Header.Set("Content-Type", "application/json")
-
-			withExcludeUpperParameters := models.SecretParameters{
+		It("returns a request with parameters", func() {
+			parameters := models.SecretParameters{
+				Length:       42,
 				ExcludeUpper: true,
+				ExcludeLower: true,
 			}
 
-			request := NewGenerateSecretRequest("sample.com", "my-name", withExcludeUpperParameters)
+			request := NewGenerateSecretRequest("sample.com", "my-name", parameters)
 
-			Expect(request).To(Equal(httpRequest))
+			expectedRequestBody := `{
+				"parameters": {
+					"exclude_upper": true,
+					"exclude_lower": true,
+					"length": 42
+				}
+			}`
+
+			body := new(bytes.Buffer)
+			body.ReadFrom(request.Body)
+
+			Expect(body).To(MatchJSON(expectedRequestBody))
+			Expect(request.Method).To(Equal("POST"))
+			Expect(request.URL.String()).To(Equal("sample.com/api/v1/data/my-name"))
+			Expect(request.Header.Get("Content-Type")).To(Equal("application/json"))
 		})
 	})
 
