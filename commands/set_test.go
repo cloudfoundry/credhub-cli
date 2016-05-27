@@ -14,138 +14,74 @@ import (
 	. "github.com/onsi/gomega/ghttp"
 )
 
+const VALUE_REQUEST_JSON = `{"value":"%s"}`
+const RESPONSE_JSON = `{"value":"%s"}`
+const RESPONSE_TABLE = `Name:	%s\nValue:	%s`
+
+var responseMyPotatoes = fmt.Sprintf(RESPONSE_TABLE, "my-secret", "potatoes")
+
 var _ = Describe("Set", func() {
 	It("puts a secret", func() {
-		responseJson := `{"value":"potatoes"}`
-		responseTable := fmt.Sprintf(`Name:	my-secret\nValue:	potatoes`)
-		requestJson := `{"value":"potatoes"}`
-
-		server.AppendHandlers(
-			CombineHandlers(
-				VerifyRequest("PUT", "/api/v1/data/my-secret"),
-				VerifyJSON(requestJson),
-				RespondWith(http.StatusOK, responseJson),
-			),
-		)
+		setupPutServer("my-secret", "potatoes")
 
 		session := runCommand("set", "-n", "my-secret", "-v", "potatoes")
 
 		Eventually(session).Should(Exit(0))
-		Eventually(session.Out).Should(Say(responseTable))
+		Eventually(session.Out).Should(Say(responseMyPotatoes))
 	})
 
 	It("generates a secret without parameters", func() {
-		responseJson := `{"value":"potatoes"}`
-		responseTable := fmt.Sprintf(`Name:	my-secret\nValue:	potatoes`)
-		requestJson := `{"parameters":{}}`
-
-		server.AppendHandlers(
-			CombineHandlers(
-				VerifyRequest("POST", "/api/v1/data/my-secret"),
-				VerifyJSON(requestJson),
-				RespondWith(http.StatusOK, responseJson),
-			),
-		)
+		setupPostServer("my-secret", "potatoes", `{"parameters":{}}`)
 
 		session := runCommand("set", "-n", "my-secret", "-g")
 
 		Eventually(session).Should(Exit(0))
-		Eventually(session.Out).Should(Say(responseTable))
+		Eventually(session.Out).Should(Say(responseMyPotatoes))
 	})
 
 	It("generates a secret with length", func() {
-		responseJson := `{"value":"potatoes"}`
-		responseTable := fmt.Sprintf(`Name:	my-secret\nValue:	potatoes`)
-		requestJson := `{"parameters":{"length":42}}`
-
-		server.AppendHandlers(
-			CombineHandlers(
-				VerifyRequest("POST", "/api/v1/data/my-secret"),
-				VerifyJSON(requestJson),
-				RespondWith(http.StatusOK, responseJson),
-			),
-		)
+		setupPostServer("my-secret", "potatoes", `{"parameters":{"length":42}}`)
 
 		session := runCommand("set", "-n", "my-secret", "-g", "-l", "42")
 
 		Eventually(session).Should(Exit(0))
-		Eventually(session.Out).Should(Say(responseTable))
+		Eventually(session.Out).Should(Say(responseMyPotatoes))
 	})
 
 	It("generates a secret without upper case", func() {
-		responseJson := `{"value":"potatoes"}`
-		responseTable := fmt.Sprintf(`Name:	my-secret\nValue:	potatoes`)
-		requestJson := `{"parameters":{"exclude_upper":true}}`
-
-		server.AppendHandlers(
-			CombineHandlers(
-				VerifyRequest("POST", "/api/v1/data/my-secret"),
-				VerifyJSON(requestJson),
-				RespondWith(http.StatusOK, responseJson),
-			),
-		)
+		setupPostServer("my-secret", "potatoes", `{"parameters":{"exclude_upper":true}}`)
 
 		session := runCommand("set", "-n", "my-secret", "-g", "--exclude-upper")
 
 		Eventually(session).Should(Exit(0))
-		Eventually(session.Out).Should(Say(responseTable))
+		Eventually(session.Out).Should(Say(responseMyPotatoes))
 	})
 
 	It("generates a secret without lower case", func() {
-		responseJson := `{"value":"potatoes"}`
-		responseTable := fmt.Sprintf(`Name:	my-secret\nValue:	potatoes`)
-		requestJson := `{"parameters":{"exclude_lower":true}}`
-
-		server.AppendHandlers(
-			CombineHandlers(
-				VerifyRequest("POST", "/api/v1/data/my-secret"),
-				VerifyJSON(requestJson),
-				RespondWith(http.StatusOK, responseJson),
-			),
-		)
+		setupPostServer("my-secret", "potatoes", `{"parameters":{"exclude_lower":true}}`)
 
 		session := runCommand("set", "-n", "my-secret", "-g", "--exclude-lower")
 
 		Eventually(session).Should(Exit(0))
-		Eventually(session.Out).Should(Say(responseTable))
+		Eventually(session.Out).Should(Say(responseMyPotatoes))
 	})
 
 	It("generates a secret without special characters", func() {
-		responseJson := `{"value":"potatoes"}`
-		responseTable := fmt.Sprintf(`Name:	my-secret\nValue:	potatoes`)
-		requestJson := `{"parameters":{"exclude_special":true}}`
-
-		server.AppendHandlers(
-			CombineHandlers(
-				VerifyRequest("POST", "/api/v1/data/my-secret"),
-				VerifyJSON(requestJson),
-				RespondWith(http.StatusOK, responseJson),
-			),
-		)
+		setupPostServer("my-secret", "potatoes", `{"parameters":{"exclude_special":true}}`)
 
 		session := runCommand("set", "-n", "my-secret", "-g", "--exclude-special")
 
 		Eventually(session).Should(Exit(0))
-		Eventually(session.Out).Should(Say(responseTable))
+		Eventually(session.Out).Should(Say(responseMyPotatoes))
 	})
 
 	It("generates a secret without numbers", func() {
-		responseJson := `{"value":"potatoes"}`
-		responseTable := fmt.Sprintf(`Name:	my-secret\nValue:	potatoes`)
-		requestJson := `{"parameters":{"exclude_number":true}}`
-
-		server.AppendHandlers(
-			CombineHandlers(
-				VerifyRequest("POST", "/api/v1/data/my-secret"),
-				VerifyJSON(requestJson),
-				RespondWith(http.StatusOK, responseJson),
-			),
-		)
+		setupPostServer("my-secret", "potatoes", `{"parameters":{"exclude_number":true}}`)
 
 		session := runCommand("set", "-n", "my-secret", "-g", "--exclude-number")
 
 		Eventually(session).Should(Exit(0))
-		Eventually(session.Out).Should(Say(responseTable))
+		Eventually(session.Out).Should(Say(responseMyPotatoes))
 	})
 
 	Describe("Help", func() {
@@ -189,3 +125,23 @@ var _ = Describe("Set", func() {
 		})
 	})
 })
+
+func setupPutServer(name string, value string) {
+	server.AppendHandlers(
+		CombineHandlers(
+			VerifyRequest("PUT", fmt.Sprintf("/api/v1/data/%s", name)),
+			VerifyJSON(fmt.Sprintf(VALUE_REQUEST_JSON, value)),
+			RespondWith(http.StatusOK, fmt.Sprintf(RESPONSE_JSON, value)),
+		),
+	)
+}
+
+func setupPostServer(name string, value string, requestJson string) {
+	server.AppendHandlers(
+		CombineHandlers(
+			VerifyRequest("POST", fmt.Sprintf("/api/v1/data/%s", name)),
+			VerifyJSON(requestJson),
+			RespondWith(http.StatusOK, fmt.Sprintf(RESPONSE_JSON, value)),
+		),
+	)
+}
