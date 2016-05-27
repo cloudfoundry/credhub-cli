@@ -13,7 +13,7 @@ import (
 
 type SetCommand struct {
 	SecretIdentifier string `short:"n" required:"yes" long:"name" description:"Selects the secret being set"`
-	SecretContent    string `short:"s" long:"secret" description:"Sets a value for a secret name"`
+	SecretContent    string `short:"v" long:"value" description:"Sets a value for a secret name"`
 	Generate         bool   `short:"g" long:"generate" description:"System will generate random credential. Cannot be used in combination with --secret."`
 	Length           int    `short:"l" long:"length" description:"Sets length of generated value (Default: 20)"`
 	ExcludeSpecial   bool   `long:"exclude-special" description:"Exclude special characters from generated value"`

@@ -28,7 +28,7 @@ var _ = Describe("Set", func() {
 			),
 		)
 
-		session := runCommand("set", "-n", "my-secret", "-s", "potatoes")
+		session := runCommand("set", "-n", "my-secret", "-v", "potatoes")
 
 		Eventually(session).Should(Exit(0))
 		Eventually(session.Out).Should(Say(responseTable))
@@ -162,11 +162,11 @@ var _ = Describe("Set", func() {
 			session := runCommand("set", "-n", "my-secret")
 
 			Eventually(session).Should(Exit(1))
-			Expect(session.Err).To(Say("One of the flags 's' or 'g' must be specified"))
+			Expect(session.Err).To(Say("One of the flags 'v' or 'g' must be specified"))
 		})
 
-		It("displays missing 'n' option as required parameter", func() {
-			session := runCommand("set", "-s", "potatoes")
+		It("displays missing 'n' option as required parameter when only 'v' flag supplied", func() {
+			session := runCommand("set", "-v", "potatoes")
 
 			Eventually(session).Should(Exit(1))
 			if runtime.GOOS == "windows" {
@@ -176,7 +176,7 @@ var _ = Describe("Set", func() {
 			}
 		})
 
-		It("displays missing 'n' option and 's' option as required parameters", func() {
+		It("displays missing 'n' option as required parameters", func() {
 			session := runCommand("set")
 
 			Eventually(session).Should(Exit(1))

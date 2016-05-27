@@ -31,5 +31,5 @@ func NewNoTargetUrlError() error {
 }
 
 func NewSetOptionMissingError() error {
-	return errors.New("One of the flags 's' or 'g' must be specified.")
+	return errors.New("One of the flags 'v' or 'g' must be specified.")
 }
