@@ -5,9 +5,9 @@ import (
 
 	"net/url"
 
+	"github.com/pivotal-cf/cm-cli/actions"
 	"github.com/pivotal-cf/cm-cli/client"
 	"github.com/pivotal-cf/cm-cli/config"
-	. "github.com/pivotal-cf/cm-cli/errors"
 )
 
 type ApiCommand struct {
@@ -36,29 +36,14 @@ func (cmd ApiCommand) Execute([]string) error {
 
 		c.ApiURL = parsedUrl.String()
 
-		err = validateTarget(c.ApiURL)
+		action := actions.NewApi(client.NewHttpClient())
+		err = action.ValidateTarget(c.ApiURL)
 		if err != nil {
 			return err
 		}
 		fmt.Println("Setting the target url:", c.ApiURL)
 
 		config.WriteConfig(c)
-
-	}
-
-	return nil
-}
-
-func validateTarget(targetUrl string) error {
-	request := client.NewInfoRequest(targetUrl)
-
-	response, err := client.NewHttpClient().Do(request)
-	if err != nil {
-		return NewNetworkError()
-	}
-
-	if response.StatusCode != 200 {
-		return NewInvalidTargetError()
 	}
 
 	return nil

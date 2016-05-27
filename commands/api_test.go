@@ -89,7 +89,8 @@ var _ = Describe("API", func() {
 	})
 
 	Describe("Validating the target API URL", func() {
-		It("fails to set the target when the url is not valid", func() {
+		It("retains previous target when the url is not valid", func() {
+			// confirm we have original good server
 			apiServer := goodServer.URL()
 			session := runCommand("api", apiServer)
 
@@ -103,11 +104,13 @@ var _ = Describe("API", func() {
 				),
 			)
 
+			// fail to validate on bad server
 			session = runCommand("api", badServer.URL())
 
 			Eventually(session).Should(Exit(1))
 			Eventually(session.Err).Should(Say("The targeted API does not appear to be valid."))
 
+			// previous value remains
 			session = runCommand("api")
 
 			Eventually(session).Should(Exit(0))
