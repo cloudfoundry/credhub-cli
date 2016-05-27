@@ -27,20 +27,20 @@ GETTING STARTED:
 
 CREDENTIAL MANAGEMENT:
 
-	set --type <cred type> --name <cred name> --secret <cred value>
+	set --type <cred type> --name <cred name> --value <cred value>
 		Set the value and attributes of a credential.
 		-t, --type							Sets the type of credential to store or generate. Default: 'value'*
 		-n, --name							Selects the credential being set
 		-g, --generate        				System will generate random credential value. Cannot be used in combination with --secret.
 
 		Parameters for setting credential type 'value'
-		-s, --secret 						Sets a value for a credential.
+		-v, --value 						Sets a value for a credential.
 
-		-l, --length NUMBER					Sets length of generated value (Default: 20)*
-		--iu, --include-upper FALSE			Sets whether to include UPPER alpha characters (Default: TRUE)*
-		--il,  --include-lower FALSE		Sets whether to include lower alpha characters (Default: TRUE)*
-		--in, --include-number FALSE		Sets whether to include numeric characters (Default: TRUE)*
-		--is, --include-special FALSE		Sets whether to include special characters (Default: TRUE)*
+		-l, --length NUMBER					Sets length of generated value (Default: 20)
+		--exclude-upper 			        Exclude upper alpha characters from generated value
+		--exclude-lower 		            Exclude lower alpha characters from generated value
+		--exclude-number 		            Exclude numbers from generated value
+		--exclude-special 	  	            Exclude special characters from generated value
 
 		Parameters for setting credential type 'certificate'
 		--ca								Sets the CA value of a certificate credential*
