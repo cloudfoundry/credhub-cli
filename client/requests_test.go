@@ -50,15 +50,17 @@ var _ = Describe("API", func() {
 
 		It("returns a request with parameters", func() {
 			parameters := models.SecretParameters{
-				Length:       42,
-				ExcludeUpper: true,
-				ExcludeLower: true,
+				ExcludeSpecial: true,
+				ExcludeUpper:   true,
+				ExcludeLower:   true,
+				Length:         42,
 			}
 
 			request := NewGenerateSecretRequest("sample.com", "my-name", parameters)
 
 			expectedRequestBody := `{
 				"parameters": {
+					"exclude_special": true,
 					"exclude_upper": true,
 					"exclude_lower": true,
 					"length": 42

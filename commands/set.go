@@ -18,6 +18,7 @@ type SetCommand struct {
 	Length           int    `short:"l" long:"length" description:"Sets length of generated value (Default: 20)"`
 	ExcludeUpper     bool   `long:"exclude-upper" description:"Exclude upper alpha characters from generated value"`
 	ExcludeLower     bool   `long:"exclude-lower" description:"Exclude lower alpha characters from generated value"`
+	ExcludeSpecial   bool   `long:"exclude-special" description:"Exclude special characters from generated value"`
 }
 
 func (cmd SetCommand) Execute([]string) error {
@@ -32,9 +33,10 @@ func (cmd SetCommand) Execute([]string) error {
 
 	if cmd.Generate {
 		parameters := models.SecretParameters{
-			Length:       cmd.Length,
-			ExcludeUpper: cmd.ExcludeUpper,
-			ExcludeLower: cmd.ExcludeLower,
+			ExcludeSpecial: cmd.ExcludeSpecial,
+			ExcludeUpper:   cmd.ExcludeUpper,
+			ExcludeLower:   cmd.ExcludeLower,
+			Length:         cmd.Length,
 		}
 
 		action := actions.NewGenerate(secretRepository, config.ReadConfig())
