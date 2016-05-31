@@ -22,22 +22,21 @@ func NewSecretRepository(httpClient client.HttpClient) SecretRepository {
 }
 
 func (r secretRepository) SendRequest(request *http.Request) (models.SecretBody, error) {
-	secretBody := models.SecretBody{}
-
 	response, err := r.httpClient.Do(request)
 
 	if err != nil {
-		return secretBody, errors.NewNetworkError()
+		return models.SecretBody{}, errors.NewNetworkError()
 	}
 
 	if response.StatusCode < 200 || response.StatusCode > 299 {
-		return secretBody, errors.NewInvalidStatusError()
+		return models.SecretBody{}, errors.NewInvalidStatusError()
 	}
 
+	secretBody := models.SecretBody{}
 	decoder := json.NewDecoder(response.Body)
 	err = decoder.Decode(&secretBody)
 	if err != nil {
-		return secretBody, errors.NewResponseError()
+		return models.SecretBody{}, errors.NewResponseError()
 	}
 
 	return secretBody, nil

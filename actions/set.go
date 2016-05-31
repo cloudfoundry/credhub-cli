@@ -19,14 +19,14 @@ func NewSet(secretRepository repositories.SecretRepository, config config.Config
 	}
 }
 
-func (set Set) SetSecret(secretIdentifier string, value string) (models.Secret, error) {
+func (set Set) SetSecret(secretIdentifier string, value string, contentType string) (models.Secret, error) {
 	err := config.ValidateConfig(set.config)
 
 	if err != nil {
 		return models.Secret{}, err
 	}
 
-	request := client.NewPutSecretRequest(set.config.ApiURL, secretIdentifier, value)
+	request := client.NewPutSecretRequest(set.config.ApiURL, secretIdentifier, value, contentType)
 
 	secretBody, err := set.secretRepository.SendRequest(request)
 	if err != nil {

@@ -1,5 +1,13 @@
 package models
 
 type SecretBody struct {
-	Value string `json:"value"`
+	ContentType string `json:"type"`
+	Value       string `json:"value"`
+}
+
+func NewSecretBody(value string) SecretBody {
+	return SecretBody{
+		ContentType: "value",
+		Value:       value,
+	}
 }

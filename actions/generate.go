@@ -19,14 +19,14 @@ func NewGenerate(secretRepository repositories.SecretRepository, config config.C
 	}
 }
 
-func (g Generate) GenerateSecret(secretIdentifier string, parameters models.SecretParameters) (models.Secret, error) {
+func (g Generate) GenerateSecret(secretIdentifier string, parameters models.SecretParameters, contentType string) (models.Secret, error) {
 	err := config.ValidateConfig(g.config)
 
 	if err != nil {
 		return models.Secret{}, err
 	}
 
-	request := client.NewGenerateSecretRequest(g.config.ApiURL, secretIdentifier, parameters)
+	request := client.NewGenerateSecretRequest(g.config.ApiURL, secretIdentifier, parameters, contentType)
 
 	secretBody, err := g.secretRepository.SendRequest(request)
 	if err != nil {

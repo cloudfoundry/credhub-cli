@@ -15,37 +15,36 @@ import (
 var _ = Describe("API", func() {
 	Describe("NewInfoRequest", func() {
 		It("Returns a request for the info endpoint", func() {
-			httpRequest, _ := http.NewRequest("GET", "fake_target.com/info", nil)
+			expectedRequest, _ := http.NewRequest("GET", "fake_target.com/info", nil)
 
 			request := NewInfoRequest("fake_target.com")
 
-			Expect(request).To(Equal(httpRequest))
+			Expect(request).To(Equal(expectedRequest))
 		})
 	})
 
 	Describe("NewPutSecretRequest", func() {
 		It("Returns a request for the put-secret endpoint", func() {
-			requestBody := bytes.NewReader([]byte(`{"value":"my-value"}`))
-			httpRequest, _ := http.NewRequest("PUT", "sample.com/api/v1/data/my-name", requestBody)
-			httpRequest.Header.Set("Content-Type", "application/json")
+			requestBody := bytes.NewReader([]byte(`{"type":"my-type","value":"my-value"}`))
+			expectedRequest, _ := http.NewRequest("PUT", "sample.com/api/v1/data/my-name", requestBody)
+			expectedRequest.Header.Set("Content-Type", "application/json")
 
-			request := NewPutSecretRequest("sample.com", "my-name", "my-value")
+			request := NewPutSecretRequest("sample.com", "my-name", "my-value", "my-type")
 
-			Expect(request).To(Equal(httpRequest))
+			Expect(request).To(Equal(expectedRequest))
 		})
 	})
 
 	Describe("NewGenerateSecretRequest", func() {
 		It("returns a request with no parameters", func() {
-			requestBody := bytes.NewReader([]byte(`{"parameters":{}}`))
+			requestBody := bytes.NewReader([]byte(`{"type":"my-type","parameters":{}}`))
 
-			httpRequest, _ := http.NewRequest("POST", "sample.com/api/v1/data/my-name", requestBody)
-			httpRequest.Header.Set("Content-Type", "application/json")
+			expectedRequest, _ := http.NewRequest("POST", "sample.com/api/v1/data/my-name", requestBody)
+			expectedRequest.Header.Set("Content-Type", "application/json")
 
-			emptyParameters := models.SecretParameters{}
-			request := NewGenerateSecretRequest("sample.com", "my-name", emptyParameters)
+			request := NewGenerateSecretRequest("sample.com", "my-name", models.SecretParameters{}, "my-type")
 
-			Expect(request).To(Equal(httpRequest))
+			Expect(request).To(Equal(expectedRequest))
 		})
 
 		It("returns a request with parameters", func() {
@@ -57,9 +56,10 @@ var _ = Describe("API", func() {
 				Length:         42,
 			}
 
-			request := NewGenerateSecretRequest("sample.com", "my-name", parameters)
+			request := NewGenerateSecretRequest("sample.com", "my-name", parameters, "value")
 
 			expectedRequestBody := `{
+				"type":"value",
 				"parameters": {
 					"exclude_special": true,
 					"exclude_number": true,
@@ -81,21 +81,21 @@ var _ = Describe("API", func() {
 
 	Describe("NewGetSecretRequest", func() {
 		It("Returns a request for getting secret", func() {
-			httpRequest, _ := http.NewRequest("GET", "sample.com/api/v1/data/my-name", nil)
+			expectedRequest, _ := http.NewRequest("GET", "sample.com/api/v1/data/my-name", nil)
 
 			request := NewGetSecretRequest("sample.com", "my-name")
 
-			Expect(request).To(Equal(httpRequest))
+			Expect(request).To(Equal(expectedRequest))
 		})
 	})
 
 	Describe("NewDeleteSecretRequest", func() {
 		It("Returns a request for deleting", func() {
-			httpRequest, _ := http.NewRequest("DELETE", "sample.com/api/v1/data/my-name", nil)
+			expectedRequest, _ := http.NewRequest("DELETE", "sample.com/api/v1/data/my-name", nil)
 
 			request := NewDeleteSecretRequest("sample.com", "my-name")
 
-			Expect(request).To(Equal(httpRequest))
+			Expect(request).To(Equal(expectedRequest))
 		})
 	})
 })

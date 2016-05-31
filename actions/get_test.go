@@ -35,7 +35,7 @@ var _ = Describe("Get", func() {
 
 			responseObj := http.Response{
 				StatusCode: 200,
-				Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"value":"potatoes"}`))),
+				Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"type":"value","value":"potatoes"}`))),
 			}
 
 			httpClient.DoStub = func(req *http.Request) (resp *http.Response, err error) {
@@ -47,7 +47,7 @@ var _ = Describe("Get", func() {
 			secret, err := subject.GetSecret("my-secret")
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(secret).To(Equal(models.NewSecret("my-secret", models.SecretBody{Value: "potatoes"})))
+			Expect(secret).To(Equal(models.NewSecret("my-secret", models.NewSecretBody("potatoes"))))
 		})
 
 		Describe("Errors", func() {

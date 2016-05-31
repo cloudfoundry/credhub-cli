@@ -33,3 +33,7 @@ func NewNoTargetUrlError() error {
 func NewSetOptionMissingError() error {
 	return errors.New("One of the flags 'v' or 'g' must be specified.")
 }
+
+func NewUnknownTypeError() error {
+	return errors.New("The request does not include a valid type. Please validate your input and retry your request.")
+}

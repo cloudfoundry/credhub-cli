@@ -8,10 +8,13 @@ import (
 	"github.com/pivotal-cf/cm-cli/models"
 )
 
-func NewPutSecretRequest(apiTarget, secretIdentifier, secretContent string) *http.Request {
+func NewPutSecretRequest(apiTarget, secretIdentifier, secretContent string, contentType string) *http.Request {
 	url := apiTarget + "/api/v1/data/" + secretIdentifier
 
-	secret := models.SecretBody{Value: secretContent}
+	secret := models.SecretBody{
+		Value:       secretContent,
+		ContentType: contentType,
+	}
 	body, _ := json.Marshal(secret)
 
 	request, _ := http.NewRequest("PUT", url, bytes.NewReader(body))
@@ -20,11 +23,12 @@ func NewPutSecretRequest(apiTarget, secretIdentifier, secretContent string) *htt
 	return request
 }
 
-func NewGenerateSecretRequest(apiTarget, secretIdentifier string, parameters models.SecretParameters) *http.Request {
+func NewGenerateSecretRequest(apiTarget, secretIdentifier string, parameters models.SecretParameters, contentType string) *http.Request {
 	url := apiTarget + "/api/v1/data/" + secretIdentifier
 
 	generateRequest := models.GenerateRequest{
-		Parameters: parameters,
+		Parameters:  parameters,
+		ContentType: contentType,
 	}
 
 	body, _ := json.Marshal(generateRequest)

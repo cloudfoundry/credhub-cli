@@ -14,14 +14,15 @@ import (
 	. "github.com/onsi/gomega/ghttp"
 )
 
-const VALUE_REQUEST_JSON = `{"value":"%s"}`
-const RESPONSE_JSON = `{"value":"%s"}`
-const RESPONSE_TABLE = `Name:	%s\nValue:	%s`
+const VALUE_REQUEST_JSON = `{"type":"value", "value":"%s"}`
+const GENERATE_REQUEST_JSON = `{"type":"value","parameters":%s}`
+const RESPONSE_JSON = `{"value":"%s","type":"value"}`
+const RESPONSE_TABLE = `Type:	value\nName:	%s\nValue:	%s`
 
 var responseMyPotatoes = fmt.Sprintf(RESPONSE_TABLE, "my-secret", "potatoes")
 
 var _ = Describe("Set", func() {
-	It("puts a secret", func() {
+	It("puts a secret using default type", func() {
 		setupPutServer("my-secret", "potatoes")
 
 		session := runCommand("set", "-n", "my-secret", "-v", "potatoes")
@@ -30,8 +31,17 @@ var _ = Describe("Set", func() {
 		Eventually(session.Out).Should(Say(responseMyPotatoes))
 	})
 
+	It("puts a secret using explicit value type", func() {
+		setupPutServer("my-secret", "potatoes")
+
+		session := runCommand("set", "-n", "my-secret", "-v", "potatoes", "-t", "value")
+
+		Eventually(session).Should(Exit(0))
+		Eventually(session.Out).Should(Say(responseMyPotatoes))
+	})
+
 	It("generates a secret without parameters", func() {
-		setupPostServer("my-secret", "potatoes", `{"parameters":{}}`)
+		setupPostServer("my-secret", "potatoes", generateRequestJson("{}"))
 
 		session := runCommand("set", "-n", "my-secret", "-g")
 
@@ -40,7 +50,7 @@ var _ = Describe("Set", func() {
 	})
 
 	It("generates a secret with length", func() {
-		setupPostServer("my-secret", "potatoes", `{"parameters":{"length":42}}`)
+		setupPostServer("my-secret", "potatoes", generateRequestJson(`{"length":42}`))
 
 		session := runCommand("set", "-n", "my-secret", "-g", "-l", "42")
 
@@ -49,7 +59,7 @@ var _ = Describe("Set", func() {
 	})
 
 	It("generates a secret without upper case", func() {
-		setupPostServer("my-secret", "potatoes", `{"parameters":{"exclude_upper":true}}`)
+		setupPostServer("my-secret", "potatoes", generateRequestJson(`{"exclude_upper":true}`))
 
 		session := runCommand("set", "-n", "my-secret", "-g", "--exclude-upper")
 
@@ -58,7 +68,7 @@ var _ = Describe("Set", func() {
 	})
 
 	It("generates a secret without lower case", func() {
-		setupPostServer("my-secret", "potatoes", `{"parameters":{"exclude_lower":true}}`)
+		setupPostServer("my-secret", "potatoes", generateRequestJson(`{"exclude_lower":true}`))
 
 		session := runCommand("set", "-n", "my-secret", "-g", "--exclude-lower")
 
@@ -67,7 +77,7 @@ var _ = Describe("Set", func() {
 	})
 
 	It("generates a secret without special characters", func() {
-		setupPostServer("my-secret", "potatoes", `{"parameters":{"exclude_special":true}}`)
+		setupPostServer("my-secret", "potatoes", generateRequestJson(`{"exclude_special":true}`))
 
 		session := runCommand("set", "-n", "my-secret", "-g", "--exclude-special")
 
@@ -76,7 +86,7 @@ var _ = Describe("Set", func() {
 	})
 
 	It("generates a secret without numbers", func() {
-		setupPostServer("my-secret", "potatoes", `{"parameters":{"exclude_number":true}}`)
+		setupPostServer("my-secret", "potatoes", generateRequestJson(`{"exclude_number":true}`))
 
 		session := runCommand("set", "-n", "my-secret", "-g", "--exclude-number")
 
@@ -123,6 +133,14 @@ var _ = Describe("Set", func() {
 				Expect(session.Err).To(Say("the required flag `-n, --name' was not specified"))
 			}
 		})
+
+		It("displays unknown type message when given unknown type", func() {
+			session := runCommand("set", "-n", "my-secret", "-v", "potatoes", "-t", "foobar")
+
+			Eventually(session).Should(Exit(1))
+
+			Expect(session.Err).To(Say("The request does not include a valid type. Please validate your input and retry your request."))
+		})
 	})
 })
 
@@ -144,4 +162,8 @@ func setupPostServer(name string, value string, requestJson string) {
 			RespondWith(http.StatusOK, fmt.Sprintf(RESPONSE_JSON, value)),
 		),
 	)
+}
+
+func generateRequestJson(params string) string {
+	return fmt.Sprintf(GENERATE_REQUEST_JSON, params)
 }

@@ -13,6 +13,7 @@ import (
 
 type SetCommand struct {
 	SecretIdentifier string `short:"n" required:"yes" long:"name" description:"Selects the secret being set"`
+	ContentType      string `short:"t" long:"type" description:"Sets the type of secret to store or generate. Default: 'value'"`
 	SecretContent    string `short:"v" long:"value" description:"Sets a value for a secret name"`
 	Generate         bool   `short:"g" long:"generate" description:"System will generate random credential. Cannot be used in combination with --secret."`
 	Length           int    `short:"l" long:"length" description:"Sets length of generated value (Default: 20)"`
@@ -27,6 +28,13 @@ func (cmd SetCommand) Execute([]string) error {
 		return errors.NewSetOptionMissingError()
 	}
 
+	if cmd.ContentType == "" {
+		cmd.ContentType = "value"
+	}
+
+	if cmd.ContentType != "value" {
+		return errors.NewUnknownTypeError()
+	}
 	secretRepository := repositories.NewSecretRepository(client.NewHttpClient())
 
 	var secret models.Secret
@@ -42,10 +50,10 @@ func (cmd SetCommand) Execute([]string) error {
 		}
 
 		action := actions.NewGenerate(secretRepository, config.ReadConfig())
-		secret, err = action.GenerateSecret(cmd.SecretIdentifier, parameters)
+		secret, err = action.GenerateSecret(cmd.SecretIdentifier, parameters, cmd.ContentType)
 	} else {
 		action := actions.NewSet(secretRepository, config.ReadConfig())
-		secret, err = action.SetSecret(cmd.SecretIdentifier, cmd.SecretContent)
+		secret, err = action.SetSecret(cmd.SecretIdentifier, cmd.SecretContent, cmd.ContentType)
 	}
 
 	if err != nil {
