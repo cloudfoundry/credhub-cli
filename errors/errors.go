@@ -1,7 +1,11 @@
 package errors
 
 import (
+	"encoding/json"
 	"errors"
+	"io"
+
+	"github.com/pivotal-cf/cm-cli/models"
 )
 
 func NewNetworkError() error {
@@ -10,10 +14,6 @@ func NewNetworkError() error {
 
 func NewResponseError() error {
 	return errors.New("An error occurred when processing the response. Please validate your input and retry your request.")
-}
-
-func NewSecretNotFoundError() error {
-	return errors.New("Secret not found. Please validate your input and retry your request.")
 }
 
 func NewSecretBadRequestError() error {
@@ -34,4 +34,12 @@ func NewSetOptionMissingError() error {
 
 func NewUnknownTypeError() error {
 	return errors.New("The request does not include a valid type. Please validate your input and retry your request.")
+}
+
+func ParseError(reader io.Reader) error {
+	decoder := json.NewDecoder(reader)
+	serverError := models.ServerError{}
+	decoder.Decode(&serverError)
+
+	return errors.New(serverError.Message)
 }

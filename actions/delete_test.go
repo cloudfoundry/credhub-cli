@@ -9,6 +9,9 @@ import (
 
 	"errors"
 
+	"bytes"
+	"io/ioutil"
+
 	"github.com/pivotal-cf/cm-cli/client"
 	"github.com/pivotal-cf/cm-cli/client/clientfakes"
 	"github.com/pivotal-cf/cm-cli/config"
@@ -65,12 +68,13 @@ var _ = Describe("Delete", func() {
 			It("returns a not-found error when response is 404", func() {
 				responseObj := http.Response{
 					StatusCode: 404,
+					Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"message": "My error"}`))),
 				}
 
 				httpClient.DoReturns(&responseObj, nil)
 
 				error := subject.Delete("my-secret")
-				Expect(error).To(MatchError(cm_errors.NewSecretNotFoundError()))
+				Expect(error.Error()).To(Equal("My error"))
 			})
 
 			It("returns a bad request error when response is 500", func() {

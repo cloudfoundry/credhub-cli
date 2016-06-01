@@ -33,7 +33,7 @@ func (get Get) GetSecret(secretIdentifier string) (models.Secret, error) {
 	}
 
 	if response.StatusCode == 404 {
-		return models.Secret{}, errors.NewSecretNotFoundError()
+		return models.Secret{}, errors.ParseError(response.Body)
 	}
 
 	secretBody := new(models.SecretBody)

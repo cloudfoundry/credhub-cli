@@ -32,7 +32,7 @@ func (delete Delete) Delete(secretIdentifier string) error {
 	}
 
 	if response.StatusCode == http.StatusNotFound {
-		return errors.NewSecretNotFoundError()
+		return errors.ParseError(response.Body)
 	} else if response.StatusCode != http.StatusOK {
 		return errors.NewSecretBadRequestError()
 	}

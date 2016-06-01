@@ -59,16 +59,16 @@ var _ = Describe("Get", func() {
 				Expect(error).To(MatchError(cm_errors.NewNoTargetUrlError()))
 			})
 
-			It("returns a not-found error when response is 404", func() {
+			It("returns server error when response is 404", func() {
 				responseObj := http.Response{
 					StatusCode: 404,
-					Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"value":"potatoes"}`))),
+					Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"message": "My error"}`))),
 				}
 
 				httpClient.DoReturns(&responseObj, nil)
 
 				_, error := subject.GetSecret("my-secret")
-				Expect(error).To(MatchError(cm_errors.NewSecretNotFoundError()))
+				Expect(error.Error()).To(Equal("My error"))
 			})
 
 			It("returns NewNetworkError when there is a network error", func() {
