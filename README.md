@@ -60,7 +60,7 @@ CREDENTIAL MANAGEMENT:
 		--duration							Sets the valid duration for the generated certificate*
 		--key-length						Sets the bit length of the key*
 		--common-name						Sets the common name of the generated certificate*
-		--alternate-name						Sets an alternate name of the generated certificate*
+		--alternate-name					Sets an alternate name of the generated certificate*
 		--organization						Sets the organization of the generated certificate*
 		--organization-unit					Sets the organization unit of the generated certificate*
 		--locality							Sets the locality/city of the generated certificate*
