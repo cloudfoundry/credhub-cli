@@ -141,6 +141,18 @@ var _ = Describe("Set", func() {
 
 			Expect(session.Err).To(Say("The request does not include a valid type. Please validate your input and retry your request."))
 		})
+
+		It("displays the server provided error when an error is received", func() {
+			server.AppendHandlers(
+				RespondWith(http.StatusBadRequest, `{"message": "you fail."}`),
+			)
+
+			session := runCommand("set", "-n", "my-secret", "-g")
+
+			Eventually(session).Should(Exit(1))
+
+			Expect(session.Err).To(Say("you fail."))
+		})
 	})
 })
 

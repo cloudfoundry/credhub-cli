@@ -4,8 +4,10 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"errors"
+
 	"github.com/pivotal-cf/cm-cli/client"
-	"github.com/pivotal-cf/cm-cli/errors"
+	cli_errors "github.com/pivotal-cf/cm-cli/errors"
 	"github.com/pivotal-cf/cm-cli/models"
 )
 
@@ -25,19 +27,20 @@ func (r secretRepository) SendRequest(request *http.Request) (models.SecretBody,
 	response, err := r.httpClient.Do(request)
 
 	if err != nil {
-		return models.SecretBody{}, errors.NewNetworkError()
+		return models.SecretBody{}, cli_errors.NewNetworkError()
 	}
 
+	decoder := json.NewDecoder(response.Body)
+
 	if response.StatusCode < 200 || response.StatusCode > 299 {
-		return models.SecretBody{}, errors.NewInvalidStatusError()
+		serverError := models.ServerError{}
+		decoder.Decode(&serverError)
+
+		return models.SecretBody{}, errors.New(serverError.Message)
 	}
 
 	secretBody := models.SecretBody{}
-	decoder := json.NewDecoder(response.Body)
-	err = decoder.Decode(&secretBody)
-	if err != nil {
-		return models.SecretBody{}, errors.NewResponseError()
-	}
+	decoder.Decode(&secretBody)
 
 	return secretBody, nil
 }
