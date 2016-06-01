@@ -68,7 +68,7 @@ var _ = Describe("Delete", func() {
 			It("returns a not-found error when response is 404", func() {
 				responseObj := http.Response{
 					StatusCode: 404,
-					Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"message": "My error"}`))),
+					Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"error": "My error"}`))),
 				}
 
 				httpClient.DoReturns(&responseObj, nil)

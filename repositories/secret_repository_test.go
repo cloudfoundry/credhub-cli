@@ -62,7 +62,7 @@ var _ = Describe("SecretRepository", func() {
 			It("returns a error when response is 400", func() {
 				responseObj := http.Response{
 					StatusCode: 400,
-					Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"message": "My error"}`))),
+					Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"error": "My error"}`))),
 				}
 
 				httpClient.DoReturns(&responseObj, nil)

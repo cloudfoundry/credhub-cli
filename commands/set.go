@@ -32,9 +32,6 @@ func (cmd SetCommand) Execute([]string) error {
 		cmd.ContentType = "value"
 	}
 
-	if cmd.ContentType != "value" {
-		return errors.NewUnknownTypeError()
-	}
 	secretRepository := repositories.NewSecretRepository(client.NewHttpClient())
 
 	var secret models.Secret

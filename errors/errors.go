@@ -32,14 +32,10 @@ func NewSetOptionMissingError() error {
 	return errors.New("One of the flags 'v' or 'g' must be specified.")
 }
 
-func NewUnknownTypeError() error {
-	return errors.New("The request does not include a valid type. Please validate your input and retry your request.")
-}
-
 func ParseError(reader io.Reader) error {
 	decoder := json.NewDecoder(reader)
 	serverError := models.ServerError{}
 	decoder.Decode(&serverError)
 
-	return errors.New(serverError.Message)
+	return errors.New(serverError.Error)
 }

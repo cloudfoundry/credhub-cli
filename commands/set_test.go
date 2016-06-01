@@ -134,17 +134,9 @@ var _ = Describe("Set", func() {
 			}
 		})
 
-		It("displays unknown type message when given unknown type", func() {
-			session := runCommand("set", "-n", "my-secret", "-v", "potatoes", "-t", "foobar")
-
-			Eventually(session).Should(Exit(1))
-
-			Expect(session.Err).To(Say("The request does not include a valid type. Please validate your input and retry your request."))
-		})
-
 		It("displays the server provided error when an error is received", func() {
 			server.AppendHandlers(
-				RespondWith(http.StatusBadRequest, `{"message": "you fail."}`),
+				RespondWith(http.StatusBadRequest, `{"error": "you fail."}`),
 			)
 
 			session := runCommand("set", "-n", "my-secret", "-g")
