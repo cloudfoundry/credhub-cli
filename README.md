@@ -56,15 +56,15 @@ CREDENTIAL MANAGEMENT:
 		--exclude-special 	  	            Exclude special characters from generated value*
 
 		Parameters for generating credential type 'certificate'
-		--signing-ca					Sets the CA used to sign the generated certificate*
+		--signing-ca						Sets the CA used to sign the generated certificate*
 		--duration							Sets the valid duration for the generated certificate*
-		--key-length					Sets the bit length of the key*
-		--common-name					Sets the common name of the generated certificate*
-		--organization				Sets the organization of the generated certificate*
-		--organization-unit			Sets the organization unit of the generated certificate*
-		--locality					Sets the locality/city of the generated certificate*
-		--state						Sets the state/province of the generated certificate*
-		--country						Sets the country of the generated certificate*
+		--key-length						Sets the bit length of the key*
+		--common-name						Sets the common name of the generated certificate*
+		--organization						Sets the organization of the generated certificate*
+		--organization-unit					Sets the organization unit of the generated certificate*
+		--locality							Sets the locality/city of the generated certificate*
+		--state								Sets the state/province of the generated certificate*
+		--country							Sets the country of the generated certificate*
 		-o, --out							Sets the location to output the generated pem file*
 		
 		
