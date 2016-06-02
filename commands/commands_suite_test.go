@@ -13,9 +13,16 @@ import (
 
 	"net/http"
 
+	"fmt"
+
 	. "github.com/onsi/gomega/gexec"
 	. "github.com/onsi/gomega/ghttp"
 )
+
+const RESPONSE_JSON = `{"value":"%s","type":"value"}`
+const RESPONSE_TABLE = `Type:	value\nName:	%s\nValue:	%s`
+
+var responseMyPotatoes = fmt.Sprintf(RESPONSE_TABLE, "my-secret", "potatoes")
 
 func TestCommands(t *testing.T) {
 	RegisterFailHandler(Fail)
