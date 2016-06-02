@@ -18,7 +18,7 @@ type SetCommand struct {
 
 func (cmd SetCommand) Execute([]string) error {
 	if cmd.SecretContent == "" {
-		return errors.NewSetOptionMissingError()
+		return errors.NewSetValueMissingError()
 	}
 
 	if cmd.ContentType == "" {

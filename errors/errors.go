@@ -28,8 +28,8 @@ func NewNoTargetUrlError() error {
 	return errors.New("Credential Manager API location is not set. Please target the location of your credential manager with `cm api` to continue.")
 }
 
-func NewSetOptionMissingError() error {
-	return errors.New("One of the flags 'v' or 'g' must be specified.")
+func NewSetValueMissingError() error {
+	return errors.New("The value must be specified")
 }
 
 func ParseError(reader io.Reader) error {
