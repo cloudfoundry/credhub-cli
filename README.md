@@ -45,18 +45,18 @@ CREDENTIAL MANAGEMENT:
 
 	generate --type <cred type> --name <cred name> [generate params]
 		Generate and set a credential value based on generation parameters.
-		-t, --type							Sets the type of credential to store or generate. Default: 'value'*
-		-n, --name							Selects the credential being set*
+		-t, --type							Sets the type of credential to store or generate. Default: 'value'
+		-n, --name							Selects the credential being set
 
 		Parameters for generating credential type 'value'
-		-l, --length NUMBER					Sets length of generated value (Default: 20)*
-		--exclude-upper 			        Exclude upper alpha characters from generated value*
-		--exclude-lower 		            Exclude lower alpha characters from generated value*
-		--exclude-number 		            Exclude numbers from generated value*
-		--exclude-special 	  	            Exclude special characters from generated value*
+		-l, --length NUMBER					Sets length of generated value (Default: 20)
+		--exclude-upper 			        Exclude upper alpha characters from generated value
+		--exclude-lower 		            Exclude lower alpha characters from generated value
+		--exclude-number 		            Exclude numbers from generated value
+		--exclude-special 	  	            Exclude special characters from generated value
 
 		Parameters for generating credential type 'certificate'
-		--signing-ca						Sets the CA used to sign the generated certificate*
+		--ca					     	    Sets the CA used to sign the generated certificate*
 		--duration							Sets the valid duration for the generated certificate*
 		--key-length						Sets the bit length of the key*
 		--common-name						Sets the common name of the generated certificate*
