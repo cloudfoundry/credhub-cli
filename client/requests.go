@@ -8,12 +8,31 @@ import (
 	"github.com/pivotal-cf/cm-cli/models"
 )
 
-func NewPutSecretRequest(apiTarget, secretIdentifier, secretContent string, contentType string) *http.Request {
+func NewPutValueRequest(apiTarget, secretIdentifier, secretContent string) *http.Request {
 	url := apiTarget + "/api/v1/data/" + secretIdentifier
 
 	secret := models.SecretBody{
 		Value:       secretContent,
-		ContentType: contentType,
+		ContentType: "value",
+	}
+	body, _ := json.Marshal(secret)
+
+	request, _ := http.NewRequest("PUT", url, bytes.NewReader(body))
+	request.Header.Set("Content-Type", "application/json")
+
+	return request
+}
+
+func NewPutCertificateRequest(apiTarget, secretIdentifier, ca string, pub string, priv string) *http.Request {
+	url := apiTarget + "/api/v1/data/" + secretIdentifier
+
+	secret := models.CertificateRequest{
+		ContentType: "certificate",
+		Certificate: models.Certificate{
+			Ca:      ca,
+			Public:  pub,
+			Private: priv,
+		},
 	}
 	body, _ := json.Marshal(secret)
 

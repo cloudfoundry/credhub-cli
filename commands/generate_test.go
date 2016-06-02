@@ -112,7 +112,7 @@ func setupPostServer(name string, value string, requestJson string) {
 		CombineHandlers(
 			VerifyRequest("POST", fmt.Sprintf("/api/v1/data/%s", name)),
 			VerifyJSON(requestJson),
-			RespondWith(http.StatusOK, fmt.Sprintf(RESPONSE_JSON, value)),
+			RespondWith(http.StatusOK, fmt.Sprintf(VALUE_RESPONSE_JSON, value)),
 		),
 	)
 }

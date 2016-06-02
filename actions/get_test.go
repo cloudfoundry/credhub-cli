@@ -32,6 +32,10 @@ var _ = Describe("Get", func() {
 	Describe("GetSecret", func() {
 		It("gets and returns a secret from the server", func() {
 			request := client.NewGetSecretRequest("pivotal.io", "my-secret")
+			expectedBody := models.SecretBody{
+				ContentType: "value",
+				Value:       "potatoes",
+			}
 
 			responseObj := http.Response{
 				StatusCode: 200,
@@ -47,7 +51,7 @@ var _ = Describe("Get", func() {
 			secret, err := subject.GetSecret("my-secret")
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(secret).To(Equal(models.NewSecret("my-secret", models.NewSecretBody("potatoes"))))
+			Expect(secret).To(Equal(models.NewSecret("my-secret", expectedBody)))
 		})
 
 		Describe("Errors", func() {

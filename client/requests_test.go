@@ -7,6 +7,8 @@ import (
 
 	"bytes"
 
+	"fmt"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/pivotal-cf/cm-cli/models"
@@ -23,13 +25,27 @@ var _ = Describe("API", func() {
 		})
 	})
 
-	Describe("NewPutSecretRequest", func() {
+	Describe("NewPutSecretValueRequest", func() {
 		It("Returns a request for the put-secret endpoint", func() {
-			requestBody := bytes.NewReader([]byte(`{"type":"my-type","value":"my-value"}`))
+			requestBody := bytes.NewReader([]byte(`{"type":"value","value":"my-value"}`))
 			expectedRequest, _ := http.NewRequest("PUT", "sample.com/api/v1/data/my-name", requestBody)
 			expectedRequest.Header.Set("Content-Type", "application/json")
 
-			request := NewPutSecretRequest("sample.com", "my-name", "my-value", "my-type")
+			request := NewPutValueRequest("sample.com", "my-name", "my-value")
+
+			Expect(request).To(Equal(expectedRequest))
+		})
+	})
+
+	Describe("NewPutCertificateRequest", func() {
+		It("Returns a request for the put-certificate endpoint", func() {
+			json := fmt.Sprintf(`{"type":"certificate","certificate":{"ca":"%s","public":"%s","private":"%s"}}`,
+				"my-ca", "my-pub", "my-priv")
+			requestBody := bytes.NewReader([]byte(json))
+			expectedRequest, _ := http.NewRequest("PUT", "sample.com/api/v1/data/my-name", requestBody)
+			expectedRequest.Header.Set("Content-Type", "application/json")
+
+			request := NewPutCertificateRequest("sample.com", "my-name", "my-ca", "my-pub", "my-priv")
 
 			Expect(request).To(Equal(expectedRequest))
 		})

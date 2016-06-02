@@ -42,7 +42,10 @@ var _ = Describe("SecretRepository", func() {
 				return &responseObj, nil
 			}
 
-			expectedSecretBody := models.NewSecretBody("my-value")
+			expectedSecretBody := models.SecretBody{
+				ContentType: "value",
+				Value:       "my-value",
+			}
 
 			secretBody, err := subject.SendRequest(request)
 

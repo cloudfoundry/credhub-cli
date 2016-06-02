@@ -14,11 +14,9 @@ import (
 	. "github.com/onsi/gomega/ghttp"
 )
 
-const VALUE_REQUEST_JSON = `{"type":"value", "value":"%s"}`
-
 var _ = Describe("Set", func() {
 	It("puts a secret using default type", func() {
-		setupPutServer("my-secret", "potatoes")
+		setupPutValueServer("my-secret", "potatoes")
 
 		session := runCommand("set", "-n", "my-secret", "-v", "potatoes")
 
@@ -27,12 +25,24 @@ var _ = Describe("Set", func() {
 	})
 
 	It("puts a secret using explicit value type", func() {
-		setupPutServer("my-secret", "potatoes")
+		setupPutValueServer("my-secret", "potatoes")
 
 		session := runCommand("set", "-n", "my-secret", "-v", "potatoes", "-t", "value")
 
 		Eventually(session).Should(Exit(0))
 		Eventually(session.Out).Should(Say(responseMyPotatoes))
+	})
+
+	It("puts a secret using explicit certificate type", func() {
+		var responseMyCertificate = fmt.Sprintf(CERTIFICATE_RESPONSE_TABLE, "my-secret", "my-ca", "my-pub", "my-priv")
+		setupPutCertificateServer("my-secret", "my-ca", "my-pub", "my-priv")
+
+		session := runCommand("set", "-n", "my-secret",
+			"-t", "certificate", "--ca-string", "my-ca",
+			"--public-string", "my-pub", "--private-string", "my-priv")
+
+		Eventually(session).Should(Exit(0))
+		Eventually(session.Out).Should(Say(responseMyCertificate))
 	})
 
 	Describe("Help", func() {
@@ -61,11 +71,7 @@ var _ = Describe("Set", func() {
 
 			Eventually(session).Should(Exit(1))
 
-			if runtime.GOOS == "windows" {
-				Expect(session.Err).To(Say("the required flag `/v, /value' was not specified"))
-			} else {
-				Expect(session.Err).To(Say("the required flag `-v, --value' was not specified"))
-			}
+			Expect(session.Err).To(Say("A non-empty value must be specified. Please validate and retry your request."))
 		})
 
 		It("complains if value is empty string", func() {
@@ -73,7 +79,7 @@ var _ = Describe("Set", func() {
 
 			Eventually(session).Should(Exit(1))
 
-			Expect(session.Err).To(Say("The value must be specified"))
+			Expect(session.Err).To(Say("A non-empty value must be specified. Please validate and retry your request."))
 		})
 
 		It("displays the server provided error when an error is received", func() {
@@ -90,12 +96,22 @@ var _ = Describe("Set", func() {
 	})
 })
 
-func setupPutServer(name string, value string) {
+func setupPutValueServer(name string, value string) {
 	server.AppendHandlers(
 		CombineHandlers(
 			VerifyRequest("PUT", fmt.Sprintf("/api/v1/data/%s", name)),
 			VerifyJSON(fmt.Sprintf(VALUE_REQUEST_JSON, value)),
-			RespondWith(http.StatusOK, fmt.Sprintf(RESPONSE_JSON, value)),
+			RespondWith(http.StatusOK, fmt.Sprintf(VALUE_RESPONSE_JSON, value)),
+		),
+	)
+}
+
+func setupPutCertificateServer(name string, ca string, pub string, priv string) {
+	server.AppendHandlers(
+		CombineHandlers(
+			VerifyRequest("PUT", fmt.Sprintf("/api/v1/data/%s", name)),
+			VerifyJSON(fmt.Sprintf(CERTIFICATE_REQUEST_JSON, ca, pub, priv)),
+			RespondWith(http.StatusOK, fmt.Sprintf(CERTIFICATE_RESPONSE_JSON, ca, pub, priv)),
 		),
 	)
 }

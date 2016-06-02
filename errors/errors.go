@@ -29,7 +29,7 @@ func NewNoTargetUrlError() error {
 }
 
 func NewSetValueMissingError() error {
-	return errors.New("The value must be specified")
+	return errors.New("A non-empty value must be specified. Please validate and retry your request.")
 }
 
 func ParseError(reader io.Reader) error {

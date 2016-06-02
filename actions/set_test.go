@@ -29,17 +29,20 @@ var _ = Describe("Set", func() {
 		subject = NewSet(&secretRepository, config)
 	})
 
-	Describe("SetSecret", func() {
+	Describe("SetValueSecret", func() {
 		It("sets and returns a secret from the server", func() {
-			request := client.NewPutSecretRequest("pivotal.io", "my-secret", "abcd", "value")
-			expectedBody := models.NewSecretBody("abcd")
+			request := client.NewPutValueRequest("pivotal.io", "my-secret", "abcd")
+			expectedBody := models.SecretBody{
+				ContentType: "value",
+				Value:       "abcd",
+			}
 			expectedSecret := models.NewSecret("my-secret", expectedBody)
 			secretRepository.SendRequestStub = func(req *http.Request) (models.SecretBody, error) {
 				Expect(req).To(Equal(request))
 				return expectedBody, nil
 			}
 
-			secret, err := subject.SetSecret("my-secret", "abcd", "value")
+			secret, err := subject.SetValue("my-secret", "abcd")
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(secret).To(Equal(expectedSecret))
@@ -49,20 +52,20 @@ var _ = Describe("Set", func() {
 			It("returns a invalid target error when no api is set", func() {
 				subject = NewSet(&secretRepository, config.Config{})
 
-				_, error := subject.SetSecret("my-secret", "abcd", "value")
+				_, error := subject.SetValue("my-secret", "abcd")
 
 				Expect(error).To(MatchError(cmcli_errors.NewNoTargetUrlError()))
 			})
 
 			It("returns an error if the request fails", func() {
-				request := client.NewPutSecretRequest("pivotal.io", "my-secret", "abcd", "value")
+				request := client.NewPutValueRequest("pivotal.io", "my-secret", "abcd")
 				expectedError := errors.New("My Special Error")
 				secretRepository.SendRequestStub = func(req *http.Request) (models.SecretBody, error) {
 					Expect(req).To(Equal(request))
 					return models.SecretBody{}, expectedError
 				}
 
-				_, err := subject.SetSecret("my-secret", "abcd", "value")
+				_, err := subject.SetValue("my-secret", "abcd")
 
 				Expect(err).To(Equal(expectedError))
 			})
