@@ -3,11 +3,12 @@ package commands
 import (
 	"fmt"
 
+	"net/http"
+
 	"github.com/pivotal-cf/cm-cli/actions"
 	"github.com/pivotal-cf/cm-cli/client"
 	"github.com/pivotal-cf/cm-cli/config"
 	"github.com/pivotal-cf/cm-cli/errors"
-	"github.com/pivotal-cf/cm-cli/models"
 	"github.com/pivotal-cf/cm-cli/repositories"
 )
 
@@ -33,14 +34,9 @@ func (cmd SetCommand) Execute([]string) error {
 
 	secretRepository := repositories.NewSecretRepository(client.NewHttpClient())
 
-	action := actions.NewSet(secretRepository, config.ReadConfig())
-	var secret models.Secret
-	var err error
-	if cmd.ContentType == "value" {
-		secret, err = action.SetValue(cmd.SecretIdentifier, cmd.Value)
-	} else {
-		secret, err = action.SetCertificate(cmd.SecretIdentifier, cmd.CertificateCA, cmd.CertificatePublic, cmd.CertificatePrivate)
-	}
+	config := config.ReadConfig()
+	action := actions.NewSet(secretRepository, config)
+	secret, err := action.Set(getRequest(cmd, config.ApiURL), cmd.SecretIdentifier)
 
 	if err != nil {
 		return err
@@ -49,4 +45,15 @@ func (cmd SetCommand) Execute([]string) error {
 	fmt.Println(secret)
 
 	return nil
+}
+
+func getRequest(cmd SetCommand, url string) *http.Request {
+	var request *http.Request
+	if cmd.ContentType == "value" {
+		request = client.NewPutValueRequest(url, cmd.SecretIdentifier, cmd.Value)
+	} else {
+		request = client.NewPutCertificateRequest(url, cmd.SecretIdentifier, cmd.CertificateCA, cmd.CertificatePublic, cmd.CertificatePrivate)
+	}
+
+	return request
 }

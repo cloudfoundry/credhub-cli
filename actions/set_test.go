@@ -9,6 +9,8 @@ import (
 
 	"errors"
 
+	"bytes"
+
 	"github.com/pivotal-cf/cm-cli/client"
 	"github.com/pivotal-cf/cm-cli/config"
 	cmcli_errors "github.com/pivotal-cf/cm-cli/errors"
@@ -29,12 +31,18 @@ var _ = Describe("Set", func() {
 		subject = NewSet(&secretRepository, config)
 	})
 
-	Describe("SetValueSecret", func() {
-		It("sets and returns a secret from the server", func() {
-			request := client.NewPutValueRequest("pivotal.io", "my-secret", "abcd")
+	Describe("Set", func() {
+		It("set uses supplied request and returns a SecretBody from the server", func() {
+			myJsonRequest := `"{foo":"bar","obj":{"wild":"strawberries"}}`
+			request, _ := http.NewRequest("PUT", "my-url", bytes.NewReader([]byte(myJsonRequest)))
+			request.Header.Set("Content-Type", "application/json")
+
 			expectedBody := models.SecretBody{
 				ContentType: "value",
 				Value:       "abcd",
+				Certificate: &models.Certificate{
+					Ca: "duh",
+				},
 			}
 			expectedSecret := models.NewSecret("my-secret", expectedBody)
 			secretRepository.SendRequestStub = func(req *http.Request) (models.SecretBody, error) {
@@ -42,7 +50,7 @@ var _ = Describe("Set", func() {
 				return expectedBody, nil
 			}
 
-			secret, err := subject.SetValue("my-secret", "abcd")
+			secret, err := subject.Set(request, "my-secret")
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(secret).To(Equal(expectedSecret))
@@ -52,7 +60,8 @@ var _ = Describe("Set", func() {
 			It("returns a invalid target error when no api is set", func() {
 				subject = NewSet(&secretRepository, config.Config{})
 
-				_, error := subject.SetValue("my-secret", "abcd")
+				req := client.NewPutValueRequest("pivotal.io", "my-secret", "abcd")
+				_, error := subject.Set(req, "my-secret")
 
 				Expect(error).To(MatchError(cmcli_errors.NewNoTargetUrlError()))
 			})
@@ -65,7 +74,8 @@ var _ = Describe("Set", func() {
 					return models.SecretBody{}, expectedError
 				}
 
-				_, err := subject.SetValue("my-secret", "abcd")
+				req := client.NewPutValueRequest("pivotal.io", "my-secret", "abcd")
+				_, err := subject.Set(req, "my-secret")
 
 				Expect(err).To(Equal(expectedError))
 			})

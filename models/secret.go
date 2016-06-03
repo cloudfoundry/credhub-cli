@@ -15,14 +15,16 @@ func NewSecret(name string, secretBody SecretBody) Secret {
 }
 
 func (secret Secret) String() string {
-	if secret.SecretBody.ContentType == "value" {
-		return fmt.Sprintf("Type:	%s\nName:	%s\nValue:	%s",
-			secret.SecretBody.ContentType, secret.Name, secret.SecretBody.Value)
+	secretBody := secret.SecretBody
+	if secretBody.ContentType == "value" {
+		return fmt.Sprintf("Type:	value\nName:	%s\nValue:	%s",
+			secret.Name,
+			secretBody.Value)
 	} else {
 		return fmt.Sprintf("Type:	certificate\nName:	%s\nCA:	%s\nPublic:	%s\nPrivate:	%s",
 			secret.Name,
-			secret.SecretBody.Certificate.Ca,
-			secret.SecretBody.Certificate.Public,
-			secret.SecretBody.Certificate.Private)
+			secretBody.Certificate.Ca,
+			secretBody.Certificate.Public,
+			secretBody.Certificate.Private)
 	}
 }

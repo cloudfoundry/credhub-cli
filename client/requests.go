@@ -26,13 +26,14 @@ func NewPutValueRequest(apiTarget, secretIdentifier, secretContent string) *http
 func NewPutCertificateRequest(apiTarget, secretIdentifier, ca string, pub string, priv string) *http.Request {
 	url := apiTarget + "/api/v1/data/" + secretIdentifier
 
-	secret := models.CertificateRequest{
+	certificate := models.Certificate{
+		Ca:      ca,
+		Public:  pub,
+		Private: priv,
+	}
+	secret := models.SecretBody{
 		ContentType: "certificate",
-		Certificate: models.Certificate{
-			Ca:      ca,
-			Public:  pub,
-			Private: priv,
-		},
+		Certificate: &certificate,
 	}
 	body, _ := json.Marshal(secret)
 
