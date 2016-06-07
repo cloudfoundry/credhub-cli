@@ -29,7 +29,7 @@ CREDENTIAL MANAGEMENT:
 
 	set --type <cred type> --name <cred name> [set params]
 		Set the value and attributes of a credential.
-		-t, --type							Sets the type of credential to store or generate. Default: 'value'
+		-t, --type							Sets the type of credential to store or generate. (Default: 'value')
 		-n, --name							Selects the credential being set
 
 		Parameters for setting credential type 'value'
@@ -39,13 +39,13 @@ CREDENTIAL MANAGEMENT:
 		--ca								Sets the CA based on an input file*
 		--public							Sets the public key based on an input file*
 		--private							Sets the private key based on an input file*
-		--ca-string							Sets the CA to the parameter value*
-		--public-string						Sets the public key to the parameter value*
-		--private-string					Sets the private key to the parameter value*
+		--ca-string							Sets the CA to the parameter value
+		--public-string						Sets the public key to the parameter value
+		--private-string					Sets the private key to the parameter value
 
 	generate --type <cred type> --name <cred name> [generate params]
 		Generate and set a credential value based on generation parameters.
-		-t, --type							Sets the type of credential to store or generate. Default: 'value'
+		-t, --type							Sets the type of credential to store or generate. (Default: 'value')
 		-n, --name							Selects the credential being set
 
 		Parameters for generating credential type 'value'
