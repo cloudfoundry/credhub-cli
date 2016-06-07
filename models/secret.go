@@ -21,7 +21,7 @@ func (secret Secret) String() string {
 			secret.Name,
 			secretBody.Value)
 	} else {
-		return fmt.Sprintf("Type:	certificate\nName:	%s\nCA:	%s\nPublic:	%s\nPrivate:	%s",
+		return fmt.Sprintf("Type:		certificate\nName:		%s\nCA:		%s\nPublic:		%s\nPrivate:	%s",
 			secret.Name,
 			secretBody.Certificate.Ca,
 			secretBody.Certificate.Public,
