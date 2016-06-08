@@ -8,7 +8,6 @@ import (
 	"github.com/pivotal-cf/cm-cli/actions"
 	"github.com/pivotal-cf/cm-cli/client"
 	"github.com/pivotal-cf/cm-cli/config"
-	"github.com/pivotal-cf/cm-cli/errors"
 	"github.com/pivotal-cf/cm-cli/repositories"
 )
 
@@ -24,12 +23,6 @@ type SetCommand struct {
 func (cmd SetCommand) Execute([]string) error {
 	if cmd.ContentType == "" {
 		cmd.ContentType = "value"
-	}
-
-	if cmd.ContentType == "value" {
-		if cmd.Value == "" {
-			return errors.NewSetValueMissingError()
-		}
 	}
 
 	secretRepository := repositories.NewSecretRepository(client.NewHttpClient())

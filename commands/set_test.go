@@ -66,22 +66,6 @@ var _ = Describe("Set", func() {
 			}
 		})
 
-		It("displays missing 'v' option as required parameters", func() {
-			session := runCommand("set", "-n", "my-secret")
-
-			Eventually(session).Should(Exit(1))
-
-			Expect(session.Err).To(Say("A non-empty value must be specified. Please validate and retry your request."))
-		})
-
-		It("complains if value is empty string", func() {
-			session := runCommand("set", "-n", "my-secret", "-v", "")
-
-			Eventually(session).Should(Exit(1))
-
-			Expect(session.Err).To(Say("A non-empty value must be specified. Please validate and retry your request."))
-		})
-
 		It("displays the server provided error when an error is received", func() {
 			server.AppendHandlers(
 				RespondWith(http.StatusBadRequest, `{"error": "you fail."}`),
