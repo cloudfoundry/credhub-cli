@@ -21,7 +21,7 @@ import (
 
 const VALUE_REQUEST_JSON = `{"type":"value", "value":"%s"}`
 const VALUE_RESPONSE_JSON = VALUE_REQUEST_JSON
-const VALUE_RESPONSE_TABLE = `Type:	value\nName:	%s\nValue:	%s`
+const VALUE_RESPONSE_TABLE = `Type:		value\nName:		%s\nValue:		%s`
 const CERTIFICATE_REQUEST_JSON = `{"type":"certificate","certificate":{"ca":"%s","public":"%s","private":"%s"}}`
 const CERTIFICATE_RESPONSE_JSON = CERTIFICATE_REQUEST_JSON
 const CERTIFICATE_RESPONSE_TABLE = `Type:		certificate\nName:		%s\nCA:		%s\nPublic:		%s\nPrivate:	%s`

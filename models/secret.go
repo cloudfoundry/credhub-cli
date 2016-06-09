@@ -1,6 +1,9 @@
 package models
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 type Secret struct {
 	Name       string
@@ -15,16 +18,29 @@ func NewSecret(name string, secretBody SecretBody) Secret {
 }
 
 func (secret Secret) String() string {
+	lines := []string{}
+
 	secretBody := secret.SecretBody
+	lines = append(lines,
+		fmt.Sprintf("Type:		%s", secretBody.ContentType),
+		fmt.Sprintf("Name:		%s", secret.Name),
+	)
+
 	if secretBody.ContentType == "value" {
-		return fmt.Sprintf("Type:	value\nName:	%s\nValue:	%s",
-			secret.Name,
-			secretBody.Value)
+		lines = append(lines, fmt.Sprintf("Value:		%s", secretBody.Value))
 	} else {
-		return fmt.Sprintf("Type:		certificate\nName:		%s\nCA:		%s\nPublic:		%s\nPrivate:	%s",
-			secret.Name,
-			secretBody.Certificate.Ca,
-			secretBody.Certificate.Public,
-			secretBody.Certificate.Private)
+		if secretBody.Certificate.Ca != "" {
+			lines = append(lines, fmt.Sprintf("CA:		%s", secretBody.Certificate.Ca))
+		}
+
+		if secretBody.Certificate.Public != "" {
+			lines = append(lines, fmt.Sprintf("Public:		%s", secretBody.Certificate.Public))
+		}
+
+		if secretBody.Certificate.Private != "" {
+			lines = append(lines, fmt.Sprintf("Private:	%s", secretBody.Certificate.Private))
+		}
 	}
+
+	return strings.Join(lines, "\n")
 }
