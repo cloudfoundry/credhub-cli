@@ -47,7 +47,7 @@ CREDENTIAL MANAGEMENT:
 		-t, --type							Sets the type of credential to store or generate. (Default: 'value')
 		-n, --name							Selects the credential being set
 
-		Set parameters by [Type]
+		Generate parameters by [Type]
 		-l, --length NUMBER					[Value] Sets length of generated value (Default: 20)
 		--exclude-upper 			        [Value] Exclude upper alpha characters from generated value
 		--exclude-lower 		            [Value] Exclude lower alpha characters from generated value
