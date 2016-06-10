@@ -67,13 +67,24 @@ var _ = Describe("SecretRepository", func() {
 					StatusCode: 400,
 					Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"error": "My error"}`))),
 				}
-
 				httpClient.DoReturns(&responseObj, nil)
 
 				request, _ := http.NewRequest("GET", "http://example.com/foo", nil)
 				_, error := subject.SendRequest(request)
 
 				Expect(error.Error()).To(Equal("My error"))
+			})
+
+			It("returns a NewResponseError when the JSON response cannot be parsed", func() {
+				responseObj := http.Response{
+					StatusCode: 200,
+					Body:       ioutil.NopCloser(bytes.NewReader([]byte("adasdasdasasd"))),
+				}
+				httpClient.DoReturns(&responseObj, nil)
+				request, _ := http.NewRequest("GET", "http://example.com/foo", nil)
+
+				_, error := subject.SendRequest(request)
+				Expect(error).To(MatchError(cmcli_errors.NewResponseError()))
 			})
 		})
 	})

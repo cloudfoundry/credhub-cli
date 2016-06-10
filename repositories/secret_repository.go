@@ -34,7 +34,9 @@ func (r secretRepository) SendRequest(request *http.Request) (models.SecretBody,
 
 	decoder := json.NewDecoder(response.Body)
 	secretBody := models.SecretBody{}
-	decoder.Decode(&secretBody)
-
-	return secretBody, nil
+	err = decoder.Decode(&secretBody)
+	if err != nil {
+		return models.SecretBody{}, errors.NewResponseError()
+	}
+	return secretBody, err
 }

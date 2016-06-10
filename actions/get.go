@@ -1,48 +1,38 @@
 package actions
 
 import (
-	"encoding/json"
+	"net/http"
 
-	"github.com/pivotal-cf/cm-cli/client"
 	"github.com/pivotal-cf/cm-cli/config"
-	"github.com/pivotal-cf/cm-cli/errors"
 	"github.com/pivotal-cf/cm-cli/models"
+	"github.com/pivotal-cf/cm-cli/repositories"
 )
 
 type Get struct {
-	httpClient client.HttpClient
-	config     config.Config
+	secretRepository repositories.SecretRepository
+	config           config.Config
 }
 
-func NewGet(httpClient client.HttpClient, config config.Config) Get {
-	return Get{httpClient: httpClient, config: config}
+func NewGet(secretRepository repositories.SecretRepository, config config.Config) Get {
+	return Get{secretRepository: secretRepository, config: config}
 }
 
-func (get Get) GetSecret(secretIdentifier string) (models.Secret, error) {
+func (get Get) GetSecret(req *http.Request, secretIdentifier string) (models.Secret, error) {
 	err := config.ValidateConfig(get.config)
 
 	if err != nil {
 		return models.Secret{}, err
 	}
 
-	request := client.NewGetSecretRequest(get.config.ApiURL, secretIdentifier)
-
-	response, err := get.httpClient.Do(request)
+	secretBody, err := get.secretRepository.SendRequest(req)
 	if err != nil {
-		return models.Secret{}, errors.NewNetworkError()
+		return models.Secret{}, err
 	}
 
-	if response.StatusCode == 404 {
-		return models.Secret{}, errors.ParseError(response.Body)
-	}
+	return models.NewSecret(secretIdentifier, secretBody), nil
 
-	secretBody := new(models.SecretBody)
-
-	decoder := json.NewDecoder(response.Body)
-	err = decoder.Decode(secretBody)
-	if err != nil {
-		return models.Secret{}, errors.NewResponseError()
-	}
-
-	return models.NewSecret(secretIdentifier, *secretBody), nil
 }
+
+//if response.StatusCode == 404 {
+//return models.Secret{}, errors.ParseError(response.Body)
+//}
