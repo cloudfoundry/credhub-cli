@@ -3,39 +3,27 @@ package actions
 import (
 	"net/http"
 
-	"github.com/pivotal-cf/cm-cli/client"
 	"github.com/pivotal-cf/cm-cli/config"
-	"github.com/pivotal-cf/cm-cli/errors"
+	"github.com/pivotal-cf/cm-cli/repositories"
 )
 
 type Delete struct {
-	httpClient client.HttpClient
-	config     config.Config
+	secretRepository repositories.SecretRepository
+	config           config.Config
 }
 
-func NewDelete(httpClient client.HttpClient, config config.Config) Delete {
-	return Delete{httpClient: httpClient, config: config}
+func NewDelete(secretRepository repositories.SecretRepository, config config.Config) Delete {
+	return Delete{secretRepository: secretRepository, config: config}
 }
 
-func (delete Delete) Delete(secretIdentifier string) error {
+func (delete Delete) Delete(req *http.Request, secretIdentifier string) error {
 	err := config.ValidateConfig(delete.config)
 
 	if err != nil {
 		return err
 	}
 
-	request := client.NewDeleteSecretRequest(delete.config.ApiURL, secretIdentifier)
+	_, err = delete.secretRepository.SendRequest(req)
 
-	response, err := delete.httpClient.Do(request)
-	if err != nil {
-		return errors.NewNetworkError()
-	}
-
-	if response.StatusCode == http.StatusNotFound {
-		return errors.ParseError(response.Body)
-	} else if response.StatusCode != http.StatusOK {
-		return errors.NewSecretBadRequestError()
-	}
-
-	return nil
+	return err
 }

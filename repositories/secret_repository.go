@@ -17,8 +17,16 @@ type secretRepository struct {
 	httpClient client.HttpClient
 }
 
+type emptyBodyRepository struct {
+	httpClient client.HttpClient
+}
+
 func NewSecretRepository(httpClient client.HttpClient) SecretRepository {
 	return secretRepository{httpClient: httpClient}
+}
+
+func NewEmptyBodyRepository(httpClient client.HttpClient) SecretRepository {
+	return emptyBodyRepository{httpClient: httpClient}
 }
 
 func (r secretRepository) SendRequest(request *http.Request) (models.SecretBody, error) {
@@ -38,5 +46,19 @@ func (r secretRepository) SendRequest(request *http.Request) (models.SecretBody,
 	if err != nil {
 		return models.SecretBody{}, errors.NewResponseError()
 	}
-	return secretBody, err
+	return secretBody, nil
+}
+
+func (r emptyBodyRepository) SendRequest(request *http.Request) (models.SecretBody, error) {
+	response, err := r.httpClient.Do(request)
+
+	if err != nil {
+		return models.SecretBody{}, errors.NewNetworkError()
+	}
+
+	if response.StatusCode < 200 || response.StatusCode > 299 {
+		return models.SecretBody{}, errors.ParseError(response.Body)
+	}
+
+	return models.SecretBody{}, nil
 }

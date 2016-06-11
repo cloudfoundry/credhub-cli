@@ -5,17 +5,13 @@ import (
 	. "github.com/onsi/gomega"
 	. "github.com/pivotal-cf/cm-cli/actions"
 
-	//"errors"
-	//"io/ioutil"
 	"net/http"
 
 	"github.com/pivotal-cf/cm-cli/client"
-	//"github.com/pivotal-cf/cm-cli/client/clientfakes"
 	"github.com/pivotal-cf/cm-cli/config"
 	cm_errors "github.com/pivotal-cf/cm-cli/errors"
 	"github.com/pivotal-cf/cm-cli/models"
 	"github.com/pivotal-cf/cm-cli/repositories/repositoriesfakes"
-	//"bytes"
 )
 
 var _ = Describe("Get", func() {
@@ -27,14 +23,12 @@ var _ = Describe("Get", func() {
 
 	BeforeEach(func() {
 		myConfig := config.Config{ApiURL: "pivotal.io"}
-
 		subject = NewGet(&secretRepository, myConfig)
 	})
 
 	Describe("GetSecret", func() {
 		It("gets and returns a secret from the server", func() {
 			request, _ := http.NewRequest("GET", "my-url", nil)
-
 			expectedBody := models.SecretBody{
 				ContentType: "value",
 				Value:       "potatoes",
@@ -59,18 +53,6 @@ var _ = Describe("Get", func() {
 
 				Expect(error).To(MatchError(cm_errors.NewNoTargetUrlError()))
 			})
-
-			//It("returns server error when response is 404", func() {
-			//	responseObj := http.Response{
-			//		StatusCode: 404,
-			//		Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"error": "My error"}`))),
-			//	}
-			//
-			//	secretRepository.SendRequestStub(&responseObj, nil)
-			//	req := client.NewGetSecretRequest("pivotal.io", "my-secret")
-			//	_, error := subject.GetSecret(req, "my-secret")
-			//	Expect(error.Error()).To(Equal("My error"))
-			//})
 		})
 	})
 })

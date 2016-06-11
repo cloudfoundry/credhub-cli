@@ -28,10 +28,6 @@ func NewNoTargetUrlError() error {
 	return errors.New("Credential Manager API location is not set. Please target the location of your credential manager with `cm api` to continue.")
 }
 
-func NewSetValueMissingError() error {
-	return errors.New("A non-empty value must be specified. Please validate and retry your request.")
-}
-
 func ParseError(reader io.Reader) error {
 	decoder := json.NewDecoder(reader)
 	serverError := models.ServerError{}

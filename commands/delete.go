@@ -6,6 +6,7 @@ import (
 	"github.com/pivotal-cf/cm-cli/actions"
 	"github.com/pivotal-cf/cm-cli/client"
 	"github.com/pivotal-cf/cm-cli/config"
+	"github.com/pivotal-cf/cm-cli/repositories"
 )
 
 type DeleteCommand struct {
@@ -13,9 +14,11 @@ type DeleteCommand struct {
 }
 
 func (cmd DeleteCommand) Execute([]string) error {
-	action := actions.NewDelete(client.NewHttpClient(), config.ReadConfig())
+	secretRepository := repositories.NewEmptyBodyRepository(client.NewHttpClient())
+	config := config.ReadConfig()
+	action := actions.NewDelete(secretRepository, config)
 
-	err := action.Delete(cmd.SecretIdentifier)
+	err := action.Delete(client.NewDeleteSecretRequest(config.ApiURL, cmd.SecretIdentifier), cmd.SecretIdentifier)
 
 	if err == nil {
 		fmt.Println("Secret successfully deleted")

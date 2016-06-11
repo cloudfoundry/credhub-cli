@@ -30,9 +30,4 @@ func (get Get) GetSecret(req *http.Request, secretIdentifier string) (models.Sec
 	}
 
 	return models.NewSecret(secretIdentifier, secretBody), nil
-
 }
-
-//if response.StatusCode == 404 {
-//return models.Secret{}, errors.ParseError(response.Body)
-//}
