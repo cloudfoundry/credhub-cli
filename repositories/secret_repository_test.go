@@ -22,7 +22,6 @@ var _ = Describe("SecretRepository", func() {
 		httpClient clientfakes.FakeHttpClient
 	)
 
-
 	Describe("SendRequest", func() {
 		Context("when there is a response body", func() {
 			BeforeEach(func() {

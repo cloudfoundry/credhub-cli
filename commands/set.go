@@ -28,8 +28,8 @@ func (cmd SetCommand) Execute([]string) error {
 	secretRepository := repositories.NewSecretRepository(client.NewHttpClient())
 
 	config := config.ReadConfig()
-	action := actions.NewSet(secretRepository, config)
-	secret, err := action.Set(getRequest(cmd, config.ApiURL), cmd.SecretIdentifier)
+	action := actions.NewAction(secretRepository, config)
+	secret, err := action.DoAction(getRequest(cmd, config.ApiURL), cmd.SecretIdentifier)
 
 	if err != nil {
 		return err

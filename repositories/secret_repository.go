@@ -30,14 +30,9 @@ func NewEmptyBodyRepository(httpClient client.HttpClient) SecretRepository {
 }
 
 func (r secretRepository) SendRequest(request *http.Request) (models.SecretBody, error) {
-	response, err := r.httpClient.Do(request)
-
+	response, err := doSendRequest(r.httpClient, request)
 	if err != nil {
-		return models.SecretBody{}, errors.NewNetworkError()
-	}
-
-	if response.StatusCode < 200 || response.StatusCode > 299 {
-		return models.SecretBody{}, errors.ParseError(response.Body)
+		return models.SecretBody{}, err
 	}
 
 	decoder := json.NewDecoder(response.Body)
@@ -50,15 +45,23 @@ func (r secretRepository) SendRequest(request *http.Request) (models.SecretBody,
 }
 
 func (r emptyBodyRepository) SendRequest(request *http.Request) (models.SecretBody, error) {
-	response, err := r.httpClient.Do(request)
-
+	_, err := doSendRequest(r.httpClient, request)
 	if err != nil {
-		return models.SecretBody{}, errors.NewNetworkError()
-	}
-
-	if response.StatusCode < 200 || response.StatusCode > 299 {
-		return models.SecretBody{}, errors.ParseError(response.Body)
+		return models.SecretBody{}, err
 	}
 
 	return models.SecretBody{}, nil
+}
+
+func doSendRequest(client client.HttpClient, request *http.Request) (*http.Response, error) {
+	response, err := client.Do(request)
+
+	if err != nil {
+		return nil, errors.NewNetworkError()
+	}
+
+	if response.StatusCode < 200 || response.StatusCode > 299 {
+		return nil, errors.ParseError(response.Body)
+	}
+	return response, nil
 }

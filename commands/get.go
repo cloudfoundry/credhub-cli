@@ -16,8 +16,8 @@ type GetCommand struct {
 func (cmd GetCommand) Execute([]string) error {
 	secretRepository := repositories.NewSecretRepository(client.NewHttpClient())
 	config := config.ReadConfig()
-	action := actions.NewGet(secretRepository, config)
-	secret, err := action.GetSecret(client.NewGetSecretRequest(config.ApiURL, cmd.SecretIdentifier), cmd.SecretIdentifier)
+	action := actions.NewAction(secretRepository, config)
+	secret, err := action.DoAction(client.NewGetSecretRequest(config.ApiURL, cmd.SecretIdentifier), cmd.SecretIdentifier)
 	if err != nil {
 		return err
 	}

@@ -8,26 +8,23 @@ import (
 	"github.com/pivotal-cf/cm-cli/repositories"
 )
 
-type Set struct {
+type Action struct {
 	secretRepository repositories.SecretRepository
 	config           config.Config
 }
 
-func NewSet(secretRepository repositories.SecretRepository, config config.Config) Set {
-	return Set{
-		secretRepository: secretRepository,
-		config:           config,
-	}
+func NewAction(secretRepository repositories.SecretRepository, config config.Config) Action {
+	return Action{secretRepository: secretRepository, config: config}
 }
 
-func (set Set) Set(req *http.Request, secretIdentifier string) (models.Secret, error) {
-	err := config.ValidateConfig(set.config)
+func (action Action) DoAction(req *http.Request, secretIdentifier string) (models.Secret, error) {
+	err := config.ValidateConfig(action.config)
 
 	if err != nil {
 		return models.Secret{}, err
 	}
 
-	secretBody, err := set.secretRepository.SendRequest(req)
+	secretBody, err := action.secretRepository.SendRequest(req)
 	if err != nil {
 		return models.Secret{}, err
 	}
