@@ -7,6 +7,8 @@ import (
 
 	"runtime"
 
+	"os"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -33,7 +35,7 @@ var _ = Describe("Set", func() {
 		Eventually(session.Out).Should(Say(responseMyPotatoes))
 	})
 
-	It("puts a secret using explicit certificate type", func() {
+	It("puts a secret using explicit certificate type and string values", func() {
 		var responseMyCertificate = fmt.Sprintf(CERTIFICATE_RESPONSE_TABLE, "my-secret", "my-ca", "my-pub", "my-priv")
 		setupPutCertificateServer("my-secret", "my-ca", "my-pub", "my-priv")
 
@@ -41,6 +43,23 @@ var _ = Describe("Set", func() {
 			"-t", "certificate", "--ca-string", "my-ca",
 			"--public-string", "my-pub", "--private-string", "my-priv")
 
+		Eventually(session).Should(Exit(0))
+		Eventually(session.Out).Should(Say(responseMyCertificate))
+	})
+
+	It("puts a secret using explicit certificate type and values read from files", func() {
+		var responseMyCertificate = fmt.Sprintf(CERTIFICATE_RESPONSE_TABLE, "my-secret", "my-ca", "my-pub", "my-priv")
+		setupPutCertificateServer("my-secret", "my-ca", "my-pub", "my-priv")
+		tempDir := createTempDir("certFilesForTesting")
+		caFilename := createSecretFile(tempDir, "ca.txt", "my-ca")
+		publicFilename := createSecretFile(tempDir, "public.txt", "my-pub")
+		privateFilename := createSecretFile(tempDir, "private.txt", "my-priv")
+
+		session := runCommand("set", "-n", "my-secret",
+			"-t", "certificate", "--ca", caFilename,
+			"--public", publicFilename, "--private", privateFilename)
+
+		os.RemoveAll(tempDir)
 		Eventually(session).Should(Exit(0))
 		Eventually(session.Out).Should(Say(responseMyCertificate))
 	})

@@ -88,3 +88,20 @@ func runCommand(args ...string) *Session {
 
 	return session
 }
+
+func createTempDir(prefix string) string {
+	name, err := ioutil.TempDir("", prefix)
+	if err != nil {
+		panic(err)
+	}
+	return name
+}
+
+func createSecretFile(dir, filename string, contents string) string {
+	path := dir + "/" + filename
+	err := ioutil.WriteFile(path, []byte(contents), 0644)
+	if err != nil {
+		panic(err)
+	}
+	return path
+}
