@@ -13,7 +13,6 @@ GETTING STARTED:
  	api -s <server URI>
 		View or set the targeted CredHub API
 		-s, --server URI					Sets URI for API server
-		--skip-ssl-validation				Skip verification of the API endpoint. Not recommended!*
 
 	login*
 		Authenticates interactively with CredHub.
