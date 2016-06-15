@@ -14,61 +14,59 @@ import (
 	. "github.com/onsi/gomega/ghttp"
 )
 
-const GENERATE_REQUEST_JSON = `{"type":"value","parameters":%s}`
+const GENERATE_REQUEST_JSON = `{"type":"%s","parameters":%s}`
 
-var _ = Describe("Set", func() {
-	It("generates a secret without parameters", func() {
-		setupPostServer("my-secret", "potatoes", generateRequestJson("{}"))
-
-		session := runCommand("generate", "-n", "my-secret")
-
-		Eventually(session).Should(Exit(0))
-		Eventually(session.Out).Should(Say(responseMyPotatoes))
+var _ = Describe("Generate", func() {
+	It("without parameters", func() {
+		doValueOptionTest(`{}`)
 	})
 
-	It("generates a secret with length", func() {
-		setupPostServer("my-secret", "potatoes", generateRequestJson(`{"length":42}`))
+	Describe("with a variety of value parameters", func() {
+		It("including length", func() {
+			doValueOptionTest(`{"length":42}`, "-l", "42")
+		})
 
-		session := runCommand("generate", "-n", "my-secret", "-l", "42")
+		It("excluding upper case", func() {
+			doValueOptionTest(`{"exclude_upper":true}`, "--exclude-upper")
+		})
 
-		Eventually(session).Should(Exit(0))
-		Eventually(session.Out).Should(Say(responseMyPotatoes))
+		It("excluding lower case", func() {
+			doValueOptionTest(`{"exclude_lower":true}`, "--exclude-lower")
+		})
+
+		It("excluding special characters", func() {
+			doValueOptionTest(`{"exclude_special":true}`, "--exclude-special")
+		})
+
+		It("excluding numbers", func() {
+			doValueOptionTest(`{"exclude_number":true}`, "--exclude-number")
+		})
 	})
 
-	It("generates a secret without upper case", func() {
-		setupPostServer("my-secret", "potatoes", generateRequestJson(`{"exclude_upper":true}`))
+	Describe("with a variety of certificate parameters", func() {
+		It("including common name", func() {
+			doCertificateOptionTest(`{"common_name":"common.name.io"}`, "--common-name", "common.name.io")
+		})
 
-		session := runCommand("generate", "-n", "my-secret", "--exclude-upper")
+		It("including organization", func() {
+			doCertificateOptionTest(`{"organization":"organization.io"}`, "--organization", "organization.io")
+		})
 
-		Eventually(session).Should(Exit(0))
-		Eventually(session.Out).Should(Say(responseMyPotatoes))
-	})
+		It("including organization unit", func() {
+			doCertificateOptionTest(`{"organization_unit":"My Unit"}`, "--organization-unit", "My Unit")
+		})
 
-	It("generates a secret without lower case", func() {
-		setupPostServer("my-secret", "potatoes", generateRequestJson(`{"exclude_lower":true}`))
+		It("including locality", func() {
+			doCertificateOptionTest(`{"locality":"My Locality"}`, "--locality", "My Locality")
+		})
 
-		session := runCommand("generate", "-n", "my-secret", "--exclude-lower")
+		It("including state", func() {
+			doCertificateOptionTest(`{"state":"My State"}`, "--state", "My State")
+		})
 
-		Eventually(session).Should(Exit(0))
-		Eventually(session.Out).Should(Say(responseMyPotatoes))
-	})
-
-	It("generates a secret without special characters", func() {
-		setupPostServer("my-secret", "potatoes", generateRequestJson(`{"exclude_special":true}`))
-
-		session := runCommand("generate", "-n", "my-secret", "--exclude-special")
-
-		Eventually(session).Should(Exit(0))
-		Eventually(session.Out).Should(Say(responseMyPotatoes))
-	})
-
-	It("generates a secret without numbers", func() {
-		setupPostServer("my-secret", "potatoes", generateRequestJson(`{"exclude_number":true}`))
-
-		session := runCommand("generate", "-n", "my-secret", "--exclude-number")
-
-		Eventually(session).Should(Exit(0))
-		Eventually(session.Out).Should(Say(responseMyPotatoes))
+		It("including country", func() {
+			doCertificateOptionTest(`{"country":"My Country"}`, "--country", "My Country")
+		})
 	})
 
 	Describe("Help", func() {
@@ -117,6 +115,30 @@ func setupPostServer(name string, value string, requestJson string) {
 	)
 }
 
-func generateRequestJson(params string) string {
-	return fmt.Sprintf(GENERATE_REQUEST_JSON, params)
+func generateRequestJson(secretType string, params string) string {
+	return fmt.Sprintf(GENERATE_REQUEST_JSON, secretType, params)
+}
+
+func doValueOptionTest(optionJson string, options ...string) {
+	setupPostServer("my-secret", "potatoes", generateRequestJson("value", optionJson))
+
+	leftOpts := []string{"generate", "-n", "my-secret"}
+
+	stuff := append(leftOpts, options...)
+	session := runCommand(stuff...)
+
+	Eventually(session).Should(Exit(0))
+	Eventually(session.Out).Should(Say(responseMyPotatoes))
+}
+
+func doCertificateOptionTest(optionJson string, options ...string) {
+	setupPostServer("my-secret", "potatoes", generateRequestJson("certificate", optionJson))
+
+	leftOpts := []string{"generate", "-n", "my-secret", "-t", "certificate"}
+
+	stuff := append(leftOpts, options...)
+	session := runCommand(stuff...)
+
+	Eventually(session).Should(Exit(0))
+	Eventually(session.Out).Should(Say(responseMyPotatoes))
 }

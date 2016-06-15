@@ -18,6 +18,12 @@ type GenerateCommand struct {
 	ExcludeNumber    bool   `long:"exclude-number" description:"Exclude number characters from generated value"`
 	ExcludeUpper     bool   `long:"exclude-upper" description:"Exclude upper alpha characters from generated value"`
 	ExcludeLower     bool   `long:"exclude-lower" description:"Exclude lower alpha characters from generated value"`
+	CommonName       string `long:"common-name" description:"Sets the common name of the generated certificate"`
+	Organization     string `long:"organization" description:"Sets the organization of the generated certificate"`
+	OrganizationUnit string `long:"organization-unit" description:"Sets the organization unit of the generated certificate"`
+	Locality         string `long:"locality" description:"Sets the locality/city of the generated certificate"`
+	State            string `long:"state" description:"Sets the state/province of the generated certificate"`
+	Country          string `long:"country" description:"Sets the country of the generated certificate"`
 }
 
 func (cmd GenerateCommand) Execute([]string) error {
@@ -28,11 +34,17 @@ func (cmd GenerateCommand) Execute([]string) error {
 	secretRepository := repositories.NewSecretRepository(client.NewHttpClient())
 
 	parameters := models.SecretParameters{
-		ExcludeSpecial: cmd.ExcludeSpecial,
-		ExcludeNumber:  cmd.ExcludeNumber,
-		ExcludeUpper:   cmd.ExcludeUpper,
-		ExcludeLower:   cmd.ExcludeLower,
-		Length:         cmd.Length,
+		ExcludeSpecial:   cmd.ExcludeSpecial,
+		ExcludeNumber:    cmd.ExcludeNumber,
+		ExcludeUpper:     cmd.ExcludeUpper,
+		ExcludeLower:     cmd.ExcludeLower,
+		Length:           cmd.Length,
+		CommonName:       cmd.CommonName,
+		Organization:     cmd.Organization,
+		OrganizationUnit: cmd.OrganizationUnit,
+		Locality:         cmd.Locality,
+		State:            cmd.State,
+		Country:          cmd.Country,
 	}
 
 	config := config.ReadConfig()
