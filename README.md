@@ -34,9 +34,9 @@ CREDENTIAL MANAGEMENT:
 
 		Set parameters by [Type]
 		-v, --value 						[Value] Sets the value for the credential.
-		--ca								[Certificate] Sets the CA based on an input file*
-		--public							[Certificate] Sets the public key based on an input file*
-		--private							[Certificate] Sets the private key based on an input file*
+		--ca								[Certificate] Sets the CA based on an input file
+		--public							[Certificate] Sets the public key based on an input file
+		--private							[Certificate] Sets the private key based on an input file
 		--ca-string							[Certificate] Sets the CA to the parameter value
 		--public-string						[Certificate] Sets the public key to the parameter value
 		--private-string					[Certificate] Sets the private key to the parameter value
@@ -55,13 +55,13 @@ CREDENTIAL MANAGEMENT:
 		--ca					     	    [Certificate] Sets the CA used to sign the generated certificate*
 		--duration							[Certificate] Sets the valid duration for the generated certificate*
 		--key-length						[Certificate] Sets the bit length of the key*
-		--common-name						[Certificate] Sets the common name of the generated certificate*
+		--common-name						[Certificate] Sets the common name of the generated certificate
 		--alternate-name					[Certificate] Sets an alternate name of the generated certificate*
-		--organization						[Certificate] Sets the organization of the generated certificate*
-		--organization-unit					[Certificate] Sets the organization unit of the generated certificate*
-		--locality							[Certificate] Sets the locality/city of the generated certificate*
-		--state								[Certificate] Sets the state/province of the generated certificate*
-		--country							[Certificate] Sets the country of the generated certificate*
+		--organization						[Certificate] Sets the organization of the generated certificate
+		--organization-unit					[Certificate] Sets the organization unit of the generated certificate
+		--locality							[Certificate] Sets the locality/city of the generated certificate
+		--state								[Certificate] Sets the state/province of the generated certificate
+		--country							[Certificate] Sets the country of the generated certificate
 		
 		
 	get --name <cred name>
