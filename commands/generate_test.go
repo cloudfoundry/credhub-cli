@@ -67,6 +67,10 @@ var _ = Describe("Generate", func() {
 		It("including country", func() {
 			doCertificateOptionTest(`{"country":"My Country"}`, "--country", "My Country")
 		})
+
+		It("including multiple alternate names", func() {
+			doCertificateOptionTest(`{"alternate_name": [ "Alt1", "Alt2" ]}`, "--alternate-name", "Alt1", "--alternate-name", "Alt2")
+		})
 	})
 
 	Describe("Help", func() {
