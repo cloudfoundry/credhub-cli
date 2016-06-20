@@ -71,6 +71,10 @@ var _ = Describe("Generate", func() {
 		It("including multiple alternate names", func() {
 			doCertificateOptionTest(`{"alternate_name": [ "Alt1", "Alt2" ]}`, "--alternate-name", "Alt1", "--alternate-name", "Alt2")
 		})
+
+		It("including key length", func() {
+			doCertificateOptionTest(`{"key_length":"2048"}`, "--key-length", "2048")
+		})
 	})
 
 	Describe("Help", func() {

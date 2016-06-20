@@ -11,20 +11,21 @@ import (
 )
 
 type GenerateCommand struct {
-	SecretIdentifier string `short:"n" required:"yes" long:"name" description:"Selects the secret being set"`
-	ContentType      string `short:"t" long:"type" description:"Sets the type of secret to store or generate. Default: 'value'"`
-	Length           int    `short:"l" long:"length" description:"Sets length of generated value (Default: 20)"`
-	ExcludeSpecial   bool   `long:"exclude-special" description:"Exclude special characters from generated value"`
-	ExcludeNumber    bool   `long:"exclude-number" description:"Exclude number characters from generated value"`
-	ExcludeUpper     bool   `long:"exclude-upper" description:"Exclude upper alpha characters from generated value"`
-	ExcludeLower     bool   `long:"exclude-lower" description:"Exclude lower alpha characters from generated value"`
-	CommonName       string `long:"common-name" description:"Sets the common name of the generated certificate"`
-	Organization     string `long:"organization" description:"Sets the organization of the generated certificate"`
-	OrganizationUnit string `long:"organization-unit" description:"Sets the organization unit of the generated certificate"`
-	Locality         string `long:"locality" description:"Sets the locality/city of the generated certificate"`
-	State            string `long:"state" description:"Sets the state/province of the generated certificate"`
-	Country          string `long:"country" description:"Sets the country of the generated certificate"`
+	SecretIdentifier string  `short:"n" required:"yes" long:"name" description:"Selects the secret being set"`
+	ContentType      string  `short:"t" long:"type" description:"Sets the type of secret to store or generate. Default: 'value'"`
+	Length           int     `short:"l" long:"length" description:"Sets length of generated value (Default: 20)"`
+	ExcludeSpecial   bool    `long:"exclude-special" description:"Exclude special characters from generated value"`
+	ExcludeNumber    bool    `long:"exclude-number" description:"Exclude number characters from generated value"`
+	ExcludeUpper     bool    `long:"exclude-upper" description:"Exclude upper alpha characters from generated value"`
+	ExcludeLower     bool    `long:"exclude-lower" description:"Exclude lower alpha characters from generated value"`
+	CommonName       string  `long:"common-name" description:"Sets the common name of the generated certificate"`
+	Organization     string  `long:"organization" description:"Sets the organization of the generated certificate"`
+	OrganizationUnit string  `long:"organization-unit" description:"Sets the organization unit of the generated certificate"`
+	Locality         string  `long:"locality" description:"Sets the locality/city of the generated certificate"`
+	State            string  `long:"state" description:"Sets the state/province of the generated certificate"`
+	Country          string  `long:"country" description:"Sets the country of the generated certificate"`
 	AlternateName 	 []string`long:"alternate-name" description:"Sets an alternate name of the generated certificate. Multiple alternate names can be set"`
+	KeyLength 	 string  `long:"key-length" description:"Sets the bit length of the generated key"`
 }
 
 func (cmd GenerateCommand) Execute([]string) error {
@@ -47,6 +48,7 @@ func (cmd GenerateCommand) Execute([]string) error {
 		State:            cmd.State,
 		Country:          cmd.Country,
 		AlternateName: 	  cmd.AlternateName,
+		KeyLength:	  cmd.KeyLength,
 	}
 
 	config := config.ReadConfig()
