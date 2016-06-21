@@ -73,7 +73,7 @@ var _ = Describe("Generate", func() {
 		})
 
 		It("including key length", func() {
-			doCertificateOptionTest(`{"key_length":"2048"}`, "--key-length", "2048")
+			doCertificateOptionTest(`{"key_length":2048}`, "--key-length", "2048")
 		})
 	})
 
