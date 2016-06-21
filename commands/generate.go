@@ -24,7 +24,7 @@ type GenerateCommand struct {
 	Locality         string   `long:"locality" description:"Sets the locality/city of the generated certificate"`
 	State            string   `long:"state" description:"Sets the state/province of the generated certificate"`
 	Country          string   `long:"country" description:"Sets the country of the generated certificate"`
-	AlternateName    []string `long:"alternate-name" description:"Sets an alternate name of the generated certificate. Multiple alternate names can be set"`
+	AlternativeName  []string `long:"alternative-name" description:"Sets an alternative name of the generated certificate. Multiple alternative names can be set"`
 	KeyLength        int      `long:"key-length" description:"Sets the bit length of the generated key"`
 }
 
@@ -47,7 +47,7 @@ func (cmd GenerateCommand) Execute([]string) error {
 		Locality:         cmd.Locality,
 		State:            cmd.State,
 		Country:          cmd.Country,
-		AlternateName:    cmd.AlternateName,
+		AlternativeName:  cmd.AlternativeName,
 		KeyLength:        cmd.KeyLength,
 	}
 

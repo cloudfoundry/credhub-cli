@@ -59,7 +59,7 @@ CREDENTIAL MANAGEMENT:
 		--duration [1-3650]						[Certificate] Valid duration (in days) of the generated certificate* (Default: 365)
 		--key-length [2048, 3072, 4096]			[Certificate] Bit length of the generated key (Default: 2048)
 		--common-name 'COMMON NAME'				[Certificate] Common name of the generated certificate
-		--alternative-name 'ALT NAME'			[Certificate] Alternate name(s) of the generated certificate
+		--alternative-name 'ALT NAME'			[Certificate] Alternative name(s) of the generated certificate
 		--organization 'ORG'					[Certificate] Organization of the generated certificate
 		--organization-unit 'ORG UNIT'			[Certificate] Organization unit of the generated certificate
 		--locality 'LOCALITY'					[Certificate] Locality/city of the generated certificate
