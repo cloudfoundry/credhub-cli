@@ -14,4 +14,5 @@ type SecretParameters struct {
 	Country          string   `json:"country,omitempty"`
 	AlternativeName  []string `json:"alternative_name,omitempty"`
 	KeyLength        int      `json:"key_length,omitempty"`
+	Duration         int      `json:"duration,omitempty"`
 }

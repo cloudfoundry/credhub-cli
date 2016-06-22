@@ -26,6 +26,7 @@ type GenerateCommand struct {
 	Country          string   `long:"country" description:"Sets the country of the generated certificate"`
 	AlternativeName  []string `long:"alternative-name" description:"Sets an alternative name of the generated certificate. Multiple alternative names can be set"`
 	KeyLength        int      `long:"key-length" description:"Sets the bit length of the generated key"`
+	Duration         int      `long:"duration" description:"Sets the valid duration (in days) for the generated certificate"`
 }
 
 func (cmd GenerateCommand) Execute([]string) error {
@@ -49,6 +50,7 @@ func (cmd GenerateCommand) Execute([]string) error {
 		Country:          cmd.Country,
 		AlternativeName:  cmd.AlternativeName,
 		KeyLength:        cmd.KeyLength,
+		Duration:         cmd.Duration,
 	}
 
 	config := config.ReadConfig()
