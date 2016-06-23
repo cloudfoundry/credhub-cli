@@ -9,23 +9,15 @@ import (
 )
 
 func NewPutValueRequest(apiTarget, secretIdentifier, secretContent string) *http.Request {
-	url := apiTarget + "/api/v1/data/" + secretIdentifier
-
 	secret := models.SecretBody{
 		Value:       secretContent,
 		ContentType: "value",
 	}
-	body, _ := json.Marshal(secret)
 
-	request, _ := http.NewRequest("PUT", url, bytes.NewReader(body))
-	request.Header.Set("Content-Type", "application/json")
-
-	return request
+	return newSecretRequest("PUT", apiTarget, secretIdentifier, secret)
 }
 
 func NewPutCertificateRequest(apiTarget, secretIdentifier, ca string, pub string, priv string) *http.Request {
-	url := apiTarget + "/api/v1/data/" + secretIdentifier
-
 	certificate := models.Certificate{
 		Ca:      ca,
 		Public:  pub,
@@ -35,50 +27,46 @@ func NewPutCertificateRequest(apiTarget, secretIdentifier, ca string, pub string
 		ContentType: "certificate",
 		Certificate: &certificate,
 	}
-	body, _ := json.Marshal(secret)
 
-	request, _ := http.NewRequest("PUT", url, bytes.NewReader(body))
-	request.Header.Set("Content-Type", "application/json")
-
-	return request
+	return newSecretRequest("PUT", apiTarget, secretIdentifier, secret)
 }
 
 func NewGenerateSecretRequest(apiTarget, secretIdentifier string, parameters models.SecretParameters, contentType string) *http.Request {
-	url := apiTarget + "/api/v1/data/" + secretIdentifier
-
 	generateRequest := models.GenerateRequest{
 		Parameters:  parameters,
 		ContentType: contentType,
 	}
 
-	body, _ := json.Marshal(generateRequest)
-
-	request, _ := http.NewRequest("POST", url, bytes.NewReader(body))
-	request.Header.Set("Content-Type", "application/json")
-
-	return request
+	return newSecretRequest("POST", apiTarget, secretIdentifier, generateRequest)
 }
 
 func NewGetSecretRequest(apiTarget, secretIdentifier string) *http.Request {
-	url := apiTarget + "/api/v1/data/" + secretIdentifier
-
-	request, _ := http.NewRequest("GET", url, nil)
-
-	return request
+	return newSecretRequest("GET", apiTarget, secretIdentifier, nil)
 }
 
 func NewDeleteSecretRequest(apiTarget, secretIdentifier string) *http.Request {
-	url := apiTarget + "/api/v1/data/" + secretIdentifier
-
-	request, _ := http.NewRequest("DELETE", url, nil)
-
-	return request
+	return newSecretRequest("DELETE", apiTarget, secretIdentifier, nil)
 }
 
 func NewInfoRequest(apiTarget string) *http.Request {
 	url := apiTarget + "/info"
 
 	request, _ := http.NewRequest("GET", url, nil)
+
+	return request
+}
+
+func newSecretRequest(requestType, apiTarget, secretIdentifier string, bodyModel interface{}) *http.Request {
+	url := apiTarget + "/api/v1/data/" + secretIdentifier
+
+	var request *http.Request
+	if bodyModel == nil {
+		request, _ = http.NewRequest(requestType, url, nil)
+	} else {
+		body, _ := json.Marshal(bodyModel)
+		request, _ = http.NewRequest(requestType, url, bytes.NewReader(body))
+		request.Header.Set("Content-Type", "application/json")
+	}
 
 	return request
 }
