@@ -42,5 +42,7 @@ func (secret Secret) String() string {
 		}
 	}
 
+	lines = append(lines, fmt.Sprintf("Updated:	%s", secretBody.UpdatedAt))
+
 	return strings.Join(lines, "\n")
 }

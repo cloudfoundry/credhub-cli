@@ -17,51 +17,80 @@ import (
 )
 
 var _ = Describe("Set", func() {
-	It("puts a secret using default type", func() {
-		setupPutValueServer("my-secret", "potatoes")
+	Describe("setting string secrets", func() {
+		It("puts a secret using default type", func() {
+			setupPutValueServer("my-secret", "potatoes")
 
-		session := runCommand("set", "-n", "my-secret", "-v", "potatoes")
+			session := runCommand("set", "-n", "my-secret", "-v", "potatoes")
 
-		Eventually(session).Should(Exit(0))
-		Eventually(session.Out).Should(Say(responseMyPotatoes))
+			Eventually(session).Should(Exit(0))
+			Eventually(session.Out).Should(Say(responseMyPotatoes))
+		})
+
+		It("puts a secret using explicit value type", func() {
+			setupPutValueServer("my-secret", "potatoes")
+
+			session := runCommand("set", "-n", "my-secret", "-v", "potatoes", "-t", "value")
+
+			Eventually(session).Should(Exit(0))
+			Eventually(session.Out).Should(Say(responseMyPotatoes))
+		})
+		It("outputs updated_at timestamp", func() {
+			setupPutValueServer("my-secret", "potatoes")
+
+			session := runCommand("set", "-n", "my-secret", "-v", "potatoes", "-t", "value")
+
+			Eventually(session).Should(Exit(0))
+			Eventually(session.Out).Should(Say("Updated:\t" + TIMESTAMP))
+		})
+
 	})
+	Describe("setting certificate secrets", func() {
+		It("puts a secret using explicit certificate type and string values", func() {
+			var responseMyCertificate = fmt.Sprintf(CERTIFICATE_RESPONSE_TABLE, "my-secret", "my-ca", "my-pub", "my-priv")
+			setupPutCertificateServer("my-secret", "my-ca", "my-pub", "my-priv")
 
-	It("puts a secret using explicit value type", func() {
-		setupPutValueServer("my-secret", "potatoes")
+			session := runCommand("set", "-n", "my-secret",
+				"-t", "certificate", "--ca-string", "my-ca",
+				"--public-string", "my-pub", "--private-string", "my-priv")
 
-		session := runCommand("set", "-n", "my-secret", "-v", "potatoes", "-t", "value")
+			Eventually(session).Should(Exit(0))
+			Eventually(session.Out).Should(Say(responseMyCertificate))
+		})
 
-		Eventually(session).Should(Exit(0))
-		Eventually(session.Out).Should(Say(responseMyPotatoes))
-	})
+		It("puts a secret using explicit certificate type and values read from files", func() {
+			var responseMyCertificate = fmt.Sprintf(CERTIFICATE_RESPONSE_TABLE, "my-secret", "my-ca", "my-pub", "my-priv")
+			setupPutCertificateServer("my-secret", "my-ca", "my-pub", "my-priv")
+			tempDir := createTempDir("certFilesForTesting")
+			caFilename := createSecretFile(tempDir, "ca.txt", "my-ca")
+			publicFilename := createSecretFile(tempDir, "public.txt", "my-pub")
+			privateFilename := createSecretFile(tempDir, "private.txt", "my-priv")
 
-	It("puts a secret using explicit certificate type and string values", func() {
-		var responseMyCertificate = fmt.Sprintf(CERTIFICATE_RESPONSE_TABLE, "my-secret", "my-ca", "my-pub", "my-priv")
-		setupPutCertificateServer("my-secret", "my-ca", "my-pub", "my-priv")
+			session := runCommand("set", "-n", "my-secret",
+				"-t", "certificate", "--ca", caFilename,
+				"--public", publicFilename, "--private", privateFilename)
 
-		session := runCommand("set", "-n", "my-secret",
-			"-t", "certificate", "--ca-string", "my-ca",
-			"--public-string", "my-pub", "--private-string", "my-priv")
+			os.RemoveAll(tempDir)
+			Eventually(session).Should(Exit(0))
+			Eventually(session.Out).Should(Say(responseMyCertificate))
+		})
 
-		Eventually(session).Should(Exit(0))
-		Eventually(session.Out).Should(Say(responseMyCertificate))
-	})
+		It("outputs updated_at timestamp for certificates", func() {
+			setupPutCertificateServer("my-secret", "my-ca", "my-pub", "my-priv")
+			tempDir := createTempDir("certFilesForTesting")
+			caFilename := createSecretFile(tempDir, "ca.txt", "my-ca")
+			publicFilename := createSecretFile(tempDir, "public.txt", "my-pub")
+			privateFilename := createSecretFile(tempDir, "private.txt", "my-priv")
 
-	It("puts a secret using explicit certificate type and values read from files", func() {
-		var responseMyCertificate = fmt.Sprintf(CERTIFICATE_RESPONSE_TABLE, "my-secret", "my-ca", "my-pub", "my-priv")
-		setupPutCertificateServer("my-secret", "my-ca", "my-pub", "my-priv")
-		tempDir := createTempDir("certFilesForTesting")
-		caFilename := createSecretFile(tempDir, "ca.txt", "my-ca")
-		publicFilename := createSecretFile(tempDir, "public.txt", "my-pub")
-		privateFilename := createSecretFile(tempDir, "private.txt", "my-priv")
+			session := runCommand("set", "-n", "my-secret",
+				"-t", "certificate", "--ca", caFilename,
+				"--public", publicFilename, "--private", privateFilename)
 
-		session := runCommand("set", "-n", "my-secret",
-			"-t", "certificate", "--ca", caFilename,
-			"--public", publicFilename, "--private", privateFilename)
+			os.RemoveAll(tempDir)
+			Eventually(session).Should(Exit(0))
 
-		os.RemoveAll(tempDir)
-		Eventually(session).Should(Exit(0))
-		Eventually(session.Out).Should(Say(responseMyCertificate))
+			Eventually(session.Out).Should(Say("Updated:\t" + TIMESTAMP))
+		})
 	})
 
 	Describe("Help", func() {
