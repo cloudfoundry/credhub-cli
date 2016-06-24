@@ -24,7 +24,7 @@ var _ = Describe("Set", func() {
 			session := runCommand("set", "-n", "my-secret", "-v", "potatoes")
 
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say(responseMyPotatoes))
+			Eventually(session.Out).Should(Say(responseMySecretPotatoes))
 		})
 
 		It("puts a secret using explicit value type", func() {
@@ -33,12 +33,11 @@ var _ = Describe("Set", func() {
 			session := runCommand("set", "-n", "my-secret", "-v", "potatoes", "-t", "value")
 
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say(responseMyPotatoes))
+			Eventually(session.Out).Should(Say(responseMySecretPotatoes))
 		})
 	})
 	Describe("setting certificate secrets", func() {
 		It("puts a secret using explicit certificate type and string values", func() {
-			var responseMyCertificate = fmt.Sprintf(CERTIFICATE_RESPONSE_TABLE, "my-secret", "my-ca", "my-pub", "my-priv")
 			setupPutCertificateServer("my-secret", "my-ca", "my-pub", "my-priv")
 
 			session := runCommand("set", "-n", "my-secret",
@@ -46,11 +45,10 @@ var _ = Describe("Set", func() {
 				"--public-string", "my-pub", "--private-string", "my-priv")
 
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say(responseMyCertificate))
+			Eventually(session.Out).Should(Say(responseMySecretCertificate))
 		})
 
 		It("puts a secret using explicit certificate type and values read from files", func() {
-			var responseMyCertificate = fmt.Sprintf(CERTIFICATE_RESPONSE_TABLE, "my-secret", "my-ca", "my-pub", "my-priv")
 			setupPutCertificateServer("my-secret", "my-ca", "my-pub", "my-priv")
 			tempDir := createTempDir("certFilesForTesting")
 			caFilename := createSecretFile(tempDir, "ca.txt", "my-ca")
@@ -63,7 +61,7 @@ var _ = Describe("Set", func() {
 
 			os.RemoveAll(tempDir)
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say(responseMyCertificate))
+			Eventually(session.Out).Should(Say(responseMySecretCertificate))
 		})
 	})
 
@@ -106,8 +104,8 @@ func setupPutValueServer(name string, value string) {
 	server.AppendHandlers(
 		CombineHandlers(
 			VerifyRequest("PUT", fmt.Sprintf("/api/v1/data/%s", name)),
-			VerifyJSON(fmt.Sprintf(VALUE_REQUEST_JSON, value)),
-			RespondWith(http.StatusOK, fmt.Sprintf(VALUE_RESPONSE_JSON, value)),
+			VerifyJSON(fmt.Sprintf(SECRET_VALUE_REQUEST_JSON, value)),
+			RespondWith(http.StatusOK, fmt.Sprintf(SECRET_VALUE_RESPONSE_JSON, value)),
 		),
 	)
 }
@@ -116,8 +114,8 @@ func setupPutCertificateServer(name string, ca string, pub string, priv string) 
 	server.AppendHandlers(
 		CombineHandlers(
 			VerifyRequest("PUT", fmt.Sprintf("/api/v1/data/%s", name)),
-			VerifyJSON(fmt.Sprintf(CERTIFICATE_REQUEST_JSON, ca, pub, priv)),
-			RespondWith(http.StatusOK, fmt.Sprintf(CERTIFICATE_RESPONSE_JSON, ca, pub, priv)),
+			VerifyJSON(fmt.Sprintf(SECRET_CERTIFICATE_REQUEST_JSON, ca, pub, priv)),
+			RespondWith(http.StatusOK, fmt.Sprintf(SECRET_CERTIFICATE_RESPONSE_JSON, ca, pub, priv)),
 		),
 	)
 }

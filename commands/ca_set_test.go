@@ -16,7 +16,7 @@ import (
 
 var _ = Describe("Ca-Set", func() {
 	It("puts a root CA", func() {
-		var responseMyCertificate = fmt.Sprintf(CA_CERTIFICATE_RESPONSE_TABLE, "my-ca", "my-pub", "my-priv")
+		var responseMyCertificate = fmt.Sprintf(CA_RESPONSE_TABLE, "my-ca", "my-pub", "my-priv")
 		setupPutCaServer("my-ca", "my-pub", "my-priv")
 
 		session := runCommand("ca-set", "-n", "my-ca", "--public-string", "my-pub", "--private-string", "my-priv")
@@ -65,8 +65,8 @@ func setupPutCaServer(name string, pub string, priv string) {
 	server.AppendHandlers(
 		CombineHandlers(
 			VerifyRequest("PUT", fmt.Sprintf("/api/v1/ca/%s", name)),
-			VerifyJSON(fmt.Sprintf(CA_CERTIFICATE_REQUEST_JSON, pub, priv)),
-			RespondWith(http.StatusOK, fmt.Sprintf(CA_CERTIFICATE_RESPONSE_JSON, pub, priv)),
+			VerifyJSON(fmt.Sprintf(CA_REQUEST_JSON, pub, priv)),
+			RespondWith(http.StatusOK, fmt.Sprintf(CA_RESPONSE_JSON, pub, priv)),
 		),
 	)
 }

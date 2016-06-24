@@ -31,7 +31,7 @@ func NewPutCertificateRequest(apiTarget, secretIdentifier, ca string, pub string
 	return newSecretRequest("PUT", apiTarget, secretIdentifier, secret)
 }
 
-func NewPutCaRequest(apiTarget, secretIdentifier, pub string, priv string) *http.Request {
+func NewPutCaRequest(apiTarget, caIdentifier, pub string, priv string) *http.Request {
 	ca := models.CaParameters{
 		Public:  pub,
 		Private: priv,
@@ -40,7 +40,7 @@ func NewPutCaRequest(apiTarget, secretIdentifier, pub string, priv string) *http
 		Ca: &ca,
 	}
 
-	return newCaRequest("PUT", apiTarget, secretIdentifier, caBody)
+	return newCaRequest("PUT", apiTarget, caIdentifier, caBody)
 }
 
 func NewGenerateSecretRequest(apiTarget, secretIdentifier string, parameters models.SecretParameters, contentType string) *http.Request {

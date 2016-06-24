@@ -20,17 +20,18 @@ import (
 )
 
 const TIMESTAMP = `2016-01-01T12:00:00Z`
-const VALUE_REQUEST_JSON = `{"type":"value", "value":"%s"}`
-const VALUE_RESPONSE_JSON = `{"type":"value", "value":"%s", "updated_at":"` + TIMESTAMP + `"}`
-const VALUE_RESPONSE_TABLE = `Type:		value\nName:		%s\nValue:		%s\nUpdated:	` + TIMESTAMP
-const CERTIFICATE_REQUEST_JSON = `{"type":"certificate","certificate":{"ca":"%s","public":"%s","private":"%s"}}`
-const CERTIFICATE_RESPONSE_JSON = `{"type":"certificate","certificate":{"ca":"%s","public":"%s","private":"%s"},"updated_at":"` + TIMESTAMP + `"}`
-const CERTIFICATE_RESPONSE_TABLE = `Type:		certificate\nName:		%s\nCA:		%s\nPublic:		%s\nPrivate:	%s\nUpdated:	` + TIMESTAMP
-const CA_CERTIFICATE_REQUEST_JSON = `{"root":{"public":"%s","private":"%s"}}`
-const CA_CERTIFICATE_RESPONSE_JSON = `{"root":{"public":"%s","private":"%s"},"updated_at":"` + TIMESTAMP + `"}`
-const CA_CERTIFICATE_RESPONSE_TABLE = `Name:		%s\nPublic:		%s\nPrivate:	%s\nUpdated:	` + TIMESTAMP
+const SECRET_VALUE_REQUEST_JSON = `{"type":"value", "value":"%s"}`
+const SECRET_VALUE_RESPONSE_JSON = `{"type":"value", "value":"%s", "updated_at":"` + TIMESTAMP + `"}`
+const SECRET_VALUE_RESPONSE_TABLE = `Type:		value\nName:		%s\nValue:		%s\nUpdated:	` + TIMESTAMP
+const SECRET_CERTIFICATE_REQUEST_JSON = `{"type":"certificate","certificate":{"ca":"%s","public":"%s","private":"%s"}}`
+const SECRET_CERTIFICATE_RESPONSE_JSON = `{"type":"certificate","certificate":{"ca":"%s","public":"%s","private":"%s"},"updated_at":"` + TIMESTAMP + `"}`
+const SECRET_CERTIFICATE_RESPONSE_TABLE = `Type:		certificate\nName:		%s\nCA:		%s\nPublic:		%s\nPrivate:	%s\nUpdated:	` + TIMESTAMP
+const CA_REQUEST_JSON = `{"root":{"public":"%s","private":"%s"}}`
+const CA_RESPONSE_JSON = `{"root":{"public":"%s","private":"%s"},"updated_at":"` + TIMESTAMP + `"}`
+const CA_RESPONSE_TABLE = `Name:		%s\nPublic:		%s\nPrivate:	%s\nUpdated:	` + TIMESTAMP
 
-var responseMyPotatoes = fmt.Sprintf(VALUE_RESPONSE_TABLE, "my-secret", "potatoes")
+var responseMySecretPotatoes = fmt.Sprintf(SECRET_VALUE_RESPONSE_TABLE, "my-secret", "potatoes")
+var responseMySecretCertificate = fmt.Sprintf(SECRET_CERTIFICATE_RESPONSE_TABLE, "my-secret", "my-ca", "my-pub", "my-priv")
 
 func TestCommands(t *testing.T) {
 	RegisterFailHandler(Fail)

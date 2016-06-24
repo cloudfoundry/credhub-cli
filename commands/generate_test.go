@@ -122,7 +122,7 @@ func setupPostServer(name string, value string, requestJson string) {
 		CombineHandlers(
 			VerifyRequest("POST", fmt.Sprintf("/api/v1/data/%s", name)),
 			VerifyJSON(requestJson),
-			RespondWith(http.StatusOK, fmt.Sprintf(VALUE_RESPONSE_JSON, value)),
+			RespondWith(http.StatusOK, fmt.Sprintf(SECRET_VALUE_RESPONSE_JSON, value)),
 		),
 	)
 }
@@ -140,7 +140,7 @@ func doValueOptionTest(optionJson string, options ...string) {
 	session := runCommand(stuff...)
 
 	Eventually(session).Should(Exit(0))
-	Eventually(session.Out).Should(Say(responseMyPotatoes))
+	Eventually(session.Out).Should(Say(responseMySecretPotatoes))
 }
 
 func doCertificateOptionTest(optionJson string, options ...string) {
@@ -152,5 +152,7 @@ func doCertificateOptionTest(optionJson string, options ...string) {
 	session := runCommand(stuff...)
 
 	Eventually(session).Should(Exit(0))
-	Eventually(session.Out).Should(Say(responseMyPotatoes))
+	// TODO:  Mash the following potatoes into a certifrycate:  the expected response here doesn't match certificates,
+	// only a value.  We need tyo make this work with <code>responseMySecretCertificate</code> instead
+	Eventually(session.Out).Should(Say(responseMySecretPotatoes))
 }
