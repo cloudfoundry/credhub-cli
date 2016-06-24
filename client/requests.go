@@ -31,6 +31,18 @@ func NewPutCertificateRequest(apiTarget, secretIdentifier, ca string, pub string
 	return newSecretRequest("PUT", apiTarget, secretIdentifier, secret)
 }
 
+func NewPutCaRequest(apiTarget, secretIdentifier, pub string, priv string) *http.Request {
+	ca := models.CaParameters{
+		Public:  pub,
+		Private: priv,
+	}
+	caBody := models.CaBody{
+		Ca: &ca,
+	}
+
+	return newCaRequest("PUT", apiTarget, secretIdentifier, caBody)
+}
+
 func NewGenerateSecretRequest(apiTarget, secretIdentifier string, parameters models.SecretParameters, contentType string) *http.Request {
 	generateRequest := models.GenerateRequest{
 		Parameters:  parameters,
@@ -59,6 +71,16 @@ func NewInfoRequest(apiTarget string) *http.Request {
 func newSecretRequest(requestType, apiTarget, secretIdentifier string, bodyModel interface{}) *http.Request {
 	url := apiTarget + "/api/v1/data/" + secretIdentifier
 
+	return newRequest(requestType, url, bodyModel)
+}
+
+func newCaRequest(requestType, apiTarget, caIdentifier string, bodyModel interface{}) *http.Request {
+	url := apiTarget + "/api/v1/ca/" + caIdentifier
+
+	return newRequest(requestType, url, bodyModel)
+}
+
+func newRequest(requestType, url string, bodyModel interface{}) *http.Request {
 	var request *http.Request
 	if bodyModel == nil {
 		request, _ = http.NewRequest(requestType, url, nil)

@@ -51,6 +51,20 @@ var _ = Describe("API", func() {
 		})
 	})
 
+	Describe("NewPutCaRequest", func() {
+		It("Returns a request for the put-root-ca endpoint", func() {
+			json := fmt.Sprintf(`{"root":{"public":"%s","private":"%s"}}`,
+				"my-pub", "my-priv")
+			requestBody := bytes.NewReader([]byte(json))
+			expectedRequest, _ := http.NewRequest("PUT", "sample.com/api/v1/ca/my-name", requestBody)
+			expectedRequest.Header.Set("Content-Type", "application/json")
+
+			request := NewPutCaRequest("sample.com", "my-name", "my-pub", "my-priv")
+
+			Expect(request).To(Equal(expectedRequest))
+		})
+	})
+
 	Describe("NewGenerateSecretRequest", func() {
 		It("returns a request with no parameters", func() {
 			requestBody := bytes.NewReader([]byte(`{"type":"my-type","parameters":{}}`))

@@ -26,6 +26,9 @@ const VALUE_RESPONSE_TABLE = `Type:		value\nName:		%s\nValue:		%s\nUpdated:	` + 
 const CERTIFICATE_REQUEST_JSON = `{"type":"certificate","certificate":{"ca":"%s","public":"%s","private":"%s"}}`
 const CERTIFICATE_RESPONSE_JSON = `{"type":"certificate","certificate":{"ca":"%s","public":"%s","private":"%s"},"updated_at":"` + TIMESTAMP + `"}`
 const CERTIFICATE_RESPONSE_TABLE = `Type:		certificate\nName:		%s\nCA:		%s\nPublic:		%s\nPrivate:	%s\nUpdated:	` + TIMESTAMP
+const CA_CERTIFICATE_REQUEST_JSON = `{"root":{"public":"%s","private":"%s"}}`
+const CA_CERTIFICATE_RESPONSE_JSON = `{"root":{"public":"%s","private":"%s"},"updated_at":"` + TIMESTAMP + `"}`
+const CA_CERTIFICATE_RESPONSE_TABLE = `Name:		%s\nPublic:		%s\nPrivate:	%s\nUpdated:	` + TIMESTAMP
 
 var responseMyPotatoes = fmt.Sprintf(VALUE_RESPONSE_TABLE, "my-secret", "potatoes")
 

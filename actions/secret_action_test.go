@@ -13,16 +13,16 @@ import (
 	"github.com/pivotal-cf/cm-cli/repositories/repositoriesfakes"
 )
 
-var _ = Describe("Action", func() {
+var _ = Describe("SecretAction", func() {
 
 	var (
-		subject          Action
+		subject          SecretAction
 		secretRepository repositoriesfakes.FakeSecretRepository
 	)
 
 	BeforeEach(func() {
 		myConfig := config.Config{ApiURL: "pivotal.io"}
-		subject = NewAction(&secretRepository, myConfig)
+		subject = NewSecretAction(&secretRepository, myConfig)
 	})
 
 	Describe("DoAction", func() {
@@ -38,7 +38,7 @@ var _ = Describe("Action", func() {
 				return expectedBody, nil
 			}
 
-			secret, err := subject.DoAction(request, "my-secret")
+			secret, err := subject.DoSecretAction(request, "my-secret")
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(secret).To(Equal(expectedSecret))
@@ -46,9 +46,9 @@ var _ = Describe("Action", func() {
 
 		Describe("Errors", func() {
 			It("returns a invalid target error when no api is set", func() {
-				subject = NewAction(&secretRepository, config.Config{})
+				subject = NewSecretAction(&secretRepository, config.Config{})
 				req, _ := http.NewRequest("GET", "my-url", nil)
-				_, error := subject.DoAction(req, "my-secret")
+				_, error := subject.DoSecretAction(req, "my-secret")
 
 				Expect(error).To(MatchError(cm_errors.NewNoTargetUrlError()))
 			})

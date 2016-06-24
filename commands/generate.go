@@ -54,9 +54,9 @@ func (cmd GenerateCommand) Execute([]string) error {
 	}
 
 	config := config.ReadConfig()
-	action := actions.NewAction(secretRepository, config)
+	action := actions.NewSecretAction(secretRepository, config)
 	request := client.NewGenerateSecretRequest(config.ApiURL, cmd.SecretIdentifier, parameters, cmd.ContentType)
-	secret, err := action.DoAction(request, cmd.SecretIdentifier)
+	secret, err := action.DoSecretAction(request, cmd.SecretIdentifier)
 
 	if err != nil {
 		return err
