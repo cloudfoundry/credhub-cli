@@ -15,7 +15,7 @@ import (
 
 var _ = Describe("CaRepository", func() {
 	var (
-		repository CaRepository
+		repository Repository
 		httpClient clientfakes.FakeHttpClient
 	)
 
@@ -46,11 +46,15 @@ var _ = Describe("CaRepository", func() {
 				expectedCaBody := models.CaBody{
 					Ca: &caParams,
 				}
+				expectedCa := models.Ca{
+					Name:   "foo",
+					CaBody: expectedCaBody,
+				}
 
-				caBody, err := repository.SendRequest(request)
+				ca, err := repository.SendRequest(request, "foo")
 
 				Expect(err).ToNot(HaveOccurred())
-				Expect(caBody).To(Equal(expectedCaBody))
+				Expect(ca).To(Equal(expectedCa))
 			})
 		})
 	})

@@ -10,7 +10,7 @@ type Secret struct {
 	SecretBody SecretBody
 }
 
-func NewSecret(name string, secretBody SecretBody) Secret {
+func NewSecret(name string, secretBody SecretBody) Item {
 	return Secret{
 		Name:       name,
 		SecretBody: secretBody,

@@ -10,7 +10,7 @@ type Ca struct {
 	CaBody CaBody
 }
 
-func NewCa(name string, caBody CaBody) Ca {
+func NewCa(name string, caBody CaBody) Item {
 	return Ca{
 		Name:   name,
 		CaBody: caBody,

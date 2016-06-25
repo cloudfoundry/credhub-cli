@@ -9,20 +9,20 @@ import (
 	"github.com/pivotal-cf/cm-cli/repositories"
 )
 
-type FakeCaRepository struct {
-	SendRequestStub        func(request *http.Request) (models.CaBody, error)
+type FakeRepository struct {
+	SendRequestStub        func(request *http.Request, identifier string) (models.Item, error)
 	sendRequestMutex       sync.RWMutex
 	sendRequestArgsForCall []struct {
 		request *http.Request
 	}
 	sendRequestReturns struct {
-		result1 models.CaBody
+		result1 models.Item
 		result2 error
 	}
 	invocations map[string][][]interface{}
 }
 
-func (fake *FakeCaRepository) SendRequest(request *http.Request) (models.CaBody, error) {
+func (fake *FakeRepository) SendRequest(request *http.Request, identifier string) (models.Item, error) {
 	fake.sendRequestMutex.Lock()
 	fake.sendRequestArgsForCall = append(fake.sendRequestArgsForCall, struct {
 		request *http.Request
@@ -31,37 +31,37 @@ func (fake *FakeCaRepository) SendRequest(request *http.Request) (models.CaBody,
 	fake.invocations["SendRequest"] = append(fake.invocations["SendRequest"], []interface{}{request})
 	fake.sendRequestMutex.Unlock()
 	if fake.SendRequestStub != nil {
-		return fake.SendRequestStub(request)
+		return fake.SendRequestStub(request, identifier)
 	} else {
 		return fake.sendRequestReturns.result1, fake.sendRequestReturns.result2
 	}
 }
 
-func (fake *FakeCaRepository) SendRequestCallCount() int {
+func (fake *FakeRepository) SendRequestCallCount() int {
 	fake.sendRequestMutex.RLock()
 	defer fake.sendRequestMutex.RUnlock()
 	return len(fake.sendRequestArgsForCall)
 }
 
-func (fake *FakeCaRepository) SendRequestArgsForCall(i int) *http.Request {
+func (fake *FakeRepository) SendRequestArgsForCall(i int) *http.Request {
 	fake.sendRequestMutex.RLock()
 	defer fake.sendRequestMutex.RUnlock()
 	return fake.sendRequestArgsForCall[i].request
 }
 
-func (fake *FakeCaRepository) SendRequestReturns(result1 models.CaBody, result2 error) {
+func (fake *FakeRepository) SendRequestReturns(result1 models.Item, result2 error) {
 	fake.SendRequestStub = nil
 	fake.sendRequestReturns = struct {
-		result1 models.CaBody
+		result1 models.Item
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeCaRepository) Invocations() map[string][][]interface{} {
+func (fake *FakeRepository) Invocations() map[string][][]interface{} {
 	return fake.invocations
 }
 
-func (fake *FakeCaRepository) guard(key string) {
+func (fake *FakeRepository) guard(key string) {
 	if fake.invocations == nil {
 		fake.invocations = map[string][][]interface{}{}
 	}
@@ -70,4 +70,4 @@ func (fake *FakeCaRepository) guard(key string) {
 	}
 }
 
-var _ repositories.CaRepository = new(FakeCaRepository)
+var _ repositories.Repository = new(FakeRepository)

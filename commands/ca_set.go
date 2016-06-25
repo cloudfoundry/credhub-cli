@@ -19,8 +19,8 @@ func (cmd CaSetCommand) Execute([]string) error {
 	caRepository := repositories.NewCaRepository(client.NewHttpClient())
 
 	config := config.ReadConfig()
-	action := actions.NewCaAction(caRepository, config)
-	ca, err := action.DoCaAction(
+	action := actions.NewAction(caRepository, config)
+	ca, err := action.DoAction(
 		client.NewPutCaRequest(
 			config.ApiURL,
 			cmd.CaIdentifier,

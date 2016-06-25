@@ -9,10 +9,6 @@ import (
 	"github.com/pivotal-cf/cm-cli/models"
 )
 
-type SecretRepository interface {
-	SendRequest(request *http.Request) (models.SecretBody, error)
-}
-
 type secretRepository struct {
 	httpClient client.HttpClient
 }
@@ -21,36 +17,36 @@ type emptyBodyRepository struct {
 	httpClient client.HttpClient
 }
 
-func NewSecretRepository(httpClient client.HttpClient) SecretRepository {
+func NewSecretRepository(httpClient client.HttpClient) Repository {
 	return secretRepository{httpClient: httpClient}
 }
 
-func NewEmptyBodyRepository(httpClient client.HttpClient) SecretRepository {
+func NewEmptyBodyRepository(httpClient client.HttpClient) Repository {
 	return emptyBodyRepository{httpClient: httpClient}
 }
 
-func (r secretRepository) SendRequest(request *http.Request) (models.SecretBody, error) {
+func (r secretRepository) SendRequest(request *http.Request, identifier string) (models.Item, error) {
 	response, err := doSendRequest(r.httpClient, request)
 	if err != nil {
-		return models.SecretBody{}, err
+		return models.Secret{}, err
 	}
 
 	decoder := json.NewDecoder(response.Body)
 	secretBody := models.SecretBody{}
 	err = decoder.Decode(&secretBody)
 	if err != nil {
-		return models.SecretBody{}, errors.NewResponseError()
+		return models.Secret{}, errors.NewResponseError()
 	}
-	return secretBody, nil
+	return models.NewSecret(identifier, secretBody), nil
 }
 
-func (r emptyBodyRepository) SendRequest(request *http.Request) (models.SecretBody, error) {
+func (r emptyBodyRepository) SendRequest(request *http.Request, identifier string) (models.Item, error) {
 	_, err := doSendRequest(r.httpClient, request)
 	if err != nil {
-		return models.SecretBody{}, err
+		return models.Secret{}, err
 	}
 
-	return models.SecretBody{}, nil
+	return models.Secret{}, nil
 }
 
 func doSendRequest(client client.HttpClient, request *http.Request) (*http.Response, error) {

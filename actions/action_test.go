@@ -13,16 +13,16 @@ import (
 	"github.com/pivotal-cf/cm-cli/repositories/repositoriesfakes"
 )
 
-var _ = Describe("SecretAction", func() {
+var _ = Describe("Action", func() {
 
 	var (
-		subject          SecretAction
-		secretRepository repositoriesfakes.FakeSecretRepository
+		subject    Action
+		repository repositoriesfakes.FakeRepository
 	)
 
 	BeforeEach(func() {
 		myConfig := config.Config{ApiURL: "pivotal.io"}
-		subject = NewSecretAction(&secretRepository, myConfig)
+		subject = NewAction(&repository, myConfig)
 	})
 
 	Describe("DoAction", func() {
@@ -32,23 +32,23 @@ var _ = Describe("SecretAction", func() {
 				ContentType: "value",
 				Value:       "potatoes",
 			}
-			expectedSecret := models.NewSecret("my-secret", expectedBody)
-			secretRepository.SendRequestStub = func(req *http.Request) (models.SecretBody, error) {
+			expectedItem := models.NewSecret("my-item", expectedBody)
+			repository.SendRequestStub = func(req *http.Request, identifier string) (models.Item, error) {
 				Expect(req).To(Equal(request))
-				return expectedBody, nil
+				return expectedItem, nil
 			}
 
-			secret, err := subject.DoSecretAction(request, "my-secret")
+			secret, err := subject.DoAction(request, "my-item")
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(secret).To(Equal(expectedSecret))
+			Expect(secret).To(Equal(expectedItem))
 		})
 
 		Describe("Errors", func() {
 			It("returns a invalid target error when no api is set", func() {
-				subject = NewSecretAction(&secretRepository, config.Config{})
+				subject = NewAction(&repository, config.Config{})
 				req, _ := http.NewRequest("GET", "my-url", nil)
-				_, error := subject.DoSecretAction(req, "my-secret")
+				_, error := subject.DoAction(req, "my-item")
 
 				Expect(error).To(MatchError(cm_errors.NewNoTargetUrlError()))
 			})

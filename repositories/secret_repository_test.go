@@ -18,7 +18,7 @@ import (
 
 var _ = Describe("SecretRepository", func() {
 	var (
-		repository SecretRepository
+		repository Repository
 		httpClient clientfakes.FakeHttpClient
 	)
 
@@ -47,10 +47,15 @@ var _ = Describe("SecretRepository", func() {
 					Value:       "my-value",
 				}
 
-				secretBody, err := repository.SendRequest(request)
+				expectedSecret := models.Secret{
+					Name:       "foo",
+					SecretBody: expectedSecretBody,
+				}
+
+				secret, err := repository.SendRequest(request, "foo")
 
 				Expect(err).ToNot(HaveOccurred())
-				Expect(secretBody).To(Equal(expectedSecretBody))
+				Expect(secret).To(Equal(expectedSecret))
 			})
 
 			Describe("Errors", func() {
@@ -58,7 +63,7 @@ var _ = Describe("SecretRepository", func() {
 					httpClient.DoReturns(nil, errors.New("hello"))
 
 					request, _ := http.NewRequest("GET", "http://example.com/foo", nil)
-					_, error := repository.SendRequest(request)
+					_, error := repository.SendRequest(request, "foo")
 					Expect(error).To(MatchError(cmcli_errors.NewNetworkError()))
 				})
 
@@ -71,7 +76,7 @@ var _ = Describe("SecretRepository", func() {
 					httpClient.DoReturns(&responseObj, nil)
 
 					request, _ := http.NewRequest("GET", "http://example.com/foo", nil)
-					_, error := repository.SendRequest(request)
+					_, error := repository.SendRequest(request, "foo")
 
 					Expect(error.Error()).To(Equal("My error"))
 				})
@@ -84,7 +89,7 @@ var _ = Describe("SecretRepository", func() {
 					httpClient.DoReturns(&responseObj, nil)
 					request, _ := http.NewRequest("GET", "http://example.com/foo", nil)
 
-					_, error := repository.SendRequest(request)
+					_, error := repository.SendRequest(request, "foo")
 					Expect(error).To(MatchError(cmcli_errors.NewResponseError()))
 				})
 			})
@@ -109,10 +114,10 @@ var _ = Describe("SecretRepository", func() {
 					return &responseObj, nil
 				}
 
-				secretBody, err := repository.SendRequest(request)
+				secret, err := repository.SendRequest(request, "foo")
 
 				Expect(err).ToNot(HaveOccurred())
-				Expect(secretBody).To(Equal(models.SecretBody{}))
+				Expect(secret).To(Equal(models.Secret{}))
 			})
 
 			Describe("Errors", func() {
@@ -120,7 +125,7 @@ var _ = Describe("SecretRepository", func() {
 					httpClient.DoReturns(nil, errors.New("hello"))
 
 					request, _ := http.NewRequest("GET", "http://example.com/foo", nil)
-					_, error := repository.SendRequest(request)
+					_, error := repository.SendRequest(request, "foo")
 					Expect(error).To(MatchError(cmcli_errors.NewNetworkError()))
 				})
 
@@ -133,7 +138,7 @@ var _ = Describe("SecretRepository", func() {
 					httpClient.DoReturns(&responseObj, nil)
 
 					request, _ := http.NewRequest("GET", "http://example.com/foo", nil)
-					_, error := repository.SendRequest(request)
+					_, error := repository.SendRequest(request, "foo")
 
 					Expect(error.Error()).To(Equal("My error"))
 				})
