@@ -30,13 +30,5 @@ var _ = Describe("Version", func() {
 			Eventually(session.Out).Should(Say("CLI Version: 0.1.0 build DEV"))
 			Eventually(session.Out).Should(Say("CM Version: 0.2.0"))
 		})
-
-		It("displays the version with -v", func() {
-			session := runCommand("-v")
-
-			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say("CLI Version: 0.1.0 build DEV"))
-			Eventually(session.Out).Should(Say("CM Version: 0.2.0"))
-		})
 	})
 })
