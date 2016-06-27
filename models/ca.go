@@ -33,7 +33,9 @@ func (ca Ca) String() string {
 		lines = append(lines, fmt.Sprintf("Private:	%s", caBody.Ca.Private))
 	}
 
-	lines = append(lines, fmt.Sprintf("Updated:	%s", caBody.UpdatedAt))
+	if caBody.UpdatedAt != "" {
+		lines = append(lines, fmt.Sprintf("Updated:	%s", caBody.UpdatedAt))
+	}
 
 	return strings.Join(lines, "\n")
 }
