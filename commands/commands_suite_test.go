@@ -32,6 +32,7 @@ const CA_RESPONSE_TABLE = `Name:		%s\nPublic:		%s\nPrivate:	%s\nUpdated:	` + TIM
 
 var responseMySecretPotatoes = fmt.Sprintf(SECRET_VALUE_RESPONSE_TABLE, "my-secret", "potatoes")
 var responseMySecretCertificate = fmt.Sprintf(SECRET_CERTIFICATE_RESPONSE_TABLE, "my-secret", "my-ca", "my-pub", "my-priv")
+var responseMyCertificateAuthority = fmt.Sprintf(CA_RESPONSE_TABLE, "my-secret", "my-pub", "my-priv")
 
 func TestCommands(t *testing.T) {
 	RegisterFailHandler(Fail)

@@ -36,6 +36,7 @@ var _ = Describe("Set", func() {
 			Eventually(session.Out).Should(Say(responseMySecretPotatoes))
 		})
 	})
+
 	Describe("setting certificate secrets", func() {
 		It("puts a secret using explicit certificate type and string values", func() {
 			setupPutCertificateServer("my-secret", "my-ca", "my-pub", "my-priv")

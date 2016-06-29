@@ -7,6 +7,8 @@ import (
 
 	"runtime"
 
+	"os"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -15,14 +17,32 @@ import (
 )
 
 var _ = Describe("Ca-Set", func() {
-	It("puts a root CA", func() {
-		var responseMyCertificate = fmt.Sprintf(CA_RESPONSE_TABLE, "my-ca", "my-pub", "my-priv")
-		setupPutCaServer("my-ca", "my-pub", "my-priv")
+	Describe("setting certificate authorities", func() {
+		It("puts a root CA", func() {
+			var responseMyCertificate = fmt.Sprintf(CA_RESPONSE_TABLE, "my-ca", "my-pub", "my-priv")
+			setupPutCaServer("my-ca", "my-pub", "my-priv")
 
-		session := runCommand("ca-set", "-n", "my-ca", "--public-string", "my-pub", "--private-string", "my-priv")
+			session := runCommand("ca-set", "-n", "my-ca", "--public-string", "my-pub", "--private-string", "my-priv")
 
-		Eventually(session).Should(Exit(0))
-		Eventually(session.Out).Should(Say(responseMyCertificate))
+			Eventually(session).Should(Exit(0))
+			Eventually(session.Out).Should(Say(responseMyCertificate))
+		})
+
+		It("puts a secret using explicit certificate type and values read from files", func() {
+			setupPutCaServer("my-secret", "my-pub", "my-priv")
+			tempDir := createTempDir("certFilesForTesting")
+			publicFilename := createSecretFile(tempDir, "public.txt", "my-pub")
+			privateFilename := createSecretFile(tempDir, "private.txt", "my-priv")
+
+			session := runCommand("ca-set",
+				"-n", "my-secret",
+				"--public", publicFilename,
+				"--private", privateFilename)
+
+			os.RemoveAll(tempDir)
+			Eventually(session).Should(Exit(0))
+			Eventually(session.Out).Should(Say(responseMyCertificateAuthority))
+		})
 	})
 
 	Describe("Help", func() {

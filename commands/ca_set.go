@@ -10,9 +10,11 @@ import (
 )
 
 type CaSetCommand struct {
-	CaIdentifier string `short:"n" required:"yes" long:"name" description:"Sets the name of the CA"`
-	CaPublic     string `long:"public-string" description:"Sets the public key to the parameter value"`
-	CaPrivate    string `long:"private-string" description:"Sets the private key to the parameter value"`
+	CaIdentifier      string `short:"n" required:"yes" long:"name" description:"Sets the name of the CA"`
+	CaPublicFileName  string `long:"public" description:"Sets the Public Key based on an input file"`
+	CaPrivateFileName string `long:"private" description:"Sets the Private Key based on an input file"`
+	CaPublic          string `long:"public-string" description:"Sets the public key to the parameter value"`
+	CaPrivate         string `long:"private-string" description:"Sets the private key to the parameter value"`
 }
 
 func (cmd CaSetCommand) Execute([]string) error {
@@ -20,6 +22,14 @@ func (cmd CaSetCommand) Execute([]string) error {
 
 	config := config.ReadConfig()
 	action := actions.NewAction(caRepository, config)
+
+	if cmd.CaPublicFileName != "" {
+		cmd.CaPublic = readFile(cmd.CaPublicFileName)
+	}
+	if cmd.CaPrivateFileName != "" {
+		cmd.CaPrivate = readFile(cmd.CaPrivateFileName)
+	}
+
 	ca, err := action.DoAction(
 		client.NewPutCaRequest(
 			config.ApiURL,
