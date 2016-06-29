@@ -23,11 +23,11 @@ var _ = Describe("SecretRepository", func() {
 	)
 
 	Describe("SendRequest", func() {
-		Context("when there is a response body", func() {
-			BeforeEach(func() {
-				repository = NewSecretRepository(&httpClient)
-			})
+		BeforeEach(func() {
+			repository = NewSecretRepository(&httpClient)
+		})
 
+		Context("when there is a response body", func() {
 			It("sends a request to the server", func() {
 				request, _ := http.NewRequest("GET", "http://example.com/foo", nil)
 
@@ -59,28 +59,6 @@ var _ = Describe("SecretRepository", func() {
 			})
 
 			Describe("Errors", func() {
-				It("returns NewNetworkError when there is a network error", func() {
-					httpClient.DoReturns(nil, errors.New("hello"))
-
-					request, _ := http.NewRequest("GET", "http://example.com/foo", nil)
-					_, error := repository.SendRequest(request, "foo")
-					Expect(error).To(MatchError(cmcli_errors.NewNetworkError()))
-				})
-
-				It("returns a error when response is 400", func() {
-					responseObj := http.Response{
-						StatusCode: 400,
-						Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"error": "My error"}`))),
-					}
-
-					httpClient.DoReturns(&responseObj, nil)
-
-					request, _ := http.NewRequest("GET", "http://example.com/foo", nil)
-					_, error := repository.SendRequest(request, "foo")
-
-					Expect(error.Error()).To(Equal("My error"))
-				})
-
 				It("returns a NewResponseError when the JSON response cannot be parsed", func() {
 					responseObj := http.Response{
 						StatusCode: 200,
@@ -95,12 +73,8 @@ var _ = Describe("SecretRepository", func() {
 			})
 		})
 
-		Context("when there is no response body", func() {
-			BeforeEach(func() {
-				repository = NewEmptyBodyRepository(&httpClient)
-			})
-
-			It("sends a request to the server", func() {
+		Describe("Deletion", func() {
+			It("sends a delete request to the server", func() {
 				request, _ := http.NewRequest("DELETE", "http://example.com/foo", nil)
 
 				responseObj := http.Response{
@@ -119,29 +93,29 @@ var _ = Describe("SecretRepository", func() {
 				Expect(err).ToNot(HaveOccurred())
 				Expect(secret).To(Equal(models.Secret{}))
 			})
+		})
 
-			Describe("Errors", func() {
-				It("returns NewNetworkError when there is a network error", func() {
-					httpClient.DoReturns(nil, errors.New("hello"))
+		Describe("Errors", func() {
+			It("returns NewNetworkError when there is a network error", func() {
+				httpClient.DoReturns(nil, errors.New("hello"))
 
-					request, _ := http.NewRequest("GET", "http://example.com/foo", nil)
-					_, error := repository.SendRequest(request, "foo")
-					Expect(error).To(MatchError(cmcli_errors.NewNetworkError()))
-				})
+				request, _ := http.NewRequest("GET", "http://example.com/foo", nil)
+				_, error := repository.SendRequest(request, "foo")
+				Expect(error).To(MatchError(cmcli_errors.NewNetworkError()))
+			})
 
-				It("returns a error when response is 400", func() {
-					responseObj := http.Response{
-						StatusCode: 400,
-						Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"error": "My error"}`))),
-					}
+			It("returns a error when response is 400", func() {
+				responseObj := http.Response{
+					StatusCode: 400,
+					Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"error": "My error"}`))),
+				}
 
-					httpClient.DoReturns(&responseObj, nil)
+				httpClient.DoReturns(&responseObj, nil)
 
-					request, _ := http.NewRequest("GET", "http://example.com/foo", nil)
-					_, error := repository.SendRequest(request, "foo")
+				request, _ := http.NewRequest("GET", "http://example.com/foo", nil)
+				_, error := repository.SendRequest(request, "foo")
 
-					Expect(error.Error()).To(Equal("My error"))
-				})
+				Expect(error.Error()).To(Equal("My error"))
 			})
 		})
 	})

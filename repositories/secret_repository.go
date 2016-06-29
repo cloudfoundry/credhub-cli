@@ -13,22 +13,18 @@ type secretRepository struct {
 	httpClient client.HttpClient
 }
 
-type emptyBodyRepository struct {
-	httpClient client.HttpClient
-}
-
 func NewSecretRepository(httpClient client.HttpClient) Repository {
 	return secretRepository{httpClient: httpClient}
-}
-
-func NewEmptyBodyRepository(httpClient client.HttpClient) Repository {
-	return emptyBodyRepository{httpClient: httpClient}
 }
 
 func (r secretRepository) SendRequest(request *http.Request, identifier string) (models.Item, error) {
 	response, err := doSendRequest(r.httpClient, request)
 	if err != nil {
 		return models.Secret{}, err
+	}
+
+	if request.Method == "DELETE" {
+		return models.Secret{}, nil
 	}
 
 	decoder := json.NewDecoder(response.Body)
@@ -38,15 +34,6 @@ func (r secretRepository) SendRequest(request *http.Request, identifier string) 
 		return models.Secret{}, errors.NewResponseError()
 	}
 	return models.NewSecret(identifier, secretBody), nil
-}
-
-func (r emptyBodyRepository) SendRequest(request *http.Request, identifier string) (models.Item, error) {
-	_, err := doSendRequest(r.httpClient, request)
-	if err != nil {
-		return models.Secret{}, err
-	}
-
-	return models.Secret{}, nil
 }
 
 func doSendRequest(client client.HttpClient, request *http.Request) (*http.Response, error) {
