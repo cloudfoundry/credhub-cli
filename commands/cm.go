@@ -7,7 +7,8 @@ type CMCommand struct {
 	Set      SetCommand      `command:"set" description:"Set a secret value"`
 	Generate GenerateCommand `command:"generate" description:"Generate a secret value"`
 	Delete   DeleteCommand   `command:"delete" description:"Delete a secret value"`
-	CaSet    CaSetCommand    `command:"ca-set" description:"Sets a certificate authority for generating signed certificates"`
+	CaSet    CaSetCommand    `command:"ca-set" description:"Set a certificate authority for generating signed certificates"`
+	CaGet    CaGetCommand    `command:"ca-get" description:"Get a certificate authority"`
 	Version  func()          `long:"version" description:"Version of Credential Manager"`
 }
 

@@ -65,10 +65,19 @@ var _ = Describe("API", func() {
 		})
 	})
 
+	Describe("NewGetCaRequest", func() {
+		It("Returns a request for the get-root-ca endpoint", func() {
+			expectedRequest, _ := http.NewRequest("GET", "sample.com/api/v1/ca/my-name", nil)
+
+			request := NewGetCaRequest("sample.com", "my-name")
+
+			Expect(request).To(Equal(expectedRequest))
+		})
+	})
+
 	Describe("NewGenerateSecretRequest", func() {
 		It("returns a request with no parameters", func() {
 			requestBody := bytes.NewReader([]byte(`{"type":"my-type","parameters":{}}`))
-
 			expectedRequest, _ := http.NewRequest("POST", "sample.com/api/v1/data/my-name", requestBody)
 			expectedRequest.Header.Set("Content-Type", "application/json")
 
@@ -85,9 +94,6 @@ var _ = Describe("API", func() {
 				ExcludeLower:   true,
 				Length:         42,
 			}
-
-			request := NewGenerateSecretRequest("sample.com", "my-name", parameters, "value")
-
 			expectedRequestBody := `{
 				"type":"value",
 				"parameters": {
@@ -99,10 +105,11 @@ var _ = Describe("API", func() {
 				}
 			}`
 
-			body := new(bytes.Buffer)
-			body.ReadFrom(request.Body)
+			request := NewGenerateSecretRequest("sample.com", "my-name", parameters, "value")
 
-			Expect(body).To(MatchJSON(expectedRequestBody))
+			bodyBuffer := new(bytes.Buffer)
+			bodyBuffer.ReadFrom(request.Body)
+			Expect(bodyBuffer).To(MatchJSON(expectedRequestBody))
 			Expect(request.Method).To(Equal("POST"))
 			Expect(request.URL.String()).To(Equal("sample.com/api/v1/data/my-name"))
 			Expect(request.Header.Get("Content-Type")).To(Equal("application/json"))

@@ -43,6 +43,10 @@ func NewPutCaRequest(apiTarget, caIdentifier, pub string, priv string) *http.Req
 	return newCaRequest("PUT", apiTarget, caIdentifier, caBody)
 }
 
+func NewGetCaRequest(apiTarget, caIdentifier string) *http.Request {
+	return newCaRequest("GET", apiTarget, caIdentifier, nil)
+}
+
 func NewGenerateSecretRequest(apiTarget, secretIdentifier string, parameters models.SecretParameters, contentType string) *http.Request {
 	generateRequest := models.GenerateRequest{
 		Parameters:  parameters,
