@@ -1,4 +1,4 @@
-**Pivotal Cloud Foundry CredHub CLI helps you configure and interact with deployed CredHub APIs.**
+**Pivotal Cloud Foundry CredHub CLI helps you configure and interact with CredHub APIs.**
 
 *Starred commands and parameters are planned, but not yet implemented*
 
