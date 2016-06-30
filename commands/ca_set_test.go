@@ -28,6 +28,16 @@ var _ = Describe("Ca-Set", func() {
 			Eventually(session.Out).Should(Say(responseMyCertificate))
 		})
 
+		It("sets the type as root if no type is given", func() {
+			var responseMyCertificate = fmt.Sprintf(CA_RESPONSE_TABLE, "root", "my-ca", "my-pub", "my-priv")
+			setupPutCaServer("root", "my-ca", "my-pub", "my-priv")
+
+			session := runCommand("ca-set", "-n", "my-ca", "--public-string", "my-pub", "--private-string", "my-priv")
+
+			Eventually(session).Should(Exit(0))
+			Eventually(session.Out).Should(Say(responseMyCertificate))
+		})
+
 		It("puts a secret using explicit certificate type and values read from files", func() {
 			setupPutCaServer("root", "my-secret", "my-pub", "my-priv")
 			tempDir := createTempDir("certFilesForTesting")

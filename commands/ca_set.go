@@ -30,6 +30,9 @@ func (cmd CaSetCommand) Execute([]string) error {
 	if cmd.CaPrivateFileName != "" {
 		cmd.CaPrivate = readFile(cmd.CaPrivateFileName)
 	}
+	if cmd.CaType == "" {
+		cmd.CaType = "root"
+	}
 
 	ca, err := action.DoAction(
 		client.NewPutCaRequest(
