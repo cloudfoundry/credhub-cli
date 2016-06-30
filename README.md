@@ -72,9 +72,9 @@ CREDENTIAL MANAGEMENT:
 		
 CERTIFICATE AUTHORITY:
 
-	ca-get --name <ca name>*
+	ca-get --name <ca name>
 		Get the value and attributes of a CA. 
-		-n, --name 'CA'							Name of CA to retrieve*
+		-n, --name 'CA'							Name of CA to retrieve
 
 	ca-set --type <ca type> --name <ca name> [set params]
 		Set the value and attributes of a CA.
