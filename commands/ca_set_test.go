@@ -57,7 +57,18 @@ var _ = Describe("Ca-Set", func() {
 		})
 
 		It("displays missing 'n' option as required parameter", func() {
-			session := runCommand("set", "-v", "potatoes")
+			session := runCommand("ca-set")
+
+			Eventually(session).Should(Exit(1))
+			if runtime.GOOS == "windows" {
+				Expect(session.Err).To(Say("the required flag `/n, /name' was not specified"))
+			} else {
+				Expect(session.Err).To(Say("the required flag `-n, --name' was not specified"))
+			}
+		})
+
+		It("displays missing 'n' option as required parameter", func() {
+			session := runCommand("ca-set")
 
 			Eventually(session).Should(Exit(1))
 			if runtime.GOOS == "windows" {
