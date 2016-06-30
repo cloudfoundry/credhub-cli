@@ -26,13 +26,13 @@ const SECRET_VALUE_RESPONSE_TABLE = `Type:		value\nName:		%s\nValue:		%s\nUpdate
 const SECRET_CERTIFICATE_REQUEST_JSON = `{"type":"certificate","certificate":{"ca":"%s","public":"%s","private":"%s"}}`
 const SECRET_CERTIFICATE_RESPONSE_JSON = `{"type":"certificate","certificate":{"ca":"%s","public":"%s","private":"%s"},"updated_at":"` + TIMESTAMP + `"}`
 const SECRET_CERTIFICATE_RESPONSE_TABLE = `Type:		certificate\nName:		%s\nCA:		%s\nPublic:		%s\nPrivate:	%s\nUpdated:	` + TIMESTAMP
-const CA_REQUEST_JSON = `{"root":{"public":"%s","private":"%s"}}`
-const CA_RESPONSE_JSON = `{"root":{"public":"%s","private":"%s"},"updated_at":"` + TIMESTAMP + `"}`
-const CA_RESPONSE_TABLE = `Name:		%s\nPublic:		%s\nPrivate:	%s\nUpdated:	` + TIMESTAMP
+const CA_REQUEST_JSON = `{"type":"%s","root":{"public":"%s","private":"%s"}}`
+const CA_RESPONSE_JSON = `{"type":"%s","root":{"public":"%s","private":"%s"},"updated_at":"` + TIMESTAMP + `"}`
+const CA_RESPONSE_TABLE = `Type:		%s\nName:		%s\nPublic:		%s\nPrivate:	%s\nUpdated:	` + TIMESTAMP
 
 var responseMySecretPotatoes = fmt.Sprintf(SECRET_VALUE_RESPONSE_TABLE, "my-secret", "potatoes")
 var responseMySecretCertificate = fmt.Sprintf(SECRET_CERTIFICATE_RESPONSE_TABLE, "my-secret", "my-ca", "my-pub", "my-priv")
-var responseMyCertificateAuthority = fmt.Sprintf(CA_RESPONSE_TABLE, "my-secret", "my-pub", "my-priv")
+var responseMyCertificateAuthority = fmt.Sprintf(CA_RESPONSE_TABLE, "root", "my-secret", "my-pub", "my-priv")
 
 func TestCommands(t *testing.T) {
 	RegisterFailHandler(Fail)

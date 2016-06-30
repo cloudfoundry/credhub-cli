@@ -1,6 +1,7 @@
 package models
 
 type CaBody struct {
-	Ca        *CaParameters `json:"root,omitempty" binding:"required"`
-	UpdatedAt string        `json:"updated_at,omitempty"`
+	ContentType string        `json:"type" binding:"required"`
+	Ca          *CaParameters `json:"root,omitempty" binding:"required"`
+	UpdatedAt   string        `json:"updated_at,omitempty"`
 }

@@ -22,6 +22,7 @@ func (ca Ca) String() string {
 
 	caBody := ca.CaBody
 	lines = append(lines,
+		fmt.Sprintf("Type:		%s", caBody.ContentType),
 		fmt.Sprintf("Name:		%s", ca.Name),
 	)
 

@@ -15,8 +15,8 @@ import (
 var _ = Describe("Ca-Get", func() {
 	Describe("getting certificate authorities", func() {
 		It("gets a root CA", func() {
-			var responseMyCertificate = fmt.Sprintf(CA_RESPONSE_TABLE, "my-ca-name", "my-pub", "my-priv")
-			setupGetCaServer("my-ca-name", "my-pub", "my-priv")
+			var responseMyCertificate = fmt.Sprintf(CA_RESPONSE_TABLE, "root", "my-ca-name", "my-pub", "my-priv")
+			setupGetCaServer("root", "my-ca-name", "my-pub", "my-priv")
 
 			session := runCommand("ca-get", "-n", "my-ca-name")
 
@@ -36,11 +36,11 @@ var _ = Describe("Ca-Get", func() {
 	})
 })
 
-func setupGetCaServer(name string, pub string, priv string) {
+func setupGetCaServer(caType, name, pub, priv string) {
 	server.AppendHandlers(
 		CombineHandlers(
 			VerifyRequest("GET", fmt.Sprintf("/api/v1/ca/%s", name)),
-			RespondWith(http.StatusOK, fmt.Sprintf(CA_RESPONSE_JSON, pub, priv)),
+			RespondWith(http.StatusOK, fmt.Sprintf(CA_RESPONSE_JSON, caType, pub, priv)),
 		),
 	)
 }

@@ -19,23 +19,24 @@ import (
 var _ = Describe("Ca-Set", func() {
 	Describe("setting certificate authorities", func() {
 		It("puts a root CA", func() {
-			var responseMyCertificate = fmt.Sprintf(CA_RESPONSE_TABLE, "my-ca", "my-pub", "my-priv")
-			setupPutCaServer("my-ca", "my-pub", "my-priv")
+			var responseMyCertificate = fmt.Sprintf(CA_RESPONSE_TABLE, "root", "my-ca", "my-pub", "my-priv")
+			setupPutCaServer("root", "my-ca", "my-pub", "my-priv")
 
-			session := runCommand("ca-set", "-n", "my-ca", "--public-string", "my-pub", "--private-string", "my-priv")
+			session := runCommand("ca-set", "-n", "my-ca", "-t", "root", "--public-string", "my-pub", "--private-string", "my-priv")
 
 			Eventually(session).Should(Exit(0))
 			Eventually(session.Out).Should(Say(responseMyCertificate))
 		})
 
 		It("puts a secret using explicit certificate type and values read from files", func() {
-			setupPutCaServer("my-secret", "my-pub", "my-priv")
+			setupPutCaServer("root", "my-secret", "my-pub", "my-priv")
 			tempDir := createTempDir("certFilesForTesting")
 			publicFilename := createSecretFile(tempDir, "public.txt", "my-pub")
 			privateFilename := createSecretFile(tempDir, "private.txt", "my-priv")
 
 			session := runCommand("ca-set",
 				"-n", "my-secret",
+				"-t", "root",
 				"--public", publicFilename,
 				"--private", privateFilename)
 
@@ -81,12 +82,12 @@ var _ = Describe("Ca-Set", func() {
 	})
 })
 
-func setupPutCaServer(name string, pub string, priv string) {
+func setupPutCaServer(caType, name, pub, priv string) {
 	server.AppendHandlers(
 		CombineHandlers(
 			VerifyRequest("PUT", fmt.Sprintf("/api/v1/ca/%s", name)),
-			VerifyJSON(fmt.Sprintf(CA_REQUEST_JSON, pub, priv)),
-			RespondWith(http.StatusOK, fmt.Sprintf(CA_RESPONSE_JSON, pub, priv)),
+			VerifyJSON(fmt.Sprintf(CA_REQUEST_JSON, caType, pub, priv)),
+			RespondWith(http.StatusOK, fmt.Sprintf(CA_RESPONSE_JSON, caType, pub, priv)),
 		),
 	)
 }
