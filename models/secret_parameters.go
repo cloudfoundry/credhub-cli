@@ -15,4 +15,5 @@ type SecretParameters struct {
 	AlternativeName  []string `json:"alternative_name,omitempty"`
 	KeyLength        int      `json:"key_length,omitempty"`
 	Duration         int      `json:"duration,omitempty"`
+	Ca               string   `json:"ca,omitempty"`
 }

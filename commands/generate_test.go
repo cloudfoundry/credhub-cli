@@ -79,6 +79,10 @@ var _ = Describe("Generate", func() {
 		It("including duration", func() {
 			doCertificateOptionTest(`{"duration":1000}`, "--duration", "1000")
 		})
+
+		It("including certificate authority", func() {
+			doCertificateOptionTest(`{"ca":"my_ca"}`, "--ca", "my_ca")
+		})
 	})
 
 	Describe("Help", func() {
