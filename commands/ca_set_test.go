@@ -59,6 +59,11 @@ var _ = Describe("Ca-Set", func() {
 			testCaSetFileFailure("", "private.txt")
 			testCaSetFileFailure("public.txt", "")
 		})
+
+		It("fails to put a CA when a specified cert string duplicates the contents of a file", func() {
+			testSetCaFileDuplicationFailure("--public-string", "my-pub")
+			testSetCaFileDuplicationFailure("--private-string", "my-priv")
+		})
 	})
 
 	Describe("Help", func() {
@@ -126,4 +131,22 @@ func testCaSetFileFailure(publicFilename, privateFilename string) {
 	os.RemoveAll(tempDir)
 	Eventually(session).Should(Exit(1))
 	Eventually(session.Err).Should(Say("A referenced file could not be opened. Please validate the provided filenames and permissions, then retry your request."))
+}
+
+func testSetCaFileDuplicationFailure(option, optionValue string) {
+	setupPutCaServer("root", "my-secret", "my-pub", "my-priv")
+	tempDir := createTempDir("certFilesForTesting")
+	publicFilename := createSecretFile(tempDir, "public.txt", "my-pub")
+	privateFilename := createSecretFile(tempDir, "private.txt", "my-priv")
+
+	session := runCommand("ca-set",
+		"-n", "my-secret",
+		"-t", "root",
+		"--public", publicFilename,
+		"--private", privateFilename,
+		option, optionValue)
+
+	os.RemoveAll(tempDir)
+	Eventually(session).Should(Exit(1))
+	Eventually(session.Err).Should(Say("The combination of parameters in the request is not allowed. Please validate your input and retry your request."))
 }

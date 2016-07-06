@@ -7,6 +7,8 @@ import (
 	"github.com/pivotal-cf/cm-cli/client"
 	"github.com/pivotal-cf/cm-cli/config"
 	"github.com/pivotal-cf/cm-cli/repositories"
+
+	cmcli_errors "github.com/pivotal-cf/cm-cli/errors"
 )
 
 type CaSetCommand struct {
@@ -27,12 +29,18 @@ func (cmd CaSetCommand) Execute([]string) error {
 	action := actions.NewAction(caRepository, config)
 
 	if cmd.CaPublicFileName != "" {
+		if cmd.CaPublic != "" {
+			return cmcli_errors.NewCombinationOfParametersError()
+		}
 		cmd.CaPublic, err = ReadFile(cmd.CaPublicFileName)
 		if err != nil {
 			return err
 		}
 	}
 	if cmd.CaPrivateFileName != "" {
+		if cmd.CaPrivate != "" {
+			return cmcli_errors.NewCombinationOfParametersError()
+		}
 		cmd.CaPrivate, err = ReadFile(cmd.CaPrivateFileName)
 		if err != nil {
 			return err

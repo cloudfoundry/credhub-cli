@@ -70,6 +70,12 @@ var _ = Describe("Set", func() {
 			testSetFileFailure("ca.txt", "", "private.txt")
 			testSetFileFailure("ca.txt", "public.txt", "")
 		})
+
+		It("fails to put a secret when a specified cert string duplicates the contents of a file", func() {
+			testSetCertFileDuplicationFailure("--ca-string", "my-ca")
+			testSetCertFileDuplicationFailure("--public-string", "my-pub")
+			testSetCertFileDuplicationFailure("--private-string", "my-priv")
+		})
 	})
 
 	Describe("Help", func() {
@@ -152,4 +158,19 @@ func testSetFileFailure(caFilename, publicFilename, privateFilename string) {
 	os.RemoveAll(tempDir)
 	Eventually(session).Should(Exit(1))
 	Eventually(session.Err).Should(Say("A referenced file could not be opened. Please validate the provided filenames and permissions, then retry your request."))
+}
+
+func testSetCertFileDuplicationFailure(option, optionValue string) {
+	setupPutCertificateServer("my-secret", "my-ca", "my-pub", "my-priv")
+	tempDir := createTempDir("certFilesForTesting")
+	caFilename := createSecretFile(tempDir, "ca.txt", "my-ca")
+	publicFilename := createSecretFile(tempDir, "public.txt", "my-pub")
+	privateFilename := createSecretFile(tempDir, "private.txt", "my-priv")
+
+	session := runCommand("set", "-n", "my-secret", "-t", "certificate", "--ca", caFilename,
+		"--public", publicFilename, "--private", privateFilename, option, optionValue)
+
+	os.RemoveAll(tempDir)
+	Eventually(session).Should(Exit(1))
+	Eventually(session.Err).Should(Say("The combination of parameters in the request is not allowed. Please validate your input and retry your request."))
 }

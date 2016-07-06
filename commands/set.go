@@ -9,6 +9,8 @@ import (
 	"github.com/pivotal-cf/cm-cli/client"
 	"github.com/pivotal-cf/cm-cli/config"
 	"github.com/pivotal-cf/cm-cli/repositories"
+
+	cmcli_errors "github.com/pivotal-cf/cm-cli/errors"
 )
 
 type SetCommand struct {
@@ -54,18 +56,27 @@ func getRequest(cmd SetCommand, url string) (*http.Request, error) {
 	} else {
 		var err error
 		if cmd.CertificateCAFileName != "" {
+			if cmd.CertificateCA != "" {
+				return nil, cmcli_errors.NewCombinationOfParametersError()
+			}
 			cmd.CertificateCA, err = ReadFile(cmd.CertificateCAFileName)
 			if err != nil {
 				return nil, err
 			}
 		}
 		if cmd.CertificatePublicFileName != "" {
+			if cmd.CertificatePublic != "" {
+				return nil, cmcli_errors.NewCombinationOfParametersError()
+			}
 			cmd.CertificatePublic, err = ReadFile(cmd.CertificatePublicFileName)
 			if err != nil {
 				return nil, err
 			}
 		}
 		if cmd.CertificatePrivateFileName != "" {
+			if cmd.CertificatePrivate != "" {
+				return nil, cmcli_errors.NewCombinationOfParametersError()
+			}
 			cmd.CertificatePrivate, err = ReadFile(cmd.CertificatePrivateFileName)
 			if err != nil {
 				return nil, err
