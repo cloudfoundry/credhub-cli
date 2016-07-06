@@ -54,6 +54,11 @@ var _ = Describe("Ca-Set", func() {
 			Eventually(session).Should(Exit(0))
 			Eventually(session.Out).Should(Say(responseMyCertificateAuthority))
 		})
+
+		It("fails to put a CA when failing to read from a file", func() {
+			testCaSetFileFailure("", "private.txt")
+			testCaSetFileFailure("public.txt", "")
+		})
 	})
 
 	Describe("Help", func() {
@@ -100,4 +105,25 @@ func setupPutCaServer(caType, name, pub, priv string) {
 			RespondWith(http.StatusOK, fmt.Sprintf(CA_RESPONSE_JSON, caType, pub, priv)),
 		),
 	)
+}
+
+func testCaSetFileFailure(publicFilename, privateFilename string) {
+	tempDir := createTempDir("certFilesForTesting")
+	if publicFilename != "" {
+		publicFilename = createSecretFile(tempDir, publicFilename, "my-pub")
+	} else {
+		publicFilename = "dud"
+	}
+	if privateFilename != "" {
+		privateFilename = createSecretFile(tempDir, privateFilename, "my-priv")
+	} else {
+		privateFilename = "dud"
+	}
+
+	session := runCommand("ca-set", "-n", "my-ca",
+		"--public", publicFilename, "--private", privateFilename)
+
+	os.RemoveAll(tempDir)
+	Eventually(session).Should(Exit(1))
+	Eventually(session.Err).Should(Say("A referenced file could not be opened. Please validate the provided filenames and permissions, then retry your request."))
 }

@@ -19,16 +19,24 @@ type CaSetCommand struct {
 }
 
 func (cmd CaSetCommand) Execute([]string) error {
+	var err error
+
 	caRepository := repositories.NewCaRepository(client.NewHttpClient())
 
 	config := config.ReadConfig()
 	action := actions.NewAction(caRepository, config)
 
 	if cmd.CaPublicFileName != "" {
-		cmd.CaPublic = readFile(cmd.CaPublicFileName)
+		cmd.CaPublic, err = ReadFile(cmd.CaPublicFileName)
+		if err != nil {
+			return err
+		}
 	}
 	if cmd.CaPrivateFileName != "" {
-		cmd.CaPrivate = readFile(cmd.CaPrivateFileName)
+		cmd.CaPrivate, err = ReadFile(cmd.CaPrivateFileName)
+		if err != nil {
+			return err
+		}
 	}
 	if cmd.CaType == "" {
 		cmd.CaType = "root"

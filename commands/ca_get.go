@@ -30,5 +30,4 @@ func (cmd CaGetCommand) Execute([]string) error {
 	fmt.Println(ca)
 
 	return nil
-
 }

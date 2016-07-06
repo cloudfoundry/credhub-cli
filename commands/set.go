@@ -5,8 +5,6 @@ import (
 
 	"net/http"
 
-	"io/ioutil"
-
 	"github.com/pivotal-cf/cm-cli/actions"
 	"github.com/pivotal-cf/cm-cli/client"
 	"github.com/pivotal-cf/cm-cli/config"
@@ -34,8 +32,12 @@ func (cmd SetCommand) Execute([]string) error {
 
 	config := config.ReadConfig()
 	action := actions.NewAction(repository, config)
-	secret, err := action.DoAction(getRequest(cmd, config.ApiURL), cmd.SecretIdentifier)
+	request, err := getRequest(cmd, config.ApiURL)
+	if err != nil {
+		return err
+	}
 
+	secret, err := action.DoAction(request, cmd.SecretIdentifier)
 	if err != nil {
 		return err
 	}
@@ -45,27 +47,32 @@ func (cmd SetCommand) Execute([]string) error {
 	return nil
 }
 
-func getRequest(cmd SetCommand, url string) *http.Request {
+func getRequest(cmd SetCommand, url string) (*http.Request, error) {
 	var request *http.Request
 	if cmd.ContentType == "value" {
 		request = client.NewPutValueRequest(url, cmd.SecretIdentifier, cmd.Value)
 	} else {
+		var err error
 		if cmd.CertificateCAFileName != "" {
-			cmd.CertificateCA = readFile(cmd.CertificateCAFileName)
+			cmd.CertificateCA, err = ReadFile(cmd.CertificateCAFileName)
+			if err != nil {
+				return nil, err
+			}
 		}
 		if cmd.CertificatePublicFileName != "" {
-			cmd.CertificatePublic = readFile(cmd.CertificatePublicFileName)
+			cmd.CertificatePublic, err = ReadFile(cmd.CertificatePublicFileName)
+			if err != nil {
+				return nil, err
+			}
 		}
 		if cmd.CertificatePrivateFileName != "" {
-			cmd.CertificatePrivate = readFile(cmd.CertificatePrivateFileName)
+			cmd.CertificatePrivate, err = ReadFile(cmd.CertificatePrivateFileName)
+			if err != nil {
+				return nil, err
+			}
 		}
 		request = client.NewPutCertificateRequest(url, cmd.SecretIdentifier, cmd.CertificateCA, cmd.CertificatePublic, cmd.CertificatePrivate)
 	}
 
-	return request
-}
-
-func readFile(filename string) string {
-	dat, _ := ioutil.ReadFile(filename)
-	return string(dat)
+	return request, nil
 }

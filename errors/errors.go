@@ -16,16 +16,16 @@ func NewResponseError() error {
 	return errors.New("An error occurred when processing the response. Please validate your input and retry your request.")
 }
 
-func NewSecretBadRequestError() error {
-	return errors.New("Unable to perform the request. Please validate your input and retry your request.")
-}
-
 func NewInvalidTargetError() error {
 	return errors.New("The targeted API does not appear to be valid. Please validate the API address and retry your request.")
 }
 
 func NewNoTargetUrlError() error {
 	return errors.New("Credential Manager API location is not set. Please target the location of your credential manager with `cm api` to continue.")
+}
+
+func NewFileLoadError() error {
+	return errors.New("A referenced file could not be opened. Please validate the provided filenames and permissions, then retry your request.")
 }
 
 func ParseError(reader io.Reader) error {

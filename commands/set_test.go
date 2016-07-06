@@ -64,6 +64,12 @@ var _ = Describe("Set", func() {
 			Eventually(session).Should(Exit(0))
 			Eventually(session.Out).Should(Say(responseMySecretCertificate))
 		})
+
+		It("fails to put a secret when failing to read from a file", func() {
+			testSetFileFailure("", "public.txt", "private.txt")
+			testSetFileFailure("ca.txt", "", "private.txt")
+			testSetFileFailure("ca.txt", "public.txt", "")
+		})
 	})
 
 	Describe("Help", func() {
@@ -119,4 +125,31 @@ func setupPutCertificateServer(name string, ca string, pub string, priv string) 
 			RespondWith(http.StatusOK, fmt.Sprintf(SECRET_CERTIFICATE_RESPONSE_JSON, ca, pub, priv)),
 		),
 	)
+}
+
+func testSetFileFailure(caFilename, publicFilename, privateFilename string) {
+	tempDir := createTempDir("certFilesForTesting")
+	if caFilename != "" {
+		caFilename = createSecretFile(tempDir, caFilename, "my-ca")
+	} else {
+		caFilename = "dud"
+	}
+	if publicFilename != "" {
+		publicFilename = createSecretFile(tempDir, publicFilename, "my-pub")
+	} else {
+		publicFilename = "dud"
+	}
+	if privateFilename != "" {
+		privateFilename = createSecretFile(tempDir, privateFilename, "my-priv")
+	} else {
+		privateFilename = "dud"
+	}
+
+	session := runCommand("set", "-n", "my-secret",
+		"-t", "certificate", "--ca", caFilename,
+		"--public", publicFilename, "--private", privateFilename)
+
+	os.RemoveAll(tempDir)
+	Eventually(session).Should(Exit(1))
+	Eventually(session.Err).Should(Say("A referenced file could not be opened. Please validate the provided filenames and permissions, then retry your request."))
 }
