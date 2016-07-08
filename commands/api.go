@@ -5,8 +5,6 @@ import (
 
 	"net/url"
 
-	"strings"
-
 	"github.com/pivotal-cf/cm-cli/actions"
 	"github.com/pivotal-cf/cm-cli/client"
 	"github.com/pivotal-cf/cm-cli/config"
@@ -28,9 +26,7 @@ func (cmd ApiCommand) Execute([]string) error {
 	if serverUrl == "" {
 		fmt.Println(c.ApiURL)
 	} else {
-		if !strings.Contains(serverUrl, "://") {
-			serverUrl = "https://" + serverUrl
-		}
+		serverUrl = AddDefaultSchemeIfNecessary(serverUrl)
 		parsedUrl, err := url.Parse(serverUrl)
 		if err != nil {
 			return err

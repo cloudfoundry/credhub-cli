@@ -12,7 +12,7 @@ import (
 )
 
 var _ = Describe("Util", func() {
-	Describe("readFile", func() {
+	Describe("#ReadFile", func() {
 		It("reads a file into memory", func() {
 			tempDir := createTempDir("filesForTesting")
 			fileContents := "My Test String"
@@ -27,6 +27,18 @@ var _ = Describe("Util", func() {
 			readContents, err := commands.ReadFile("Foo")
 			Expect(readContents).To(Equal(""))
 			Expect(err).To(MatchError(cmcli_errors.NewFileLoadError()))
+		})
+	})
+
+	Describe("#AddDefaultSchemeIfNecessary", func() {
+		It("adds the default scheme (https://) to a server which has none", func() {
+			transformedUrl := commands.AddDefaultSchemeIfNecessary("foo.com:8080")
+			Expect(transformedUrl).To(Equal("https://foo.com:8080"))
+		})
+
+		It("does not add the default scheme if one is already there", func() {
+			transformedUrl := commands.AddDefaultSchemeIfNecessary("ftp://foo.com:8080")
+			Expect(transformedUrl).To(Equal("ftp://foo.com:8080"))
 		})
 	})
 })

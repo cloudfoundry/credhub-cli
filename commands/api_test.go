@@ -89,18 +89,6 @@ var _ = Describe("API", func() {
 			Eventually(session.Out).Should(Say(httpsServer.URL()))
 		})
 
-		It("sets the target qualified name to an https URL when no URL scheme is provided", func() {
-			httpsServer.HTTPTestServer.URL = "https://localhost:8080"
-			session := runCommand("api", "localhost:8080")
-
-			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say("https://localhost:8080"))
-
-			session = runCommand("api")
-
-			Eventually(session.Out).Should(Say("https://localhost:8080"))
-		})
-
 		Context("when the provided server url is not valid", func() {
 			var (
 				badServer *Server
