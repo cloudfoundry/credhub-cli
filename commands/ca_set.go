@@ -23,9 +23,9 @@ type CaSetCommand struct {
 func (cmd CaSetCommand) Execute([]string) error {
 	var err error
 
-	caRepository := repositories.NewCaRepository(client.NewHttpClient())
-
 	config := config.ReadConfig()
+	caRepository := repositories.NewCaRepository(client.NewHttpClient(config))
+
 	action := actions.NewAction(caRepository, config)
 
 	if cmd.CaPublicFileName != "" {

@@ -30,9 +30,9 @@ func (cmd SetCommand) Execute([]string) error {
 		cmd.ContentType = "value"
 	}
 
-	repository := repositories.NewSecretRepository(client.NewHttpClient())
-
 	config := config.ReadConfig()
+	repository := repositories.NewSecretRepository(client.NewHttpClient(config))
+
 	action := actions.NewAction(repository, config)
 	request, err := getRequest(cmd, config.ApiURL)
 	if err != nil {

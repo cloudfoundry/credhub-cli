@@ -35,7 +35,8 @@ func (cmd GenerateCommand) Execute([]string) error {
 		cmd.ContentType = "value"
 	}
 
-	repository := repositories.NewSecretRepository(client.NewHttpClient())
+	config := config.ReadConfig()
+	repository := repositories.NewSecretRepository(client.NewHttpClient(config))
 
 	parameters := models.SecretParameters{
 		ExcludeSpecial:   cmd.ExcludeSpecial,
@@ -55,7 +56,6 @@ func (cmd GenerateCommand) Execute([]string) error {
 		Ca:               cmd.Ca,
 	}
 
-	config := config.ReadConfig()
 	action := actions.NewAction(repository, config)
 	request := client.NewGenerateSecretRequest(config.ApiURL, cmd.SecretIdentifier, parameters, cmd.ContentType)
 	secret, err := action.DoAction(request, cmd.SecretIdentifier)

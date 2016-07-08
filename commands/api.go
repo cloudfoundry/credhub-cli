@@ -30,13 +30,14 @@ func (cmd ApiCommand) Execute([]string) error {
 		if err != nil {
 			return err
 		}
-		if parsedUrl.Scheme == "" {
-			parsedUrl.Scheme = "http"
-		}
 
+		if parsedUrl.Scheme == "" {
+			parsedUrl.Scheme = "https"
+		}
 		c.ApiURL = parsedUrl.String()
 
-		action := actions.NewApi(client.NewHttpClient())
+		action := actions.NewApi(client.NewHttpClient(c))
+
 		err = action.ValidateTarget(c.ApiURL)
 		if err != nil {
 			return err

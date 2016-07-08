@@ -87,7 +87,6 @@ var _ = SynchronizedAfterSuite(func() {}, func() {
 
 func runCommand(args ...string) *Session {
 	cmd := exec.Command(commandPath, args...)
-
 	session, err := Start(cmd, GinkgoWriter, GinkgoWriter)
 	Expect(err).NotTo(HaveOccurred())
 	<-session.Exited
