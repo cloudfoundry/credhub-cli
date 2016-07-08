@@ -40,6 +40,11 @@ func (cmd ApiCommand) Execute([]string) error {
 		if err != nil {
 			return err
 		}
+		if parsedUrl.Scheme != "https" {
+			fmt.Println("Warning: Insecure HTTP API detected. Data sent to this API could be intercepted" +
+				" in transit by third parties. Secure HTTPS API endpoints are recommended.")
+		}
+
 		fmt.Println("Setting the target url:", c.ApiURL)
 
 		config.WriteConfig(c)
