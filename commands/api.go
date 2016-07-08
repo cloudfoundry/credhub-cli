@@ -27,9 +27,11 @@ func (cmd ApiCommand) Execute([]string) error {
 	if serverUrl == "" {
 		fmt.Println(c.ApiURL)
 	} else {
+		fmt.Println("Before:  serverUrl = " + serverUrl);
 		if !strings.Contains(serverUrl, "://") {
 			serverUrl = "https://" + serverUrl
 		}
+		fmt.Println("After:  serverUrl = " + serverUrl);
 		parsedUrl, err := url.Parse(serverUrl)
 		if err != nil {
 			return err
