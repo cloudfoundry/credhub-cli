@@ -8,6 +8,7 @@ import (
 	"github.com/pivotal-cf/cm-cli/actions"
 	"github.com/pivotal-cf/cm-cli/client"
 	"github.com/pivotal-cf/cm-cli/config"
+	"strings"
 )
 
 type ApiCommand struct {
@@ -26,14 +27,14 @@ func (cmd ApiCommand) Execute([]string) error {
 	if serverUrl == "" {
 		fmt.Println(c.ApiURL)
 	} else {
+		if !strings.Contains(serverUrl, "://") {
+			serverUrl = "https://" + serverUrl
+		}
 		parsedUrl, err := url.Parse(serverUrl)
 		if err != nil {
 			return err
 		}
 
-		if parsedUrl.Scheme == "" {
-			parsedUrl.Scheme = "https"
-		}
 		c.ApiURL = parsedUrl.String()
 
 		action := actions.NewApi(client.NewHttpClient(c))
