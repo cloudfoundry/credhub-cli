@@ -4,7 +4,7 @@
 
 ```
 Usage: cm [<options>] <command> [<args>]
-		-v, --version					 		Show version of CLI and API
+		--version				    	 		Show version of CLI and API
 		-h, --help								Displays help menu
 
 
@@ -55,8 +55,8 @@ CREDENTIAL MANAGEMENT:
 		--exclude-lower 		            	[Value] Exclude lower alpha characters from generated value
 		--exclude-number 		            	[Value] Exclude numbers from generated value
 		--exclude-special 	  	            	[Value] Exclude special characters from generated value
-		--ca 'CA NAME'					     	[Certificate] Name of CA used to sign the generated certificate* (Default: 'default')
-		--duration [1-3650]						[Certificate] Valid duration (in days) of the generated certificate* (Default: 365)
+		--ca 'CA NAME'					     	[Certificate] Name of CA used to sign the generated certificate (Default: 'default')
+		--duration [1-3650]						[Certificate] Valid duration (in days) of the generated certificate (Default: 365)
 		--key-length [2048, 3072, 4096]			[Certificate] Bit length of the generated key (Default: 2048)
 		--common-name 'COMMON NAME'				[Certificate] Common name of the generated certificate
 		--alternative-name 'ALT NAME'			[Certificate] Alternative name(s) of the generated certificate
@@ -78,7 +78,7 @@ CERTIFICATE AUTHORITY:
 
 	ca-set --type <ca type> --name <ca name> [set params]
 		Set the value and attributes of a CA.
-		-t, --type ['root', 'intermediate']		Sets the type of CA to store or generate. (Default: 'root')*
+		-t, --type ['root', 'intermediate']		Sets the type of CA to store or generate. (Default: 'root')
 		-n, --name 'CA'							Selects the CA being set
 
 		Set parameters by [Type]
