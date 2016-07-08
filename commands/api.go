@@ -5,10 +5,11 @@ import (
 
 	"net/url"
 
+	"strings"
+
 	"github.com/pivotal-cf/cm-cli/actions"
 	"github.com/pivotal-cf/cm-cli/client"
 	"github.com/pivotal-cf/cm-cli/config"
-	"strings"
 )
 
 type ApiCommand struct {
@@ -27,11 +28,9 @@ func (cmd ApiCommand) Execute([]string) error {
 	if serverUrl == "" {
 		fmt.Println(c.ApiURL)
 	} else {
-		fmt.Println("Before:  serverUrl = " + serverUrl);
 		if !strings.Contains(serverUrl, "://") {
 			serverUrl = "https://" + serverUrl
 		}
-		fmt.Println("After:  serverUrl = " + serverUrl);
 		parsedUrl, err := url.Parse(serverUrl)
 		if err != nil {
 			return err

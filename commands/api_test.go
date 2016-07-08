@@ -90,6 +90,7 @@ var _ = Describe("API", func() {
 		})
 
 		It("sets the target qualified name to an https URL when no URL scheme is provided", func() {
+			httpsServer.HTTPTestServer.URL = "https://localhost:8080"
 			session := runCommand("api", "localhost:8080")
 
 			Eventually(session).Should(Exit(0))
