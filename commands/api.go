@@ -41,8 +41,10 @@ func (cmd ApiCommand) Execute([]string) error {
 			return err
 		}
 		if parsedUrl.Scheme != "https" {
-			fmt.Println("Warning: Insecure HTTP API detected. Data sent to this API could be intercepted" +
-				" in transit by third parties. Secure HTTPS API endpoints are recommended.")
+			fmt.Println("\033[38;2;255;255;0m" +
+				"Warning: Insecure HTTP API detected. Data sent to this API could be intercepted" +
+				" in transit by third parties. Secure HTTPS API endpoints are recommended." +
+				"\033[0m")
 		}
 
 		fmt.Println("Setting the target url:", c.ApiURL)
