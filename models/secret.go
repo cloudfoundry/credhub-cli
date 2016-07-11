@@ -1,6 +1,7 @@
 package models
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 )
@@ -27,18 +28,24 @@ func (secret Secret) String() string {
 	)
 
 	if secretBody.ContentType == "value" {
-		lines = append(lines, fmt.Sprintf("Value:		%s", secretBody.Value))
+		value := secretBody.Credential.(string)
+		lines = append(lines, fmt.Sprintf("Credential:	%s", value))
 	} else {
-		if secretBody.Certificate.Ca != "" {
-			lines = append(lines, fmt.Sprintf("CA:		%s", secretBody.Certificate.Ca))
+		// We are marshaling again here because there isn't a simple way
+		// to convert map[string]interface{} to a Certificate struct
+		json_cert, _ := json.Marshal(secretBody.Credential)
+		cert := Certificate{}
+		json.Unmarshal(json_cert, &cert)
+		if cert.Ca != "" {
+			lines = append(lines, fmt.Sprintf("CA:		%s", cert.Ca))
 		}
 
-		if secretBody.Certificate.Public != "" {
-			lines = append(lines, fmt.Sprintf("Public:		%s", secretBody.Certificate.Public))
+		if cert.Certificate != "" {
+			lines = append(lines, fmt.Sprintf("Certificate:		%s", cert.Certificate))
 		}
 
-		if secretBody.Certificate.Private != "" {
-			lines = append(lines, fmt.Sprintf("Private:	%s", secretBody.Certificate.Private))
+		if cert.Private != "" {
+			lines = append(lines, fmt.Sprintf("Private:	%s", cert.Private))
 		}
 	}
 

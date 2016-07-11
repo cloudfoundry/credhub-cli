@@ -30,7 +30,7 @@ var _ = Describe("CaRepository", func() {
 
 				responseObj := http.Response{
 					StatusCode: 200,
-					Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"root":{"public":"my-pub","private":"my-priv"}}`))),
+					Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"root":{"certificate":"my-cert","private":"my-priv"}}`))),
 				}
 
 				httpClient.DoStub = func(req *http.Request) (resp *http.Response, err error) {
@@ -40,8 +40,8 @@ var _ = Describe("CaRepository", func() {
 				}
 
 				caParams := models.CaParameters{
-					Public:  "my-pub",
-					Private: "my-priv",
+					Certificate: "my-cert",
+					Private:     "my-priv",
 				}
 				expectedCaBody := models.CaBody{
 					Ca: &caParams,

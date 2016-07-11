@@ -26,8 +26,8 @@ func (ca Ca) String() string {
 		fmt.Sprintf("Name:		%s", ca.Name),
 	)
 
-	if caBody.Ca.Public != "" {
-		lines = append(lines, fmt.Sprintf("Public:		%s", caBody.Ca.Public))
+	if caBody.Ca.Certificate != "" {
+		lines = append(lines, fmt.Sprintf("Certificate:		%s", caBody.Ca.Certificate))
 	}
 
 	if caBody.Ca.Private != "" {

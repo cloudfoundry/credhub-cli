@@ -19,35 +19,35 @@ import (
 var _ = Describe("Ca-Set", func() {
 	Describe("setting certificate authorities", func() {
 		It("puts a root CA", func() {
-			var responseMyCertificate = fmt.Sprintf(CA_RESPONSE_TABLE, "root", "my-ca", "my-pub", "my-priv")
-			setupPutCaServer("root", "my-ca", "my-pub", "my-priv")
+			var responseMyCertificate = fmt.Sprintf(CA_RESPONSE_TABLE, "root", "my-ca", "my-cert", "my-priv")
+			setupPutCaServer("root", "my-ca", "my-cert", "my-priv")
 
-			session := runCommand("ca-set", "-n", "my-ca", "-t", "root", "--public-string", "my-pub", "--private-string", "my-priv")
+			session := runCommand("ca-set", "-n", "my-ca", "-t", "root", "--certificate-string", "my-cert", "--private-string", "my-priv")
 
 			Eventually(session).Should(Exit(0))
 			Eventually(session.Out).Should(Say(responseMyCertificate))
 		})
 
 		It("sets the type as root if no type is given", func() {
-			var responseMyCertificate = fmt.Sprintf(CA_RESPONSE_TABLE, "root", "my-ca", "my-pub", "my-priv")
-			setupPutCaServer("root", "my-ca", "my-pub", "my-priv")
+			var responseMyCertificate = fmt.Sprintf(CA_RESPONSE_TABLE, "root", "my-ca", "my-cert", "my-priv")
+			setupPutCaServer("root", "my-ca", "my-cert", "my-priv")
 
-			session := runCommand("ca-set", "-n", "my-ca", "--public-string", "my-pub", "--private-string", "my-priv")
+			session := runCommand("ca-set", "-n", "my-ca", "--certificate-string", "my-cert", "--private-string", "my-priv")
 
 			Eventually(session).Should(Exit(0))
 			Eventually(session.Out).Should(Say(responseMyCertificate))
 		})
 
 		It("puts a secret using explicit certificate type and values read from files", func() {
-			setupPutCaServer("root", "my-secret", "my-pub", "my-priv")
+			setupPutCaServer("root", "my-secret", "my-cert", "my-priv")
 			tempDir := createTempDir("certFilesForTesting")
-			publicFilename := createSecretFile(tempDir, "public.txt", "my-pub")
+			certificateFilename := createSecretFile(tempDir, "certificate.txt", "my-cert")
 			privateFilename := createSecretFile(tempDir, "private.txt", "my-priv")
 
 			session := runCommand("ca-set",
 				"-n", "my-secret",
 				"-t", "root",
-				"--public", publicFilename,
+				"--certificate", certificateFilename,
 				"--private", privateFilename)
 
 			os.RemoveAll(tempDir)
@@ -57,11 +57,11 @@ var _ = Describe("Ca-Set", func() {
 
 		It("fails to put a CA when failing to read from a file", func() {
 			testCaSetFileFailure("", "private.txt")
-			testCaSetFileFailure("public.txt", "")
+			testCaSetFileFailure("certificate.txt", "")
 		})
 
 		It("fails to put a CA when a specified cert string duplicates the contents of a file", func() {
-			testSetCaFileDuplicationFailure("--public-string", "my-pub")
+			testSetCaFileDuplicationFailure("--certificate-string", "my-cert")
 			testSetCaFileDuplicationFailure("--private-string", "my-priv")
 		})
 	})
@@ -73,7 +73,7 @@ var _ = Describe("Ca-Set", func() {
 			Eventually(session).Should(Exit(1))
 			Expect(session.Err).To(Say("ca-set"))
 			Expect(session.Err).To(Say("name"))
-			Expect(session.Err).To(Say("public-string"))
+			Expect(session.Err).To(Say("certificate-string"))
 			Expect(session.Err).To(Say("private-string"))
 		})
 
@@ -93,7 +93,7 @@ var _ = Describe("Ca-Set", func() {
 				RespondWith(http.StatusBadRequest, `{"error": "you fail."}`),
 			)
 
-			session := runCommand("ca-set", "-n", "my-ca", "--public-string", "my-pub", "--private-string", "my-priv")
+			session := runCommand("ca-set", "-n", "my-ca", "--certificate-string", "my-cert", "--private-string", "my-priv")
 
 			Eventually(session).Should(Exit(1))
 
@@ -102,22 +102,22 @@ var _ = Describe("Ca-Set", func() {
 	})
 })
 
-func setupPutCaServer(caType, name, pub, priv string) {
+func setupPutCaServer(caType, name, certificate, priv string) {
 	server.AppendHandlers(
 		CombineHandlers(
 			VerifyRequest("PUT", fmt.Sprintf("/api/v1/ca/%s", name)),
-			VerifyJSON(fmt.Sprintf(CA_REQUEST_JSON, caType, pub, priv)),
-			RespondWith(http.StatusOK, fmt.Sprintf(CA_RESPONSE_JSON, caType, pub, priv)),
+			VerifyJSON(fmt.Sprintf(CA_REQUEST_JSON, caType, certificate, priv)),
+			RespondWith(http.StatusOK, fmt.Sprintf(CA_RESPONSE_JSON, caType, certificate, priv)),
 		),
 	)
 }
 
-func testCaSetFileFailure(publicFilename, privateFilename string) {
+func testCaSetFileFailure(certificateFilename, privateFilename string) {
 	tempDir := createTempDir("certFilesForTesting")
-	if publicFilename != "" {
-		publicFilename = createSecretFile(tempDir, publicFilename, "my-pub")
+	if certificateFilename != "" {
+		certificateFilename = createSecretFile(tempDir, certificateFilename, "my-cert")
 	} else {
-		publicFilename = "dud"
+		certificateFilename = "dud"
 	}
 	if privateFilename != "" {
 		privateFilename = createSecretFile(tempDir, privateFilename, "my-priv")
@@ -126,7 +126,7 @@ func testCaSetFileFailure(publicFilename, privateFilename string) {
 	}
 
 	session := runCommand("ca-set", "-n", "my-ca",
-		"--public", publicFilename, "--private", privateFilename)
+		"--certificate", certificateFilename, "--private", privateFilename)
 
 	os.RemoveAll(tempDir)
 	Eventually(session).Should(Exit(1))
@@ -134,15 +134,15 @@ func testCaSetFileFailure(publicFilename, privateFilename string) {
 }
 
 func testSetCaFileDuplicationFailure(option, optionValue string) {
-	setupPutCaServer("root", "my-secret", "my-pub", "my-priv")
+	setupPutCaServer("root", "my-secret", "my-cert", "my-priv")
 	tempDir := createTempDir("certFilesForTesting")
-	publicFilename := createSecretFile(tempDir, "public.txt", "my-pub")
+	certificateFilename := createSecretFile(tempDir, "certificate.txt", "my-cert")
 	privateFilename := createSecretFile(tempDir, "private.txt", "my-priv")
 
 	session := runCommand("ca-set",
 		"-n", "my-secret",
 		"-t", "root",
-		"--public", publicFilename,
+		"--certificate", certificateFilename,
 		"--private", privateFilename,
 		option, optionValue)
 

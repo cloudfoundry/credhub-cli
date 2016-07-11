@@ -27,7 +27,7 @@ var _ = Describe("API", func() {
 
 	Describe("NewPutSecretValueRequest", func() {
 		It("Returns a request for the put-secret endpoint", func() {
-			requestBody := bytes.NewReader([]byte(`{"type":"value","value":"my-value"}`))
+			requestBody := bytes.NewReader([]byte(`{"type":"value","credential":"my-value"}`))
 			expectedRequest, _ := http.NewRequest("PUT", "sample.com/api/v1/data/my-name", requestBody)
 			expectedRequest.Header.Set("Content-Type", "application/json")
 
@@ -39,13 +39,13 @@ var _ = Describe("API", func() {
 
 	Describe("NewPutCertificateRequest", func() {
 		It("Returns a request for the put-certificate endpoint", func() {
-			json := fmt.Sprintf(`{"type":"certificate","certificate":{"ca":"%s","public":"%s","private":"%s"}}`,
-				"my-ca", "my-pub", "my-priv")
+			json := fmt.Sprintf(`{"type":"certificate","credential":{"ca":"%s","certificate":"%s","private":"%s"}}`,
+				"my-ca", "my-cert", "my-priv")
 			requestBody := bytes.NewReader([]byte(json))
 			expectedRequest, _ := http.NewRequest("PUT", "sample.com/api/v1/data/my-name", requestBody)
 			expectedRequest.Header.Set("Content-Type", "application/json")
 
-			request := NewPutCertificateRequest("sample.com", "my-name", "my-ca", "my-pub", "my-priv")
+			request := NewPutCertificateRequest("sample.com", "my-name", "my-ca", "my-cert", "my-priv")
 
 			Expect(request).To(Equal(expectedRequest))
 		})
@@ -53,13 +53,13 @@ var _ = Describe("API", func() {
 
 	Describe("NewPutCaRequest", func() {
 		It("Returns a request for the put-root-ca endpoint", func() {
-			json := fmt.Sprintf(`{"type":"root","root":{"public":"%s","private":"%s"}}`,
-				"my-pub", "my-priv")
+			json := fmt.Sprintf(`{"type":"root","root":{"certificate":"%s","private":"%s"}}`,
+				"my-cert", "my-priv")
 			requestBody := bytes.NewReader([]byte(json))
 			expectedRequest, _ := http.NewRequest("PUT", "sample.com/api/v1/ca/my-name", requestBody)
 			expectedRequest.Header.Set("Content-Type", "application/json")
 
-			request := NewPutCaRequest("sample.com", "my-name", "root", "my-pub", "my-priv")
+			request := NewPutCaRequest("sample.com", "my-name", "root", "my-cert", "my-priv")
 
 			Expect(request).To(Equal(expectedRequest))
 		})

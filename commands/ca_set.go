@@ -14,10 +14,10 @@ import (
 type CaSetCommand struct {
 	CaIdentifier      string `short:"n" required:"yes" long:"name" description:"Sets the name of the CA"`
 	CaType            string `short:"t" long:"type" description:"Sets the type of the CA"`
-	CaPublicFileName  string `long:"public" description:"Sets the Public Key based on an input file"`
+	CaPublicFileName  string `long:"certificate" description:"Sets the Certificate based on an input file"`
 	CaPrivateFileName string `long:"private" description:"Sets the Private Key based on an input file"`
-	CaPublic          string `long:"public-string" description:"Sets the public key to the parameter value"`
-	CaPrivate         string `long:"private-string" description:"Sets the private key to the parameter value"`
+	CaPublic          string `long:"certificate-string" description:"Sets the Certificate to the parameter value"`
+	CaPrivate         string `long:"private-string" description:"Sets the Private Key to the parameter value"`
 }
 
 func (cmd CaSetCommand) Execute([]string) error {

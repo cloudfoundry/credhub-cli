@@ -33,7 +33,7 @@ var _ = Describe("SecretRepository", func() {
 
 				responseObj := http.Response{
 					StatusCode: 200,
-					Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"type":"value","value":"my-value"}`))),
+					Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"type":"value","credential":"my-value"}`))),
 				}
 
 				httpClient.DoStub = func(req *http.Request) (resp *http.Response, err error) {
@@ -44,7 +44,7 @@ var _ = Describe("SecretRepository", func() {
 
 				expectedSecretBody := models.SecretBody{
 					ContentType: "value",
-					Value:       "my-value",
+					Credential:  "my-value",
 				}
 
 				expectedSecret := models.Secret{

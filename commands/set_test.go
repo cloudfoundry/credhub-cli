@@ -39,26 +39,26 @@ var _ = Describe("Set", func() {
 
 	Describe("setting certificate secrets", func() {
 		It("puts a secret using explicit certificate type and string values", func() {
-			setupPutCertificateServer("my-secret", "my-ca", "my-pub", "my-priv")
+			setupPutCertificateServer("my-secret", "my-ca", "my-cert", "my-priv")
 
 			session := runCommand("set", "-n", "my-secret",
 				"-t", "certificate", "--ca-string", "my-ca",
-				"--public-string", "my-pub", "--private-string", "my-priv")
+				"--certificate-string", "my-cert", "--private-string", "my-priv")
 
 			Eventually(session).Should(Exit(0))
 			Eventually(session.Out).Should(Say(responseMySecretCertificate))
 		})
 
 		It("puts a secret using explicit certificate type and values read from files", func() {
-			setupPutCertificateServer("my-secret", "my-ca", "my-pub", "my-priv")
+			setupPutCertificateServer("my-secret", "my-ca", "my-cert", "my-priv")
 			tempDir := createTempDir("certFilesForTesting")
 			caFilename := createSecretFile(tempDir, "ca.txt", "my-ca")
-			publicFilename := createSecretFile(tempDir, "public.txt", "my-pub")
+			certificateFilename := createSecretFile(tempDir, "certificate.txt", "my-cert")
 			privateFilename := createSecretFile(tempDir, "private.txt", "my-priv")
 
 			session := runCommand("set", "-n", "my-secret",
 				"-t", "certificate", "--ca", caFilename,
-				"--public", publicFilename, "--private", privateFilename)
+				"--certificate", certificateFilename, "--private", privateFilename)
 
 			os.RemoveAll(tempDir)
 			Eventually(session).Should(Exit(0))
@@ -66,14 +66,14 @@ var _ = Describe("Set", func() {
 		})
 
 		It("fails to put a secret when failing to read from a file", func() {
-			testSetFileFailure("", "public.txt", "private.txt")
+			testSetFileFailure("", "certificate.txt", "private.txt")
 			testSetFileFailure("ca.txt", "", "private.txt")
-			testSetFileFailure("ca.txt", "public.txt", "")
+			testSetFileFailure("ca.txt", "certificate.txt", "")
 		})
 
 		It("fails to put a secret when a specified cert string duplicates the contents of a file", func() {
 			testSetCertFileDuplicationFailure("--ca-string", "my-ca")
-			testSetCertFileDuplicationFailure("--public-string", "my-pub")
+			testSetCertFileDuplicationFailure("--certificate-string", "my-cert")
 			testSetCertFileDuplicationFailure("--private-string", "my-priv")
 		})
 	})
@@ -123,27 +123,27 @@ func setupPutValueServer(name string, value string) {
 	)
 }
 
-func setupPutCertificateServer(name string, ca string, pub string, priv string) {
+func setupPutCertificateServer(name string, ca string, cert string, priv string) {
 	server.AppendHandlers(
 		CombineHandlers(
 			VerifyRequest("PUT", fmt.Sprintf("/api/v1/data/%s", name)),
-			VerifyJSON(fmt.Sprintf(SECRET_CERTIFICATE_REQUEST_JSON, ca, pub, priv)),
-			RespondWith(http.StatusOK, fmt.Sprintf(SECRET_CERTIFICATE_RESPONSE_JSON, ca, pub, priv)),
+			VerifyJSON(fmt.Sprintf(SECRET_CERTIFICATE_REQUEST_JSON, ca, cert, priv)),
+			RespondWith(http.StatusOK, fmt.Sprintf(SECRET_CERTIFICATE_RESPONSE_JSON, ca, cert, priv)),
 		),
 	)
 }
 
-func testSetFileFailure(caFilename, publicFilename, privateFilename string) {
+func testSetFileFailure(caFilename, certificateFilename, privateFilename string) {
 	tempDir := createTempDir("certFilesForTesting")
 	if caFilename != "" {
 		caFilename = createSecretFile(tempDir, caFilename, "my-ca")
 	} else {
 		caFilename = "dud"
 	}
-	if publicFilename != "" {
-		publicFilename = createSecretFile(tempDir, publicFilename, "my-pub")
+	if certificateFilename != "" {
+		certificateFilename = createSecretFile(tempDir, certificateFilename, "my-cert")
 	} else {
-		publicFilename = "dud"
+		certificateFilename = "dud"
 	}
 	if privateFilename != "" {
 		privateFilename = createSecretFile(tempDir, privateFilename, "my-priv")
@@ -153,7 +153,7 @@ func testSetFileFailure(caFilename, publicFilename, privateFilename string) {
 
 	session := runCommand("set", "-n", "my-secret",
 		"-t", "certificate", "--ca", caFilename,
-		"--public", publicFilename, "--private", privateFilename)
+		"--certificate", certificateFilename, "--private", privateFilename)
 
 	os.RemoveAll(tempDir)
 	Eventually(session).Should(Exit(1))
@@ -161,14 +161,14 @@ func testSetFileFailure(caFilename, publicFilename, privateFilename string) {
 }
 
 func testSetCertFileDuplicationFailure(option, optionValue string) {
-	setupPutCertificateServer("my-secret", "my-ca", "my-pub", "my-priv")
+	setupPutCertificateServer("my-secret", "my-ca", "my-cert", "my-priv")
 	tempDir := createTempDir("certFilesForTesting")
 	caFilename := createSecretFile(tempDir, "ca.txt", "my-ca")
-	publicFilename := createSecretFile(tempDir, "public.txt", "my-pub")
+	certificateFilename := createSecretFile(tempDir, "certificate.txt", "my-cert")
 	privateFilename := createSecretFile(tempDir, "private.txt", "my-priv")
 
 	session := runCommand("set", "-n", "my-secret", "-t", "certificate", "--ca", caFilename,
-		"--public", publicFilename, "--private", privateFilename, option, optionValue)
+		"--certificate", certificateFilename, "--private", privateFilename, option, optionValue)
 
 	os.RemoveAll(tempDir)
 	Eventually(session).Should(Exit(1))

@@ -18,10 +18,10 @@ type SetCommand struct {
 	ContentType                string `short:"t" long:"type" description:"Sets the type of secret to store or generate. Default: 'value'"`
 	Value                      string `short:"v" long:"value" description:"Sets a value for a secret name"`
 	CertificateCAFileName      string `long:"ca" description:"Sets the CA based on an input file"`
-	CertificatePublicFileName  string `long:"public" description:"Sets the Public Key based on an input file"`
+	CertificatePublicFileName  string `long:"certificate" description:"Sets the Certificate based on an input file"`
 	CertificatePrivateFileName string `long:"private" description:"Sets the Private Key based on an input file"`
 	CertificateCA              string `long:"ca-string" description:"Sets the Certificate Authority"`
-	CertificatePublic          string `long:"public-string" description:"Sets the Public Key"`
+	CertificatePublic          string `long:"certificate-string" description:"Sets the Certificate"`
 	CertificatePrivate         string `long:"private-string" description:"Sets the Private Key"`
 }
 

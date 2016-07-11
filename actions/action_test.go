@@ -30,7 +30,7 @@ var _ = Describe("Action", func() {
 			request, _ := http.NewRequest("GET", "my-url", nil)
 			expectedBody := models.SecretBody{
 				ContentType: "value",
-				Value:       "potatoes",
+				Credential:  "potatoes",
 			}
 			expectedItem := models.NewSecret("my-item", expectedBody)
 			repository.SendRequestStub = func(req *http.Request, identifier string) (models.Item, error) {

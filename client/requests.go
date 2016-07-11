@@ -10,31 +10,31 @@ import (
 
 func NewPutValueRequest(apiTarget, secretIdentifier, secretContent string) *http.Request {
 	secret := models.SecretBody{
-		Value:       secretContent,
+		Credential:  secretContent,
 		ContentType: "value",
 	}
 
 	return newSecretRequest("PUT", apiTarget, secretIdentifier, secret)
 }
 
-func NewPutCertificateRequest(apiTarget, secretIdentifier, ca string, pub string, priv string) *http.Request {
+func NewPutCertificateRequest(apiTarget, secretIdentifier, ca string, cert string, priv string) *http.Request {
 	certificate := models.Certificate{
-		Ca:      ca,
-		Public:  pub,
-		Private: priv,
+		Ca:          ca,
+		Certificate: cert,
+		Private:     priv,
 	}
 	secret := models.SecretBody{
 		ContentType: "certificate",
-		Certificate: &certificate,
+		Credential:  &certificate,
 	}
 
 	return newSecretRequest("PUT", apiTarget, secretIdentifier, secret)
 }
 
-func NewPutCaRequest(apiTarget, caIdentifier, caType, pub, priv string) *http.Request {
+func NewPutCaRequest(apiTarget, caIdentifier, caType, cert, priv string) *http.Request {
 	ca := models.CaParameters{
-		Public:  pub,
-		Private: priv,
+		Certificate: cert,
+		Private:     priv,
 	}
 	caBody := models.CaBody{
 		ContentType: caType,
