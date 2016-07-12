@@ -1,3 +1,6 @@
 build/
 cm-cli
 *.iml
+*.pem
+*.crt
+*.key
