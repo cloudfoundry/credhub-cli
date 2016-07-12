@@ -31,4 +31,23 @@ var _ = Describe("Version", func() {
 			Eventually(session.Out).Should(Say("CM Version: 0.2.0"))
 		})
 	})
+
+	Context("when the request fails", func() {
+		BeforeEach(func() {
+			server.AppendHandlers(
+				CombineHandlers(
+					VerifyRequest("GET", "/info"),
+					RespondWith(http.StatusNotFound, ""),
+				),
+			)
+		})
+
+		It("displays the version with --version", func() {
+			session := runCommand("--version")
+
+			Eventually(session).Should(Exit(0))
+			Eventually(session.Out).Should(Say("CLI Version: 0.1.0 build DEV"))
+			Eventually(session.Out).Should(Say("CM Version: Not Found"))
+		})
+	})
 })

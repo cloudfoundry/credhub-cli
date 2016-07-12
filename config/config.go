@@ -9,7 +9,8 @@ import (
 )
 
 type Config struct {
-	ApiURL string
+	ApiURL  string
+	AuthURL string
 }
 
 func userHomeDir() string {

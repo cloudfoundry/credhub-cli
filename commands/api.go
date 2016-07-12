@@ -20,11 +20,11 @@ type ApiPositionalArgs struct {
 }
 
 func (cmd ApiCommand) Execute([]string) error {
-	c := config.ReadConfig()
+	cfg := config.ReadConfig()
 	serverUrl := targetUrl(cmd)
 
 	if serverUrl == "" {
-		fmt.Println(c.ApiURL)
+		fmt.Println(cfg.ApiURL)
 	} else {
 		serverUrl = AddDefaultSchemeIfNecessary(serverUrl)
 		parsedUrl, err := url.Parse(serverUrl)
@@ -32,14 +32,14 @@ func (cmd ApiCommand) Execute([]string) error {
 			return err
 		}
 
-		c.ApiURL = parsedUrl.String()
+		cfg.ApiURL = parsedUrl.String()
 
-		action := actions.NewApi(client.NewHttpClient(c))
-
-		err = action.ValidateTarget(c.ApiURL)
+		cmInfo, err := actions.NewInfo(client.NewHttpClient(cfg), cfg).GetServerInfo()
 		if err != nil {
 			return err
 		}
+		cfg.AuthURL = cmInfo.AuthServer.Url
+
 		if parsedUrl.Scheme != "https" {
 			fmt.Println("\033[38;2;255;255;0m" +
 				"Warning: Insecure HTTP API detected. Data sent to this API could be intercepted" +
@@ -47,9 +47,9 @@ func (cmd ApiCommand) Execute([]string) error {
 				"\033[0m")
 		}
 
-		fmt.Println("Setting the target url:", c.ApiURL)
+		fmt.Println("Setting the target url:", cfg.ApiURL)
 
-		config.WriteConfig(c)
+		config.WriteConfig(cfg)
 	}
 
 	return nil

@@ -8,6 +8,7 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
 	. "github.com/onsi/gomega/ghttp"
+	"github.com/pivotal-cf/cm-cli/config"
 )
 
 var _ = Describe("API", func() {
@@ -35,7 +36,10 @@ var _ = Describe("API", func() {
 			httpsServer.AppendHandlers(
 				CombineHandlers(
 					VerifyRequest("GET", "/info"),
-					RespondWith(http.StatusOK, ""),
+					RespondWith(http.StatusOK, `{
+					"app":{"version":"0.1.0 build DEV","name":"Pivotal Credential Manager"},
+					"auth-server":{"url":"https://example.com"}
+					}`),
 				),
 			)
 		})
@@ -53,6 +57,10 @@ var _ = Describe("API", func() {
 
 			Eventually(session).Should(Exit(0))
 			Eventually(session.Out).Should(Say(apiHttpsServerUrl))
+
+			config := config.ReadConfig()
+
+			Expect(config.AuthURL).To(Equal("https://example.com"))
 		})
 
 		It("sets the target URL using a flag", func() {
@@ -140,7 +148,10 @@ var _ = Describe("API", func() {
 			httpServer.AppendHandlers(
 				CombineHandlers(
 					VerifyRequest("GET", "/info"),
-					RespondWith(http.StatusOK, ""),
+					RespondWith(http.StatusOK, `{
+					"app":{"version":"my-version","name":"Pivotal Credential Manager"},
+					"auth-server":{"url":"https://example.com"}
+					}`),
 				),
 			)
 		})

@@ -14,7 +14,7 @@ import (
 	"github.com/pivotal-cf/cm-cli/config"
 )
 
-var _ = Describe("Version", func() {
+var _ = Describe("Info", func() {
 	var (
 		subject    actions.Version
 		httpClient clientfakes.FakeHttpClient
@@ -22,7 +22,7 @@ var _ = Describe("Version", func() {
 
 	BeforeEach(func() {
 		config := config.Config{ApiURL: "omfgdogs.com"}
-		subject = actions.NewVersion(&httpClient, config)
+		subject = actions.NewInfo(&httpClient, config)
 	})
 
 	Describe("Version", func() {
@@ -31,7 +31,10 @@ var _ = Describe("Version", func() {
 
 			responseObj := http.Response{
 				StatusCode: 200,
-				Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"app":{"name":"Pivotal Credential Manager","version":"my-version"}}`))),
+				Body: ioutil.NopCloser(bytes.NewBufferString(`{
+					"app":{"version":"my-version","name":"Pivotal Credential Manager"},
+					"auth-server":{"url":"https://example.com"}
+					}`)),
 			}
 
 			httpClient.DoStub = func(req *http.Request) (resp *http.Response, err error) {
@@ -40,43 +43,47 @@ var _ = Describe("Version", func() {
 				return &responseObj, nil
 			}
 
-			serverVersion := subject.GetServerVersion()
-			Expect(serverVersion).To(Equal("my-version"))
+			serverInfo, _ := subject.GetServerInfo()
+			Expect(serverInfo.App.Version).To(Equal("my-version"))
+			Expect(serverInfo.AuthServer.Url).To(Equal("https://example.com"))
 		})
 
-		It("returns Not Found if server returned a non 200 status code", func() {
+		It("returns error if server returned a non 200 status code", func() {
 			responseObj := http.Response{
 				StatusCode: 400,
-				Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"app":{"name":"Pivotal Credential Manager","version":"my-version"}}`))),
+				Body: ioutil.NopCloser(bytes.NewBufferString(`{
+					"app":{"version":"my-version","name":"Pivotal Credential Manager"},
+					"auth-server":{"url":"https://example.com"}
+					}`)),
 			}
 
 			httpClient.DoReturns(&responseObj, nil)
 
-			serverVersion := subject.GetServerVersion()
-			Expect(serverVersion).To(Equal("Not Found"))
+			_, err := subject.GetServerInfo()
+			Expect(err).NotTo(BeNil())
 		})
 
-		It("returns Not Found if server has a network error", func() {
+		It("returns error if server has a network error", func() {
 			responseObj := http.Response{
 				StatusCode: 200,
 			}
 
 			httpClient.DoReturns(&responseObj, errors.New("dogs are gone"))
 
-			serverVersion := subject.GetServerVersion()
-			Expect(serverVersion).To(Equal("Not Found"))
+			_, err := subject.GetServerInfo()
+			Expect(err).NotTo(BeNil())
 		})
 
-		It("returns Not Found if server returns bad json", func() {
+		It("returns error if server returns bad json", func() {
 			responseObj := http.Response{
 				StatusCode: 200,
-				Body:       ioutil.NopCloser(bytes.NewReader([]byte(`sdafasdfasdf`))),
+				Body:       ioutil.NopCloser(bytes.NewBufferString(`sdafasdfasdf`)),
 			}
 
 			httpClient.DoReturns(&responseObj, nil)
 
-			serverVersion := subject.GetServerVersion()
-			Expect(serverVersion).To(Equal("Not Found"))
+			_, err := subject.GetServerInfo()
+			Expect(err).NotTo(BeNil())
 		})
 	})
 })

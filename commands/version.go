@@ -14,7 +14,11 @@ import (
 func PrintVersion() error {
 	cfg := config.ReadConfig()
 
-	cmVersion := actions.NewVersion(client.NewHttpClient(cfg), cfg).GetServerVersion()
+	cmVersion := "Not Found"
+	cmInfo, err := actions.NewInfo(client.NewHttpClient(cfg), cfg).GetServerInfo()
+	if err == nil {
+		cmVersion = cmInfo.App.Version
+	}
 
 	fmt.Println("CLI Version:", version.Version+" build "+version.BuildNumber)
 	fmt.Println("CM Version:", cmVersion)

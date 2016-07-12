@@ -5,6 +5,11 @@ type infoApp struct {
 	Version string `json:"version"`
 }
 
+type authServer struct {
+	Url string `json:"url"`
+}
+
 type Info struct {
-	App infoApp `json:"app"`
+	App        infoApp    `json:"app"`
+	AuthServer authServer `json:"auth-server"`
 }

@@ -61,7 +61,10 @@ var _ = BeforeEach(func() {
 	server.AppendHandlers(
 		CombineHandlers(
 			VerifyRequest("GET", "/info"),
-			RespondWith(http.StatusOK, ""),
+			RespondWith(http.StatusOK, `{
+					"app":{"version":"my-version","name":"Pivotal Credential Manager"},
+					"auth-server":{"url":"https://example.com"}
+					}`),
 		),
 	)
 
