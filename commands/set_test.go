@@ -42,7 +42,7 @@ var _ = Describe("Set", func() {
 			setupPutCertificateServer("my-secret", "my-ca", "my-cert", "my-priv")
 
 			session := runCommand("set", "-n", "my-secret",
-				"-t", "certificate", "--ca-string", "my-ca",
+				"-t", "certificate", "--root-string", "my-ca",
 				"--certificate-string", "my-cert", "--private-string", "my-priv")
 
 			Eventually(session).Should(Exit(0))
@@ -57,7 +57,7 @@ var _ = Describe("Set", func() {
 			privateFilename := createSecretFile(tempDir, "private.txt", "my-priv")
 
 			session := runCommand("set", "-n", "my-secret",
-				"-t", "certificate", "--ca", caFilename,
+				"-t", "certificate", "--root", caFilename,
 				"--certificate", certificateFilename, "--private", privateFilename)
 
 			os.RemoveAll(tempDir)
@@ -72,7 +72,7 @@ var _ = Describe("Set", func() {
 		})
 
 		It("fails to put a secret when a specified cert string duplicates the contents of a file", func() {
-			testSetCertFileDuplicationFailure("--ca-string", "my-ca")
+			testSetCertFileDuplicationFailure("--root-string", "my-ca")
 			testSetCertFileDuplicationFailure("--certificate-string", "my-cert")
 			testSetCertFileDuplicationFailure("--private-string", "my-priv")
 		})
@@ -152,7 +152,7 @@ func testSetFileFailure(caFilename, certificateFilename, privateFilename string)
 	}
 
 	session := runCommand("set", "-n", "my-secret",
-		"-t", "certificate", "--ca", caFilename,
+		"-t", "certificate", "--root", caFilename,
 		"--certificate", certificateFilename, "--private", privateFilename)
 
 	os.RemoveAll(tempDir)
@@ -167,7 +167,7 @@ func testSetCertFileDuplicationFailure(option, optionValue string) {
 	certificateFilename := createSecretFile(tempDir, "certificate.txt", "my-cert")
 	privateFilename := createSecretFile(tempDir, "private.txt", "my-priv")
 
-	session := runCommand("set", "-n", "my-secret", "-t", "certificate", "--ca", caFilename,
+	session := runCommand("set", "-n", "my-secret", "-t", "certificate", "--root", caFilename,
 		"--certificate", certificateFilename, "--private", privateFilename, option, optionValue)
 
 	os.RemoveAll(tempDir)

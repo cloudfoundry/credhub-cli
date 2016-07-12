@@ -17,9 +17,9 @@ func NewPutValueRequest(apiTarget, secretIdentifier, secretContent string) *http
 	return newSecretRequest("PUT", apiTarget, secretIdentifier, secret)
 }
 
-func NewPutCertificateRequest(apiTarget, secretIdentifier, ca string, cert string, priv string) *http.Request {
+func NewPutCertificateRequest(apiTarget, secretIdentifier, root string, cert string, priv string) *http.Request {
 	certificate := models.Certificate{
-		Ca:          ca,
+		Root:        root,
 		Certificate: cert,
 		Private:     priv,
 	}

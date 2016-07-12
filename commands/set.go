@@ -17,10 +17,10 @@ type SetCommand struct {
 	SecretIdentifier           string `short:"n" required:"yes" long:"name" description:"Selects the secret being set"`
 	ContentType                string `short:"t" long:"type" description:"Sets the type of secret to store or generate. Default: 'value'"`
 	Value                      string `short:"v" long:"value" description:"Sets a value for a secret name"`
-	CertificateCAFileName      string `long:"ca" description:"Sets the CA based on an input file"`
+	RootCAFileName             string `long:"root" description:"Sets the Root CA based on an input file"`
 	CertificatePublicFileName  string `long:"certificate" description:"Sets the Certificate based on an input file"`
 	CertificatePrivateFileName string `long:"private" description:"Sets the Private Key based on an input file"`
-	CertificateCA              string `long:"ca-string" description:"Sets the Certificate Authority"`
+	RootCA                     string `long:"root-string" description:"Sets the Root Certificate Authority"`
 	CertificatePublic          string `long:"certificate-string" description:"Sets the Certificate"`
 	CertificatePrivate         string `long:"private-string" description:"Sets the Private Key"`
 }
@@ -55,11 +55,11 @@ func getRequest(cmd SetCommand, url string) (*http.Request, error) {
 		request = client.NewPutValueRequest(url, cmd.SecretIdentifier, cmd.Value)
 	} else {
 		var err error
-		if cmd.CertificateCAFileName != "" {
-			if cmd.CertificateCA != "" {
+		if cmd.RootCAFileName != "" {
+			if cmd.RootCA != "" {
 				return nil, cmcli_errors.NewCombinationOfParametersError()
 			}
-			cmd.CertificateCA, err = ReadFile(cmd.CertificateCAFileName)
+			cmd.RootCA, err = ReadFile(cmd.RootCAFileName)
 			if err != nil {
 				return nil, err
 			}
@@ -82,7 +82,7 @@ func getRequest(cmd SetCommand, url string) (*http.Request, error) {
 				return nil, err
 			}
 		}
-		request = client.NewPutCertificateRequest(url, cmd.SecretIdentifier, cmd.CertificateCA, cmd.CertificatePublic, cmd.CertificatePrivate)
+		request = client.NewPutCertificateRequest(url, cmd.SecretIdentifier, cmd.RootCA, cmd.CertificatePublic, cmd.CertificatePrivate)
 	}
 
 	return request, nil

@@ -36,8 +36,8 @@ func (secret Secret) String() string {
 		json_cert, _ := json.Marshal(secretBody.Credential)
 		cert := Certificate{}
 		json.Unmarshal(json_cert, &cert)
-		if cert.Ca != "" {
-			lines = append(lines, fmt.Sprintf("CA:		%s", cert.Ca))
+		if cert.Root != "" {
+			lines = append(lines, fmt.Sprintf("Root:		%s", cert.Root))
 		}
 
 		if cert.Certificate != "" {

@@ -19,24 +19,24 @@ var _ = Describe("String function", func() {
 	Describe("renders certificate secrets", func() {
 
 		It("when fields have non-nil values", func() {
-			cert := Certificate{Ca: "my-ca", Certificate: "my-cert", Private: "my-priv"}
+			cert := Certificate{Root: "my-ca", Certificate: "my-cert", Private: "my-priv"}
 			certificateSecret := NewSecret("nonNulledSecret", SecretBody{ContentType: "certificate", Credential: &cert, UpdatedAt: "2016-01-01T12:00:00Z"})
 			Expect(certificateSecret.String()).To(Equal("" +
 				"Type:		certificate\n" +
 				"Name:		nonNulledSecret\n" +
-				"CA:		my-ca\n" +
+				"Root:		my-ca\n" +
 				"Certificate:		my-cert\n" +
 				"Private:	my-priv\n" +
 				"Updated:	2016-01-01T12:00:00Z"))
 		})
 
 		It("when some fields have nil values", func() {
-			cert := Certificate{Ca: "my-ca", Certificate: "", Private: "my-priv"}
+			cert := Certificate{Root: "my-ca", Certificate: "", Private: "my-priv"}
 			certificateSecret := NewSecret("nonNulledSecret", SecretBody{ContentType: "certificate", Credential: &cert, UpdatedAt: "2016-01-01T12:00:00Z"})
 			Expect(certificateSecret.String()).To(Equal("" +
 				"Type:		certificate\n" +
 				"Name:		nonNulledSecret\n" +
-				"CA:		my-ca\n" +
+				"Root:		my-ca\n" +
 				"Private:	my-priv\n" +
 				"Updated:	2016-01-01T12:00:00Z"))
 		})
