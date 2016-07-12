@@ -15,7 +15,7 @@ type DeleteCommand struct {
 
 func (cmd DeleteCommand) Execute([]string) error {
 	config := config.ReadConfig()
-	repository := repositories.NewSecretRepository(client.NewHttpClient(config))
+	repository := repositories.NewSecretRepository(client.NewHttpClient(config.ApiURL))
 	action := actions.NewAction(repository, config)
 
 	_, err := action.DoAction(client.NewDeleteSecretRequest(config.ApiURL, cmd.SecretIdentifier), cmd.SecretIdentifier)

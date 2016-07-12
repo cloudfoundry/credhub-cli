@@ -5,8 +5,6 @@ import (
 	"net/http"
 	"net/url"
 	"time"
-
-	"github.com/pivotal-cf/cm-cli/config"
 )
 
 const TIMEOUT_SECS = 30
@@ -17,8 +15,8 @@ type HttpClient interface {
 	Do(req *http.Request) (resp *http.Response, err error)
 }
 
-func NewHttpClient(config config.Config) *http.Client {
-	parsedUrl, _ := url.Parse(config.ApiURL)
+func NewHttpClient(serverUrl string) *http.Client {
+	parsedUrl, _ := url.Parse(serverUrl)
 	if parsedUrl.Scheme == "https" {
 		return newHttpsClient()
 	} else {

@@ -13,7 +13,7 @@ var _ = Describe("#NewHttpClient", func() {
 			ApiURL: "http://foo.bar",
 		}
 
-		httpClient := client.NewHttpClient(config)
+		httpClient := client.NewHttpClient(config.ApiURL)
 		Expect(httpClient.Transport).To(BeNil())
 	})
 	It("returns https client when", func() {
@@ -21,7 +21,7 @@ var _ = Describe("#NewHttpClient", func() {
 			ApiURL: "https://foo.bar",
 		}
 
-		httpsClient := client.NewHttpClient(config)
+		httpsClient := client.NewHttpClient(config.ApiURL)
 		Expect(httpsClient.Transport).To(Not(BeNil()))
 	})
 })

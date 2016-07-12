@@ -24,7 +24,7 @@ func (cmd CaSetCommand) Execute([]string) error {
 	var err error
 
 	config := config.ReadConfig()
-	caRepository := repositories.NewCaRepository(client.NewHttpClient(config))
+	caRepository := repositories.NewCaRepository(client.NewHttpClient(config.ApiURL))
 
 	action := actions.NewAction(caRepository, config)
 

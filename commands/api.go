@@ -34,7 +34,7 @@ func (cmd ApiCommand) Execute([]string) error {
 
 		cfg.ApiURL = parsedUrl.String()
 
-		cmInfo, err := actions.NewInfo(client.NewHttpClient(cfg), cfg).GetServerInfo()
+		cmInfo, err := actions.NewInfo(client.NewHttpClient(cfg.ApiURL), cfg).GetServerInfo()
 		if err != nil {
 			return err
 		}
