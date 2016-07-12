@@ -53,7 +53,7 @@ var _ = Describe("API", func() {
 
 	Describe("NewPutCaRequest", func() {
 		It("Returns a request for the put-root-ca endpoint", func() {
-			json := fmt.Sprintf(`{"type":"root","root":{"certificate":"%s","private":"%s"}}`,
+			json := fmt.Sprintf(`{"type":"root","ca":{"certificate":"%s","private":"%s"}}`,
 				"my-cert", "my-priv")
 			requestBody := bytes.NewReader([]byte(json))
 			expectedRequest, _ := http.NewRequest("PUT", "sample.com/api/v1/ca/my-name", requestBody)

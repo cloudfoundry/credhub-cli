@@ -30,7 +30,7 @@ var _ = Describe("CaRepository", func() {
 
 				responseObj := http.Response{
 					StatusCode: 200,
-					Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"root":{"certificate":"my-cert","private":"my-priv"}}`))),
+					Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"ca":{"certificate":"my-cert","private":"my-priv"}}`))),
 				}
 
 				httpClient.DoStub = func(req *http.Request) (resp *http.Response, err error) {
