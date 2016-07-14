@@ -32,6 +32,10 @@ func NewCombinationOfParametersError() error {
 	return errors.New("The combination of parameters in the request is not allowed. Please validate your input and retry your request.")
 }
 
+func NewAuthorizationError() error {
+	return errors.New("Authorization failed.")  // todo
+}
+
 func ParseError(reader io.Reader) error {
 	decoder := json.NewDecoder(reader)
 	serverError := models.ServerError{}

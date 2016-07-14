@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/pivotal-cf/cm-cli/models"
+	"net/url"
 )
 
 func NewPutValueRequest(apiTarget, secretIdentifier, secretContent string) *http.Request {
@@ -70,6 +71,20 @@ func NewInfoRequest(apiTarget string) *http.Request {
 
 	request, _ := http.NewRequest("GET", url, nil)
 
+	return request
+}
+
+func NewTokenRequest(authTarget string, user string, pass string) *http.Request {
+	authUrl := authTarget + "/oauth/token/"
+	data := url.Values{}
+	data.Set("grant_type", "password")
+	data.Add("response_type", "token")
+	data.Add("username", user)
+	data.Add("password", pass)
+	request, _ := http.NewRequest("POST", authUrl, bytes.NewBufferString(data.Encode()))
+	request.SetBasicAuth("credhub", "") // todo get this from config, just like URL
+	request.Header.Add("Accept", "application/json")
+	request.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	return request
 }
 

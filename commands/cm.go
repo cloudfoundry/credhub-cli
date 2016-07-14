@@ -9,6 +9,7 @@ type CMCommand struct {
 	Delete   DeleteCommand   `command:"delete" description:"Delete a secret value"`
 	CaSet    CaSetCommand    `command:"ca-set" description:"Set a certificate authority for generating signed certificates"`
 	CaGet    CaGetCommand    `command:"ca-get" description:"Get a certificate authority"`
+	Login    LoginCommand    `command:"login" description:"Authenticates user with CredHub"`
 	Version  func()          `long:"version" description:"Version of Credential Manager"`
 }
 

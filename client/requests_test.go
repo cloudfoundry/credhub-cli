@@ -12,6 +12,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/pivotal-cf/cm-cli/models"
+	"net/url"
 )
 
 var _ = Describe("API", func() {
@@ -20,6 +21,28 @@ var _ = Describe("API", func() {
 			expectedRequest, _ := http.NewRequest("GET", "fake_target.com/info", nil)
 
 			request := NewInfoRequest("fake_target.com")
+
+			Expect(request).To(Equal(expectedRequest))
+		})
+	})
+
+	Describe("NewTokenRequest", func(){
+		It("Returns a request for the uaa password grant endpoint", func() {
+			authTarget := "http://example.com/uaa"
+			authUrl := authTarget + "/oauth/token/"
+			user := "my-user"
+			pass := "my-pass"
+			data := url.Values{}
+			data.Set("grant_type", "password")
+			data.Add("response_type", "token")
+			data.Add("username", user)
+			data.Add("password", pass)
+			expectedRequest, _ := http.NewRequest("POST", authUrl, bytes.NewBufferString(data.Encode()))
+			expectedRequest.SetBasicAuth("credhub", "")
+			expectedRequest.Header.Add("Accept", "application/json")
+			expectedRequest.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+
+			request := NewTokenRequest("http://example.com/uaa", user, pass)
 
 			Expect(request).To(Equal(expectedRequest))
 		})

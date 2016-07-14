@@ -21,13 +21,13 @@ var _ = Describe("Info", func() {
 	)
 
 	BeforeEach(func() {
-		config := config.Config{ApiURL: "omfgdogs.com"}
+		config := config.Config{ApiURL: "example.com"}
 		subject = actions.NewInfo(&httpClient, config)
 	})
 
 	Describe("Version", func() {
 		It("returns the version of the cli and server", func() {
-			request := client.NewInfoRequest("omfgdogs.com")
+			request := client.NewInfoRequest("example.com")
 
 			responseObj := http.Response{
 				StatusCode: 200,

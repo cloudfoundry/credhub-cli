@@ -77,9 +77,9 @@ var _ = AfterEach(func() {
 })
 
 var _ = SynchronizedBeforeSuite(func() []byte {
-	path, err := Build("github.com/pivotal-cf/cm-cli")
+	executable_path, err := Build("github.com/pivotal-cf/cm-cli")
 	Expect(err).NotTo(HaveOccurred())
-	return []byte(path)
+	return []byte(executable_path)
 }, func(data []byte) {
 	commandPath = string(data)
 })
