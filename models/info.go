@@ -6,7 +6,8 @@ type infoApp struct {
 }
 
 type authServer struct {
-	Url string `json:"url"`
+	Url    string `json:"url"`
+	Client string `json:"client"`
 }
 
 type Info struct {

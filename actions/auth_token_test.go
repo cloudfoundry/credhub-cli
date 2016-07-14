@@ -15,18 +15,19 @@ import (
 
 var _ = Describe("Token", func() {
 	var (
-		subject    actions.Version
+		subject    actions.ServerInfo
 		httpClient clientfakes.FakeHttpClient
+		testConfig config.Config
 	)
 
 	BeforeEach(func() {
-		config := config.Config{AuthURL: "example.com"}
-		subject = actions.NewToken(&httpClient, config)
+		testConfig = config.Config{AuthURL: "example.com"}
+		subject = actions.NewAuthToken(&httpClient, testConfig)
 	})
 
 	Describe("Authorization", func() {
 		It("returns the token from the authorization server", func() {
-			request := client.NewTokenRequest("example.com", "userName", "password")
+			request := client.NewAuthTokenRequest(testConfig, "userName", "password")
 
 			responseObj := http.Response{
 				StatusCode: 200,
@@ -42,10 +43,8 @@ var _ = Describe("Token", func() {
 				return &responseObj, nil
 			}
 
-			token, _ := subject.GetToken("userName", "password")
+			token, _ := subject.GetAuthToken("userName", "password")
 			Expect(token.AccessToken).To(Equal("2YotnFZFEjr1zCsicMWpAA"))
 		})
-
-
 	})
 })

@@ -1,13 +1,13 @@
 package commands_test
 
 import (
+	"net/http"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
-	. "github.com/onsi/gomega/ghttp"
 	. "github.com/onsi/gomega/gexec"
-	"net/http"
+	. "github.com/onsi/gomega/ghttp"
 	"github.com/pivotal-cf/cm-cli/config"
 )
 
@@ -51,4 +51,3 @@ var _ = Describe("Login", func() {
 		})
 	})
 })
-

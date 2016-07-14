@@ -11,6 +11,7 @@ import (
 type Config struct {
 	ApiURL      string
 	AuthURL     string
+	AuthClient  string
 	AccessToken string
 }
 

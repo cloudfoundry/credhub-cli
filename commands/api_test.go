@@ -38,7 +38,7 @@ var _ = Describe("API", func() {
 					VerifyRequest("GET", "/info"),
 					RespondWith(http.StatusOK, `{
 					"app":{"version":"0.1.0 build DEV","name":"Pivotal Credential Manager"},
-					"auth-server":{"url":"https://example.com"}
+					"auth-server":{"url":"https://example.com","client":"bar"}
 					}`),
 				),
 			)
@@ -135,6 +135,18 @@ var _ = Describe("API", func() {
 				Eventually(session.Out).Should(Say(httpsServer.URL()))
 			})
 		})
+
+		Context("saving configuration from server", func() {
+			It("saves config", func() {
+				session := runCommand("api", httpsServer.URL())
+				Eventually(session).Should(Exit(0))
+
+				config := config.ReadConfig()
+				Expect(config.ApiURL).To(Equal(httpsServer.URL()))
+				Expect(config.AuthURL).To(Equal("https://example.com"))
+				Expect(config.AuthClient).To(Equal("bar"))
+			})
+		})
 	})
 
 	Context("when the provided server url's scheme is http", func() {
@@ -150,7 +162,7 @@ var _ = Describe("API", func() {
 					VerifyRequest("GET", "/info"),
 					RespondWith(http.StatusOK, `{
 					"app":{"version":"my-version","name":"Pivotal Credential Manager"},
-					"auth-server":{"url":"https://example.com"}
+					"auth-server":{"url":"https://example.com","client":"bar"}
 					}`),
 				),
 			)
@@ -177,6 +189,5 @@ var _ = Describe("API", func() {
 			Eventually(session).Should(Say("Warning: Insecure HTTP API detected. Data sent to this API could be intercepted" +
 				" in transit by third parties. Secure HTTPS API endpoints are recommended."))
 		})
-
 	})
 })

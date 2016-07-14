@@ -9,10 +9,12 @@ import (
 
 	"fmt"
 
+	"net/url"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/pivotal-cf/cm-cli/config"
 	"github.com/pivotal-cf/cm-cli/models"
-	"net/url"
 )
 
 var _ = Describe("API", func() {
@@ -26,10 +28,12 @@ var _ = Describe("API", func() {
 		})
 	})
 
-	Describe("NewTokenRequest", func(){
-		It("Returns a request for the uaa password grant endpoint", func() {
-			authTarget := "http://example.com/uaa"
-			authUrl := authTarget + "/oauth/token/"
+	Describe("NewAuthTokenRequest", func() {
+		It("Returns a request for the uaa oauth token endpoint", func() {
+			config := config.Config{
+				AuthURL:    "http://example.com/uaa",
+				AuthClient: "my-credhub",
+			}
 			user := "my-user"
 			pass := "my-pass"
 			data := url.Values{}
@@ -37,12 +41,15 @@ var _ = Describe("API", func() {
 			data.Add("response_type", "token")
 			data.Add("username", user)
 			data.Add("password", pass)
-			expectedRequest, _ := http.NewRequest("POST", authUrl, bytes.NewBufferString(data.Encode()))
-			expectedRequest.SetBasicAuth("credhub", "")
+			expectedRequest, _ := http.NewRequest(
+				"POST",
+				config.AuthURL+"/oauth/token/",
+				bytes.NewBufferString(data.Encode()))
+			expectedRequest.SetBasicAuth("my-credhub", "")
 			expectedRequest.Header.Add("Accept", "application/json")
 			expectedRequest.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
-			request := NewTokenRequest("http://example.com/uaa", user, pass)
+			request := NewAuthTokenRequest(config, user, pass)
 
 			Expect(request).To(Equal(expectedRequest))
 		})

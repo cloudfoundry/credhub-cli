@@ -33,7 +33,7 @@ func NewCombinationOfParametersError() error {
 }
 
 func NewAuthorizationError() error {
-	return errors.New("Authorization failed.")  // todo
+	return errors.New("Authorization failed.")
 }
 
 func ParseError(reader io.Reader) error {

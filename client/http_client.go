@@ -25,16 +25,7 @@ func NewHttpClient(serverUrl string) *http.Client {
 }
 
 func newHttpClient() *http.Client {
-	return &http.Client{
-		Timeout: time.Second * TIMEOUT_SECS,
-		CheckRedirect: redirectPolicyFunc,
-	}
-}
-
-func redirectPolicyFunc(req *http.Request, via []*http.Request) error{
-	// todo test this in!!
-	req.SetBasicAuth("credhub", "") // todo move elsehwerew
-	return nil
+	return &http.Client{Timeout: time.Second * TIMEOUT_SECS}
 }
 
 func newHttpsClient() *http.Client {

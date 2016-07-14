@@ -16,7 +16,7 @@ import (
 
 var _ = Describe("Info", func() {
 	var (
-		subject    actions.Version
+		subject    actions.ServerInfo
 		httpClient clientfakes.FakeHttpClient
 	)
 
@@ -25,15 +25,15 @@ var _ = Describe("Info", func() {
 		subject = actions.NewInfo(&httpClient, config)
 	})
 
-	Describe("Version", func() {
-		It("returns the version of the cli and server", func() {
+	Describe("ServerInfo", func() {
+		It("returns the version of the cli and CM server, as well as auth server URL and client name", func() {
 			request := client.NewInfoRequest("example.com")
 
 			responseObj := http.Response{
 				StatusCode: 200,
 				Body: ioutil.NopCloser(bytes.NewBufferString(`{
 					"app":{"version":"my-version","name":"Pivotal Credential Manager"},
-					"auth-server":{"url":"https://example.com"}
+					"auth-server":{"url":"https://example.com","client":"credhub"}
 					}`)),
 			}
 
@@ -46,16 +46,11 @@ var _ = Describe("Info", func() {
 			serverInfo, _ := subject.GetServerInfo()
 			Expect(serverInfo.App.Version).To(Equal("my-version"))
 			Expect(serverInfo.AuthServer.Url).To(Equal("https://example.com"))
+			Expect(serverInfo.AuthServer.Client).To(Equal("credhub"))
 		})
 
 		It("returns error if server returned a non 200 status code", func() {
-			responseObj := http.Response{
-				StatusCode: 400,
-				Body: ioutil.NopCloser(bytes.NewBufferString(`{
-					"app":{"version":"my-version","name":"Pivotal Credential Manager"},
-					"auth-server":{"url":"https://example.com"}
-					}`)),
-			}
+			responseObj := http.Response{StatusCode: 400}
 
 			httpClient.DoReturns(&responseObj, nil)
 

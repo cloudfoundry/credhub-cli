@@ -10,30 +10,29 @@ import (
 	"github.com/pivotal-cf/cm-cli/models"
 )
 
-func NewInfo(httpClient client.HttpClient, config config.Config) ServerInfo {
+func NewAuthToken(httpClient client.HttpClient, config config.Config) ServerInfo {
 	return ServerInfo{httpClient: httpClient, config: config}
 }
 
-func (serverInfo ServerInfo) GetServerInfo() (models.Info, error) {
-	request := client.NewInfoRequest(serverInfo.config.ApiURL)
-
+func (serverInfo ServerInfo) GetAuthToken(user string, pass string) (models.Token, error) {
+	request := client.NewAuthTokenRequest(serverInfo.config, user, pass)
 	response, err := serverInfo.httpClient.Do(request)
 	if err != nil {
-		return models.Info{}, errors.NewNetworkError()
+		return models.Token{}, errors.NewNetworkError()
 	}
 
 	if response.StatusCode != http.StatusOK {
-		return models.Info{}, errors.NewInvalidTargetError()
+		return models.Token{}, errors.NewAuthorizationError()
 	}
 
-	info := new(models.Info)
+	token := new(models.Token)
 
 	decoder := json.NewDecoder(response.Body)
-	err = decoder.Decode(info)
+	err = decoder.Decode(token)
 
 	if err != nil {
-		return models.Info{}, err
+		return models.Token{}, err
 	}
 
-	return *info, nil
+	return *token, nil
 }
