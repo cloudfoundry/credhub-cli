@@ -33,7 +33,7 @@ func NewCombinationOfParametersError() error {
 }
 
 func NewAuthorizationError() error {
-	return errors.New("Authorization failed.")
+	return errors.New("The provided username and password combination are incorrect. Please validate your input and retry your request.")
 }
 
 func ParseError(reader io.Reader) error {

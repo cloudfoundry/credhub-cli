@@ -122,6 +122,46 @@ var _ = Describe("Login", func() {
 				Expect(config.ReadConfig().ApiURL).To(Equal("foo"))
 			})
 		})
+
+		Context("when credentials are invalid", func() {
+			var (
+				apiServer    *Server
+				badUaaServer *Server
+			)
+
+			BeforeEach(func() {
+				badUaaServer = NewServer()
+				badUaaServer.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest("POST", "/oauth/token/"),
+						VerifyBody([]byte(`grant_type=password&password=pass&response_type=token&username=user`)),
+						RespondWith(http.StatusUnauthorized, `{
+						"error":"unauthorized",
+						"error_description":"An Authentication object was not found in the SecurityContext"
+						}`),
+					),
+				)
+
+				apiServer = NewServer()
+				apiServer.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest("GET", "/info"),
+						RespondWith(http.StatusOK, fmt.Sprintf(`{
+					"app":{"version":"0.1.0 build DEV","name":"Pivotal Credential Manager"},
+					"auth-server":{"url":"%s","client":"bar"}
+					}`, badUaaServer.URL())),
+					),
+				)
+			})
+
+			It("fails to login", func() {
+				session := runCommand("login", "-u", "user", "-p", "pass", "-s", apiServer.URL())
+
+				Eventually(session).Should(Exit(1))
+				Eventually(session.Err).Should(Say("The provided username and password combination are incorrect. Please validate your input and retry your request."))
+				Expect(badUaaServer.ReceivedRequests()).Should(HaveLen(1))
+			})
+		})
 	})
 
 	Describe("Help", func() {
