@@ -9,12 +9,20 @@ import (
 )
 
 type LoginCommand struct {
-	Username string `short:"u" long:"username" description:"Sets username"`
-	Password string `short:"p" long:"password" description:"Sets password"`
+	Username  string `short:"u" long:"username" description:"Sets username"`
+	Password  string `short:"p" long:"password" description:"Sets password"`
+	ServerUrl string `short:"s" long:"server" description:"API endpoint"`
 }
 
 func (cmd LoginCommand) Execute([]string) error {
 	cfg := config.ReadConfig()
+
+	if cmd.ServerUrl != "" {
+		err := GetApiInfo(&cfg, cmd.ServerUrl)
+		if err != nil {
+			return err
+		}
+	}
 
 	token, err := actions.NewAuthToken(client.NewHttpClient(cfg.AuthURL), cfg).GetAuthToken(cmd.Username, cmd.Password)
 
