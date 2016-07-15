@@ -29,9 +29,7 @@ var _ = Describe("Login", func() {
 				),
 			)
 
-			cfg := config.ReadConfig()
-			cfg.AuthURL = uaaServer.URL()
-			config.WriteConfig(cfg)
+			setConfigAuthUrl(uaaServer.URL())
 
 			session := runCommand("login", "-u", "user", "-p", "pass")
 
@@ -125,7 +123,6 @@ var _ = Describe("Login", func() {
 
 		Context("when credentials are invalid", func() {
 			var (
-				apiServer    *Server
 				badUaaServer *Server
 			)
 
@@ -141,21 +138,12 @@ var _ = Describe("Login", func() {
 						}`),
 					),
 				)
-
-				apiServer = NewServer()
-				apiServer.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest("GET", "/info"),
-						RespondWith(http.StatusOK, fmt.Sprintf(`{
-					"app":{"version":"0.1.0 build DEV","name":"Pivotal Credential Manager"},
-					"auth-server":{"url":"%s","client":"bar"}
-					}`, badUaaServer.URL())),
-					),
-				)
 			})
 
 			It("fails to login", func() {
-				session := runCommand("login", "-u", "user", "-p", "pass", "-s", apiServer.URL())
+				setConfigAuthUrl(badUaaServer.URL())
+
+				session := runCommand("login", "-u", "user", "-p", "pass")
 
 				Eventually(session).Should(Exit(1))
 				Eventually(session.Err).Should(Say("The provided username and password combination are incorrect. Please validate your input and retry your request."))
@@ -175,3 +163,9 @@ var _ = Describe("Login", func() {
 		})
 	})
 })
+
+func setConfigAuthUrl(authUrl string) {
+	cfg := config.ReadConfig()
+	cfg.AuthURL = authUrl
+	config.WriteConfig(cfg)
+}
