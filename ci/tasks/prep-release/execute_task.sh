@@ -3,7 +3,7 @@
 set -exu
 
 PREP_RELEASE_INPUT=$(mktemp -d -t prep-release-input)
-echo "$(date +%s)" > $PREP_RELEASE_INPUT/input
+echo '{"source":{"interval":"1s"},"version":{"time":"2012-07-18T22:36:54.500564939Z"}}' > $PREP_RELEASE_INPUT/input
 
 PREP_RELEASE_OUTPUT=$(mktemp -d -t prep-release-output)
 

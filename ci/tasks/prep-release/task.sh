@@ -9,7 +9,7 @@ export GOARCH=amd64
 BUILD_ROOT=$PWD
 
 binary_name="cm-cli"
-build_number=$(cat clock/input)
+build_number=$(python task-repo/ci/tasks/prep-release/extract_timestamp.py clock/input)
 
 echo ${binary_name} > ${PREP_RELEASE_OUTPUT_PATH}/name
 echo ${build_number} > ${PREP_RELEASE_OUTPUT_PATH}/tag
