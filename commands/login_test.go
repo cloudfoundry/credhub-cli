@@ -11,13 +11,17 @@ import (
 	. "github.com/onsi/gomega/gexec"
 	. "github.com/onsi/gomega/ghttp"
 	"github.com/pivotal-cf/cm-cli/config"
+	"strings"
 )
 
 var _ = Describe("Login", func() {
-	Describe("provided a username and password", func() {
-		It("authenticates with the UAA server and saves a token", func() {
+	Context("provided a username", func() {
+		var (
+			uaaServer *Server
+		)
 
-			uaaServer := NewServer()
+		BeforeEach(func() {
+			uaaServer = NewServer()
 			uaaServer.AppendHandlers(
 				CombineHandlers(
 					VerifyRequest("POST", "/oauth/token/"),
@@ -30,13 +34,60 @@ var _ = Describe("Login", func() {
 			)
 
 			setConfigAuthUrl(uaaServer.URL())
+		})
 
-			session := runCommand("login", "-u", "user", "-p", "pass")
+		Context("provided a password", func() {
+			It("authenticates with the UAA server and saves a token", func() {
+				session := runCommand("login", "-u", "user", "-p", "pass")
 
-			Expect(uaaServer.ReceivedRequests()).Should(HaveLen(1))
-			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say("Login Successful"))
-			Expect(config.ReadConfig().AccessToken).To(Equal("2YotnFZFEjr1zCsicMWpAA"))
+				Expect(uaaServer.ReceivedRequests()).Should(HaveLen(1))
+				Eventually(session).Should(Exit(0))
+				Eventually(session.Out).Should(Say("Login Successful"))
+				Expect(config.ReadConfig().AccessToken).To(Equal("2YotnFZFEjr1zCsicMWpAA"))
+			})
+		})
+
+		Context("provided no password", func() {
+			It("prompts for a password", func() {
+				session := runCommandWithStdin(strings.NewReader("pass\n"), "login", "-u", "user")
+				Eventually(session.Out).Should(Say("password:"))
+				Eventually(session.Wait("10s").Out).Should(Say("Login Successful"))
+				Eventually(session).Should(Exit(0))
+			})
+		})
+	})
+
+	Context("provided no username", func() {
+		Context("provided a password", func() {
+			It("fails authentication with an error message", func() {
+				session := runCommand("login", "-p", "pass")
+
+				Eventually(session).Should(Exit(1))
+				Eventually(session.Err).Should(Say("The combination of parameters in the request is not allowed. Please validate your input and retry your request."))
+			})
+		})
+
+		Context("provided no password", func() {
+			It("prompts for a username and password", func() {
+				uaaServer := NewServer()
+				uaaServer.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest("POST", "/oauth/token/"),
+						VerifyBody([]byte(`grant_type=password&password=pass&response_type=token&username=user`)),
+						RespondWith(http.StatusOK, `{
+						"access_token":"2YotnFZFEjr1zCsicMWpAA",
+						"token_type":"bearer",
+						"expires_in":3600}`),
+					),
+				)
+
+				setConfigAuthUrl(uaaServer.URL())
+				session := runCommandWithStdin(strings.NewReader("user\npass\n"), "login")
+				Eventually(session.Out).Should(Say("username:"))
+				Eventually(session.Out).Should(Say("password:"))
+				Eventually(session.Wait("10s").Out).Should(Say("Login Successful"))
+				Eventually(session).Should(Exit(0))
+			})
 		})
 	})
 

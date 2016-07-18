@@ -36,6 +36,10 @@ func NewAuthorizationError() error {
 	return errors.New("The provided username and password combination are incorrect. Please validate your input and retry your request.")
 }
 
+func NewAuthorizationParametersError() error {
+	return errors.New("The combination of parameters in the request is not allowed. Please validate your input and retry your request.")
+}
+
 func ParseError(reader io.Reader) error {
 	decoder := json.NewDecoder(reader)
 	serverError := models.ServerError{}

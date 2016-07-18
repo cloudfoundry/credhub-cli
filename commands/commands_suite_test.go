@@ -17,6 +17,7 @@ import (
 
 	. "github.com/onsi/gomega/gexec"
 	. "github.com/onsi/gomega/ghttp"
+	"io"
 )
 
 const TIMESTAMP = `2016-01-01T12:00:00Z`
@@ -90,6 +91,16 @@ var _ = SynchronizedAfterSuite(func() {}, func() {
 
 func runCommand(args ...string) *Session {
 	cmd := exec.Command(commandPath, args...)
+	session, err := Start(cmd, GinkgoWriter, GinkgoWriter)
+	Expect(err).NotTo(HaveOccurred())
+	<-session.Exited
+
+	return session
+}
+
+func runCommandWithStdin(stdin io.Reader, args ...string) *Session {
+	cmd := exec.Command(commandPath, args...)
+	cmd.Stdin = stdin
 	session, err := Start(cmd, GinkgoWriter, GinkgoWriter)
 	Expect(err).NotTo(HaveOccurred())
 	<-session.Exited

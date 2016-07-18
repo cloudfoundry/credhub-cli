@@ -6,6 +6,8 @@ import (
 	"github.com/pivotal-cf/cm-cli/actions"
 	"github.com/pivotal-cf/cm-cli/client"
 	"github.com/pivotal-cf/cm-cli/config"
+	"github.com/pivotal-cf/cm-cli/errors"
+  "github.com/howeyc/gopass"
 )
 
 type LoginCommand struct {
@@ -24,8 +26,12 @@ func (cmd LoginCommand) Execute([]string) error {
 		}
 	}
 
-	token, err := actions.NewAuthToken(client.NewHttpClient(cfg.AuthURL), cfg).GetAuthToken(cmd.Username, cmd.Password)
+	err := getUsernameAndPassword(&cmd)
+	if err != nil {
+		return err
+	}
 
+	token, err := actions.NewAuthToken(client.NewHttpClient(cfg.AuthURL), cfg).GetAuthToken(cmd.Username, cmd.Password)
 	if err != nil {
 		return err
 	}
@@ -34,4 +40,28 @@ func (cmd LoginCommand) Execute([]string) error {
 	config.WriteConfig(cfg)
 	fmt.Println("Login Successful")
 	return nil
+}
+
+func getUsernameAndPassword(cmd *LoginCommand) error {
+	if cmd.Username == "" && cmd.Password != "" {
+		return errors.NewAuthorizationParametersError()
+	}
+	if cmd.Username == "" {
+		promptForInput("username: ", &cmd.Username)
+	}
+	if cmd.Password == "" {
+		promptForInputWithoutEcho("password: ", &cmd.Password)
+	}
+	return nil
+}
+
+func promptForInput(prompt string, value *string) {
+	fmt.Printf(prompt)
+	fmt.Scanln(value)
+}
+
+func promptForInputWithoutEcho(prompt string, value *string) {
+	fmt.Printf(prompt)
+	pass, _ := gopass.GetPasswdMasked()
+	*value = string(pass)
 }
