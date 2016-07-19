@@ -28,7 +28,8 @@ var _ = Describe("Ca-Generate", func() {
 				"--organization-unit", "my-unit",
 				"--locality", "my-locality",
 				"--state", "my-state",
-				"--country", "my-country")
+				"--country", "my-country",
+				"--key-length", "512")
 
 			Eventually(session).Should(Exit(0))
 			Eventually(session.Out).Should(Say(responseMyCertificate))
@@ -44,6 +45,13 @@ var _ = Describe("Ca-Generate", func() {
 			Expect(session.Err).To(Say("ca-generate"))
 			Expect(session.Err).To(Say("name"))
 			Expect(session.Err).To(Say("type"))
+			Expect(session.Err).To(Say("common-name"))
+			Expect(session.Err).To(Say("organization"))
+			Expect(session.Err).To(Say("organization-unit"))
+			Expect(session.Err).To(Say("locality"))
+			Expect(session.Err).To(Say("state"))
+			Expect(session.Err).To(Say("country"))
+			Expect(session.Err).To(Say("key-length"))
 		})
 
 		It("displays missing 'n' option as required parameter", func() {
@@ -78,7 +86,8 @@ func setupPostCaServer(caType, name, certificate, priv string) {
 	"organization_unit":"my-unit",
 	"locality":"my-locality",
 	"state":"my-state",
-	"country":"my-country"
+	"country":"my-country",
+	"key_length": 512
 	}`
 	server.AppendHandlers(
 		CombineHandlers(
