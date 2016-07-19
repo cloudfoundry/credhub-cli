@@ -2,8 +2,6 @@
 
 set -eux
 
-ls -l clock
-
 export GOPATH=$PWD/go
 export GOARCH=amd64
 BUILD_ROOT=$PWD
