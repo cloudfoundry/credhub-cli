@@ -117,7 +117,7 @@ var _ = Describe("Login", func() {
 					VerifyRequest("GET", "/info"),
 					RespondWith(http.StatusOK, fmt.Sprintf(`{
 					"app":{"version":"0.1.0 build DEV","name":"Pivotal Credential Manager"},
-					"auth-server":{"url":"%s","client":"bar"}
+					"auth-server":{"url":"%s"}
 					}`, uaaServer.URL())),
 				),
 			)
@@ -132,7 +132,6 @@ var _ = Describe("Login", func() {
 			Eventually(session.Out).Should(Say("Login Successful"))
 			Expect(config.ReadConfig().ApiURL).To(Equal(apiServer.URL()))
 			Expect(config.ReadConfig().AuthURL).To(Equal(uaaServer.URL()))
-			Expect(config.ReadConfig().AuthClient).To(Equal("bar"))
 			Expect(config.ReadConfig().AccessToken).To(Equal("2YotnFZFEjr1zCsicMWpAA"))
 		})
 

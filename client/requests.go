@@ -85,15 +85,15 @@ func NewInfoRequest(apiTarget string) *http.Request {
 	return request
 }
 
-func NewAuthTokenRequest(config config.Config, user string, pass string) *http.Request {
-	authUrl := config.AuthURL + "/oauth/token/"
+func NewAuthTokenRequest(cfg config.Config, user string, pass string) *http.Request {
+	authUrl := cfg.AuthURL + "/oauth/token/"
 	data := url.Values{}
 	data.Set("grant_type", "password")
 	data.Add("response_type", "token")
 	data.Add("username", user)
 	data.Add("password", pass)
 	request, _ := http.NewRequest("POST", authUrl, bytes.NewBufferString(data.Encode()))
-	request.SetBasicAuth(config.AuthClient, "")
+	request.SetBasicAuth(config.AuthClient, config.AuthPassword)
 	request.Header.Add("Accept", "application/json")
 	request.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	return request

@@ -31,8 +31,7 @@ var _ = Describe("API", func() {
 	Describe("NewAuthTokenRequest", func() {
 		It("Returns a request for the uaa oauth token endpoint", func() {
 			config := config.Config{
-				AuthURL:    "http://example.com/uaa",
-				AuthClient: "my-credhub",
+				AuthURL: "http://example.com/uaa",
 			}
 			user := "my-user"
 			pass := "my-pass"
@@ -45,7 +44,7 @@ var _ = Describe("API", func() {
 				"POST",
 				config.AuthURL+"/oauth/token/",
 				bytes.NewBufferString(data.Encode()))
-			expectedRequest.SetBasicAuth("my-credhub", "")
+			expectedRequest.SetBasicAuth("credhub", "")
 			expectedRequest.Header.Add("Accept", "application/json")
 			expectedRequest.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 

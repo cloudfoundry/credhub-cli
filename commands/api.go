@@ -50,7 +50,6 @@ func GetApiInfo(cfg *config.Config, serverUrl string) error {
 		return err
 	}
 	cfg.AuthURL = cmInfo.AuthServer.Url
-	cfg.AuthClient = cmInfo.AuthServer.Client
 
 	if parsedUrl.Scheme != "https" {
 		fmt.Println("\033[38;2;255;255;0m" +

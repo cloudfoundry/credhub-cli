@@ -8,10 +8,12 @@ import (
 	"runtime"
 )
 
+const AuthClient = "credhub"
+const AuthPassword = ""
+
 type Config struct {
 	ApiURL      string
 	AuthURL     string
-	AuthClient  string
 	AccessToken string
 }
 

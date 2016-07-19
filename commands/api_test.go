@@ -144,7 +144,6 @@ var _ = Describe("API", func() {
 				config := config.ReadConfig()
 				Expect(config.ApiURL).To(Equal(httpsServer.URL()))
 				Expect(config.AuthURL).To(Equal("https://example.com"))
-				Expect(config.AuthClient).To(Equal("bar"))
 			})
 		})
 	})
