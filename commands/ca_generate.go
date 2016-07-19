@@ -20,6 +20,7 @@ type CaGenerateCommand struct {
 	CaState            string `long:"state" description:"Sets the state/province of the generated CA"`
 	CaCountry          string `long:"country" description:"Sets the country of the generated CA"`
 	CaKeyLength        int    `long:"key-length" description:"Sets the bit length of the generated CA key"`
+	CaDuration         int    `long:"duration" description:"Sets the valid duration (in days) for the generated CA"`
 }
 
 func (cmd CaGenerateCommand) Execute([]string) error {
@@ -36,6 +37,7 @@ func (cmd CaGenerateCommand) Execute([]string) error {
 		State:            cmd.CaState,
 		Country:          cmd.CaCountry,
 		KeyLength:        cmd.CaKeyLength,
+		Duration:         cmd.CaDuration,
 	}
 
 	action := actions.NewAction(caRepository, config)
