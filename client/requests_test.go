@@ -98,12 +98,12 @@ var _ = Describe("API", func() {
 	Describe("NewPostCaRequest", func() {
 		It("Returns a request for the post-root-ca endpoint", func() {
 			parameters := models.SecretParameters{
-				CommonName: "my-common-name",
-				Organization: "my-organization",
+				CommonName:       "my-common-name",
+				Organization:     "my-organization",
 				OrganizationUnit: "my-unit",
-				Locality: "my-locality",
-				State: "my-state",
-				Country: "my-country",
+				Locality:         "my-locality",
+				State:            "my-state",
+				Country:          "my-country",
 			}
 			expectedRequestJson := `{
 				"type":"root",

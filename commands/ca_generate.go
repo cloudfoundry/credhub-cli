@@ -6,19 +6,19 @@ import (
 	"github.com/pivotal-cf/cm-cli/actions"
 	"github.com/pivotal-cf/cm-cli/client"
 	"github.com/pivotal-cf/cm-cli/config"
-	"github.com/pivotal-cf/cm-cli/repositories"
 	"github.com/pivotal-cf/cm-cli/models"
+	"github.com/pivotal-cf/cm-cli/repositories"
 )
 
 type CaGenerateCommand struct {
 	CaIdentifier       string `short:"n" required:"yes" long:"name" description:"Sets the name of the CA"`
 	CaType             string `short:"t" long:"type" description:"Sets the type of the CA"`
 	CaCommonName       string `long:"common-name" description:"Sets the common name of the generated CA"`
-	CaOrganization     string   `long:"organization" description:"Sets the organization of the generated CA"`
-	CaOrganizationUnit string   `long:"organization-unit" description:"Sets the organization unit of the generated CA"`
-	CaLocality         string   `long:"locality" description:"Sets the locality/city of the generated CA"`
-	CaState            string   `long:"state" description:"Sets the state/province of the generated CA"`
-	CaCountry          string   `long:"country" description:"Sets the country of the generated CA"`
+	CaOrganization     string `long:"organization" description:"Sets the organization of the generated CA"`
+	CaOrganizationUnit string `long:"organization-unit" description:"Sets the organization unit of the generated CA"`
+	CaLocality         string `long:"locality" description:"Sets the locality/city of the generated CA"`
+	CaState            string `long:"state" description:"Sets the state/province of the generated CA"`
+	CaCountry          string `long:"country" description:"Sets the country of the generated CA"`
 }
 
 func (cmd CaGenerateCommand) Execute([]string) error {
