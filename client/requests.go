@@ -47,6 +47,15 @@ func NewPutCaRequest(apiTarget, caIdentifier, caType, cert, priv string) *http.R
 	return newCaRequest("PUT", apiTarget, caIdentifier, caBody)
 }
 
+func NewPostCaRequest(apiTarget, caIdentifier, caType string) *http.Request {
+	caBody := models.CaBody{
+		ContentType: caType,
+		Ca:          nil,
+	}
+
+	return newCaRequest("POST", apiTarget, caIdentifier, caBody)
+}
+
 func NewGetCaRequest(apiTarget, caIdentifier string) *http.Request {
 	return newCaRequest("GET", apiTarget, caIdentifier, nil)
 }

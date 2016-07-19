@@ -95,6 +95,19 @@ var _ = Describe("API", func() {
 		})
 	})
 
+	Describe("NewPostCaRequest", func() {
+		It("Returns a request for the post-root-ca endpoint", func() {
+			json := `{"type":"root"}`
+			requestBody := bytes.NewReader([]byte(json))
+			expectedRequest, _ := http.NewRequest("POST", "sample.com/api/v1/ca/my-name", requestBody)
+			expectedRequest.Header.Set("Content-Type", "application/json")
+
+			request := NewPostCaRequest("sample.com", "my-name", "root")
+
+			Expect(request).To(Equal(expectedRequest))
+		})
+	})
+
 	Describe("NewGetCaRequest", func() {
 		It("Returns a request for the get-root-ca endpoint", func() {
 			expectedRequest, _ := http.NewRequest("GET", "sample.com/api/v1/ca/my-name", nil)

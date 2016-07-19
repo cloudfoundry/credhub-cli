@@ -14,8 +14,6 @@ import (
 	. "github.com/onsi/gomega/ghttp"
 )
 
-const GENERATE_REQUEST_JSON = `{"type":"%s","parameters":%s}`
-
 var _ = Describe("Generate", func() {
 	It("without parameters", func() {
 		doValueOptionTest(`{}`)
