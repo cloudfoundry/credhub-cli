@@ -97,14 +97,39 @@ var _ = Describe("API", func() {
 
 	Describe("NewPostCaRequest", func() {
 		It("Returns a request for the post-root-ca endpoint", func() {
-			json := `{"type":"root"}`
-			requestBody := bytes.NewReader([]byte(json))
-			expectedRequest, _ := http.NewRequest("POST", "sample.com/api/v1/ca/my-name", requestBody)
+			parameters := models.SecretParameters{
+				CommonName: "my-common-name",
+				Organization: "my-organization",
+				OrganizationUnit: "my-unit",
+				Locality: "my-locality",
+				State: "my-state",
+				Country: "my-country",
+			}
+			expectedRequestJson := `{
+				"type":"root",
+				"parameters": {
+					"common_name": "my-common-name",
+					"organization": "my-organization",
+					"organization_unit": "my-unit",
+					"locality": "my-locality",
+					"state": "my-state",
+					"country": "my-country"
+				}
+			}`
+
+			expectedRequestBody := bytes.NewReader([]byte(expectedRequestJson))
+
+			expectedRequest, _ := http.NewRequest("POST", "sample.com/api/v1/ca/my-name", expectedRequestBody)
 			expectedRequest.Header.Set("Content-Type", "application/json")
 
-			request := NewPostCaRequest("sample.com", "my-name", "root")
+			request := NewPostCaRequest("sample.com", "my-name", "root", parameters)
 
-			Expect(request).To(Equal(expectedRequest))
+			bodyBuffer := new(bytes.Buffer)
+			bodyBuffer.ReadFrom(request.Body)
+			Expect(bodyBuffer).To(MatchJSON(expectedRequestJson))
+			Expect(request.Method).To(Equal("POST"))
+			Expect(request.URL.String()).To(Equal("sample.com/api/v1/ca/my-name"))
+			Expect(request.Header.Get("Content-Type")).To(Equal("application/json"))
 		})
 	})
 

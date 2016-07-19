@@ -29,7 +29,6 @@ const SECRET_CERTIFICATE_REQUEST_JSON = `{"type":"certificate","credential":{"ro
 const SECRET_CERTIFICATE_RESPONSE_JSON = `{"type":"certificate","credential":{"root":"%s","certificate":"%s","private":"%s"},"updated_at":"` + TIMESTAMP + `"}`
 const SECRET_CERTIFICATE_RESPONSE_TABLE = `Type:		certificate\nName:		%s\nRoot:		%s\nCertificate:		%s\nPrivate:	%s\nUpdated:	` + TIMESTAMP
 const GENERATE_REQUEST_JSON = `{"type":"%s","parameters":%s}`
-const CA_GENERATE_REQUEST_JSON = `{"type":"%s"}`
 const CA_REQUEST_JSON = `{"type":"%s","ca":{"certificate":"%s","private":"%s"}}`
 const CA_RESPONSE_JSON = `{"type":"%s","ca":{"certificate":"%s","private":"%s"},"updated_at":"` + TIMESTAMP + `"}`
 const CA_RESPONSE_TABLE = `Type:		%s\nName:		%s\nCertificate:		%s\nPrivate:	%s\nUpdated:	` + TIMESTAMP

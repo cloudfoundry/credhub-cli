@@ -20,7 +20,15 @@ var _ = Describe("Ca-Generate", func() {
 			var responseMyCertificate = fmt.Sprintf(CA_RESPONSE_TABLE, "root", "my-ca", "my-cert-generated", "my-priv-generated")
 			setupPostCaServer("root", "my-ca", "my-cert-generated", "my-priv-generated")
 
-			session := runCommand("ca-generate", "-n", "my-ca", "-t", "root")
+			session := runCommand("ca-generate",
+				"-n", "my-ca",
+				"-t", "root",
+				"--common-name", "my-common-name",
+				"--organization", "my-organization",
+				"--organization-unit", "my-unit",
+				"--locality", "my-locality",
+				"--state", "my-state",
+				"--country", "my-country")
 
 			Eventually(session).Should(Exit(0))
 			Eventually(session.Out).Should(Say(responseMyCertificate))
@@ -64,10 +72,18 @@ var _ = Describe("Ca-Generate", func() {
 })
 
 func setupPostCaServer(caType, name, certificate, priv string) {
+	params := `{
+	"common_name":"my-common-name",
+	"organization":"my-organization",
+	"organization_unit":"my-unit",
+	"locality":"my-locality",
+	"state":"my-state",
+	"country":"my-country"
+	}`
 	server.AppendHandlers(
 		CombineHandlers(
 			VerifyRequest("POST", fmt.Sprintf("/api/v1/ca/%s", name)),
-			VerifyJSON(fmt.Sprintf(CA_GENERATE_REQUEST_JSON, caType)),
+			VerifyJSON(fmt.Sprintf(GENERATE_REQUEST_JSON, caType, params)),
 			RespondWith(http.StatusOK, fmt.Sprintf(CA_RESPONSE_JSON, caType, certificate, priv)),
 		),
 	)

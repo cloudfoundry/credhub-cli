@@ -47,13 +47,13 @@ func NewPutCaRequest(apiTarget, caIdentifier, caType, cert, priv string) *http.R
 	return newCaRequest("PUT", apiTarget, caIdentifier, caBody)
 }
 
-func NewPostCaRequest(apiTarget, caIdentifier, caType string) *http.Request {
-	caBody := models.CaBody{
+func NewPostCaRequest(apiTarget, caIdentifier, caType string, params models.SecretParameters) *http.Request {
+	caGenerateRequestBody := models.GenerateRequest{
 		ContentType: caType,
-		Ca:          nil,
+		Parameters:  params,
 	}
 
-	return newCaRequest("POST", apiTarget, caIdentifier, caBody)
+	return newCaRequest("POST", apiTarget, caIdentifier, caGenerateRequestBody)
 }
 
 func NewGetCaRequest(apiTarget, caIdentifier string) *http.Request {
