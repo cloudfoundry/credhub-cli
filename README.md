@@ -14,11 +14,11 @@ GETTING STARTED:
 		View or set the targeted CredHub API
 		-s, --server 'URI'						URI of API server to target
 
-	login*
+	login
 		Authenticates interactively with CredHub.
-		-u, --user 'USER'           			Authentication username*
-    	-p, --password 'PASSWORD'				Authentication password*
-		-s, --server 'URI'						URI of API server to target*
+		-u, --user 'USER'           			Authentication username
+    	-p, --password 'PASSWORD'				Authentication password
+		-s, --server 'URI'						URI of API server to target
 
 	logout*
 		Discard authenticated user session.
@@ -72,6 +72,8 @@ CREDENTIAL MANAGEMENT:
 		
 CERTIFICATE AUTHORITY:
 
+NOTE: CA with name 'default' will be used when generating a certificate credential without a named CA
+
 	ca-get --name <ca name>
 		Get the value and attributes of a CA. 
 		-n, --name 'CA'							Name of CA to retrieve
@@ -89,20 +91,19 @@ CERTIFICATE AUTHORITY:
 		--certificate-string 'CERT'       		[Root/Intermediate] Sets the CA certificate from string input
 		--private-string 'PRIVATE'				[Root/Intermediate] Sets the CA private key from string input
 
-	ca-generate --type <ca type> --name <ca name> [generate params]*
+	ca-generate --type <ca type> --name <ca name> [generate params]
 		Generate and set a credential value based on generation parameters.
-		-t, --type ['value', 'certificate']		Sets the type of credential to store or generate. (Default: 'value')*
-		-n, --name 'CRED'						Selects the credential being set*
+		-t, --type ['value', 'certificate']		Sets the type of credential to store or generate. (Default: 'value')
+		-n, --name 'CRED'						Selects the credential being set
 
 		Generate parameters by [Type]
 		--ca 'CA NAME'					     	[Intermediate] Name of CA used to sign the generated certificate (Default: 'default')*
-		--duration [1-3650]						[Root/Intermediate] Valid duration (in days) of the generated certificate (Default: 365)*
-		--key-length [2048, 3072, 4096]			[Root/Intermediate] Bit length of the generated key (Default: 2048)*
-		--common-name 'COMMON NAME'				[Root/Intermediate] Common name of the generated certificate*
-		--alternative-name 'ALT NAME'			[Root/Intermediate] Alternative name(s) of the generated certificate*
-		--organization 'ORG'					[Root/Intermediate] Organization of the generated certificate*
-		--organization-unit 'ORG UNIT'			[Root/Intermediate] Organization unit of the generated certificate*
-		--locality 'LOCALITY'					[Root/Intermediate] Locality/city of the generated certificate*
-		--state	'ST'							[Root/Intermediate] State/province of the generated certificate*
-		--country 'CC'							[Root/Intermediate] Country of the generated certificate*
+		--duration [1-3650]						[Root/Intermediate] Valid duration (in days) of the generated certificate (Default: 365)
+		--key-length [2048, 3072, 4096]			[Root/Intermediate] Bit length of the generated key (Default: 2048)
+		--common-name 'COMMON NAME'				[Root/Intermediate] Common name of the generated certificate
+		--organization 'ORG'					[Root/Intermediate] Organization of the generated certificate
+		--organization-unit 'ORG UNIT'			[Root/Intermediate] Organization unit of the generated certificate
+		--locality 'LOCALITY'					[Root/Intermediate] Locality/city of the generated certificate
+		--state	'ST'							[Root/Intermediate] State/province of the generated certificate
+		--country 'CC'							[Root/Intermediate] Country of the generated certificate
 ```
