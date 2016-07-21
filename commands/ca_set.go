@@ -52,7 +52,7 @@ func (cmd CaSetCommand) Execute([]string) error {
 
 	ca, err := action.DoAction(
 		client.NewPutCaRequest(
-			config.ApiURL,
+			config,
 			cmd.CaIdentifier,
 			cmd.CaType,
 			cmd.CaPublic,

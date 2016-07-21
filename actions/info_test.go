@@ -18,16 +18,17 @@ var _ = Describe("Info", func() {
 	var (
 		subject    actions.ServerInfo
 		httpClient clientfakes.FakeHttpClient
+		cfg				 config.Config
 	)
 
 	BeforeEach(func() {
-		config := config.Config{ApiURL: "example.com"}
-		subject = actions.NewInfo(&httpClient, config)
+		cfg = config.Config{ApiURL: "example.com"}
+		subject = actions.NewInfo(&httpClient, cfg)
 	})
 
 	Describe("ServerInfo", func() {
 		It("returns the version of the cli and CM server, as well as auth server URL and client name", func() {
-			request := client.NewInfoRequest("example.com")
+			request := client.NewInfoRequest(cfg)
 
 			responseObj := http.Response{
 				StatusCode: 200,

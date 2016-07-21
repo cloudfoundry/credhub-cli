@@ -20,7 +20,7 @@ func (cmd CaGetCommand) Execute([]string) error {
 
 	ca, err := action.DoAction(
 		client.NewGetCaRequest(
-			config.ApiURL,
+			config,
 			cmd.CaIdentifier), cmd.CaIdentifier)
 
 	if err != nil {

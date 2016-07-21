@@ -34,7 +34,7 @@ func (cmd SetCommand) Execute([]string) error {
 	repository := repositories.NewSecretRepository(client.NewHttpClient(config.ApiURL))
 
 	action := actions.NewAction(repository, config)
-	request, err := getRequest(cmd, config.ApiURL)
+	request, err := getRequest(cmd, config)
 	if err != nil {
 		return err
 	}
@@ -49,10 +49,10 @@ func (cmd SetCommand) Execute([]string) error {
 	return nil
 }
 
-func getRequest(cmd SetCommand, url string) (*http.Request, error) {
+func getRequest(cmd SetCommand, config config.Config) (*http.Request, error) {
 	var request *http.Request
 	if cmd.ContentType == "value" {
-		request = client.NewPutValueRequest(url, cmd.SecretIdentifier, cmd.Value)
+		request = client.NewPutValueRequest(config, cmd.SecretIdentifier, cmd.Value)
 	} else {
 		var err error
 		if cmd.RootCAFileName != "" {
@@ -82,7 +82,7 @@ func getRequest(cmd SetCommand, url string) (*http.Request, error) {
 				return nil, err
 			}
 		}
-		request = client.NewPutCertificateRequest(url, cmd.SecretIdentifier, cmd.RootCA, cmd.CertificatePublic, cmd.CertificatePrivate)
+		request = client.NewPutCertificateRequest(config, cmd.SecretIdentifier, cmd.RootCA, cmd.CertificatePublic, cmd.CertificatePrivate)
 	}
 
 	return request, nil

@@ -46,7 +46,7 @@ func (cmd CaGenerateCommand) Execute([]string) error {
 		cmd.CaType = "root"
 	}
 
-	request := client.NewPostCaRequest(config.ApiURL, cmd.CaIdentifier, cmd.CaType, parameters)
+	request := client.NewPostCaRequest(config, cmd.CaIdentifier, cmd.CaType, parameters)
 
 	ca, err := action.DoAction(request, cmd.CaIdentifier)
 

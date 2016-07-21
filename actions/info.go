@@ -15,7 +15,7 @@ func NewInfo(httpClient client.HttpClient, config config.Config) ServerInfo {
 }
 
 func (serverInfo ServerInfo) GetServerInfo() (models.Info, error) {
-	request := client.NewInfoRequest(serverInfo.config.ApiURL)
+	request := client.NewInfoRequest(serverInfo.config)
 
 	response, err := serverInfo.httpClient.Do(request)
 	if err != nil {

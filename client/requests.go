@@ -11,16 +11,16 @@ import (
 	"github.com/pivotal-cf/cm-cli/models"
 )
 
-func NewPutValueRequest(apiTarget, secretIdentifier, secretContent string) *http.Request {
+func NewPutValueRequest(config config.Config, secretIdentifier, secretContent string) *http.Request {
 	secret := models.SecretBody{
 		Credential:  secretContent,
 		ContentType: "value",
 	}
 
-	return newSecretRequest("PUT", apiTarget, secretIdentifier, secret)
+	return newSecretRequest("PUT", config, secretIdentifier, secret)
 }
 
-func NewPutCertificateRequest(apiTarget, secretIdentifier, root string, cert string, priv string) *http.Request {
+func NewPutCertificateRequest(config config.Config, secretIdentifier, root string, cert string, priv string) *http.Request {
 	certificate := models.Certificate{
 		Root:        root,
 		Certificate: cert,
@@ -31,10 +31,10 @@ func NewPutCertificateRequest(apiTarget, secretIdentifier, root string, cert str
 		Credential:  &certificate,
 	}
 
-	return newSecretRequest("PUT", apiTarget, secretIdentifier, secret)
+	return newSecretRequest("PUT", config, secretIdentifier, secret)
 }
 
-func NewPutCaRequest(apiTarget, caIdentifier, caType, cert, priv string) *http.Request {
+func NewPutCaRequest(config config.Config, caIdentifier, caType, cert, priv string) *http.Request {
 	ca := models.CaParameters{
 		Certificate: cert,
 		Private:     priv,
@@ -44,41 +44,41 @@ func NewPutCaRequest(apiTarget, caIdentifier, caType, cert, priv string) *http.R
 		Ca:          &ca,
 	}
 
-	return newCaRequest("PUT", apiTarget, caIdentifier, caBody)
+	return newCaRequest("PUT", config, caIdentifier, caBody)
 }
 
-func NewPostCaRequest(apiTarget, caIdentifier, caType string, params models.SecretParameters) *http.Request {
+func NewPostCaRequest(config config.Config, caIdentifier, caType string, params models.SecretParameters) *http.Request {
 	caGenerateRequestBody := models.GenerateRequest{
 		ContentType: caType,
 		Parameters:  params,
 	}
 
-	return newCaRequest("POST", apiTarget, caIdentifier, caGenerateRequestBody)
+	return newCaRequest("POST", config, caIdentifier, caGenerateRequestBody)
 }
 
-func NewGetCaRequest(apiTarget, caIdentifier string) *http.Request {
-	return newCaRequest("GET", apiTarget, caIdentifier, nil)
+func NewGetCaRequest(config config.Config, caIdentifier string) *http.Request {
+	return newCaRequest("GET", config, caIdentifier, nil)
 }
 
-func NewGenerateSecretRequest(apiTarget, secretIdentifier string, parameters models.SecretParameters, contentType string) *http.Request {
+func NewGenerateSecretRequest(config config.Config, secretIdentifier string, parameters models.SecretParameters, contentType string) *http.Request {
 	generateRequest := models.GenerateRequest{
 		Parameters:  parameters,
 		ContentType: contentType,
 	}
 
-	return newSecretRequest("POST", apiTarget, secretIdentifier, generateRequest)
+	return newSecretRequest("POST", config, secretIdentifier, generateRequest)
 }
 
-func NewGetSecretRequest(apiTarget, secretIdentifier string) *http.Request {
-	return newSecretRequest("GET", apiTarget, secretIdentifier, nil)
+func NewGetSecretRequest(config config.Config, secretIdentifier string) *http.Request {
+	return newSecretRequest("GET", config, secretIdentifier, nil)
 }
 
-func NewDeleteSecretRequest(apiTarget, secretIdentifier string) *http.Request {
-	return newSecretRequest("DELETE", apiTarget, secretIdentifier, nil)
+func NewDeleteSecretRequest(config config.Config, secretIdentifier string) *http.Request {
+	return newSecretRequest("DELETE", config, secretIdentifier, nil)
 }
 
-func NewInfoRequest(apiTarget string) *http.Request {
-	url := apiTarget + "/info"
+func NewInfoRequest(config config.Config) *http.Request {
+	url := config.ApiURL + "/info"
 
 	request, _ := http.NewRequest("GET", url, nil)
 
@@ -99,19 +99,19 @@ func NewAuthTokenRequest(cfg config.Config, user string, pass string) *http.Requ
 	return request
 }
 
-func newSecretRequest(requestType, apiTarget, secretIdentifier string, bodyModel interface{}) *http.Request {
-	url := apiTarget + "/api/v1/data/" + secretIdentifier
+func newSecretRequest(requestType string, config config.Config, secretIdentifier string, bodyModel interface{}) *http.Request {
+	url := config.ApiURL + "/api/v1/data/" + secretIdentifier
 
-	return newRequest(requestType, url, bodyModel)
+	return newRequest(requestType, config, url, bodyModel)
 }
 
-func newCaRequest(requestType, apiTarget, caIdentifier string, bodyModel interface{}) *http.Request {
-	url := apiTarget + "/api/v1/ca/" + caIdentifier
+func newCaRequest(requestType string, config config.Config, caIdentifier string, bodyModel interface{}) *http.Request {
+	url := config.ApiURL + "/api/v1/ca/" + caIdentifier
 
-	return newRequest(requestType, url, bodyModel)
+	return newRequest(requestType, config, url, bodyModel)
 }
 
-func newRequest(requestType, url string, bodyModel interface{}) *http.Request {
+func newRequest(requestType string, config config.Config, url string, bodyModel interface{}) *http.Request {
 	var request *http.Request
 	if bodyModel == nil {
 		request, _ = http.NewRequest(requestType, url, nil)
@@ -120,6 +120,7 @@ func newRequest(requestType, url string, bodyModel interface{}) *http.Request {
 		request, _ = http.NewRequest(requestType, url, bytes.NewReader(body))
 		request.Header.Set("Content-Type", "application/json")
 	}
+	request.Header.Set("Authorization", "Bearer " + config.AccessToken)
 
 	return request
 }

@@ -18,7 +18,7 @@ func (cmd DeleteCommand) Execute([]string) error {
 	repository := repositories.NewSecretRepository(client.NewHttpClient(config.ApiURL))
 	action := actions.NewAction(repository, config)
 
-	_, err := action.DoAction(client.NewDeleteSecretRequest(config.ApiURL, cmd.SecretIdentifier), cmd.SecretIdentifier)
+	_, err := action.DoAction(client.NewDeleteSecretRequest(config, cmd.SecretIdentifier), cmd.SecretIdentifier)
 
 	if err == nil {
 		fmt.Println("Secret successfully deleted")
