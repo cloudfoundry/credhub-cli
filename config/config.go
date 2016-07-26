@@ -53,3 +53,7 @@ func WriteConfig(c Config) {
 	data, _ := json.Marshal(c)
 	ioutil.WriteFile(configPath(), data, 0644)
 }
+
+func RemoveConfig() {
+	os.Remove(configPath())
+}

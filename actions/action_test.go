@@ -36,6 +36,10 @@ var _ = Describe("Action", func() {
 		expectedItem = models.NewSecret("my-item", expectedBody)
 	})
 
+	AfterEach(func() {
+		config.RemoveConfig()
+	})
+
 	Describe("DoAction", func() {
 		It("performs a network request", func() {
 			request, _ := http.NewRequest("GET", "my-url", nil)
@@ -60,9 +64,8 @@ var _ = Describe("Action", func() {
 			})
 
 			It("refreshes the access token when server returns unauthorized", func() {
-				// setup auth failure then success
 				var authRepository repositoriesfakes.FakeRepository
-				authRepository.SendRequestReturns(&models.Token{AccessToken: "access_token", RefreshToken: "refresh_token"}, nil)
+				authRepository.SendRequestReturns(models.Token{AccessToken: "access_token", RefreshToken: "refresh_token"}, nil)
 				subject.AuthRepository = &authRepository
 
 				i := 0

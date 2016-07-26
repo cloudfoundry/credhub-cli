@@ -16,6 +16,10 @@ import (
 )
 
 var _ = Describe("Login", func() {
+	AfterEach(func() {
+		config.RemoveConfig()
+	})
+
 	Context("provided a username", func() {
 		var (
 			uaaServer *Server
@@ -55,6 +59,7 @@ var _ = Describe("Login", func() {
 				Eventually(session.Out).Should(Say("password:"))
 				Eventually(session.Wait("10s").Out).Should(Say("Login Successful"))
 				Eventually(session).Should(Exit(0))
+				Expect(config.ReadConfig().AccessToken).To(Equal("2YotnFZFEjr1zCsicMWpAA"))
 			})
 		})
 	})
