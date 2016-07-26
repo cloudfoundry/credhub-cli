@@ -46,6 +46,7 @@ var (
 	commandPath string
 	homeDir     string
 	server      *Server
+	authServer  *Server
 )
 
 var _ = BeforeEach(func() {
@@ -61,12 +62,14 @@ var _ = BeforeEach(func() {
 
 	server = NewServer()
 
+	authServer = NewServer()
+
 	server.AppendHandlers(
 		CombineHandlers(
 			VerifyRequest("GET", "/info"),
 			RespondWith(http.StatusOK, `{
 					"app":{"version":"my-version","name":"Pivotal Credential Manager"},
-					"auth-server":{"url":"https://example.com"}
+					"auth-server":{"url":"`+authServer.URL()+`"}
 					}`),
 		),
 	)
@@ -76,6 +79,7 @@ var _ = BeforeEach(func() {
 
 var _ = AfterEach(func() {
 	server.Close()
+	authServer.Close()
 	os.RemoveAll(homeDir)
 })
 

@@ -15,7 +15,7 @@ import (
 	"github.com/pivotal-cf/cm-cli/models"
 )
 
-var _ = Describe("SecretRepository", func() {
+var _ = Describe("AuthRepository", func() {
 	var (
 		repository Repository
 		httpClient clientfakes.FakeHttpClient
@@ -31,16 +31,16 @@ var _ = Describe("SecretRepository", func() {
 
 	Describe("SendRequest", func() {
 		BeforeEach(func() {
-			repository = NewSecretRepository(&httpClient)
+			repository = NewAuthRepository(&httpClient)
 		})
 
 		Context("when there is a response body", func() {
 			It("sends a request to the server", func() {
-				request, _ := http.NewRequest("GET", "http://example.com/foo", nil)
+				request, _ := http.NewRequest("POST", cfg.AuthURL, nil)
 
 				responseObj := http.Response{
 					StatusCode: 200,
-					Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"type":"value","credential":"my-value"}`))),
+					Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"access_token":"token","expires_in": 1234,"refresh_token":"refresh-token"}`))),
 				}
 
 				httpClient.DoStub = func(req *http.Request) (resp *http.Response, err error) {
@@ -49,42 +49,16 @@ var _ = Describe("SecretRepository", func() {
 					return &responseObj, nil
 				}
 
-				expectedSecretBody := models.SecretBody{
-					ContentType: "value",
-					Credential:  "my-value",
+				expectedToken := models.Token{
+					AccessToken:  "token",
+					ExpiresIn:    1234,
+					RefreshToken: "refresh-token",
 				}
 
-				expectedSecret := models.Secret{
-					Name:       "foo",
-					SecretBody: expectedSecretBody,
-				}
-
-				secret, err := repository.SendRequest(request, "foo")
+				token, err := repository.SendRequest(request, "")
 
 				Expect(err).ToNot(HaveOccurred())
-				Expect(secret).To(Equal(expectedSecret))
-			})
-		})
-
-		Describe("Deletion", func() {
-			It("sends a delete request to the server", func() {
-				request, _ := http.NewRequest("DELETE", "http://example.com/foo", nil)
-
-				responseObj := http.Response{
-					StatusCode: 200,
-					Body:       ioutil.NopCloser(bytes.NewReader([]byte(""))),
-				}
-
-				httpClient.DoStub = func(req *http.Request) (resp *http.Response, err error) {
-					Expect(req).To(Equal(request))
-
-					return &responseObj, nil
-				}
-
-				secret, err := repository.SendRequest(request, "foo")
-
-				Expect(err).ToNot(HaveOccurred())
-				Expect(secret).To(Equal(models.Secret{}))
+				Expect(token).To(Equal(expectedToken))
 			})
 		})
 

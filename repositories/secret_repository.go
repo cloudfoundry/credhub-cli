@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/pivotal-cf/cm-cli/client"
-	"github.com/pivotal-cf/cm-cli/errors"
+	cm_errors "github.com/pivotal-cf/cm-cli/errors"
 	"github.com/pivotal-cf/cm-cli/models"
 )
 
@@ -18,7 +18,7 @@ func NewSecretRepository(httpClient client.HttpClient) Repository {
 }
 
 func (r secretRepository) SendRequest(request *http.Request, identifier string) (models.Item, error) {
-	response, err := doSendRequest(r.httpClient, request)
+	response, err := DoSendRequest(r.httpClient, request)
 	if err != nil {
 		return models.Secret{}, err
 	}
@@ -31,20 +31,7 @@ func (r secretRepository) SendRequest(request *http.Request, identifier string) 
 	secretBody := models.SecretBody{}
 	err = decoder.Decode(&secretBody)
 	if err != nil {
-		return models.Secret{}, errors.NewResponseError()
+		return models.Secret{}, cm_errors.NewResponseError()
 	}
 	return models.NewSecret(identifier, secretBody), nil
-}
-
-func doSendRequest(client client.HttpClient, request *http.Request) (*http.Response, error) {
-	response, err := client.Do(request)
-
-	if err != nil {
-		return nil, errors.NewNetworkError()
-	}
-
-	if response.StatusCode < 200 || response.StatusCode > 299 {
-		return nil, errors.ParseError(response.Body)
-	}
-	return response, nil
 }

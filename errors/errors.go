@@ -1,11 +1,7 @@
 package errors
 
 import (
-	"encoding/json"
 	"errors"
-	"io"
-
-	"github.com/pivotal-cf/cm-cli/models"
 )
 
 func NewNetworkError() error {
@@ -40,10 +36,6 @@ func NewAuthorizationParametersError() error {
 	return errors.New("The combination of parameters in the request is not allowed. Please validate your input and retry your request.")
 }
 
-func ParseError(reader io.Reader) error {
-	decoder := json.NewDecoder(reader)
-	serverError := models.ServerError{}
-	decoder.Decode(&serverError)
-
-	return errors.New(serverError.Error)
+func NewRefreshError() error {
+	return errors.New("You are not currently authenticated. Please log in to continue.")
 }

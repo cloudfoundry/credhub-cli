@@ -29,6 +29,7 @@ var _ = Describe("Login", func() {
 					VerifyBody([]byte(`grant_type=password&password=pass&response_type=token&username=user`)),
 					RespondWith(http.StatusOK, `{
 						"access_token":"2YotnFZFEjr1zCsicMWpAA",
+						"refresh_token":"erousflkajqwer",
 						"token_type":"bearer",
 						"expires_in":3600}`),
 				),
@@ -106,6 +107,7 @@ var _ = Describe("Login", func() {
 					VerifyBody([]byte(`grant_type=password&password=pass&response_type=token&username=user`)),
 					RespondWith(http.StatusOK, `{
 						"access_token":"2YotnFZFEjr1zCsicMWpAA",
+						"refresh_token":"erousflkajqwer",
 						"token_type":"bearer",
 						"expires_in":3600}`),
 				),
@@ -132,7 +134,13 @@ var _ = Describe("Login", func() {
 			Eventually(session.Out).Should(Say("Login Successful"))
 			Expect(config.ReadConfig().ApiURL).To(Equal(apiServer.URL()))
 			Expect(config.ReadConfig().AuthURL).To(Equal(uaaServer.URL()))
+		})
+
+		It("saves the oauth tokens", func() {
+			runCommand("login", "-u", "user", "-p", "pass", "-s", apiServer.URL())
+
 			Expect(config.ReadConfig().AccessToken).To(Equal("2YotnFZFEjr1zCsicMWpAA"))
+			Expect(config.ReadConfig().RefreshToken).To(Equal("erousflkajqwer"))
 		})
 
 		Context("when api server is unavailable", func() {

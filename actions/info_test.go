@@ -18,7 +18,7 @@ var _ = Describe("Info", func() {
 	var (
 		subject    actions.ServerInfo
 		httpClient clientfakes.FakeHttpClient
-		cfg				 config.Config
+		cfg        config.Config
 	)
 
 	BeforeEach(func() {

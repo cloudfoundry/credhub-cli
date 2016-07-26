@@ -99,6 +99,18 @@ func NewAuthTokenRequest(cfg config.Config, user string, pass string) *http.Requ
 	return request
 }
 
+func NewRefreshTokenRequest(cfg config.Config) *http.Request {
+	authUrl := cfg.AuthURL + "/oauth/token/"
+	data := url.Values{}
+	data.Set("grant_type", "refresh_token")
+	data.Set("refresh_token", cfg.RefreshToken)
+	request, _ := http.NewRequest("POST", authUrl, bytes.NewBufferString(data.Encode()))
+	request.SetBasicAuth(config.AuthClient, config.AuthPassword)
+	request.Header.Add("Accept", "application/json")
+	request.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	return request
+}
+
 func newSecretRequest(requestType string, config config.Config, secretIdentifier string, bodyModel interface{}) *http.Request {
 	url := config.ApiURL + "/api/v1/data/" + secretIdentifier
 
@@ -120,7 +132,7 @@ func newRequest(requestType string, config config.Config, url string, bodyModel 
 		request, _ = http.NewRequest(requestType, url, bytes.NewReader(body))
 		request.Header.Set("Content-Type", "application/json")
 	}
-	request.Header.Set("Authorization", "Bearer " + config.AccessToken)
+	request.Header.Set("Authorization", "Bearer "+config.AccessToken)
 
 	return request
 }

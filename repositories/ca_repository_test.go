@@ -10,6 +10,8 @@ import (
 	"net/http"
 
 	"github.com/pivotal-cf/cm-cli/client/clientfakes"
+	"github.com/pivotal-cf/cm-cli/config"
+	cmcli_errors "github.com/pivotal-cf/cm-cli/errors"
 	"github.com/pivotal-cf/cm-cli/models"
 )
 
@@ -17,14 +19,19 @@ var _ = Describe("CaRepository", func() {
 	var (
 		repository Repository
 		httpClient clientfakes.FakeHttpClient
+		cfg        config.Config
 	)
 
 	Describe("SendRequest", func() {
-		Context("when there is a response body", func() {
-			BeforeEach(func() {
-				repository = NewCaRepository(&httpClient)
-			})
+		BeforeEach(func() {
+			repository = NewCaRepository(&httpClient)
+			cfg = config.Config{
+				ApiURL:  "http://example.com",
+				AuthURL: "http://example.com",
+			}
+		})
 
+		Context("when there is a response body", func() {
 			It("sends a request to the server", func() {
 				request, _ := http.NewRequest("PUT", "http://example.com/foo", nil)
 
@@ -55,6 +62,20 @@ var _ = Describe("CaRepository", func() {
 
 				Expect(err).ToNot(HaveOccurred())
 				Expect(ca).To(Equal(expectedCa))
+			})
+		})
+
+		Describe("Errors", func() {
+			It("returns a NewResponseError when the JSON response cannot be parsed", func() {
+				responseObj := http.Response{
+					StatusCode: 200,
+					Body:       ioutil.NopCloser(bytes.NewReader([]byte("adasdasdasasd"))),
+				}
+				httpClient.DoReturns(&responseObj, nil)
+				request, _ := http.NewRequest("GET", "http://example.com/foo", nil)
+
+				_, error := repository.SendRequest(request, "foo")
+				Expect(error).To(MatchError(cmcli_errors.NewResponseError()))
 			})
 		})
 	})

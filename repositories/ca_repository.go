@@ -18,7 +18,7 @@ func NewCaRepository(httpClient client.HttpClient) Repository {
 }
 
 func (r caRepository) SendRequest(request *http.Request, caIdentifier string) (models.Item, error) {
-	response, err := r.doSendRequest(r.httpClient, request)
+	response, err := DoSendRequest(r.httpClient, request)
 	if err != nil {
 		return models.Ca{}, err
 	}
@@ -30,17 +30,4 @@ func (r caRepository) SendRequest(request *http.Request, caIdentifier string) (m
 		return models.Ca{}, errors.NewResponseError()
 	}
 	return models.NewCa(caIdentifier, caBody), nil
-}
-
-func (r caRepository) doSendRequest(client client.HttpClient, request *http.Request) (*http.Response, error) {
-	response, err := client.Do(request)
-
-	if err != nil {
-		return nil, errors.NewNetworkError()
-	}
-
-	if response.StatusCode < 200 || response.StatusCode > 299 {
-		return nil, errors.ParseError(response.Body)
-	}
-	return response, nil
 }

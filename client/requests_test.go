@@ -22,7 +22,7 @@ var _ = Describe("API", func() {
 
 	BeforeEach(func() {
 		cfg = config.Config{
-			ApiURL: "http://example.com",
+			ApiURL:  "http://example.com",
 			AuthURL: "http://example.com/uaa",
 		}
 	})
@@ -55,6 +55,25 @@ var _ = Describe("API", func() {
 			expectedRequest.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
 			request := NewAuthTokenRequest(cfg, user, pass)
+
+			Expect(request).To(Equal(expectedRequest))
+		})
+	})
+
+	Describe("NewRefreshTokenRequest", func() {
+		It("Returns a request for the uaa oauth token endpoint to get refresh token", func() {
+			data := url.Values{}
+			data.Set("grant_type", "refresh_token")
+			data.Set("refresh_token", cfg.RefreshToken)
+			expectedRequest, _ := http.NewRequest(
+				"POST",
+				cfg.AuthURL+"/oauth/token/",
+				bytes.NewBufferString(data.Encode()))
+			expectedRequest.SetBasicAuth("credhub", "")
+			expectedRequest.Header.Add("Accept", "application/json")
+			expectedRequest.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+
+			request := NewRefreshTokenRequest(cfg)
 
 			Expect(request).To(Equal(expectedRequest))
 		})
