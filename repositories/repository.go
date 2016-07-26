@@ -5,7 +5,6 @@ import (
 
 	"encoding/json"
 	"errors"
-	"strings"
 
 	"github.com/pivotal-cf/cm-cli/client"
 	cm_errors "github.com/pivotal-cf/cm-cli/errors"
@@ -31,7 +30,7 @@ func DoSendRequest(httpClient client.HttpClient, request *http.Request) (*http.R
 			return nil, err
 		}
 
-		if response.StatusCode == http.StatusUnauthorized && strings.HasPrefix(serverError.ErrorDescription, "Access token expired: ") {
+		if response.StatusCode == http.StatusUnauthorized {
 			return nil, cm_errors.NewUnauthorizedError()
 		}
 

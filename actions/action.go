@@ -31,10 +31,9 @@ func (action Action) DoAction(req *http.Request, identifier string) (models.Item
 		return models.NewItem(), err
 	}
 
-	var secret models.Item
-	secret, err = action.repository.SendRequest(req, identifier)
+	var item models.Item
+	item, err = action.repository.SendRequest(req, identifier)
 	if err != nil && reflect.DeepEqual(err, errors.NewUnauthorizedError()) {
-		// refresh
 		refresh_request := client.NewRefreshTokenRequest(action.config)
 		refreshed_token, err := action.AuthRepository.SendRequest(refresh_request, "")
 
@@ -48,10 +47,10 @@ func (action Action) DoAction(req *http.Request, identifier string) (models.Item
 		config.WriteConfig(action.config)
 
 		req.Header.Set("Authorization", "Bearer "+action.config.AccessToken)
-		secret, err = action.DoAction(req, identifier)
+		item, err = action.repository.SendRequest(req, identifier)
 	} else if err != nil {
 		return models.NewItem(), err
 	}
 
-	return secret, nil
+	return item, nil
 }

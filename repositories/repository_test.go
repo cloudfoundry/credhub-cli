@@ -18,7 +18,6 @@ import (
 
 var _ = Describe("Repository", func() {
 	var (
-		repository Repository
 		httpClient clientfakes.FakeHttpClient
 		cfg        config.Config
 	)
@@ -31,10 +30,6 @@ var _ = Describe("Repository", func() {
 	})
 
 	Describe("DoSendRequest", func() {
-		BeforeEach(func() {
-			repository = NewSecretRepository(&httpClient)
-		})
-
 		It("sends a request to the server", func() {
 			request, _ := http.NewRequest("GET", "http://example.com/foo", nil)
 
@@ -59,7 +54,7 @@ var _ = Describe("Repository", func() {
 				httpClient.DoReturns(nil, errors.New("hello"))
 
 				request, _ := http.NewRequest("GET", "http://example.com/foo", nil)
-				_, error := repository.SendRequest(request, "foo")
+				_, error := DoSendRequest(&httpClient, request)
 				Expect(error).To(MatchError(cmcli_errors.NewNetworkError()))
 			})
 
@@ -72,20 +67,32 @@ var _ = Describe("Repository", func() {
 				httpClient.DoReturns(&responseObj, nil)
 
 				request, _ := http.NewRequest("GET", "http://example.com/foo", nil)
-				_, error := repository.SendRequest(request, "foo")
+				_, error := DoSendRequest(&httpClient, request)
 
 				Expect(error.Error()).To(Equal("My error"))
 			})
 
-			It("returns a NewUnauthorizedError when the CM server returns a 401", func() {
+			It("returns a NewExpiredToken when the CM server returns a 401 for an expired token", func() {
 				responseObj := http.Response{
 					StatusCode: 401,
-					Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"error": "Unauthorized"}`))),
+					Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"error": "invalid_token","error_description":"Access token expired: "}`))),
 				}
 				httpClient.DoReturns(&responseObj, nil)
 				request, _ := http.NewRequest("GET", "http://example.com/foo", nil)
 
-				_, error := repository.SendRequest(request, "foo")
+				_, error := DoSendRequest(&httpClient, request)
+				Expect(error).To(MatchError(cmcli_errors.NewUnauthorizedError()))
+			})
+
+			It("returns a NewUnauthorizedError when the CM server returns a 401 for another reason", func() {
+				responseObj := http.Response{
+					StatusCode: 401,
+					Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"error": "invalid_token"}`))),
+				}
+				httpClient.DoReturns(&responseObj, nil)
+				request, _ := http.NewRequest("GET", "http://example.com/foo", nil)
+
+				_, error := DoSendRequest(&httpClient, request)
 				Expect(error).To(MatchError(cmcli_errors.NewUnauthorizedError()))
 			})
 		})
