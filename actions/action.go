@@ -31,26 +31,46 @@ func (action Action) DoAction(req *http.Request, identifier string) (models.Item
 		return models.NewItem(), err
 	}
 
-	var item models.Item
-	item, err = action.repository.SendRequest(req, identifier)
-	if err != nil && reflect.DeepEqual(err, errors.NewUnauthorizedError()) {
-		refresh_request := client.NewRefreshTokenRequest(action.config)
-		refreshed_token, err := action.AuthRepository.SendRequest(refresh_request, "")
+	item, err := action.repository.SendRequest(req, identifier)
 
-		if err != nil {
-			return models.NewItem(), errors.NewRefreshError()
-		}
+	if reflect.DeepEqual(err, errors.NewUnauthorizedError()) {
+		item, err = action.refreshTokenAndResendRequest(req, identifier)
+	}
 
-		action.config.AccessToken = refreshed_token.(models.Token).AccessToken
-		action.config.RefreshToken = refreshed_token.(models.Token).RefreshToken
-
-		config.WriteConfig(action.config)
-
-		req.Header.Set("Authorization", "Bearer "+action.config.AccessToken)
-		item, err = action.repository.SendRequest(req, identifier)
-	} else if err != nil {
+	if err != nil {
 		return models.NewItem(), err
 	}
 
 	return item, nil
+}
+
+func (action Action) refreshTokenAndResendRequest(req *http.Request, identifier string) (models.Item, error) {
+	err := action.refreshToken()
+	if err != nil {
+		return models.NewItem(), err
+	}
+
+	req.Header.Set("Authorization", "Bearer "+action.config.AccessToken)
+	item, err := action.repository.SendRequest(req, identifier)
+	if err != nil {
+		return models.NewItem(), err
+	}
+
+	return item, nil
+}
+
+func (action *Action) refreshToken() error {
+	refresh_request := client.NewRefreshTokenRequest(action.config)
+	refreshed_token, err := action.AuthRepository.SendRequest(refresh_request, "")
+
+	if err != nil {
+		return errors.NewRefreshError()
+	}
+
+	action.config.AccessToken = refreshed_token.(models.Token).AccessToken
+	action.config.RefreshToken = refreshed_token.(models.Token).RefreshToken
+
+	config.WriteConfig(action.config)
+
+	return nil
 }

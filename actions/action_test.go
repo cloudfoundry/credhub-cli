@@ -7,6 +7,8 @@ import (
 
 	"net/http"
 
+	"errors"
+
 	"github.com/pivotal-cf/cm-cli/config"
 	cm_errors "github.com/pivotal-cf/cm-cli/errors"
 	"github.com/pivotal-cf/cm-cli/models"
@@ -63,28 +65,56 @@ var _ = Describe("Action", func() {
 				Expect(error).To(MatchError(cm_errors.NewNoTargetUrlError()))
 			})
 
-			It("refreshes the access token when server returns unauthorized", func() {
-				var authRepository repositoriesfakes.FakeRepository
-				authRepository.SendRequestReturns(models.Token{AccessToken: "access_token", RefreshToken: "refresh_token"}, nil)
-				subject.AuthRepository = &authRepository
+			Context("when repository returns unauthorized", func() {
+				It("refreshes the access token", func() {
+					var authRepository repositoriesfakes.FakeRepository
+					authRepository.SendRequestReturns(models.Token{AccessToken: "access_token", RefreshToken: "refresh_token"}, nil)
+					subject.AuthRepository = &authRepository
 
-				i := 0
-				repository.SendRequestStub = func(req *http.Request, identifier string) (models.Item, error) {
-					i = i + 1
-					if i == 1 {
-						return models.NewItem(), cm_errors.NewUnauthorizedError()
+					i := 0
+					repository.SendRequestStub = func(req *http.Request, identifier string) (models.Item, error) {
+						i = i + 1
+						if i == 1 {
+							return models.NewItem(), cm_errors.NewUnauthorizedError()
+						}
+						Expect(req.Header.Get("Authorization")).To(Equal("Bearer access_token"))
+						return expectedItem, nil
 					}
-					Expect(req.Header.Get("Authorization")).To(Equal("Bearer access_token"))
-					return expectedItem, nil
-				}
-				req, _ := http.NewRequest("GET", "my-url", nil)
+					req, _ := http.NewRequest("GET", "my-url", nil)
 
-				secret, err := subject.DoAction(req, "my-item")
+					secret, err := subject.DoAction(req, "my-item")
 
-				Expect(err).ToNot(HaveOccurred())
-				Expect(secret).To(Equal(expectedItem))
-				Expect(config.ReadConfig().AccessToken).To(Equal("access_token"))
-				Expect(config.ReadConfig().RefreshToken).To(Equal("refresh_token"))
+					Expect(err).ToNot(HaveOccurred())
+					Expect(secret).To(Equal(expectedItem))
+					Expect(config.ReadConfig().AccessToken).To(Equal("access_token"))
+					Expect(config.ReadConfig().RefreshToken).To(Equal("refresh_token"))
+				})
+
+				Context("When repository returns an error other than unauthorized", func() {
+					It("refreshes the access token and returns repository error", func() {
+						var authRepository repositoriesfakes.FakeRepository
+						authRepository.SendRequestReturns(models.Token{AccessToken: "access_token", RefreshToken: "refresh_token"}, nil)
+						subject.AuthRepository = &authRepository
+						expectedError := errors.New("Custom Server Error")
+						i := 0
+						repository.SendRequestStub = func(req *http.Request, identifier string) (models.Item, error) {
+							i = i + 1
+							if i == 1 {
+								return models.NewItem(), cm_errors.NewUnauthorizedError()
+							}
+							Expect(req.Header.Get("Authorization")).To(Equal("Bearer access_token"))
+							return models.NewItem(), expectedError
+						}
+						req, _ := http.NewRequest("GET", "my-url", nil)
+
+						_, err := subject.DoAction(req, "my-item")
+
+						Expect(err).To(HaveOccurred())
+						Expect(expectedError).To(Equal(err))
+						Expect(config.ReadConfig().AccessToken).To(Equal("access_token"))
+						Expect(config.ReadConfig().RefreshToken).To(Equal("refresh_token"))
+					})
+				})
 			})
 		})
 	})
