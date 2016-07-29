@@ -7,6 +7,9 @@ import (
 
 	"net/url"
 
+	"io"
+	"io/ioutil"
+
 	"github.com/pivotal-cf/cm-cli/config"
 	"github.com/pivotal-cf/cm-cli/models"
 )
@@ -109,6 +112,23 @@ func NewRefreshTokenRequest(cfg config.Config) *http.Request {
 	request.Header.Add("Accept", "application/json")
 	request.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	return request
+}
+
+func NewBodyClone(req *http.Request) io.ReadCloser {
+	var result io.ReadCloser = nil
+	if req.Body != nil {
+		var bodyBytes []byte
+		buf := new(bytes.Buffer)
+		rc, ok := req.Body.(io.ReadCloser)
+		if !ok {
+			rc = ioutil.NopCloser(req.Body)
+		}
+		buf.ReadFrom(rc)
+		bodyBytes = buf.Bytes()
+		req.Body = ioutil.NopCloser(bytes.NewReader(bodyBytes))
+		result = ioutil.NopCloser(bytes.NewReader(bodyBytes))
+	}
+	return result
 }
 
 func newSecretRequest(requestType string, config config.Config, secretIdentifier string, bodyModel interface{}) *http.Request {

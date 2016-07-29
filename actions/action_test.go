@@ -9,10 +9,13 @@ import (
 
 	"errors"
 
+	"bytes"
+
 	"github.com/pivotal-cf/cm-cli/config"
 	cm_errors "github.com/pivotal-cf/cm-cli/errors"
 	"github.com/pivotal-cf/cm-cli/models"
 	"github.com/pivotal-cf/cm-cli/repositories/repositoriesfakes"
+	"github.com/pivotal-cf/cm-cli/util"
 )
 
 var _ = Describe("Action", func() {
@@ -44,7 +47,7 @@ var _ = Describe("Action", func() {
 
 	Describe("DoAction", func() {
 		It("performs a network request", func() {
-			request, _ := http.NewRequest("GET", "my-url", nil)
+			request, _ := http.NewRequest("POST", "my-url", nil)
 			repository.SendRequestStub = func(req *http.Request, identifier string) (models.Item, error) {
 				Expect(req).To(Equal(request))
 				return expectedItem, nil
@@ -59,7 +62,7 @@ var _ = Describe("Action", func() {
 		Describe("Errors", func() {
 			It("returns a invalid target error when no api is set", func() {
 				subject = NewAction(&repository, config.Config{})
-				req, _ := http.NewRequest("GET", "my-url", nil)
+				req, _ := http.NewRequest("POST", "my-url", bytes.NewBufferString("{}"))
 				_, error := subject.DoAction(req, "my-item")
 
 				Expect(error).To(MatchError(cm_errors.NewNoTargetUrlError()))
@@ -71,16 +74,25 @@ var _ = Describe("Action", func() {
 					authRepository.SendRequestReturns(models.Token{AccessToken: "access_token", RefreshToken: "refresh_token"}, nil)
 					subject.AuthRepository = &authRepository
 
-					i := 0
-					repository.SendRequestStub = func(req *http.Request, identifier string) (models.Item, error) {
-						i = i + 1
-						if i == 1 {
+					repository.SendRequestStub = util.SequentialStub(
+						func(req *http.Request, identifier string) (models.Item, error) {
+							buf := new(bytes.Buffer)
+							buf.ReadFrom(req.Body)
+							Expect(buf.String()).To(Equal("{}"))
 							return models.NewItem(), cm_errors.NewUnauthorizedError()
-						}
-						Expect(req.Header.Get("Authorization")).To(Equal("Bearer access_token"))
-						return expectedItem, nil
-					}
-					req, _ := http.NewRequest("GET", "my-url", nil)
+						},
+						func(req *http.Request, identifier string) (models.Item, error) {
+							Expect(req.Header.Get("Authorization")).To(Equal("Bearer access_token"))
+
+							buf := new(bytes.Buffer)
+							buf.ReadFrom(req.Body)
+							Expect(buf.String()).To(Equal("{}"))
+
+							return expectedItem, nil
+						},
+					)
+
+					req, _ := http.NewRequest("POST", "my-url", bytes.NewBufferString("{}"))
 
 					secret, err := subject.DoAction(req, "my-item")
 
@@ -90,22 +102,24 @@ var _ = Describe("Action", func() {
 					Expect(config.ReadConfig().RefreshToken).To(Equal("refresh_token"))
 				})
 
-				Context("When repository returns an error other than unauthorized", func() {
+				Context("after refreshing the token the repository returns an error", func() {
 					It("refreshes the access token and returns repository error", func() {
 						var authRepository repositoriesfakes.FakeRepository
 						authRepository.SendRequestReturns(models.Token{AccessToken: "access_token", RefreshToken: "refresh_token"}, nil)
 						subject.AuthRepository = &authRepository
 						expectedError := errors.New("Custom Server Error")
-						i := 0
-						repository.SendRequestStub = func(req *http.Request, identifier string) (models.Item, error) {
-							i = i + 1
-							if i == 1 {
+
+						repository.SendRequestStub = util.SequentialStub(
+							func(req *http.Request, identifier string) (models.Item, error) {
 								return models.NewItem(), cm_errors.NewUnauthorizedError()
-							}
-							Expect(req.Header.Get("Authorization")).To(Equal("Bearer access_token"))
-							return models.NewItem(), expectedError
-						}
-						req, _ := http.NewRequest("GET", "my-url", nil)
+							},
+							func(req *http.Request, identifier string) (models.Item, error) {
+								Expect(req.Header.Get("Authorization")).To(Equal("Bearer access_token"))
+								return models.NewItem(), expectedError
+							},
+						)
+
+						req, _ := http.NewRequest("POST", "my-url", bytes.NewBufferString("{}"))
 
 						_, err := subject.DoAction(req, "my-item")
 
