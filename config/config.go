@@ -34,14 +34,14 @@ func configDir() string {
 	return path.Join(userHomeDir(), ".cm")
 }
 
-func configPath() string {
+func ConfigPath() string {
 	return path.Join(configDir(), "config.json")
 }
 
 func ReadConfig() Config {
 	c := Config{}
 
-	data, _ := ioutil.ReadFile(configPath())
+	data, _ := ioutil.ReadFile(ConfigPath())
 	json.Unmarshal(data, &c)
 
 	return c
@@ -51,9 +51,9 @@ func WriteConfig(c Config) {
 	os.MkdirAll(configDir(), 0755)
 
 	data, _ := json.Marshal(c)
-	ioutil.WriteFile(configPath(), data, 0644)
+	ioutil.WriteFile(ConfigPath(), data, 0600)
 }
 
 func RemoveConfig() {
-	os.Remove(configPath())
+	os.Remove(ConfigPath())
 }

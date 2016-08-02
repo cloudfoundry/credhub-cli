@@ -3,6 +3,8 @@ package commands_test
 import (
 	"net/http"
 
+	"os"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -144,6 +146,16 @@ var _ = Describe("API", func() {
 				config := config.ReadConfig()
 				Expect(config.ApiURL).To(Equal(httpsServer.URL()))
 				Expect(config.AuthURL).To(Equal("https://example.com"))
+			})
+
+			It("sets file permissions so that the configuration is readable and writeable only by the owner", func() {
+				configPath := config.ConfigPath()
+				os.Remove(configPath)
+				session := runCommand("api", httpsServer.URL())
+				Eventually(session).Should(Exit(0))
+
+				statResult, _ := os.Stat(configPath)
+				Expect(int(statResult.Mode())).To(Equal(0600))
 			})
 		})
 	})
