@@ -155,7 +155,8 @@ var _ = Describe("API", func() {
 				Eventually(session).Should(Exit(0))
 
 				statResult, _ := os.Stat(configPath)
-				Expect(int(statResult.Mode())).To(Equal(0600))
+
+				Expect(statResult.Mode().String(), "r--------")
 			})
 		})
 	})
@@ -198,7 +199,7 @@ var _ = Describe("API", func() {
 			session := runCommand("api", httpServer.URL())
 			Eventually(session).Should(Exit(0))
 			Eventually(session).Should(Say("Warning: Insecure HTTP API detected. Data sent to this API could be intercepted" +
-					" in transit by third parties. Secure HTTPS API endpoints are recommended."))
+				" in transit by third parties. Secure HTTPS API endpoints are recommended."))
 		})
 	})
 })
