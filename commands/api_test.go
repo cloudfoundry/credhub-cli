@@ -198,7 +198,7 @@ var _ = Describe("API", func() {
 			session := runCommand("api", httpServer.URL())
 			Eventually(session).Should(Exit(0))
 			Eventually(session).Should(Say("Warning: Insecure HTTP API detected. Data sent to this API could be intercepted" +
-				" in transit by third parties. Secure HTTPS API endpoints are recommended."))
+					" in transit by third parties. Secure HTTPS API endpoints are recommended."))
 		})
 	})
 })

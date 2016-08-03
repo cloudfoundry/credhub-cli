@@ -6,6 +6,7 @@ import (
 	"os"
 	"path"
 	"runtime"
+	"syscall"
 )
 
 const AuthClient = "credhub"
@@ -51,7 +52,9 @@ func WriteConfig(c Config) {
 	os.MkdirAll(configDir(), 0755)
 
 	data, _ := json.Marshal(c)
-	ioutil.WriteFile(ConfigPath(), data, 0600)
+	configPath := ConfigPath()
+	ioutil.WriteFile(configPath, data, 0600)
+	syscall.Chmod(configPath, 0600)
 }
 
 func RemoveConfig() {
