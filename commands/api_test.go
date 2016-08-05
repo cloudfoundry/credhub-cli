@@ -60,7 +60,7 @@ var _ = Describe("API", func() {
 			Eventually(session).Should(Exit(0))
 			Eventually(session.Out).Should(Say(apiHttpsServerUrl))
 
-			config := config.ReadConfig()
+			config, _ := config.ReadConfig()
 
 			Expect(config.AuthURL).To(Equal("https://example.com"))
 		})
@@ -143,7 +143,8 @@ var _ = Describe("API", func() {
 				session := runCommand("api", httpsServer.URL())
 				Eventually(session).Should(Exit(0))
 
-				config := config.ReadConfig()
+				config, error := config.ReadConfig()
+				Expect(error).NotTo(HaveOccurred())
 				Expect(config.ApiURL).To(Equal(httpsServer.URL()))
 				Expect(config.AuthURL).To(Equal("https://example.com"))
 			})
@@ -156,7 +157,7 @@ var _ = Describe("API", func() {
 
 				statResult, _ := os.Stat(configPath)
 
-				Expect(statResult.Mode().String(), "r--------")
+				Expect(statResult.Mode().String(), "-rw-------")
 			})
 		})
 	})

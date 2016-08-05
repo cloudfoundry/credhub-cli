@@ -40,7 +40,7 @@ var _ = Describe("Delete", func() {
 
 	Describe("Errors", func() {
 		It("prints an error when the network request fails", func() {
-			cfg := config.ReadConfig()
+			cfg, _ := config.ReadConfig()
 			cfg.ApiURL = "mashed://potatoes"
 			config.WriteConfig(cfg)
 

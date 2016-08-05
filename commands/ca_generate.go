@@ -26,7 +26,7 @@ type CaGenerateCommand struct {
 func (cmd CaGenerateCommand) Execute([]string) error {
 	var err error
 
-	config := config.ReadConfig()
+	config, _ := config.ReadConfig()
 	caRepository := repositories.NewCaRepository(client.NewHttpClient(config.ApiURL))
 
 	parameters := models.SecretParameters{

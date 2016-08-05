@@ -35,7 +35,7 @@ func (cmd GenerateCommand) Execute([]string) error {
 		cmd.ContentType = "value"
 	}
 
-	config := config.ReadConfig()
+	config, _ := config.ReadConfig()
 	repository := repositories.NewSecretRepository(client.NewHttpClient(config.ApiURL))
 
 	parameters := models.SecretParameters{

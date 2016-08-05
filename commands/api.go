@@ -20,7 +20,7 @@ type ApiPositionalArgs struct {
 }
 
 func (cmd ApiCommand) Execute([]string) error {
-	cfg := config.ReadConfig()
+	cfg, _ := config.ReadConfig()
 	serverUrl := targetUrl(cmd)
 
 	if serverUrl == "" {

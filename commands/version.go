@@ -12,7 +12,7 @@ import (
 )
 
 func PrintVersion() error {
-	cfg := config.ReadConfig()
+	cfg, _ := config.ReadConfig()
 
 	cmVersion := "Not Found"
 	cmInfo, err := actions.NewInfo(client.NewHttpClient(cfg.ApiURL), cfg).GetServerInfo()

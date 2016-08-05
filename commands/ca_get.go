@@ -14,7 +14,7 @@ type CaGetCommand struct {
 }
 
 func (cmd CaGetCommand) Execute([]string) error {
-	config := config.ReadConfig()
+	config, _ := config.ReadConfig()
 	caRepository := repositories.NewCaRepository(client.NewHttpClient(config.ApiURL))
 	action := actions.NewAction(caRepository, config)
 

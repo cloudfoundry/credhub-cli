@@ -49,7 +49,8 @@ var _ = Describe("Login", func() {
 				Expect(uaaServer.ReceivedRequests()).Should(HaveLen(1))
 				Eventually(session).Should(Exit(0))
 				Eventually(session.Out).Should(Say("Login Successful"))
-				Expect(config.ReadConfig().AccessToken).To(Equal("2YotnFZFEjr1zCsicMWpAA"))
+				cfg, _ := config.ReadConfig()
+				Expect(cfg.AccessToken).To(Equal("2YotnFZFEjr1zCsicMWpAA"))
 			})
 		})
 
@@ -59,7 +60,8 @@ var _ = Describe("Login", func() {
 				Eventually(session.Out).Should(Say("password:"))
 				Eventually(session.Wait("10s").Out).Should(Say("Login Successful"))
 				Eventually(session).Should(Exit(0))
-				Expect(config.ReadConfig().AccessToken).To(Equal("2YotnFZFEjr1zCsicMWpAA"))
+				cfg, _ := config.ReadConfig()
+				Expect(cfg.AccessToken).To(Equal("2YotnFZFEjr1zCsicMWpAA"))
 			})
 		})
 	})
@@ -137,15 +139,17 @@ var _ = Describe("Login", func() {
 			Expect(uaaServer.ReceivedRequests()).Should(HaveLen(1))
 			Eventually(session).Should(Exit(0))
 			Eventually(session.Out).Should(Say("Login Successful"))
-			Expect(config.ReadConfig().ApiURL).To(Equal(apiServer.URL()))
-			Expect(config.ReadConfig().AuthURL).To(Equal(uaaServer.URL()))
+			cfg, _ := config.ReadConfig()
+			Expect(cfg.ApiURL).To(Equal(apiServer.URL()))
+			Expect(cfg.AuthURL).To(Equal(uaaServer.URL()))
 		})
 
 		It("saves the oauth tokens", func() {
 			runCommand("login", "-u", "user", "-p", "pass", "-s", apiServer.URL())
 
-			Expect(config.ReadConfig().AccessToken).To(Equal("2YotnFZFEjr1zCsicMWpAA"))
-			Expect(config.ReadConfig().RefreshToken).To(Equal("erousflkajqwer"))
+			cfg, _ := config.ReadConfig()
+			Expect(cfg.AccessToken).To(Equal("2YotnFZFEjr1zCsicMWpAA"))
+			Expect(cfg.RefreshToken).To(Equal("erousflkajqwer"))
 		})
 
 		Context("when api server is unavailable", func() {
@@ -172,7 +176,7 @@ var _ = Describe("Login", func() {
 			})
 
 			It("should not override config's existing API URL value", func() {
-				cfg := config.ReadConfig()
+				cfg, _ := config.ReadConfig()
 				cfg.ApiURL = "foo"
 				config.WriteConfig(cfg)
 
@@ -181,7 +185,8 @@ var _ = Describe("Login", func() {
 				Eventually(session).Should(Exit(1))
 				Eventually(session.Err).Should(Say("The targeted API does not appear to be valid. Please validate the API address and retry your request."))
 				Expect(uaaServer.ReceivedRequests()).Should(HaveLen(0))
-				Expect(config.ReadConfig().ApiURL).To(Equal("foo"))
+				cfg2, _ := config.ReadConfig()
+				Expect(cfg2.ApiURL).To(Equal("foo"))
 			})
 		})
 
@@ -229,7 +234,7 @@ var _ = Describe("Login", func() {
 })
 
 func setConfigAuthUrl(authUrl string) {
-	cfg := config.ReadConfig()
+	cfg, _ := config.ReadConfig()
 	cfg.AuthURL = authUrl
 	config.WriteConfig(cfg)
 }

@@ -30,7 +30,7 @@ func (cmd SetCommand) Execute([]string) error {
 		cmd.ContentType = "value"
 	}
 
-	config := config.ReadConfig()
+	config, _ := config.ReadConfig()
 	repository := repositories.NewSecretRepository(client.NewHttpClient(config.ApiURL))
 
 	action := actions.NewAction(repository, config)

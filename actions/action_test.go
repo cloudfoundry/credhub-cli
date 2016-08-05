@@ -98,8 +98,9 @@ var _ = Describe("Action", func() {
 
 					Expect(err).ToNot(HaveOccurred())
 					Expect(secret).To(Equal(expectedItem))
-					Expect(config.ReadConfig().AccessToken).To(Equal("access_token"))
-					Expect(config.ReadConfig().RefreshToken).To(Equal("refresh_token"))
+					cfg, _ := config.ReadConfig()
+					Expect(cfg.AccessToken).To(Equal("access_token"))
+					Expect(cfg.RefreshToken).To(Equal("refresh_token"))
 				})
 
 				Context("after refreshing the token the repository returns an error", func() {
@@ -125,8 +126,9 @@ var _ = Describe("Action", func() {
 
 						Expect(err).To(HaveOccurred())
 						Expect(expectedError).To(Equal(err))
-						Expect(config.ReadConfig().AccessToken).To(Equal("access_token"))
-						Expect(config.ReadConfig().RefreshToken).To(Equal("refresh_token"))
+						cfg, _ := config.ReadConfig()
+						Expect(cfg.AccessToken).To(Equal("access_token"))
+						Expect(cfg.RefreshToken).To(Equal("refresh_token"))
 					})
 				})
 			})

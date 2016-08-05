@@ -17,7 +17,7 @@ type LoginCommand struct {
 }
 
 func (cmd LoginCommand) Execute([]string) error {
-	cfg := config.ReadConfig()
+	cfg, _ := config.ReadConfig()
 
 	if cmd.ServerUrl != "" {
 		err := GetApiInfo(&cfg, cmd.ServerUrl)
