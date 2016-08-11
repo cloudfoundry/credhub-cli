@@ -10,33 +10,33 @@ Usage: cm [<options>] <command> [<args>]
 
 GETTING STARTED: 
 
- 	api -s <server URI>
+ 	api
 		View or set the targeted CredHub API
 		-s, --server 'URI'						URI of API server to target
 
 	login
-		Authenticates interactively with CredHub.
+		Authenticates interactively with CredHub
 		-u, --user 'USER'           			Authentication username
     	-p, --password 'PASSWORD'				Authentication password
 		-s, --server 'URI'						URI of API server to target
 
-	logout*
-		Discard authenticated user session.
+	logout
+		Discard authenticated user session
 
 
 CREDENTIAL MANAGEMENT:
 
 	get --name <cred name>
-		Get the value and attributes of a credential. 
+		Get the value and attributes of a credential
 		-n, --name 'CRED'						Name of credential to retrieve
 
 	set --type <cred type> --name <cred name> [set params]
-		Set the value and attributes of a credential.
-		-t, --type ['value', 'certificate']		Sets the type of credential to store or generate. (Default: 'value')
+		Set the value and attributes of a credential
+		-t, --type ['value', 'certificate']		Sets the type of credential to store (Default: 'value')
 		-n, --name 'CRED'						Selects the credential being set
 
 		Set parameters by [Type]
-		-v, --value 'VALUE'						[Value] Sets the value for the credential.
+		-v, --value 'VALUE'						[Value] Sets the value for the credential
 		--root	<FILE>							[Certificate] Sets the root CA from file
 		--certificate <FILE>					[Certificate] Sets the certificate from file
 		--private <FILE>						[Certificate] Sets the private key from file
@@ -45,8 +45,8 @@ CREDENTIAL MANAGEMENT:
 		--private-string 'PRIVATE'				[Certificate] Sets the private key from string input
 
 	generate --type <cred type> --name <cred name> [generate params]
-		Generate and set a credential value based on generation parameters.
-		-t, --type ['value', 'certificate']		Sets the type of credential to store or generate. (Default: 'value')
+		Generate and set a credential value based on generation parameters
+		-t, --type ['value', 'certificate']		Sets the type of credential to generate (Default: 'value')
 		-n, --name 'CRED'						Selects the credential being set
 
 		Generate parameters by [Type]
@@ -67,7 +67,7 @@ CREDENTIAL MANAGEMENT:
 		--country 'CC'							[Certificate] Country of the generated certificate
 
 	delete --name <cred name>
-		Delete a credential. 
+		Delete a credential
 		-n, --name 'CRED'						Name of credential to delete
 		
 CERTIFICATE AUTHORITY:
@@ -75,35 +75,32 @@ CERTIFICATE AUTHORITY:
 NOTE: CA with name 'default' will be used when generating a certificate credential without a named CA
 
 	ca-get --name <ca name>
-		Get the value and attributes of a CA. 
+		Get the value and attributes of a CA
 		-n, --name 'CA'							Name of CA to retrieve
 
 	ca-set --type <ca type> --name <ca name> [set params]
-		Set the value and attributes of a CA.
-		-t, --type ['root', 'intermediate']		Sets the type of CA to store or generate. (Default: 'root')
+		Set the value and attributes of a CA
+		-t, --type ['root']						Sets the type of CA to store (Default: 'root')
 		-n, --name 'CA'							Selects the CA being set
 
 		Set parameters by [Type]
-		--root	<FILE>							[Intermediate] Sets the root CA from file*
-		--certificate <FILE>					[Root/Intermediate] Sets the CA certificate from file
-		--private <FILE>						[Root/Intermediate] Sets the CA private key from file
-		--root-string 'ROOT'					[Intermediate] Sets the root CA from string input*
-		--certificate-string 'CERT'       		[Root/Intermediate] Sets the CA certificate from string input
-		--private-string 'PRIVATE'				[Root/Intermediate] Sets the CA private key from string input
+		--certificate <FILE>					[Root] Sets the CA certificate from file
+		--private <FILE>						[Root] Sets the CA private key from file
+		--certificate-string 'CERT'       		[Root] Sets the CA certificate from string input
+		--private-string 'PRIVATE'				[Root] Sets the CA private key from string input
 
 	ca-generate --type <ca type> --name <ca name> [generate params]
-		Generate and set a credential value based on generation parameters.
-		-t, --type ['value', 'certificate']		Sets the type of credential to store or generate. (Default: 'value')
-		-n, --name 'CRED'						Selects the credential being set
+		Generate and set a credential value based on generation parameters
+		-t, --type ['root']	       	     		Sets the type of CA to generate (Default: 'root')
+		-n, --name 'CRED'						Selects the CA to generate
 
 		Generate parameters by [Type]
-		--ca 'CA NAME'					     	[Intermediate] Name of CA used to sign the generated certificate (Default: 'default')*
-		--duration [1-3650]						[Root/Intermediate] Valid duration (in days) of the generated certificate (Default: 365)
-		--key-length [2048, 3072, 4096]			[Root/Intermediate] Bit length of the generated key (Default: 2048)
-		--common-name 'COMMON NAME'				[Root/Intermediate] Common name of the generated certificate
-		--organization 'ORG'					[Root/Intermediate] Organization of the generated certificate
-		--organization-unit 'ORG UNIT'			[Root/Intermediate] Organization unit of the generated certificate
-		--locality 'LOCALITY'					[Root/Intermediate] Locality/city of the generated certificate
-		--state	'ST'							[Root/Intermediate] State/province of the generated certificate
-		--country 'CC'							[Root/Intermediate] Country of the generated certificate
+		--duration [1-3650]						[Root] Valid duration (in days) of the generated certificate (Default: 365)
+		--key-length [2048, 3072, 4096]			[Root] Bit length of the generated key (Default: 2048)
+		--common-name 'COMMON NAME'				[Root] Common name of the generated certificate
+		--organization 'ORG'					[Root] Organization of the generated certificate
+		--organization-unit 'ORG UNIT'			[Root] Organization unit of the generated certificate
+		--locality 'LOCALITY'					[Root] Locality/city of the generated certificate
+		--state	'ST'							[Root] State/province of the generated certificate
+		--country 'CC'							[Root] Country of the generated certificate
 ```
