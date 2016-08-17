@@ -11,6 +11,7 @@ type CMCommand struct {
 	CaGet      CaGetCommand      `command:"ca-get" description:"Get a certificate authority"`
 	CaGenerate CaGenerateCommand `command:"ca-generate" description:"Configures a certificate authority with a generated key pair."`
 	Login      LoginCommand      `command:"login" description:"Authenticates user with CredHub"`
+	Logout     LogoutCommand     `command:"logout" description:"Discard authenticated user session."`
 	Version    func()            `long:"version" description:"Version of Credential Manager"`
 }
 

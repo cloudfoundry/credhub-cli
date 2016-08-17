@@ -12,6 +12,8 @@ import (
 
 	"github.com/pivotal-cf/cm-cli/config"
 	"github.com/pivotal-cf/cm-cli/models"
+
+	"github.com/dgrijalva/jwt-go"
 )
 
 func NewPutValueRequest(config config.Config, secretIdentifier, secretContent string) *http.Request {
@@ -111,6 +113,15 @@ func NewRefreshTokenRequest(cfg config.Config) *http.Request {
 	request.SetBasicAuth(config.AuthClient, config.AuthPassword)
 	request.Header.Add("Accept", "application/json")
 	request.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	return request
+}
+
+func NewTokenRevocationRequest(cfg config.Config) *http.Request {
+	claims := jwt.MapClaims{}
+	jwt.ParseWithClaims(cfg.RefreshToken, claims, nil)
+	url := cfg.AuthURL + "/oauth/token/revoke/" + claims["jti"].(string)
+	request, _ := http.NewRequest("DELETE", url, nil)
+	request.Header.Add("Authorization", "Bearer "+cfg.AccessToken)
 	return request
 }
 

@@ -30,11 +30,12 @@ var _ = Describe("AuthRepository", func() {
 	})
 
 	Describe("SendRequest", func() {
-		BeforeEach(func() {
-			repository = NewAuthRepository(&httpClient)
-		})
 
 		Context("when there is a response body", func() {
+			BeforeEach(func() {
+				repository = NewAuthRepository(&httpClient, true)
+			})
+
 			It("sends a request to the server", func() {
 				request, _ := http.NewRequest("POST", cfg.AuthURL, nil)
 
@@ -60,9 +61,7 @@ var _ = Describe("AuthRepository", func() {
 				Expect(err).ToNot(HaveOccurred())
 				Expect(token).To(Equal(expectedToken))
 			})
-		})
 
-		Describe("Errors", func() {
 			It("returns a NewResponseError when the JSON response cannot be parsed", func() {
 				responseObj := http.Response{
 					StatusCode: 200,
@@ -74,6 +73,25 @@ var _ = Describe("AuthRepository", func() {
 				_, error := repository.SendRequest(request, "foo")
 				Expect(error).To(MatchError(cmcli_errors.NewResponseError()))
 			})
+
+		})
+
+		Context("when there is no response body", func() {
+
+			BeforeEach(func() {
+				repository = NewAuthRepository(&httpClient, false)
+			})
+
+			It("does not require a response body", func() {
+				responseObj := http.Response{StatusCode: 200}
+				httpClient.DoReturns(&responseObj, nil)
+				request, _ := http.NewRequest("GET", "http://example.com/foo", nil)
+
+				_, err := repository.SendRequest(request, "foo")
+				Expect(err).ToNot(HaveOccurred())
+			})
+
 		})
 	})
+
 })

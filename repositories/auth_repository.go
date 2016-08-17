@@ -10,11 +10,12 @@ import (
 )
 
 type authRepository struct {
-	httpClient client.HttpClient
+	httpClient         client.HttpClient
+	expectResponseBody bool
 }
 
-func NewAuthRepository(httpClient client.HttpClient) Repository {
-	return authRepository{httpClient: httpClient}
+func NewAuthRepository(httpClient client.HttpClient, expectResponseBody bool) Repository {
+	return authRepository{httpClient: httpClient, expectResponseBody: expectResponseBody}
 }
 
 func (r authRepository) SendRequest(request *http.Request, identifier string) (models.Item, error) {
@@ -23,11 +24,13 @@ func (r authRepository) SendRequest(request *http.Request, identifier string) (m
 		return models.Token{}, err
 	}
 
-	decoder := json.NewDecoder(response.Body)
 	token := models.Token{}
-	err = decoder.Decode(&token)
-	if err != nil {
-		return models.Token{}, errors.NewResponseError()
+	if r.expectResponseBody {
+		decoder := json.NewDecoder(response.Body)
+		err = decoder.Decode(&token)
+		if err != nil {
+			return models.Token{}, errors.NewResponseError()
+		}
 	}
 	return token, nil
 }
