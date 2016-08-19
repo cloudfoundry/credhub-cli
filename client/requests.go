@@ -18,7 +18,7 @@ import (
 
 func NewPutValueRequest(config config.Config, secretIdentifier, secretContent string) *http.Request {
 	secret := models.SecretBody{
-		Credential:  secretContent,
+		Value:       secretContent,
 		ContentType: "value",
 	}
 
@@ -33,7 +33,7 @@ func NewPutCertificateRequest(config config.Config, secretIdentifier, root strin
 	}
 	secret := models.SecretBody{
 		ContentType: "certificate",
-		Credential:  &certificate,
+		Value:       &certificate,
 	}
 
 	return newSecretRequest("PUT", config, secretIdentifier, secret)
@@ -46,7 +46,7 @@ func NewPutCaRequest(config config.Config, caIdentifier, caType, cert, priv stri
 	}
 	caBody := models.CaBody{
 		ContentType: caType,
-		Ca:          &ca,
+		Value:          &ca,
 	}
 
 	return newCaRequest("PUT", config, caIdentifier, caBody)

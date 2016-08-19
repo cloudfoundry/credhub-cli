@@ -8,11 +8,11 @@ import (
 var _ = Describe("String function", func() {
 
 	It("renders string secrets", func() {
-		stringSecret := NewSecret("stringSecret", SecretBody{ContentType: "value", Credential: "my-value", UpdatedAt: "2016-01-01T12:00:00Z"})
+		stringSecret := NewSecret("stringSecret", SecretBody{ContentType: "value", Value: "my-value", UpdatedAt: "2016-01-01T12:00:00Z"})
 		Expect(stringSecret.String()).To(Equal("" +
 			"Type:		value\n" +
 			"Name:		stringSecret\n" +
-			"Credential:	my-value\n" +
+			"Value:	my-value\n" +
 			"Updated:	2016-01-01T12:00:00Z"))
 	})
 
@@ -20,7 +20,7 @@ var _ = Describe("String function", func() {
 
 		It("when fields have non-nil values", func() {
 			cert := Certificate{Root: "my-ca", Certificate: "my-cert", Private: "my-priv"}
-			certificateSecret := NewSecret("nonNulledSecret", SecretBody{ContentType: "certificate", Credential: &cert, UpdatedAt: "2016-01-01T12:00:00Z"})
+			certificateSecret := NewSecret("nonNulledSecret", SecretBody{ContentType: "certificate", Value: &cert, UpdatedAt: "2016-01-01T12:00:00Z"})
 			Expect(certificateSecret.String()).To(Equal("" +
 				"Type:		certificate\n" +
 				"Name:		nonNulledSecret\n" +
@@ -32,7 +32,7 @@ var _ = Describe("String function", func() {
 
 		It("when some fields have nil values", func() {
 			cert := Certificate{Root: "my-ca", Certificate: "", Private: "my-priv"}
-			certificateSecret := NewSecret("nonNulledSecret", SecretBody{ContentType: "certificate", Credential: &cert, UpdatedAt: "2016-01-01T12:00:00Z"})
+			certificateSecret := NewSecret("nonNulledSecret", SecretBody{ContentType: "certificate", Value: &cert, UpdatedAt: "2016-01-01T12:00:00Z"})
 			Expect(certificateSecret.String()).To(Equal("" +
 				"Type:		certificate\n" +
 				"Name:		nonNulledSecret\n" +
@@ -43,7 +43,7 @@ var _ = Describe("String function", func() {
 
 		It("when fields all have nil values", func() {
 			cert := Certificate{}
-			certificateSecret := NewSecret("nulledSecret", SecretBody{ContentType: "certificate", Credential: &cert, UpdatedAt: "2016-01-01T12:00:00Z"})
+			certificateSecret := NewSecret("nulledSecret", SecretBody{ContentType: "certificate", Value: &cert, UpdatedAt: "2016-01-01T12:00:00Z"})
 			Expect(certificateSecret.String()).To(Equal("" +
 				"Type:		certificate\n" +
 				"Name:		nulledSecret\n" +

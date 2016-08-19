@@ -26,12 +26,12 @@ func (ca Ca) String() string {
 		fmt.Sprintf("Name:		%s", ca.Name),
 	)
 
-	if caBody.Ca.Certificate != "" {
-		lines = append(lines, fmt.Sprintf("Certificate:		%s", caBody.Ca.Certificate))
+	if caBody.Value.Certificate != "" {
+		lines = append(lines, fmt.Sprintf("Certificate:		%s", caBody.Value.Certificate))
 	}
 
-	if caBody.Ca.Private != "" {
-		lines = append(lines, fmt.Sprintf("Private:	%s", caBody.Ca.Private))
+	if caBody.Value.Private != "" {
+		lines = append(lines, fmt.Sprintf("Private:	%s", caBody.Value.Private))
 	}
 
 	if caBody.UpdatedAt != "" {

@@ -36,7 +36,7 @@ var _ = Describe("Action", func() {
 		subject = NewAction(&repository, cfg)
 		expectedBody = models.SecretBody{
 			ContentType: "value",
-			Credential:  "potatoes",
+			Value:       "potatoes",
 		}
 		expectedItem = models.NewSecret("my-item", expectedBody)
 	})

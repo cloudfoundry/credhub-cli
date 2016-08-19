@@ -102,7 +102,7 @@ var _ = Describe("API", func() {
 
 		Describe("NewPutSecretValueRequest", func() {
 			It("Returns a request for the put-secret endpoint", func() {
-				requestBody := bytes.NewReader([]byte(`{"type":"value","credential":"my-value"}`))
+				requestBody := bytes.NewReader([]byte(`{"type":"value","value":"my-value"}`))
 				expectedRequest, _ := http.NewRequest("PUT", "http://example.com/api/v1/data/my-name", requestBody)
 				expectedRequest.Header.Set("Content-Type", "application/json")
 				expectedRequest.Header.Set("Authorization", "Bearer access-token")
@@ -115,7 +115,7 @@ var _ = Describe("API", func() {
 
 		Describe("NewPutCertificateRequest", func() {
 			It("Returns a request for the put-certificate endpoint", func() {
-				json := fmt.Sprintf(`{"type":"certificate","credential":{"root":"%s","certificate":"%s","private":"%s"}}`,
+				json := fmt.Sprintf(`{"type":"certificate","value":{"root":"%s","certificate":"%s","private":"%s"}}`,
 					"my-ca", "my-cert", "my-priv")
 				requestBody := bytes.NewReader([]byte(json))
 				expectedRequest, _ := http.NewRequest("PUT", "http://example.com/api/v1/data/my-name", requestBody)
@@ -130,7 +130,7 @@ var _ = Describe("API", func() {
 
 		Describe("NewPutCaRequest", func() {
 			It("Returns a request for the put-root-ca endpoint", func() {
-				json := fmt.Sprintf(`{"type":"root","ca":{"certificate":"%s","private":"%s"}}`,
+				json := fmt.Sprintf(`{"type":"root","value":{"certificate":"%s","private":"%s"}}`,
 					"my-cert", "my-priv")
 				requestBody := bytes.NewReader([]byte(json))
 				expectedRequest, _ := http.NewRequest("PUT", "http://example.com/api/v1/ca/my-name", requestBody)

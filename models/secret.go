@@ -28,12 +28,12 @@ func (secret Secret) String() string {
 	)
 
 	if secretBody.ContentType == "value" {
-		value := secretBody.Credential.(string)
-		lines = append(lines, fmt.Sprintf("Credential:	%s", value))
+		value := secretBody.Value.(string)
+		lines = append(lines, fmt.Sprintf("Value:	%s", value))
 	} else {
 		// We are marshaling again here because there isn't a simple way
 		// to convert map[string]interface{} to a Certificate struct
-		json_cert, _ := json.Marshal(secretBody.Credential)
+		json_cert, _ := json.Marshal(secretBody.Value)
 		cert := Certificate{}
 		json.Unmarshal(json_cert, &cert)
 		if cert.Root != "" {

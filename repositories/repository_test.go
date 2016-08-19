@@ -35,7 +35,7 @@ var _ = Describe("Repository", func() {
 
 			responseObj := http.Response{
 				StatusCode: 200,
-				Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"type":"value","credential":"my-value"}`))),
+				Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"type":"value","value":"my-value"}`))),
 			}
 
 			httpClient.DoStub = func(req *http.Request) (resp *http.Response, err error) {
