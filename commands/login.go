@@ -33,6 +33,9 @@ func (cmd LoginCommand) Execute([]string) error {
 
 	token, err := actions.NewAuthToken(client.NewHttpClient(cfg.AuthURL), cfg).GetAuthToken(cmd.Username, cmd.Password)
 	if err != nil {
+		cfg.AccessToken = ""
+		cfg.RefreshToken = ""
+		config.WriteConfig(cfg)
 		return err
 	}
 

@@ -46,7 +46,7 @@ func NewPutCaRequest(config config.Config, caIdentifier, caType, cert, priv stri
 	}
 	caBody := models.CaBody{
 		ContentType: caType,
-		Value:          &ca,
+		Value:       &ca,
 	}
 
 	return newCaRequest("PUT", config, caIdentifier, caBody)

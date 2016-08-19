@@ -193,6 +193,7 @@ var _ = Describe("Login", func() {
 		Context("when credentials are invalid", func() {
 			var (
 				badUaaServer *Server
+				session      *Session
 			)
 
 			BeforeEach(func() {
@@ -207,16 +208,27 @@ var _ = Describe("Login", func() {
 						}`),
 					),
 				)
+
+				cfg, _ := config.ReadConfig()
+				cfg.AuthURL = badUaaServer.URL()
+				cfg.AccessToken = "fake_token"
+				cfg.RefreshToken = "fake_refresh_token"
+				config.WriteConfig(cfg)
+
+				session = runCommand("login", "-u", "user", "-p", "pass")
 			})
 
 			It("fails to login", func() {
-				setConfigAuthUrl(badUaaServer.URL())
-
-				session := runCommand("login", "-u", "user", "-p", "pass")
-
 				Eventually(session).Should(Exit(1))
 				Eventually(session.Err).Should(Say("The provided username and password combination are incorrect. Please validate your input and retry your request."))
 				Expect(badUaaServer.ReceivedRequests()).Should(HaveLen(1))
+			})
+
+			It("removes any existing tokens", func() {
+				Eventually(session).Should(Exit(1))
+				cfg, _ := config.ReadConfig()
+				Expect(cfg.AccessToken).To(BeEmpty())
+				Expect(cfg.RefreshToken).To(BeEmpty())
 			})
 		})
 	})
