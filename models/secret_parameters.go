@@ -12,7 +12,7 @@ type SecretParameters struct {
 	Locality         string   `json:"locality,omitempty"`
 	State            string   `json:"state,omitempty"`
 	Country          string   `json:"country,omitempty"`
-	AlternativeName  []string `json:"alternative_name,omitempty"`
+	AlternativeName  []string `json:"alternative_names,omitempty"`
 	KeyLength        int      `json:"key_length,omitempty"`
 	Duration         int      `json:"duration,omitempty"`
 	Ca               string   `json:"ca,omitempty"`
