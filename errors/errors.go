@@ -39,3 +39,7 @@ func NewAuthorizationParametersError() error {
 func NewRefreshError() error {
 	return errors.New("You are not currently authenticated. Please log in to continue.")
 }
+
+func NewForbiddenError() error {
+	return errors.New("You are not authorized to perform this action. You must log in with an elevated user or contact your administrator to continue.")
+}

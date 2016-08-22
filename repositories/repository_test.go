@@ -50,7 +50,7 @@ var _ = Describe("Repository", func() {
 		})
 
 		Describe("Errors", func() {
-			It("returns NewNetworkError when there is a network error", func() {
+			It("returns NetworkError when there is a network error", func() {
 				httpClient.DoReturns(nil, errors.New("hello"))
 
 				request, _ := http.NewRequest("GET", "http://example.com/foo", nil)
@@ -72,7 +72,7 @@ var _ = Describe("Repository", func() {
 				Expect(error.Error()).To(Equal("My error"))
 			})
 
-			It("returns a NewUnauthorizedError when the CM server returns a 401", func() {
+			It("returns UnauthorizedError when the CM server returns Unauthorized", func() {
 				responseObj := http.Response{
 					StatusCode: 401,
 					Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"error": "invalid_token","error_description":"Access token expired: "}`))),
@@ -82,6 +82,18 @@ var _ = Describe("Repository", func() {
 
 				_, error := DoSendRequest(&httpClient, request)
 				Expect(error).To(MatchError(cmcli_errors.NewUnauthorizedError()))
+			})
+
+			It("returns ForbiddenError when the CM server returns Forbidden", func() {
+				responseObj := http.Response{
+					StatusCode: 403,
+					Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"error": "insufficient_scope","error_description":"Insufficient scope for this resource"}`))),
+				}
+				httpClient.DoReturns(&responseObj, nil)
+				request, _ := http.NewRequest("GET", "http://example.com/foo", nil)
+
+				_, error := DoSendRequest(&httpClient, request)
+				Expect(error).To(MatchError(cmcli_errors.NewForbiddenError()))
 			})
 		})
 	})

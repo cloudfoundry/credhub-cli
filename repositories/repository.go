@@ -32,6 +32,8 @@ func DoSendRequest(httpClient client.HttpClient, request *http.Request) (*http.R
 
 		if response.StatusCode == http.StatusUnauthorized {
 			return nil, cm_errors.NewUnauthorizedError()
+		} else if response.StatusCode == http.StatusForbidden {
+			return nil, cm_errors.NewForbiddenError()
 		}
 
 		return nil, errors.New(serverError.Error)
