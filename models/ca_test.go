@@ -7,12 +7,12 @@ import (
 
 var _ = Describe("String function", func() {
 	It("when fields have non-nil values", func() {
-		params := CaParameters{Certificate: "my-cert", Private: "my-priv"}
+		params := CaParameters{Certificate: "my-cert", PrivateKey: "my-priv"}
 		stringCa := NewCa("stringCa", CaBody{ContentType: "root", Value: &params})
 		Expect(stringCa.String()).To(Equal("" +
 			"Type:		root\n" +
 			"Name:		stringCa\n" +
 			"Certificate:		my-cert\n" +
-			"Private:	my-priv"))
+			"Private Key:	my-priv"))
 	})
 })

@@ -29,7 +29,7 @@ func (secret Secret) String() string {
 
 	if secretBody.ContentType == "value" {
 		value := secretBody.Value.(string)
-		lines = append(lines, fmt.Sprintf("Value:	%s", value))
+		lines = append(lines, fmt.Sprintf("Value:\t\t%s", value))
 	} else {
 		// We are marshaling again here because there isn't a simple way
 		// to convert map[string]interface{} to a Certificate struct
@@ -44,8 +44,8 @@ func (secret Secret) String() string {
 			lines = append(lines, fmt.Sprintf("Certificate:		%s", cert.Certificate))
 		}
 
-		if cert.Private != "" {
-			lines = append(lines, fmt.Sprintf("Private:	%s", cert.Private))
+		if cert.PrivateKey != "" {
+			lines = append(lines, fmt.Sprintf("Private Key:	%s", cert.PrivateKey))
 		}
 	}
 

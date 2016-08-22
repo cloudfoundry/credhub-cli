@@ -37,7 +37,7 @@ var _ = Describe("CaRepository", func() {
 
 				responseObj := http.Response{
 					StatusCode: 200,
-					Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"value":{"certificate":"my-cert","private":"my-priv"}}`))),
+					Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"value":{"certificate":"my-cert","private_key":"my-priv"}}`))),
 				}
 
 				httpClient.DoStub = func(req *http.Request) (resp *http.Response, err error) {
@@ -48,7 +48,7 @@ var _ = Describe("CaRepository", func() {
 
 				caParams := models.CaParameters{
 					Certificate: "my-cert",
-					Private:     "my-priv",
+					PrivateKey:  "my-priv",
 				}
 				expectedCaBody := models.CaBody{
 					Value: &caParams,

@@ -30,8 +30,8 @@ func (ca Ca) String() string {
 		lines = append(lines, fmt.Sprintf("Certificate:		%s", caBody.Value.Certificate))
 	}
 
-	if caBody.Value.Private != "" {
-		lines = append(lines, fmt.Sprintf("Private:	%s", caBody.Value.Private))
+	if caBody.Value.PrivateKey != "" {
+		lines = append(lines, fmt.Sprintf("Private Key:	%s", caBody.Value.PrivateKey))
 	}
 
 	if caBody.UpdatedAt != "" {

@@ -24,14 +24,14 @@ import (
 const TIMESTAMP = `2016-01-01T12:00:00Z`
 const SECRET_VALUE_REQUEST_JSON = `{"type":"value", "value":"%s"}`
 const SECRET_VALUE_RESPONSE_JSON = `{"type":"value", "value":"%s", "updated_at":"` + TIMESTAMP + `"}`
-const SECRET_VALUE_RESPONSE_TABLE = `Type:		value\nName:		%s\nValue:	%s\nUpdated:	` + TIMESTAMP
-const SECRET_CERTIFICATE_REQUEST_JSON = `{"type":"certificate","value":{"root":"%s","certificate":"%s","private":"%s"}}`
-const SECRET_CERTIFICATE_RESPONSE_JSON = `{"type":"certificate","value":{"root":"%s","certificate":"%s","private":"%s"},"updated_at":"` + TIMESTAMP + `"}`
-const SECRET_CERTIFICATE_RESPONSE_TABLE = `Type:		certificate\nName:		%s\nRoot:		%s\nCertificate:		%s\nPrivate:	%s\nUpdated:	` + TIMESTAMP
+const SECRET_VALUE_RESPONSE_TABLE = `Type:		value\nName:		%s\nValue:\t\t%s\nUpdated:	` + TIMESTAMP
+const SECRET_CERTIFICATE_REQUEST_JSON = `{"type":"certificate","value":{"root":"%s","certificate":"%s","private_key":"%s"}}`
+const SECRET_CERTIFICATE_RESPONSE_JSON = `{"type":"certificate","value":{"root":"%s","certificate":"%s","private_key":"%s"},"updated_at":"` + TIMESTAMP + `"}`
+const SECRET_CERTIFICATE_RESPONSE_TABLE = `Type:		certificate\nName:		%s\nRoot:		%s\nCertificate:		%s\nPrivate Key:	%s\nUpdated:	` + TIMESTAMP
 const GENERATE_REQUEST_JSON = `{"type":"%s","parameters":%s}`
-const CA_REQUEST_JSON = `{"type":"%s","value":{"certificate":"%s","private":"%s"}}`
-const CA_RESPONSE_JSON = `{"type":"%s","value":{"certificate":"%s","private":"%s"},"updated_at":"` + TIMESTAMP + `"}`
-const CA_RESPONSE_TABLE = `Type:		%s\nName:		%s\nCertificate:		%s\nPrivate:	%s\nUpdated:	` + TIMESTAMP
+const CA_REQUEST_JSON = `{"type":"%s","value":{"certificate":"%s","private_key":"%s"}}`
+const CA_RESPONSE_JSON = `{"type":"%s","value":{"certificate":"%s","private_key":"%s"},"updated_at":"` + TIMESTAMP + `"}`
+const CA_RESPONSE_TABLE = `Type:		%s\nName:		%s\nCertificate:		%s\nPrivate Key:	%s\nUpdated:	` + TIMESTAMP
 
 var responseMySecretPotatoes = fmt.Sprintf(SECRET_VALUE_RESPONSE_TABLE, "my-secret", "potatoes")
 var responseMySecretCertificate = fmt.Sprintf(SECRET_CERTIFICATE_RESPONSE_TABLE, "my-secret", "my-ca", "my-cert", "my-priv")

@@ -29,7 +29,7 @@ func NewPutCertificateRequest(config config.Config, secretIdentifier, root strin
 	certificate := models.Certificate{
 		Root:        root,
 		Certificate: cert,
-		Private:     priv,
+		PrivateKey:  priv,
 	}
 	secret := models.SecretBody{
 		ContentType: "certificate",
@@ -42,7 +42,7 @@ func NewPutCertificateRequest(config config.Config, secretIdentifier, root strin
 func NewPutCaRequest(config config.Config, caIdentifier, caType, cert, priv string) *http.Request {
 	ca := models.CaParameters{
 		Certificate: cert,
-		Private:     priv,
+		PrivateKey:  priv,
 	}
 	caBody := models.CaBody{
 		ContentType: caType,
