@@ -17,7 +17,7 @@ func (cmd LogoutCommand) Execute([]string) error {
 		SendLogoutIfNecessary(cfg)
 	}
 
-	RevokeConfig(cfg)
+	RevokeConfig(&cfg)
 	fmt.Println("Logout Successful")
 	return nil
 }
@@ -29,8 +29,8 @@ func SendLogoutIfNecessary(cfg config.Config) {
 	}
 }
 
-func RevokeConfig(cfg config.Config) {
+func RevokeConfig(cfg *config.Config) {
 	cfg.AccessToken = "revoked"
 	cfg.RefreshToken = "revoked"
-	config.WriteConfig(cfg)
+	config.WriteConfig(*cfg)
 }

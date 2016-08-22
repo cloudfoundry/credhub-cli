@@ -60,9 +60,9 @@ var _ = BeforeEach(func() {
 		os.Setenv("HOME", homeDir)
 	}
 
-	server = NewServer()
+	server = NewTLSServer()
 
-	authServer = NewServer()
+	authServer = NewTLSServer()
 
 	server.AppendHandlers(
 		CombineHandlers(
@@ -74,7 +74,8 @@ var _ = BeforeEach(func() {
 		),
 	)
 
-	runCommand("api", server.URL())
+	session := runCommand("api", server.URL())
+	Eventually(session).Should(Exit(0))
 })
 
 var _ = AfterEach(func() {

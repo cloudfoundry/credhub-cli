@@ -24,6 +24,40 @@ var _ = Describe("API", func() {
 		})
 	})
 
+	It("revokes existing auth tokens when setting the api", func() {
+		apiServer := NewTLSServer()
+		apiServer.AppendHandlers(
+			CombineHandlers(
+				VerifyRequest("GET", "/info"),
+				RespondWith(http.StatusOK, `{
+					"app":{"version":"0.1.0 build DEV","name":"Pivotal Credential Manager"},
+					"auth-server":{"url":"https://example.com"}
+					}`),
+			),
+		)
+
+		authServer.AppendHandlers(
+			CombineHandlers(
+				VerifyRequest("DELETE", "/oauth/token/revoke/5b9c9fd51ba14838ac2e6b222d487106-r"),
+				RespondWith(http.StatusOK, ""),
+			),
+		)
+
+		cfg, _ := config.ReadConfig()
+		cfg.AuthURL = authServer.URL()
+		cfg.AccessToken = "fake_token"
+		cfg.RefreshToken = "eyJhbGciOiJSUzI1NiIsImtpZCI6ImxlZ2FjeS10b2tlbi1rZXkiLCJ0eXAiOiJKV1QifQ.eyJqdGkiOiI1YjljOWZkNTFiYTE0ODM4YWMyZTZiMjIyZDQ4NzEwNi1yIiwic3ViIjoiYzE0ZGJjZGQtNzNkOC00ZDdjLWI5NDctYzM4ODVhODAxYzY2Iiwic2NvcGUiOlsiY3JlZGh1Yi53cml0ZSIsImNyZWRodWIucmVhZCJdLCJpYXQiOjE0NzEzMTAwMTIsImV4cCI6MTQ3MTM5NjQxMiwiY2lkIjoiY3JlZGh1YiIsImNsaWVudF9pZCI6ImNyZWRodWIiLCJpc3MiOiJodHRwczovLzUyLjIwNC40OS4xMDc6ODQ0My9vYXV0aC90b2tlbiIsInppZCI6InVhYSIsInJldm9jYWJsZSI6dHJ1ZSwiZ3JhbnRfdHlwZSI6InBhc3N3b3JkIiwidXNlcl9uYW1lIjoiY3JlZGh1Yl9jbGkiLCJvcmlnaW4iOiJ1YWEiLCJ1c2VyX2lkIjoiYzE0ZGJjZGQtNzNkOC00ZDdjLWI5NDctYzM4ODVhODAxYzY2IiwicmV2X3NpZyI6ImQ3MTkyZmUxIiwiYXVkIjpbImNyZWRodWIiXX0.UAp6Ou24f18mdE0XOqG9RLVWZAx3khNHHPeHfuzmcOUYojtILa0_izlGVHhCtNx07f4M9pcRKpo-AijXRw1vSimSTHBeVCDjuuc2nBdznIMhyQSlPpd2stW-WG7Gix82K4gy4oCb1wlTqsK3UKGYoy8JWs6XZqhoZZ6JZM7-Xjj2zag3Q4kgvEBReWC5an_IP6SeCpNt5xWvGdxtTz7ki1WPweUBy0M73ZjRi9_poQT2JmeSIbrePukkfsfCxHG1vM7ApIdzzhdCx6T_KmmMU3xHqhpI_ueLOuvfHjdBinm2atypeTHD83yRRFxhfjRsG1-XguTn-lo_Z2Jis89r5g"
+		config.WriteConfig(cfg)
+
+		session := runCommand("api", apiServer.URL())
+
+		Eventually(session).Should(Exit(0))
+		newCfg, _ := config.ReadConfig()
+		Expect(newCfg.AccessToken).To(Equal("revoked"))
+		Expect(newCfg.RefreshToken).To(Equal("revoked"))
+		Expect(authServer.ReceivedRequests()).Should(HaveLen(1))
+	})
+
 	Context("when the provided server url's scheme is https", func() {
 		var (
 			httpsServer       *Server
@@ -40,7 +74,7 @@ var _ = Describe("API", func() {
 					VerifyRequest("GET", "/info"),
 					RespondWith(http.StatusOK, `{
 					"app":{"version":"0.1.0 build DEV","name":"Pivotal Credential Manager"},
-					"auth-server":{"url":"https://example.com","client":"bar"}
+					"auth-server":{"url":"https://example.com"}
 					}`),
 				),
 			)
@@ -175,7 +209,7 @@ var _ = Describe("API", func() {
 					VerifyRequest("GET", "/info"),
 					RespondWith(http.StatusOK, `{
 					"app":{"version":"my-version","name":"Pivotal Credential Manager"},
-					"auth-server":{"url":"https://example.com","client":"bar"}
+					"auth-server":{"url":"https://example.com"}
 					}`),
 				),
 			)

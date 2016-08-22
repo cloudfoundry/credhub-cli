@@ -26,6 +26,8 @@ func (cmd ApiCommand) Execute([]string) error {
 	if serverUrl == "" {
 		fmt.Println(cfg.ApiURL)
 	} else {
+		SendLogoutIfNecessary(cfg)
+		RevokeConfig(&cfg)
 		err := GetApiInfo(&cfg, serverUrl)
 		if err != nil {
 			return err
