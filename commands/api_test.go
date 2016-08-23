@@ -24,7 +24,7 @@ var _ = Describe("API", func() {
 		})
 	})
 
-	It("revokes existing auth tokens when setting the api", func() {
+	It("revokes existing auth tokens when setting the api successfully", func() {
 		apiServer := NewTLSServer()
 		apiServer.AppendHandlers(
 			CombineHandlers(
@@ -56,6 +56,30 @@ var _ = Describe("API", func() {
 		Expect(newCfg.AccessToken).To(Equal("revoked"))
 		Expect(newCfg.RefreshToken).To(Equal("revoked"))
 		Expect(authServer.ReceivedRequests()).Should(HaveLen(1))
+	})
+
+	It("retains existing tokens when setting the api fails", func() {
+		apiServer := NewTLSServer()
+		apiServer.AppendHandlers(
+			CombineHandlers(
+				VerifyRequest("GET", "/info"),
+				RespondWith(http.StatusNotFound, ""),
+			),
+		)
+
+		cfg, _ := config.ReadConfig()
+		cfg.AuthURL = authServer.URL()
+		cfg.AccessToken = "fake_token"
+		cfg.RefreshToken = "fake_refresh"
+		config.WriteConfig(cfg)
+
+		session := runCommand("api", apiServer.URL())
+
+		Eventually(session).Should(Exit(1))
+		newCfg, _ := config.ReadConfig()
+		Expect(newCfg.AccessToken).To(Equal("fake_token"))
+		Expect(newCfg.RefreshToken).To(Equal("fake_refresh"))
+		Expect(authServer.ReceivedRequests()).Should(HaveLen(0))
 	})
 
 	Context("when the provided server url's scheme is https", func() {

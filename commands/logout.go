@@ -12,12 +12,10 @@ type LogoutCommand struct {
 }
 
 func (cmd LogoutCommand) Execute([]string) error {
-	cfg, err := config.ReadConfig()
-	if err == nil {
-		SendLogoutIfNecessary(cfg)
-	}
-
-	RevokeConfig(&cfg)
+	cfg, _ := config.ReadConfig()
+	SendLogoutIfNecessary(cfg)
+	cfg = RevokedConfig(cfg)
+	config.WriteConfig(cfg)
 	fmt.Println("Logout Successful")
 	return nil
 }
@@ -29,8 +27,8 @@ func SendLogoutIfNecessary(cfg config.Config) {
 	}
 }
 
-func RevokeConfig(cfg *config.Config) {
+func RevokedConfig(cfg config.Config) config.Config {
 	cfg.AccessToken = "revoked"
 	cfg.RefreshToken = "revoked"
-	config.WriteConfig(*cfg)
+	return cfg
 }
