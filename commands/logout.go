@@ -23,7 +23,10 @@ func (cmd LogoutCommand) Execute([]string) error {
 func SendLogoutIfNecessary(cfg config.Config) {
 	if cfg.RefreshToken != "" && cfg.RefreshToken != "revoked" {
 		authRepository := repositories.NewAuthRepository(client.NewHttpClient(cfg.AuthURL), false)
-		authRepository.SendRequest(client.NewTokenRevocationRequest(cfg), "logout")
+		request, err := client.NewTokenRevocationRequest(cfg)
+		if err == nil {
+			authRepository.SendRequest(request, "logout")
+		}
 	}
 }
 

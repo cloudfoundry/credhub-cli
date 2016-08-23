@@ -13,6 +13,8 @@ import (
 	"github.com/pivotal-cf/cm-cli/config"
 	"github.com/pivotal-cf/cm-cli/models"
 
+	"errors"
+
 	"github.com/dgrijalva/jwt-go"
 )
 
@@ -116,13 +118,19 @@ func NewRefreshTokenRequest(cfg config.Config) *http.Request {
 	return request
 }
 
-func NewTokenRevocationRequest(cfg config.Config) *http.Request {
+func NewTokenRevocationRequest(cfg config.Config) (*http.Request, error) {
 	claims := jwt.MapClaims{}
 	jwt.ParseWithClaims(cfg.RefreshToken, claims, nil)
-	url := cfg.AuthURL + "/oauth/token/revoke/" + claims["jti"].(string)
-	request, _ := http.NewRequest("DELETE", url, nil)
+	if claims["jti"] == nil {
+		return nil, errors.New("Claims could not be retrieved from token")
+	}
+	requestUrl := cfg.AuthURL + "/oauth/token/revoke/" + claims["jti"].(string)
+	request, err := http.NewRequest("DELETE", requestUrl, nil)
+	if err != nil {
+		return nil, err
+	}
 	request.Header.Add("Authorization", "Bearer "+cfg.AccessToken)
-	return request
+	return request, nil
 }
 
 func NewBodyClone(req *http.Request) io.ReadCloser {
