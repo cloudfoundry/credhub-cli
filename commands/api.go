@@ -31,8 +31,10 @@ func (cmd ApiCommand) Execute([]string) error {
 		if err != nil {
 			return err
 		}
-		SendLogoutIfNecessary(existingCfg)
-		cfg = RevokedConfig(cfg)
+		if existingCfg.AuthURL != cfg.AuthURL {
+			SendLogoutIfNecessary(existingCfg)
+			cfg = RevokedConfig(cfg)
+		}
 		config.WriteConfig(cfg)
 	}
 
