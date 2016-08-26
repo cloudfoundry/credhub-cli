@@ -27,6 +27,15 @@ func NewPutValueRequest(config config.Config, secretIdentifier, secretContent st
 	return newSecretRequest("PUT", config, secretIdentifier, secret)
 }
 
+func NewPutPasswordRequest(config config.Config, secretIdentifier, secretContent string) *http.Request {
+	secret := models.SecretBody{
+		Value:       secretContent,
+		ContentType: "password",
+	}
+
+	return newSecretRequest("PUT", config, secretIdentifier, secret)
+}
+
 func NewPutCertificateRequest(config config.Config, secretIdentifier, root string, cert string, priv string) *http.Request {
 	certificate := models.Certificate{
 		Root:        root,

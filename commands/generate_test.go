@@ -41,6 +41,28 @@ var _ = Describe("Generate", func() {
 		})
 	})
 
+	Describe("with a variety of password parameters", func() {
+		It("including length", func() {
+			doPasswordOptionTest(`{"length":42}`, "-l", "42")
+		})
+
+		It("excluding upper case", func() {
+			doPasswordOptionTest(`{"exclude_upper":true}`, "--exclude-upper")
+		})
+
+		It("excluding lower case", func() {
+			doPasswordOptionTest(`{"exclude_lower":true}`, "--exclude-lower")
+		})
+
+		It("excluding special characters", func() {
+			doPasswordOptionTest(`{"exclude_special":true}`, "--exclude-special")
+		})
+
+		It("excluding numbers", func() {
+			doPasswordOptionTest(`{"exclude_number":true}`, "--exclude-number")
+		})
+	})
+
 	Describe("with a variety of certificate parameters", func() {
 		It("including common name", func() {
 			doCertificateOptionTest(`{"common_name":"common.name.io"}`, "--common-name", "common.name.io")
@@ -110,7 +132,7 @@ var _ = Describe("Generate", func() {
 				RespondWith(http.StatusBadRequest, `{"error": "you fail."}`),
 			)
 
-			session := runCommand("generate", "-n", "my-secret")
+			session := runCommand("generate", "-n", "my-value")
 
 			Eventually(session).Should(Exit(1))
 
@@ -124,7 +146,7 @@ func setupPostServer(name string, value string, requestJson string) {
 		CombineHandlers(
 			VerifyRequest("POST", fmt.Sprintf("/api/v1/data/%s", name)),
 			VerifyJSON(requestJson),
-			RespondWith(http.StatusOK, fmt.Sprintf(SECRET_VALUE_RESPONSE_JSON, value)),
+			RespondWith(http.StatusOK, fmt.Sprintf(SECRET_STRING_RESPONSE_JSON, "value", value)),
 		),
 	)
 }
@@ -134,15 +156,25 @@ func generateRequestJson(secretType string, params string) string {
 }
 
 func doValueOptionTest(optionJson string, options ...string) {
-	setupPostServer("my-secret", "potatoes", generateRequestJson("value", optionJson))
+	setupPostServer("my-value", "potatoes", generateRequestJson("value", optionJson))
 
-	leftOpts := []string{"generate", "-n", "my-secret"}
+	leftOpts := []string{"generate", "-n", "my-value"}
 
 	stuff := append(leftOpts, options...)
 	session := runCommand(stuff...)
 
 	Eventually(session).Should(Exit(0))
-	Eventually(session.Out).Should(Say(responseMySecretPotatoes))
+}
+
+func doPasswordOptionTest(optionJson string, options ...string) {
+	setupPostServer("my-password", "potatoes", generateRequestJson("password", optionJson))
+
+	leftOpts := []string{"generate", "-n", "my-password", "-t", "password"}
+
+	stuff := append(leftOpts, options...)
+	session := runCommand(stuff...)
+
+	Eventually(session).Should(Exit(0))
 }
 
 func doCertificateOptionTest(optionJson string, options ...string) {
@@ -154,7 +186,4 @@ func doCertificateOptionTest(optionJson string, options ...string) {
 	session := runCommand(stuff...)
 
 	Eventually(session).Should(Exit(0))
-	// TODO:  Mash the following potatoes into a certifrycate:  the expected response here doesn't match certificates,
-	// only a value.  We need tyo make this work with <code>responseMySecretCertificate</code> instead
-	Eventually(session.Out).Should(Say(responseMySecretPotatoes))
 }

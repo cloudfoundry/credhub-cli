@@ -19,21 +19,32 @@ import (
 var _ = Describe("Set", func() {
 	Describe("setting string secrets", func() {
 		It("puts a secret using default type", func() {
-			setupPutValueServer("my-secret", "potatoes")
+			setupPutValueServer("my-value", "value", "potatoes")
 
-			session := runCommand("set", "-n", "my-secret", "-v", "potatoes")
+			session := runCommand("set", "-n", "my-value", "-v", "potatoes")
 
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say(responseMySecretPotatoes))
+			Eventually(session.Out).Should(Say(responseMyValuePotatoes))
 		})
 
 		It("puts a secret using explicit value type", func() {
-			setupPutValueServer("my-secret", "potatoes")
+			setupPutValueServer("my-value", "value", "potatoes")
 
-			session := runCommand("set", "-n", "my-secret", "-v", "potatoes", "-t", "value")
+			session := runCommand("set", "-n", "my-value", "-v", "potatoes", "-t", "value")
 
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say(responseMySecretPotatoes))
+			Eventually(session.Out).Should(Say(responseMyValuePotatoes))
+		})
+	})
+
+	Describe("setting password secrets", func() {
+		It("puts a secret using explicit password type", func() {
+			setupPutValueServer("my-password", "password", "potatoes")
+
+			session := runCommand("set", "-n", "my-password", "-v", "potatoes", "-t", "password")
+
+			Eventually(session).Should(Exit(0))
+			Eventually(session.Out).Should(Say(responseMyPasswordPotatoes))
 		})
 	})
 
@@ -46,7 +57,7 @@ var _ = Describe("Set", func() {
 				"--certificate-string", "my-cert", "--private-string", "my-priv")
 
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say(responseMySecretCertificate))
+			Eventually(session.Out).Should(Say(responseMyCertificate))
 		})
 
 		It("puts a secret using explicit certificate type and values read from files", func() {
@@ -62,7 +73,7 @@ var _ = Describe("Set", func() {
 
 			os.RemoveAll(tempDir)
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say(responseMySecretCertificate))
+			Eventually(session.Out).Should(Say(responseMyCertificate))
 		})
 
 		It("fails to put a secret when failing to read from a file", func() {
@@ -104,7 +115,7 @@ var _ = Describe("Set", func() {
 				RespondWith(http.StatusBadRequest, `{"error": "you fail."}`),
 			)
 
-			session := runCommand("set", "-n", "my-secret", "-v", "tomatoes")
+			session := runCommand("set", "-n", "my-value", "-v", "tomatoes")
 
 			Eventually(session).Should(Exit(1))
 
@@ -113,12 +124,12 @@ var _ = Describe("Set", func() {
 	})
 })
 
-func setupPutValueServer(name string, value string) {
+func setupPutValueServer(name string, secretType string, value string) {
 	server.AppendHandlers(
 		CombineHandlers(
 			VerifyRequest("PUT", fmt.Sprintf("/api/v1/data/%s", name)),
-			VerifyJSON(fmt.Sprintf(SECRET_VALUE_REQUEST_JSON, value)),
-			RespondWith(http.StatusOK, fmt.Sprintf(SECRET_VALUE_RESPONSE_JSON, value)),
+			VerifyJSON(fmt.Sprintf(SECRET_STRING_REQUEST_JSON, secretType, value)),
+			RespondWith(http.StatusOK, fmt.Sprintf(SECRET_STRING_RESPONSE_JSON, secretType, value)),
 		),
 	)
 }

@@ -3,8 +3,6 @@ package commands_test
 import (
 	"net/http"
 
-	"fmt"
-
 	"runtime"
 
 	. "github.com/onsi/ginkgo"
@@ -39,18 +37,35 @@ var _ = Describe("Get", func() {
 		}
 	})
 
-	It("gets a secret", func() {
+	It("gets a string secret", func() {
 		responseJson := `{"type":"value","value":"potatoes"}`
-		responseTable := fmt.Sprintf(`Type:		value\nName:		my-secret\nValue:		potatoes`)
+		responseTable := `Type:		value\nName:		my-value\nValue:		potatoes`
 
 		server.AppendHandlers(
 			CombineHandlers(
-				VerifyRequest("GET", "/api/v1/data/my-secret"),
+				VerifyRequest("GET", "/api/v1/data/my-value"),
 				RespondWith(http.StatusOK, responseJson),
 			),
 		)
 
-		session := runCommand("get", "-n", "my-secret")
+		session := runCommand("get", "-n", "my-value")
+
+		Eventually(session).Should(Exit(0))
+		Eventually(session.Out).Should(Say(responseTable))
+	})
+
+	It("gets a password secret", func() {
+		responseJson := `{"type":"password","value":"potatoes"}`
+		responseTable := `Type:		password\nName:		my-password\nValue:		potatoes`
+
+		server.AppendHandlers(
+			CombineHandlers(
+				VerifyRequest("GET", "/api/v1/data/my-password"),
+				RespondWith(http.StatusOK, responseJson),
+			),
+		)
+
+		session := runCommand("get", "-n", "my-password")
 
 		Eventually(session).Should(Exit(0))
 		Eventually(session.Out).Should(Say(responseTable))

@@ -27,7 +27,7 @@ func (secret Secret) String() string {
 		fmt.Sprintf("Name:		%s", secret.Name),
 	)
 
-	if secretBody.ContentType == "value" {
+	if secretBody.ContentType == "value" || secretBody.ContentType == "password" {
 		value := secretBody.Value.(string)
 		lines = append(lines, fmt.Sprintf("Value:\t\t%s", value))
 	} else {

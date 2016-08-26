@@ -53,6 +53,8 @@ func getRequest(cmd SetCommand, config config.Config) (*http.Request, error) {
 	var request *http.Request
 	if cmd.ContentType == "value" {
 		request = client.NewPutValueRequest(config, cmd.SecretIdentifier, cmd.Value)
+	} else if cmd.ContentType == "password" {
+		request = client.NewPutPasswordRequest(config, cmd.SecretIdentifier, cmd.Value)
 	} else {
 		var err error
 		if cmd.RootCAFileName != "" {
