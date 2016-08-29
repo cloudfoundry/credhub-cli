@@ -7,10 +7,10 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/pivotal-cf/cm-cli/actions"
-	"github.com/pivotal-cf/cm-cli/client"
-	"github.com/pivotal-cf/cm-cli/client/clientfakes"
-	"github.com/pivotal-cf/cm-cli/config"
+	"github.com/pivotal-cf/credhub-cli/actions"
+	"github.com/pivotal-cf/credhub-cli/client"
+	"github.com/pivotal-cf/credhub-cli/client/clientfakes"
+	"github.com/pivotal-cf/credhub-cli/config"
 )
 
 var _ = Describe("Token", func() {

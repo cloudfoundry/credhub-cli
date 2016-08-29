@@ -3,12 +3,12 @@ package commands
 import (
 	"fmt"
 
-	"github.com/pivotal-cf/cm-cli/actions"
-	"github.com/pivotal-cf/cm-cli/client"
-	"github.com/pivotal-cf/cm-cli/config"
-	"github.com/pivotal-cf/cm-cli/repositories"
+	"github.com/pivotal-cf/credhub-cli/actions"
+	"github.com/pivotal-cf/credhub-cli/client"
+	"github.com/pivotal-cf/credhub-cli/config"
+	"github.com/pivotal-cf/credhub-cli/repositories"
 
-	cmcli_errors "github.com/pivotal-cf/cm-cli/errors"
+	cmcli_errors "github.com/pivotal-cf/credhub-cli/errors"
 )
 
 type CaSetCommand struct {

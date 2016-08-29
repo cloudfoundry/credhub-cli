@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/pivotal-cf/cm-cli/client"
+	"github.com/pivotal-cf/credhub-cli/client"
 )
 
 type FakeHttpClient struct {

@@ -5,7 +5,7 @@ import (
 
 	"strings"
 
-	cmcli_errors "github.com/pivotal-cf/cm-cli/errors"
+	cmcli_errors "github.com/pivotal-cf/credhub-cli/errors"
 )
 
 func ReadFile(filename string) (string, error) {

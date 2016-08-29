@@ -6,7 +6,7 @@ import (
 	"runtime/debug"
 
 	"github.com/jessevdk/go-flags"
-	"github.com/pivotal-cf/cm-cli/commands"
+	"github.com/pivotal-cf/credhub-cli/commands"
 )
 
 func main() {

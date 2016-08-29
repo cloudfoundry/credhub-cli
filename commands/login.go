@@ -4,10 +4,10 @@ import (
 	"fmt"
 
 	"github.com/howeyc/gopass"
-	"github.com/pivotal-cf/cm-cli/actions"
-	"github.com/pivotal-cf/cm-cli/client"
-	"github.com/pivotal-cf/cm-cli/config"
-	"github.com/pivotal-cf/cm-cli/errors"
+	"github.com/pivotal-cf/credhub-cli/actions"
+	"github.com/pivotal-cf/credhub-cli/client"
+	"github.com/pivotal-cf/credhub-cli/config"
+	"github.com/pivotal-cf/credhub-cli/errors"
 )
 
 type LoginCommand struct {

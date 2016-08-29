@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/pivotal-cf/cm-cli/client"
-	cm_errors "github.com/pivotal-cf/cm-cli/errors"
-	"github.com/pivotal-cf/cm-cli/models"
+	"github.com/pivotal-cf/credhub-cli/client"
+	cm_errors "github.com/pivotal-cf/credhub-cli/errors"
+	"github.com/pivotal-cf/credhub-cli/models"
 )
 
 type secretRepository struct {

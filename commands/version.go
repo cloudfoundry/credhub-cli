@@ -5,10 +5,10 @@ import (
 
 	"os"
 
-	"github.com/pivotal-cf/cm-cli/actions"
-	"github.com/pivotal-cf/cm-cli/client"
-	"github.com/pivotal-cf/cm-cli/config"
-	"github.com/pivotal-cf/cm-cli/version"
+	"github.com/pivotal-cf/credhub-cli/actions"
+	"github.com/pivotal-cf/credhub-cli/client"
+	"github.com/pivotal-cf/credhub-cli/config"
+	"github.com/pivotal-cf/credhub-cli/version"
 )
 
 func PrintVersion() error {

@@ -9,7 +9,7 @@ DEST = build/credhub
 endif
 
 GOFLAGS := -o $(DEST)
-GOFLAGS := $(GOFLAGS) -ldflags "-X github.com/pivotal-cf/cm-cli/version.BuildNumber=$(BUILD_NUMBER)"
+GOFLAGS := $(GOFLAGS) -ldflags "-X github.com/pivotal-cf/credhub-cli/version.BuildNumber=$(BUILD_NUMBER)"
 
 dependencies :
 		go get github.com/onsi/ginkgo/ginkgo

@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/pivotal-cf/cm-cli/client"
-	"github.com/pivotal-cf/cm-cli/errors"
-	"github.com/pivotal-cf/cm-cli/models"
+	"github.com/pivotal-cf/credhub-cli/client"
+	"github.com/pivotal-cf/credhub-cli/errors"
+	"github.com/pivotal-cf/credhub-cli/models"
 )
 
 type caRepository struct {

@@ -10,8 +10,8 @@ import (
 	"io"
 	"io/ioutil"
 
-	"github.com/pivotal-cf/cm-cli/config"
-	"github.com/pivotal-cf/cm-cli/models"
+	"github.com/pivotal-cf/credhub-cli/config"
+	"github.com/pivotal-cf/credhub-cli/models"
 
 	"errors"
 

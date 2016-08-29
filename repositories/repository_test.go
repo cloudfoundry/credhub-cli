@@ -3,7 +3,7 @@ package repositories_test
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	. "github.com/pivotal-cf/cm-cli/repositories"
+	. "github.com/pivotal-cf/credhub-cli/repositories"
 
 	"bytes"
 	"io/ioutil"
@@ -11,9 +11,9 @@ import (
 
 	"errors"
 
-	"github.com/pivotal-cf/cm-cli/client/clientfakes"
-	"github.com/pivotal-cf/cm-cli/config"
-	cmcli_errors "github.com/pivotal-cf/cm-cli/errors"
+	"github.com/pivotal-cf/credhub-cli/client/clientfakes"
+	"github.com/pivotal-cf/credhub-cli/config"
+	cmcli_errors "github.com/pivotal-cf/credhub-cli/errors"
 )
 
 var _ = Describe("Repository", func() {

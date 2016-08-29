@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
 	. "github.com/onsi/gomega/ghttp"
-	"github.com/pivotal-cf/cm-cli/config"
+	"github.com/pivotal-cf/credhub-cli/config"
 )
 
 var _ = Describe("API", func() {

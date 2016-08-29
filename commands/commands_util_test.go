@@ -3,12 +3,12 @@ package commands_test
 import (
 	"os"
 
-	"github.com/pivotal-cf/cm-cli/commands"
+	"github.com/pivotal-cf/credhub-cli/commands"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	cmcli_errors "github.com/pivotal-cf/cm-cli/errors"
+	cmcli_errors "github.com/pivotal-cf/credhub-cli/errors"
 )
 
 var _ = Describe("Util", func() {

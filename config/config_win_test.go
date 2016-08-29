@@ -7,7 +7,7 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/pivotal-cf/cm-cli/config"
+	"github.com/pivotal-cf/credhub-cli/config"
 )
 
 var _ = Describe("Config (windows specific)", func() {

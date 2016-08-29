@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/pivotal-cf/cm-cli/client"
-	"github.com/pivotal-cf/cm-cli/config"
-	"github.com/pivotal-cf/cm-cli/errors"
-	"github.com/pivotal-cf/cm-cli/models"
+	"github.com/pivotal-cf/credhub-cli/client"
+	"github.com/pivotal-cf/credhub-cli/config"
+	"github.com/pivotal-cf/credhub-cli/errors"
+	"github.com/pivotal-cf/credhub-cli/models"
 )
 
 func NewInfo(httpClient client.HttpClient, config config.Config) ServerInfo {

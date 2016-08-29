@@ -3,7 +3,7 @@ package client_test
 import (
 	"net/http"
 
-	. "github.com/pivotal-cf/cm-cli/client"
+	. "github.com/pivotal-cf/credhub-cli/client"
 
 	"bytes"
 
@@ -13,8 +13,8 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/pivotal-cf/cm-cli/config"
-	"github.com/pivotal-cf/cm-cli/models"
+	"github.com/pivotal-cf/credhub-cli/config"
+	"github.com/pivotal-cf/credhub-cli/models"
 )
 
 var _ = Describe("API", func() {

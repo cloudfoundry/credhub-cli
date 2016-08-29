@@ -5,11 +5,11 @@ import (
 
 	"reflect"
 
-	"github.com/pivotal-cf/cm-cli/client"
-	"github.com/pivotal-cf/cm-cli/config"
-	"github.com/pivotal-cf/cm-cli/errors"
-	"github.com/pivotal-cf/cm-cli/models"
-	"github.com/pivotal-cf/cm-cli/repositories"
+	"github.com/pivotal-cf/credhub-cli/client"
+	"github.com/pivotal-cf/credhub-cli/config"
+	"github.com/pivotal-cf/credhub-cli/errors"
+	"github.com/pivotal-cf/credhub-cli/models"
+	"github.com/pivotal-cf/credhub-cli/repositories"
 )
 
 type Action struct {

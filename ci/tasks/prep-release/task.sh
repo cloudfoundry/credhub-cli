@@ -6,12 +6,12 @@ export GOPATH=$PWD/go
 export GOARCH=amd64
 BUILD_ROOT=$PWD
 
-binary_name="cm-cli"
+binary_name="credhub-cli"
 build_number=$(python task-repo/ci/tasks/prep-release/extract_timestamp.py clock/input)
 
 echo ${binary_name} > ${PREP_RELEASE_OUTPUT_PATH}/name
 echo ${build_number} > ${PREP_RELEASE_OUTPUT_PATH}/tag
-cd ${GOPATH}/src/github.com/pivotal-cf/cm-cli
+cd ${GOPATH}/src/github.com/pivotal-cf/credhub-cli
 
 make dependencies
 

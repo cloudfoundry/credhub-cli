@@ -3,7 +3,7 @@ package actions_test
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	. "github.com/pivotal-cf/cm-cli/actions"
+	. "github.com/pivotal-cf/credhub-cli/actions"
 
 	"net/http"
 
@@ -11,11 +11,11 @@ import (
 
 	"bytes"
 
-	"github.com/pivotal-cf/cm-cli/config"
-	cm_errors "github.com/pivotal-cf/cm-cli/errors"
-	"github.com/pivotal-cf/cm-cli/models"
-	"github.com/pivotal-cf/cm-cli/repositories/repositoriesfakes"
-	"github.com/pivotal-cf/cm-cli/util"
+	"github.com/pivotal-cf/credhub-cli/config"
+	cm_errors "github.com/pivotal-cf/credhub-cli/errors"
+	"github.com/pivotal-cf/credhub-cli/models"
+	"github.com/pivotal-cf/credhub-cli/repositories/repositoriesfakes"
+	"github.com/pivotal-cf/credhub-cli/util"
 )
 
 var _ = Describe("Action", func() {

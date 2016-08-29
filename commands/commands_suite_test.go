@@ -86,7 +86,7 @@ var _ = AfterEach(func() {
 })
 
 var _ = SynchronizedBeforeSuite(func() []byte {
-	executable_path, err := Build("github.com/pivotal-cf/cm-cli")
+	executable_path, err := Build("github.com/pivotal-cf/credhub-cli")
 	Expect(err).NotTo(HaveOccurred())
 	return []byte(executable_path)
 }, func(data []byte) {

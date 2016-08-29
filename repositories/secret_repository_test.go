@@ -3,16 +3,16 @@ package repositories_test
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	. "github.com/pivotal-cf/cm-cli/repositories"
+	. "github.com/pivotal-cf/credhub-cli/repositories"
 
 	"bytes"
 	"io/ioutil"
 	"net/http"
 
-	"github.com/pivotal-cf/cm-cli/client/clientfakes"
-	"github.com/pivotal-cf/cm-cli/config"
-	cmcli_errors "github.com/pivotal-cf/cm-cli/errors"
-	"github.com/pivotal-cf/cm-cli/models"
+	"github.com/pivotal-cf/credhub-cli/client/clientfakes"
+	"github.com/pivotal-cf/credhub-cli/config"
+	cmcli_errors "github.com/pivotal-cf/credhub-cli/errors"
+	"github.com/pivotal-cf/credhub-cli/models"
 )
 
 var _ = Describe("SecretRepository", func() {

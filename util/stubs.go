@@ -3,7 +3,7 @@ package util
 import (
 	"net/http"
 
-	"github.com/pivotal-cf/cm-cli/models"
+	"github.com/pivotal-cf/credhub-cli/models"
 )
 
 type RepositoryStub func(req *http.Request, identifier string) (models.Item, error)

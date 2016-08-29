@@ -19,9 +19,9 @@ var _ = Describe("Get", func() {
 		Eventually(session).Should(Exit(1))
 		Expect(session.Err).To(Say("Usage"))
 		if runtime.GOOS == "windows" {
-			Expect(session.Err).To(Say("cm-cli.exe \\[OPTIONS\\] get \\[get-OPTIONS\\]"))
+			Expect(session.Err).To(Say("credhub-cli.exe \\[OPTIONS\\] get \\[get-OPTIONS\\]"))
 		} else {
-			Expect(session.Err).To(Say("cm-cli \\[OPTIONS\\] get \\[get-OPTIONS\\]"))
+			Expect(session.Err).To(Say("credhub-cli \\[OPTIONS\\] get \\[get-OPTIONS\\]"))
 		}
 	})
 
