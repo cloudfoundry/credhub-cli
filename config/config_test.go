@@ -19,6 +19,6 @@ var _ = Describe("Config", func() {
 	})
 
 	It("places the config file in .cm in the home directory", func() {
-		Expect(config.ConfigPath()).To(HaveSuffix(`/.cm/config.json`))
+		Expect(config.ConfigPath()).To(HaveSuffix(`/.credhub/config.json`))
 	})
 })

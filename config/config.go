@@ -18,7 +18,7 @@ type Config struct {
 }
 
 func ConfigDir() string {
-	return path.Join(userHomeDir(), ".cm")
+	return path.Join(userHomeDir(), ".credhub")
 }
 
 func ConfigPath() string {
