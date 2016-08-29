@@ -32,7 +32,7 @@ type GenerateCommand struct {
 
 func (cmd GenerateCommand) Execute([]string) error {
 	if cmd.ContentType == "" {
-		cmd.ContentType = "value"
+		cmd.ContentType = "password"
 	}
 
 	config, _ := config.ReadConfig()

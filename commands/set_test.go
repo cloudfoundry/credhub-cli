@@ -18,15 +18,6 @@ import (
 
 var _ = Describe("Set", func() {
 	Describe("setting string secrets", func() {
-		It("puts a secret using default type", func() {
-			setupPutValueServer("my-value", "value", "potatoes")
-
-			session := runCommand("set", "-n", "my-value", "-v", "potatoes")
-
-			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say(responseMyValuePotatoes))
-		})
-
 		It("puts a secret using explicit value type", func() {
 			setupPutValueServer("my-value", "value", "potatoes")
 
@@ -38,6 +29,15 @@ var _ = Describe("Set", func() {
 	})
 
 	Describe("setting password secrets", func() {
+		It("puts a secret using default type", func() {
+			setupPutValueServer("my-password", "password", "potatoes")
+
+			session := runCommand("set", "-n", "my-password", "-v", "potatoes")
+
+			Eventually(session).Should(Exit(0))
+			Eventually(session.Out).Should(Say(responseMyPasswordPotatoes))
+		})
+
 		It("puts a secret using explicit password type", func() {
 			setupPutValueServer("my-password", "password", "potatoes")
 

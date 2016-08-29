@@ -16,7 +16,7 @@ import (
 
 var _ = Describe("Generate", func() {
 	It("without parameters", func() {
-		doValueOptionTest(`{}`)
+		doValueDefaultTypeOptionTest(`{}`)
 	})
 
 	Describe("with a variety of value parameters", func() {
@@ -155,33 +155,35 @@ func generateRequestJson(secretType string, params string) string {
 	return fmt.Sprintf(GENERATE_REQUEST_JSON, secretType, params)
 }
 
+func generateDefaultTypeRequestJson(params string) string {
+	return fmt.Sprintf(GENERATE_DEFAULT_TYPE_REQUEST_JSON, params)
+}
+
+func doValueDefaultTypeOptionTest(optionJson string, options ...string) {
+	setupPostServer("my-password", "potatoes", generateDefaultTypeRequestJson(optionJson))
+
+	doTest([]string{"generate", "-n", "my-password"}, options...)
+}
+
 func doValueOptionTest(optionJson string, options ...string) {
 	setupPostServer("my-value", "potatoes", generateRequestJson("value", optionJson))
 
-	leftOpts := []string{"generate", "-n", "my-value"}
-
-	stuff := append(leftOpts, options...)
-	session := runCommand(stuff...)
-
-	Eventually(session).Should(Exit(0))
+	doTest([]string{"generate", "-n", "my-value", "-t", "value"}, options...)
 }
 
 func doPasswordOptionTest(optionJson string, options ...string) {
 	setupPostServer("my-password", "potatoes", generateRequestJson("password", optionJson))
 
-	leftOpts := []string{"generate", "-n", "my-password", "-t", "password"}
-
-	stuff := append(leftOpts, options...)
-	session := runCommand(stuff...)
-
-	Eventually(session).Should(Exit(0))
+	doTest([]string{"generate", "-n", "my-password", "-t", "password"}, options...)
 }
 
 func doCertificateOptionTest(optionJson string, options ...string) {
 	setupPostServer("my-secret", "potatoes", generateRequestJson("certificate", optionJson))
 
-	leftOpts := []string{"generate", "-n", "my-secret", "-t", "certificate"}
+	doTest([]string{"generate", "-n", "my-secret", "-t", "certificate"}, options...)
+}
 
+func doTest(leftOpts []string, options ...string) {
 	stuff := append(leftOpts, options...)
 	session := runCommand(stuff...)
 

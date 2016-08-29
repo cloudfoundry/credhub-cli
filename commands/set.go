@@ -27,7 +27,7 @@ type SetCommand struct {
 
 func (cmd SetCommand) Execute([]string) error {
 	if cmd.ContentType == "" {
-		cmd.ContentType = "value"
+		cmd.ContentType = "password"
 	}
 
 	config, _ := config.ReadConfig()
