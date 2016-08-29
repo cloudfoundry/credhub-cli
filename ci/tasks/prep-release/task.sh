@@ -17,6 +17,6 @@ make dependencies
 
 for os in linux darwin windows; do
   BUILD_NUMBER=${build_number} GOOS=${os} make build
-  tar -C build -cvzf ${BUILD_ROOT}/${PREP_RELEASE_OUTPUT_PATH}/"cm-${os}.tgz" .
+  tar -C build -cvzf ${BUILD_ROOT}/${PREP_RELEASE_OUTPUT_PATH}/"credhub-${os}.tgz" .
   rm -rf build
 done

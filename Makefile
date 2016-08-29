@@ -3,9 +3,9 @@
 .PHONY : build
 
 ifeq ($(GOOS),windows)
-DEST = build/cm.exe
+DEST = build/credhub.exe
 else
-DEST = build/cm
+DEST = build/credhub
 endif
 
 GOFLAGS := -o $(DEST)
