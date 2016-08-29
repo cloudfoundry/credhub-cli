@@ -5,7 +5,7 @@ import (
 )
 
 func NewNetworkError() error {
-	return errors.New("No response received for the command. Please validate that you are targeting an active credential manager with `cm api` and retry your request.")
+	return errors.New("No response received for the command. Please validate that you are targeting an active credential manager with `credhub api` and retry your request.")
 }
 
 func NewResponseError() error {
@@ -17,7 +17,7 @@ func NewInvalidTargetError() error {
 }
 
 func NewNoTargetUrlError() error {
-	return errors.New("Credential Manager API location is not set. Please target the location of your credential manager with `cm api` to continue.")
+	return errors.New("Credential Manager API location is not set. Please target the location of your credential manager with `credhub api` to continue.")
 }
 
 func NewFileLoadError() error {
