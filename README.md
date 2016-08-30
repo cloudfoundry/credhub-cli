@@ -3,7 +3,7 @@
 *Starred commands and parameters are planned, but not yet implemented*
 
 ```
-Usage: cm [<options>] <command> [<args>]
+Usage: credhub [<options>] <command> [<args>]
 		--version				    	 		Show version of CLI and API
 		-h, --help								Displays help menu
 
@@ -34,6 +34,7 @@ CREDENTIAL MANAGEMENT:
 		Set the value and attributes of a credential
 		-t, --type ['value', 'certificate']		Sets the type of credential to store (Default: 'value')
 		-n, --name 'CRED'						Selects the credential being set
+		--no-overwrite							Credential is not modified if stored value already exists
 
 		Set parameters by [Type]
 		-v, --value 'VALUE'						[Value] Sets the value for the credential
@@ -48,6 +49,8 @@ CREDENTIAL MANAGEMENT:
 		Generate and set a credential value based on generation parameters
 		-t, --type ['value', 'certificate']		Sets the type of credential to generate (Default: 'value')
 		-n, --name 'CRED'						Selects the credential being set
+		--no-overwrite							Credential is not modified if stored value already exists
+
 
 		Generate parameters by [Type]
 		-l, --length [4-200]					[Value] Length of generated value (Default: 20)
