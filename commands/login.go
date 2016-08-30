@@ -20,7 +20,7 @@ func (cmd LoginCommand) Execute([]string) error {
 	cfg, _ := config.ReadConfig()
 
 	if cmd.ServerUrl != "" {
-		err := GetApiInfo(&cfg, cmd.ServerUrl)
+		err := GetApiInfo(&cfg, cmd.ServerUrl, false) // todo arg should be from Skip flag
 		if err != nil {
 			return err
 		}
@@ -31,7 +31,7 @@ func (cmd LoginCommand) Execute([]string) error {
 		return err
 	}
 
-	token, err := actions.NewAuthToken(client.NewHttpClient(cfg.AuthURL), cfg).GetAuthToken(cmd.Username, cmd.Password)
+	token, err := actions.NewAuthToken(client.NewHttpClient(cfg), cfg).GetAuthToken(cmd.Username, cmd.Password)
 	if err != nil {
 		SendLogoutIfNecessary(cfg)
 		cfg = RevokedConfig(cfg)

@@ -20,7 +20,7 @@ type Action struct {
 
 func NewAction(repository repositories.Repository, config config.Config) Action {
 	action := Action{repository: repository, config: config}
-	action.AuthRepository = repositories.NewAuthRepository(client.NewHttpClient(config.AuthURL), true)
+	action.AuthRepository = repositories.NewAuthRepository(client.NewHttpClient(config), true)
 	return action
 }
 

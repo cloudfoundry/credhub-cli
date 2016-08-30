@@ -27,7 +27,7 @@ func (cmd CaGenerateCommand) Execute([]string) error {
 	var err error
 
 	config, _ := config.ReadConfig()
-	caRepository := repositories.NewCaRepository(client.NewHttpClient(config.ApiURL))
+	caRepository := repositories.NewCaRepository(client.NewHttpClient(config))
 
 	parameters := models.SecretParameters{
 		CommonName:       cmd.CaCommonName,

@@ -11,8 +11,9 @@ import (
 )
 
 type ApiCommand struct {
-	Server        ApiPositionalArgs `positional-args:"yes"`
-	ServerFlagUrl string            `short:"s" long:"server" description:"API endpoint"`
+	Server            ApiPositionalArgs `positional-args:"yes"`
+	ServerFlagUrl     string            `short:"s" long:"server" description:"API endpoint"`
+	SkipTlsValidation bool              `long:"skip-tls-validation" description:"Skip certificate validation of the API endpoint. Not recommended!"`
 }
 
 type ApiPositionalArgs struct {
@@ -27,7 +28,7 @@ func (cmd ApiCommand) Execute([]string) error {
 		fmt.Println(cfg.ApiURL)
 	} else {
 		existingCfg := cfg
-		err := GetApiInfo(&cfg, serverUrl)
+		err := GetApiInfo(&cfg, serverUrl, cmd.SkipTlsValidation)
 		if err != nil {
 			return err
 		}
@@ -41,7 +42,7 @@ func (cmd ApiCommand) Execute([]string) error {
 	return nil
 }
 
-func GetApiInfo(cfg *config.Config, serverUrl string) error {
+func GetApiInfo(cfg *config.Config, serverUrl string, skipTlsValidation bool) error {
 	serverUrl = AddDefaultSchemeIfNecessary(serverUrl)
 	parsedUrl, err := url.Parse(serverUrl)
 	if err != nil {
@@ -50,7 +51,8 @@ func GetApiInfo(cfg *config.Config, serverUrl string) error {
 
 	cfg.ApiURL = parsedUrl.String()
 
-	cmInfo, err := actions.NewInfo(client.NewHttpClient(cfg.ApiURL), *cfg).GetServerInfo()
+	cfg.InsecureSkipVerify = skipTlsValidation
+	cmInfo, err := actions.NewInfo(client.NewHttpClient(*cfg), *cfg).GetServerInfo()
 	if err != nil {
 		return err
 	}
@@ -61,6 +63,12 @@ func GetApiInfo(cfg *config.Config, serverUrl string) error {
 			"Warning: Insecure HTTP API detected. Data sent to this API could be intercepted" +
 			" in transit by third parties. Secure HTTPS API endpoints are recommended." +
 			"\033[0m")
+	} else {
+		if skipTlsValidation {
+			fmt.Println("\033[38;2;255;255;0m" +
+				"Warning: The targeted TLS certificate has not been verified for this connection." +
+				"\033[0m")
+		}
 	}
 
 	fmt.Println("Setting the target url:", cfg.ApiURL)

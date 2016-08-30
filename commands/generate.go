@@ -37,7 +37,7 @@ func (cmd GenerateCommand) Execute([]string) error {
 	}
 
 	config, _ := config.ReadConfig()
-	repository := repositories.NewSecretRepository(client.NewHttpClient(config.ApiURL))
+	repository := repositories.NewSecretRepository(client.NewHttpClient(config))
 
 	parameters := models.SecretParameters{
 		Overwrite:        !cmd.NoOverwrite,

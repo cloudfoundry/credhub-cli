@@ -22,7 +22,7 @@ format : dependencies
 		go fmt .
 
 ginkgo : dependencies
-		ginkgo -r -randomizeSuites -randomizeAllSpecs -race
+		ginkgo -r -randomizeSuites -randomizeAllSpecs -race 2>&1
 
 test : format ginkgo
 

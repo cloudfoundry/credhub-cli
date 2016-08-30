@@ -15,7 +15,7 @@ var _ = Describe("#NewHttpClient", func() {
 			ApiURL: "http://foo.bar",
 		}
 
-		httpClient := client.NewHttpClient(config.ApiURL)
+		httpClient := client.NewHttpClient(config)
 		Expect(httpClient.Transport).To(BeNil())
 	})
 
@@ -24,17 +24,28 @@ var _ = Describe("#NewHttpClient", func() {
 			ApiURL: "https://foo.bar",
 		}
 
-		httpsClient := client.NewHttpClient(config.ApiURL)
+		httpsClient := client.NewHttpClient(config)
 		Expect(httpsClient.Transport).To(Not(BeNil()))
 	})
 
 	It("requires tls verification for https client", func() {
 		config := config.Config{
-			ApiURL: "https://foo.bar",
+			ApiURL:             "https://foo.bar",
+			InsecureSkipVerify: false,
 		}
 
-		httpsClient := client.NewHttpClient(config.ApiURL)
+		httpsClient := client.NewHttpClient(config)
 		Expect(httpsClient.Transport.(*http.Transport).TLSClientConfig.InsecureSkipVerify).To(BeFalse())
+	})
+
+	It("can skip tls verification for https client", func() {
+		config := config.Config{
+			ApiURL:             "https://foo.bar",
+			InsecureSkipVerify: true,
+		}
+
+		httpsClient := client.NewHttpClient(config)
+		Expect(httpsClient.Transport.(*http.Transport).TLSClientConfig.InsecureSkipVerify).To(BeTrue())
 	})
 
 	It("prefers server cipher suites for https client", func() {
@@ -42,7 +53,8 @@ var _ = Describe("#NewHttpClient", func() {
 			ApiURL: "https://foo.bar",
 		}
 
-		httpsClient := client.NewHttpClient(config.ApiURL)
+		httpsClient := client.NewHttpClient(config)
 		Expect(httpsClient.Transport.(*http.Transport).TLSClientConfig.PreferServerCipherSuites).To(BeTrue())
 	})
+
 })

@@ -11,10 +11,11 @@ const AuthClient = "credhub"
 const AuthPassword = ""
 
 type Config struct {
-	ApiURL       string
-	AuthURL      string
-	AccessToken  string
-	RefreshToken string
+	ApiURL             string
+	AuthURL            string
+	AccessToken        string
+	RefreshToken       string
+	InsecureSkipVerify bool
 }
 
 func ConfigDir() string {

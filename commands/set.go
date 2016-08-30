@@ -32,7 +32,7 @@ func (cmd SetCommand) Execute([]string) error {
 	}
 
 	config, _ := config.ReadConfig()
-	repository := repositories.NewSecretRepository(client.NewHttpClient(config.ApiURL))
+	repository := repositories.NewSecretRepository(client.NewHttpClient(config))
 
 	action := actions.NewAction(repository, config)
 	request, err := getRequest(cmd, config)

@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"net/url"
 	"time"
+
+	"github.com/pivotal-cf/credhub-cli/config"
 )
 
 const TIMEOUT_SECS = 30
@@ -15,10 +17,10 @@ type HttpClient interface {
 	Do(req *http.Request) (resp *http.Response, err error)
 }
 
-func NewHttpClient(serverUrl string) *http.Client {
-	parsedUrl, _ := url.Parse(serverUrl)
+func NewHttpClient(cfg config.Config) *http.Client {
+	parsedUrl, _ := url.Parse(cfg.ApiURL)
 	if parsedUrl.Scheme == "https" {
-		return newHttpsClient()
+		return newHttpsClient(cfg)
 	} else {
 		return newHttpClient()
 	}
@@ -28,9 +30,9 @@ func newHttpClient() *http.Client {
 	return &http.Client{Timeout: time.Second * TIMEOUT_SECS}
 }
 
-func newHttpsClient() *http.Client {
+func newHttpsClient(cfg config.Config) *http.Client {
 	tlsConfig := &tls.Config{
-		InsecureSkipVerify:       false,
+		InsecureSkipVerify:       cfg.InsecureSkipVerify,
 		PreferServerCipherSuites: true,
 	}
 	tr := &http.Transport{
