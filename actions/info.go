@@ -19,7 +19,7 @@ func (serverInfo ServerInfo) GetServerInfo() (models.Info, error) {
 
 	response, err := serverInfo.httpClient.Do(request)
 	if err != nil {
-		return models.Info{}, errors.NewNetworkError()
+		return models.Info{}, errors.NewNetworkError(err)
 	}
 
 	if response.StatusCode != http.StatusOK {

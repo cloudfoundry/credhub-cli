@@ -2,10 +2,11 @@ package errors
 
 import (
 	"errors"
+	"fmt"
 )
 
-func NewNetworkError() error {
-	return errors.New("No response received for the command. Please validate that you are targeting an active credential manager with `credhub api` and retry your request.")
+func NewNetworkError(e error) error {
+	return errors.New(fmt.Sprintf("No response received for the command. Please validate that you are targeting an active credential manager with `credhub api` and retry your request: %#v\n", e.Error()))
 }
 
 func NewResponseError() error {

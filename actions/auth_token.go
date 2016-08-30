@@ -18,7 +18,7 @@ func (serverInfo ServerInfo) GetAuthToken(user string, pass string) (models.Toke
 	request := client.NewAuthTokenRequest(serverInfo.config, user, pass)
 	response, err := serverInfo.httpClient.Do(request)
 	if err != nil {
-		return models.Token{}, errors.NewNetworkError()
+		return models.Token{}, errors.NewNetworkError(err)
 	}
 
 	if response.StatusCode != http.StatusOK {

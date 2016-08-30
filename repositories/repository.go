@@ -19,7 +19,7 @@ func DoSendRequest(httpClient client.HttpClient, request *http.Request) (*http.R
 	response, err := httpClient.Do(request)
 
 	if err != nil {
-		return nil, cm_errors.NewNetworkError()
+		return nil, cm_errors.NewNetworkError(err)
 	}
 
 	if response.StatusCode < 200 || response.StatusCode > 299 {

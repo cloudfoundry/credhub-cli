@@ -51,11 +51,12 @@ var _ = Describe("Repository", func() {
 
 		Describe("Errors", func() {
 			It("returns NetworkError when there is a network error", func() {
-				httpClient.DoReturns(nil, errors.New("hello"))
+				serverError := errors.New("hello")
+				httpClient.DoReturns(nil, serverError)
 
 				request, _ := http.NewRequest("GET", "http://example.com/foo", nil)
 				_, error := DoSendRequest(&httpClient, request)
-				Expect(error).To(MatchError(cmcli_errors.NewNetworkError()))
+				Expect(error).To(MatchError(cmcli_errors.NewNetworkError(serverError)))
 			})
 
 			It("returns a error when response is 400", func() {
