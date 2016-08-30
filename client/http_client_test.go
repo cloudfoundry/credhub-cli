@@ -1,11 +1,12 @@
 package client_test
 
 import (
+	"net/http"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/pivotal-cf/credhub-cli/client"
 	"github.com/pivotal-cf/credhub-cli/config"
-	"net/http"
 )
 
 var _ = Describe("#NewHttpClient", func() {

@@ -111,7 +111,7 @@ var _ = Describe("API", func() {
 
 	Context("when the provided server url's scheme is https", func() {
 		var (
-			httpServer       *Server
+			httpServer        *Server
 			apiHttpsServerUrl string
 		)
 
