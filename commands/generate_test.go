@@ -16,92 +16,104 @@ import (
 
 var _ = Describe("Generate", func() {
 	It("without parameters", func() {
-		doValueDefaultTypeOptionTest(`{}`)
+		doValueDefaultTypeOptionTest(`{"overwrite":true}`)
 	})
 
 	Describe("with a variety of value parameters", func() {
+		It("with with no-overwrite", func() {
+			doValueOptionTest(`{"overwrite":false}`, "--no-overwrite")
+		})
+
 		It("including length", func() {
-			doValueOptionTest(`{"length":42}`, "-l", "42")
+			doValueOptionTest(`{"overwrite":true,"length":42}`, "-l", "42")
 		})
 
 		It("excluding upper case", func() {
-			doValueOptionTest(`{"exclude_upper":true}`, "--exclude-upper")
+			doValueOptionTest(`{"overwrite":true,"exclude_upper":true}`, "--exclude-upper")
 		})
 
 		It("excluding lower case", func() {
-			doValueOptionTest(`{"exclude_lower":true}`, "--exclude-lower")
+			doValueOptionTest(`{"overwrite":true,"exclude_lower":true}`, "--exclude-lower")
 		})
 
 		It("excluding special characters", func() {
-			doValueOptionTest(`{"exclude_special":true}`, "--exclude-special")
+			doValueOptionTest(`{"overwrite":true,"exclude_special":true}`, "--exclude-special")
 		})
 
 		It("excluding numbers", func() {
-			doValueOptionTest(`{"exclude_number":true}`, "--exclude-number")
+			doValueOptionTest(`{"overwrite":true,"exclude_number":true}`, "--exclude-number")
 		})
 	})
 
 	Describe("with a variety of password parameters", func() {
+		It("with with no-overwrite", func() {
+			doPasswordOptionTest(`{"overwrite":false}`, "--no-overwrite")
+		})
+
 		It("including length", func() {
-			doPasswordOptionTest(`{"length":42}`, "-l", "42")
+			doPasswordOptionTest(`{"overwrite":true,"length":42}`, "-l", "42")
 		})
 
 		It("excluding upper case", func() {
-			doPasswordOptionTest(`{"exclude_upper":true}`, "--exclude-upper")
+			doPasswordOptionTest(`{"overwrite":true,"exclude_upper":true}`, "--exclude-upper")
 		})
 
 		It("excluding lower case", func() {
-			doPasswordOptionTest(`{"exclude_lower":true}`, "--exclude-lower")
+			doPasswordOptionTest(`{"overwrite":true,"exclude_lower":true}`, "--exclude-lower")
 		})
 
 		It("excluding special characters", func() {
-			doPasswordOptionTest(`{"exclude_special":true}`, "--exclude-special")
+			doPasswordOptionTest(`{"overwrite":true,"exclude_special":true}`, "--exclude-special")
 		})
 
 		It("excluding numbers", func() {
-			doPasswordOptionTest(`{"exclude_number":true}`, "--exclude-number")
+			doPasswordOptionTest(`{"overwrite":true,"exclude_number":true}`, "--exclude-number")
 		})
 	})
 
 	Describe("with a variety of certificate parameters", func() {
 		It("including common name", func() {
-			doCertificateOptionTest(`{"common_name":"common.name.io"}`, "--common-name", "common.name.io")
+			doCertificateOptionTest(`{"overwrite":true,"common_name":"common.name.io"}`, "--common-name", "common.name.io")
+		})
+
+		It("including common name with no-overwrite", func() {
+			doCertificateOptionTest(`{"overwrite":false,"common_name":"common.name.io"}`, "--common-name", "common.name.io", "--no-overwrite")
 		})
 
 		It("including organization", func() {
-			doCertificateOptionTest(`{"organization":"organization.io"}`, "--organization", "organization.io")
+			doCertificateOptionTest(`{"overwrite":true,"organization":"organization.io"}`, "--organization", "organization.io")
 		})
 
 		It("including organization unit", func() {
-			doCertificateOptionTest(`{"organization_unit":"My Unit"}`, "--organization-unit", "My Unit")
+			doCertificateOptionTest(`{"overwrite":true,"organization_unit":"My Unit"}`, "--organization-unit", "My Unit")
 		})
 
 		It("including locality", func() {
-			doCertificateOptionTest(`{"locality":"My Locality"}`, "--locality", "My Locality")
+			doCertificateOptionTest(`{"overwrite":true,"locality":"My Locality"}`, "--locality", "My Locality")
 		})
 
 		It("including state", func() {
-			doCertificateOptionTest(`{"state":"My State"}`, "--state", "My State")
+			doCertificateOptionTest(`{"overwrite":true,"state":"My State"}`, "--state", "My State")
 		})
 
 		It("including country", func() {
-			doCertificateOptionTest(`{"country":"My Country"}`, "--country", "My Country")
+			doCertificateOptionTest(`{"overwrite":true,"country":"My Country"}`, "--country", "My Country")
 		})
 
 		It("including multiple alternative names", func() {
-			doCertificateOptionTest(`{"alternative_names": [ "Alt1", "Alt2" ]}`, "--alternative-name", "Alt1", "--alternative-name", "Alt2")
+			doCertificateOptionTest(`{"overwrite":true,"alternative_names": [ "Alt1", "Alt2" ]}`, "--alternative-name", "Alt1", "--alternative-name", "Alt2")
 		})
 
 		It("including key length", func() {
-			doCertificateOptionTest(`{"key_length":2048}`, "--key-length", "2048")
+			doCertificateOptionTest(`{"overwrite":true,"key_length":2048}`, "--key-length", "2048")
 		})
 
 		It("including duration", func() {
-			doCertificateOptionTest(`{"duration":1000}`, "--duration", "1000")
+			doCertificateOptionTest(`{"overwrite":true,"duration":1000}`, "--duration", "1000")
 		})
 
 		It("including certificate authority", func() {
-			doCertificateOptionTest(`{"ca":"my_ca"}`, "--ca", "my_ca")
+			doCertificateOptionTest(`{"overwrite":true,"ca":"my_ca"}`, "--ca", "my_ca")
 		})
 	})
 

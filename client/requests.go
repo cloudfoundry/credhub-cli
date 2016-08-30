@@ -18,33 +18,45 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
-func NewPutValueRequest(config config.Config, secretIdentifier, secretContent string) *http.Request {
+func NewPutValueRequest(config config.Config, secretIdentifier string, secretContent string, overwrite bool) *http.Request {
+	parameters := models.SecretParameters{
+		Overwrite: overwrite,
+	}
 	secret := models.SecretBody{
-		Value:       secretContent,
 		ContentType: "value",
-	}
-
-	return newSecretRequest("PUT", config, secretIdentifier, secret)
-}
-
-func NewPutPasswordRequest(config config.Config, secretIdentifier, secretContent string) *http.Request {
-	secret := models.SecretBody{
 		Value:       secretContent,
-		ContentType: "password",
+		Parameters:  parameters,
 	}
 
 	return newSecretRequest("PUT", config, secretIdentifier, secret)
 }
 
-func NewPutCertificateRequest(config config.Config, secretIdentifier, root string, cert string, priv string) *http.Request {
+func NewPutPasswordRequest(config config.Config, secretIdentifier string, secretContent string, overwrite bool) *http.Request {
+	parameters := models.SecretParameters{
+		Overwrite: overwrite,
+	}
+	secret := models.SecretBody{
+		ContentType: "password",
+		Value:       secretContent,
+		Parameters:  parameters,
+	}
+
+	return newSecretRequest("PUT", config, secretIdentifier, secret)
+}
+
+func NewPutCertificateRequest(config config.Config, secretIdentifier string, root string, cert string, priv string, overwrite bool) *http.Request {
 	certificate := models.Certificate{
 		Root:        root,
 		Certificate: cert,
 		PrivateKey:  priv,
 	}
+	parameters := models.SecretParameters{
+		Overwrite: overwrite,
+	}
 	secret := models.SecretBody{
 		ContentType: "certificate",
 		Value:       &certificate,
+		Parameters:  parameters,
 	}
 
 	return newSecretRequest("PUT", config, secretIdentifier, secret)

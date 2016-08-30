@@ -109,14 +109,27 @@ var _ = Describe("API", func() {
 			cfg.AccessToken = "access-token"
 		})
 
-		Describe("NewPutSecretValueRequest", func() {
-			It("Returns a request for the put-secret endpoint", func() {
-				requestBody := bytes.NewReader([]byte(`{"type":"value","value":"my-value"}`))
+		Describe("NewPutValueRequest", func() {
+			It("Returns a request for the put-value endpoint", func() {
+				requestBody := bytes.NewReader([]byte(`{"type":"value","value":"my-value","parameters":{"overwrite":true}}`))
 				expectedRequest, _ := http.NewRequest("PUT", "http://example.com/api/v1/data/my-name", requestBody)
 				expectedRequest.Header.Set("Content-Type", "application/json")
 				expectedRequest.Header.Set("Authorization", "Bearer access-token")
 
-				request := NewPutValueRequest(cfg, "my-name", "my-value")
+				request := NewPutValueRequest(cfg, "my-name", "my-value", true)
+
+				Expect(request).To(Equal(expectedRequest))
+			})
+		})
+
+		Describe("NewPutPasswordRequest", func() {
+			It("Returns a request for the put-password endpoint", func() {
+				requestBody := bytes.NewReader([]byte(`{"type":"password","value":"my-password","parameters":{"overwrite":true}}`))
+				expectedRequest, _ := http.NewRequest("PUT", "http://example.com/api/v1/data/my-name", requestBody)
+				expectedRequest.Header.Set("Content-Type", "application/json")
+				expectedRequest.Header.Set("Authorization", "Bearer access-token")
+
+				request := NewPutPasswordRequest(cfg, "my-name", "my-password", true)
 
 				Expect(request).To(Equal(expectedRequest))
 			})
@@ -124,14 +137,14 @@ var _ = Describe("API", func() {
 
 		Describe("NewPutCertificateRequest", func() {
 			It("Returns a request for the put-certificate endpoint", func() {
-				json := fmt.Sprintf(`{"type":"certificate","value":{"root":"%s","certificate":"%s","private_key":"%s"}}`,
+				json := fmt.Sprintf(`{"type":"certificate","value":{"root":"%s","certificate":"%s","private_key":"%s"},"parameters":{"overwrite":true}}`,
 					"my-ca", "my-cert", "my-priv")
 				requestBody := bytes.NewReader([]byte(json))
 				expectedRequest, _ := http.NewRequest("PUT", "http://example.com/api/v1/data/my-name", requestBody)
 				expectedRequest.Header.Set("Content-Type", "application/json")
 				expectedRequest.Header.Set("Authorization", "Bearer access-token")
 
-				request := NewPutCertificateRequest(cfg, "my-name", "my-ca", "my-cert", "my-priv")
+				request := NewPutCertificateRequest(cfg, "my-name", "my-ca", "my-cert", "my-priv", true)
 
 				Expect(request).To(Equal(expectedRequest))
 			})
@@ -165,6 +178,7 @@ var _ = Describe("API", func() {
 				expectedRequestJson := `{
 				"type":"root",
 				"parameters": {
+					"overwrite": false,
 					"common_name": "my-common-name",
 					"organization": "my-organization",
 					"organization_unit": "my-unit",
@@ -203,19 +217,21 @@ var _ = Describe("API", func() {
 		})
 
 		Describe("NewGenerateSecretRequest", func() {
-			It("returns a request with no parameters", func() {
-				requestBody := bytes.NewReader([]byte(`{"type":"my-type","parameters":{}}`))
+			It("returns a request with only overwrite", func() {
+				requestBody := bytes.NewReader([]byte(`{"type":"my-type","parameters":{"overwrite":false}}`))
 				expectedRequest, _ := http.NewRequest("POST", "http://example.com/api/v1/data/my-name", requestBody)
 				expectedRequest.Header.Set("Content-Type", "application/json")
 				expectedRequest.Header.Set("Authorization", "Bearer access-token")
 
-				request := NewGenerateSecretRequest(cfg, "my-name", models.SecretParameters{}, "my-type")
+				params := models.SecretParameters{}
+				request := NewGenerateSecretRequest(cfg, "my-name", params, "my-type")
 
 				Expect(request).To(Equal(expectedRequest))
 			})
 
 			It("returns a request with parameters", func() {
 				parameters := models.SecretParameters{
+					Overwrite:      false,
 					ExcludeSpecial: true,
 					ExcludeNumber:  true,
 					ExcludeUpper:   true,
@@ -225,6 +241,7 @@ var _ = Describe("API", func() {
 				expectedRequestBody := `{
 				"type":"value",
 				"parameters": {
+					"overwrite": false,
 					"exclude_special": true,
 					"exclude_number": true,
 					"exclude_upper": true,

@@ -1,6 +1,7 @@
 package models
 
 type SecretParameters struct {
+	Overwrite        bool     `json:"overwrite"`
 	ExcludeSpecial   bool     `json:"exclude_special,omitempty"`
 	ExcludeNumber    bool     `json:"exclude_number,omitempty"`
 	ExcludeUpper     bool     `json:"exclude_upper,omitempty"`

@@ -13,6 +13,7 @@ import (
 type GenerateCommand struct {
 	SecretIdentifier string   `short:"n" required:"yes" long:"name" description:"Selects the secret being set"`
 	ContentType      string   `short:"t" long:"type" description:"Sets the type of secret to store or generate. Default: 'value'"`
+	NoOverwrite      bool     `long:"no-overwrite" description:"Credential is not modified if stored value already exists"`
 	Length           int      `short:"l" long:"length" description:"Sets length of generated value (Default: 20)"`
 	ExcludeSpecial   bool     `long:"exclude-special" description:"Exclude special characters from generated value"`
 	ExcludeNumber    bool     `long:"exclude-number" description:"Exclude number characters from generated value"`
@@ -39,6 +40,7 @@ func (cmd GenerateCommand) Execute([]string) error {
 	repository := repositories.NewSecretRepository(client.NewHttpClient(config.ApiURL))
 
 	parameters := models.SecretParameters{
+		Overwrite:        !cmd.NoOverwrite,
 		ExcludeSpecial:   cmd.ExcludeSpecial,
 		ExcludeNumber:    cmd.ExcludeNumber,
 		ExcludeUpper:     cmd.ExcludeUpper,

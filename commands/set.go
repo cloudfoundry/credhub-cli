@@ -17,6 +17,7 @@ type SetCommand struct {
 	SecretIdentifier           string `short:"n" required:"yes" long:"name" description:"Selects the secret being set"`
 	ContentType                string `short:"t" long:"type" description:"Sets the type of secret to store or generate. Default: 'value'"`
 	Value                      string `short:"v" long:"value" description:"Sets a value for a secret name"`
+	NoOverwrite                bool   `long:"no-overwrite" description:"Credential is not modified if stored value already exists"`
 	RootCAFileName             string `long:"root" description:"Sets the Root CA based on an input file"`
 	CertificatePublicFileName  string `long:"certificate" description:"Sets the Certificate based on an input file"`
 	CertificatePrivateFileName string `long:"private" description:"Sets the Private Key based on an input file"`
@@ -52,9 +53,9 @@ func (cmd SetCommand) Execute([]string) error {
 func getRequest(cmd SetCommand, config config.Config) (*http.Request, error) {
 	var request *http.Request
 	if cmd.ContentType == "value" {
-		request = client.NewPutValueRequest(config, cmd.SecretIdentifier, cmd.Value)
+		request = client.NewPutValueRequest(config, cmd.SecretIdentifier, cmd.Value, !cmd.NoOverwrite)
 	} else if cmd.ContentType == "password" {
-		request = client.NewPutPasswordRequest(config, cmd.SecretIdentifier, cmd.Value)
+		request = client.NewPutPasswordRequest(config, cmd.SecretIdentifier, cmd.Value, !cmd.NoOverwrite)
 	} else {
 		var err error
 		if cmd.RootCAFileName != "" {
@@ -84,7 +85,7 @@ func getRequest(cmd SetCommand, config config.Config) (*http.Request, error) {
 				return nil, err
 			}
 		}
-		request = client.NewPutCertificateRequest(config, cmd.SecretIdentifier, cmd.RootCA, cmd.CertificatePublic, cmd.CertificatePrivate)
+		request = client.NewPutCertificateRequest(config, cmd.SecretIdentifier, cmd.RootCA, cmd.CertificatePublic, cmd.CertificatePrivate, !cmd.NoOverwrite)
 	}
 
 	return request, nil

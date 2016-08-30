@@ -38,6 +38,14 @@ var _ = Describe("Set", func() {
 			Eventually(session.Out).Should(Say(responseMyPasswordPotatoes))
 		})
 
+		It("puts a secret specifying no-overwrite", func() {
+			setupOverwritePutValueServer("my-password", "password", "potatoes", false)
+
+			session := runCommand("set", "-n", "my-password", "-v", "potatoes", "--no-overwrite")
+
+			Eventually(session).Should(Exit(0))
+		})
+
 		It("puts a secret using explicit password type", func() {
 			setupPutValueServer("my-password", "password", "potatoes")
 
@@ -58,6 +66,16 @@ var _ = Describe("Set", func() {
 
 			Eventually(session).Should(Exit(0))
 			Eventually(session.Out).Should(Say(responseMyCertificate))
+		})
+
+		It("puts a secret using explicit certificate type and string values with no-overwrite", func() {
+			setupOverwritePutCertificateServer("my-secret", "my-ca", "my-cert", "my-priv", false)
+
+			session := runCommand("set", "-n", "my-secret",
+				"-t", "certificate", "--root-string", "my-ca",
+				"--certificate-string", "my-cert", "--private-string", "my-priv", "--no-overwrite")
+
+			Eventually(session).Should(Exit(0))
 		})
 
 		It("puts a secret using explicit certificate type and values read from files", func() {
@@ -125,20 +143,28 @@ var _ = Describe("Set", func() {
 })
 
 func setupPutValueServer(name string, secretType string, value string) {
+	setupOverwritePutValueServer(name, secretType, value, true)
+}
+
+func setupOverwritePutValueServer(name string, secretType string, value string, overwrite bool) {
 	server.AppendHandlers(
 		CombineHandlers(
 			VerifyRequest("PUT", fmt.Sprintf("/api/v1/data/%s", name)),
-			VerifyJSON(fmt.Sprintf(SECRET_STRING_REQUEST_JSON, secretType, value)),
+			VerifyJSON(fmt.Sprintf(SECRET_STRING_REQUEST_JSON, secretType, value, overwrite)),
 			RespondWith(http.StatusOK, fmt.Sprintf(SECRET_STRING_RESPONSE_JSON, secretType, value)),
 		),
 	)
 }
 
 func setupPutCertificateServer(name string, ca string, cert string, priv string) {
+	setupOverwritePutCertificateServer(name, ca, cert, priv, true)
+}
+
+func setupOverwritePutCertificateServer(name string, ca string, cert string, priv string, overwrite bool) {
 	server.AppendHandlers(
 		CombineHandlers(
 			VerifyRequest("PUT", fmt.Sprintf("/api/v1/data/%s", name)),
-			VerifyJSON(fmt.Sprintf(SECRET_CERTIFICATE_REQUEST_JSON, ca, cert, priv)),
+			VerifyJSON(fmt.Sprintf(SECRET_CERTIFICATE_REQUEST_JSON, ca, cert, priv, overwrite)),
 			RespondWith(http.StatusOK, fmt.Sprintf(SECRET_CERTIFICATE_RESPONSE_JSON, ca, cert, priv)),
 		),
 	)
