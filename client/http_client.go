@@ -29,7 +29,10 @@ func newHttpClient() *http.Client {
 }
 
 func newHttpsClient() *http.Client {
-	tlsConfig := &tls.Config{InsecureSkipVerify: true}
+	tlsConfig := &tls.Config{
+		InsecureSkipVerify: false,
+		PreferServerCipherSuites: true,
+	}
 	tr := &http.Transport{
 		TLSClientConfig: tlsConfig,
 	}

@@ -25,9 +25,9 @@ var _ = Describe("API", func() {
 	})
 
 	It("revokes existing auth tokens when setting a new api successfully with a different auth server", func() {
-		newAuthServer := NewTLSServer()
+		newAuthServer := NewServer()
 
-		apiServer := NewTLSServer()
+		apiServer := NewServer()
 		apiServer.AppendHandlers(
 			CombineHandlers(
 				VerifyRequest("GET", "/info"),
@@ -60,7 +60,7 @@ var _ = Describe("API", func() {
 	})
 
 	It("leaves existing auth tokens intact when setting a new api with the same auth server", func() {
-		apiServer := NewTLSServer()
+		apiServer := NewServer()
 		apiServer.AppendHandlers(
 			CombineHandlers(
 				VerifyRequest("GET", "/info"),
@@ -86,7 +86,7 @@ var _ = Describe("API", func() {
 	})
 
 	It("retains existing tokens when setting the api fails", func() {
-		apiServer := NewTLSServer()
+		apiServer := NewServer()
 		apiServer.AppendHandlers(
 			CombineHandlers(
 				VerifyRequest("GET", "/info"),
@@ -111,16 +111,16 @@ var _ = Describe("API", func() {
 
 	Context("when the provided server url's scheme is https", func() {
 		var (
-			httpsServer       *Server
+			httpServer       *Server
 			apiHttpsServerUrl string
 		)
 
 		BeforeEach(func() {
-			httpsServer = NewTLSServer()
+			httpServer = NewServer()
 
-			apiHttpsServerUrl = httpsServer.URL()
+			apiHttpsServerUrl = httpServer.URL()
 
-			httpsServer.AppendHandlers(
+			httpServer.AppendHandlers(
 				CombineHandlers(
 					VerifyRequest("GET", "/info"),
 					RespondWith(http.StatusOK, `{
@@ -132,7 +132,7 @@ var _ = Describe("API", func() {
 		})
 
 		AfterEach(func() {
-			httpsServer.Close()
+			httpServer.Close()
 		})
 
 		It("sets the target URL", func() {
@@ -173,17 +173,6 @@ var _ = Describe("API", func() {
 			Eventually(session.Out).Should(Say(apiHttpsServerUrl))
 		})
 
-		It("sets the target IP address to an https URL when no URL scheme is provided", func() {
-			session := runCommand("api", httpsServer.Addr())
-
-			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say(httpsServer.URL()))
-
-			session = runCommand("api")
-
-			Eventually(session.Out).Should(Say(httpsServer.URL()))
-		})
-
 		Context("when the provided server url is not valid", func() {
 			var (
 				badServer *Server
@@ -195,7 +184,7 @@ var _ = Describe("API", func() {
 
 				Eventually(session).Should(Exit(0))
 
-				badServer = NewTLSServer()
+				badServer = NewServer()
 				badServer.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest("GET", "/info"),
@@ -219,25 +208,25 @@ var _ = Describe("API", func() {
 				session = runCommand("api")
 
 				Eventually(session).Should(Exit(0))
-				Eventually(session.Out).Should(Say(httpsServer.URL()))
+				Eventually(session.Out).Should(Say(httpServer.URL()))
 			})
 		})
 
 		Context("saving configuration from server", func() {
 			It("saves config", func() {
-				session := runCommand("api", httpsServer.URL())
+				session := runCommand("api", httpServer.URL())
 				Eventually(session).Should(Exit(0))
 
 				config, error := config.ReadConfig()
 				Expect(error).NotTo(HaveOccurred())
-				Expect(config.ApiURL).To(Equal(httpsServer.URL()))
+				Expect(config.ApiURL).To(Equal(httpServer.URL()))
 				Expect(config.AuthURL).To(Equal("https://example.com"))
 			})
 
 			It("sets file permissions so that the configuration is readable and writeable only by the owner", func() {
 				configPath := config.ConfigPath()
 				os.Remove(configPath)
-				session := runCommand("api", httpsServer.URL())
+				session := runCommand("api", httpServer.URL())
 				Eventually(session).Should(Exit(0))
 
 				statResult, _ := os.Stat(configPath)

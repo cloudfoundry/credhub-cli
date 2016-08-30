@@ -62,9 +62,9 @@ var _ = BeforeEach(func() {
 		os.Setenv("HOME", homeDir)
 	}
 
-	server = NewTLSServer()
+	server = NewServer()
 
-	authServer = NewTLSServer()
+	authServer = NewServer()
 
 	server.AppendHandlers(
 		CombineHandlers(
