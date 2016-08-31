@@ -178,7 +178,6 @@ var _ = Describe("API", func() {
 				expectedRequestJson := `{
 				"type":"root",
 				"parameters": {
-					"overwrite": false,
 					"common_name": "my-common-name",
 					"organization": "my-organization",
 					"organization_unit": "my-unit",
@@ -218,7 +217,7 @@ var _ = Describe("API", func() {
 
 		Describe("NewGenerateSecretRequest", func() {
 			It("returns a request with only overwrite", func() {
-				requestBody := bytes.NewReader([]byte(`{"type":"my-type","parameters":{"overwrite":false}}`))
+				requestBody := bytes.NewReader([]byte(`{"type":"my-type","parameters":{}}`))
 				expectedRequest, _ := http.NewRequest("POST", "http://example.com/api/v1/data/my-name", requestBody)
 				expectedRequest.Header.Set("Content-Type", "application/json")
 				expectedRequest.Header.Set("Authorization", "Bearer access-token")
@@ -231,7 +230,6 @@ var _ = Describe("API", func() {
 
 			It("returns a request with parameters", func() {
 				parameters := models.SecretParameters{
-					Overwrite:      false,
 					ExcludeSpecial: true,
 					ExcludeNumber:  true,
 					ExcludeUpper:   true,
@@ -241,7 +239,6 @@ var _ = Describe("API", func() {
 				expectedRequestBody := `{
 				"type":"value",
 				"parameters": {
-					"overwrite": false,
 					"exclude_special": true,
 					"exclude_number": true,
 					"exclude_upper": true,

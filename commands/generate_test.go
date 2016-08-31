@@ -21,7 +21,7 @@ var _ = Describe("Generate", func() {
 
 	Describe("with a variety of value parameters", func() {
 		It("with with no-overwrite", func() {
-			doValueOptionTest(`{"overwrite":false}`, "--no-overwrite")
+			doValueOptionTest(`{}`, "--no-overwrite")
 		})
 
 		It("including length", func() {
@@ -47,7 +47,7 @@ var _ = Describe("Generate", func() {
 
 	Describe("with a variety of password parameters", func() {
 		It("with with no-overwrite", func() {
-			doPasswordOptionTest(`{"overwrite":false}`, "--no-overwrite")
+			doPasswordOptionTest(`{}`, "--no-overwrite")
 		})
 
 		It("including length", func() {
@@ -77,7 +77,7 @@ var _ = Describe("Generate", func() {
 		})
 
 		It("including common name with no-overwrite", func() {
-			doCertificateOptionTest(`{"overwrite":false,"common_name":"common.name.io"}`, "--common-name", "common.name.io", "--no-overwrite")
+			doCertificateOptionTest(`{"common_name":"common.name.io"}`, "--common-name", "common.name.io", "--no-overwrite")
 		})
 
 		It("including organization", func() {

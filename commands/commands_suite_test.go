@@ -22,10 +22,12 @@ import (
 )
 
 const TIMESTAMP = `2016-01-01T12:00:00Z`
-const SECRET_STRING_REQUEST_JSON = `{"type":"%s","value":"%s","parameters":{"overwrite":%t}}`
+const SECRET_STRING_OVERWRITE_REQUEST_JSON = `{"type":"%s","value":"%s","parameters":{"overwrite":%t}}`
+const SECRET_STRING_REQUEST_JSON = `{"type":"%s","value":"%s"}`
 const SECRET_STRING_RESPONSE_JSON = `{"type":"%s", "value":"%s", "updated_at":"` + TIMESTAMP + `"}`
 const SECRET_STRING_RESPONSE_TABLE = `Type:		%s\nName:		%s\nValue:\t\t%s\nUpdated:	` + TIMESTAMP
 const SECRET_CERTIFICATE_REQUEST_JSON = `{"type":"certificate","value":{"root":"%s","certificate":"%s","private_key":"%s"},"parameters":{"overwrite":%t}}`
+const SECRET_CERTIFICATE_REQUEST_NO_OVERWRITE_JSON = `{"type":"certificate","value":{"root":"%s","certificate":"%s","private_key":"%s"}}`
 const SECRET_CERTIFICATE_RESPONSE_JSON = `{"type":"certificate","value":{"root":"%s","certificate":"%s","private_key":"%s"},"updated_at":"` + TIMESTAMP + `"}`
 const SECRET_CERTIFICATE_RESPONSE_TABLE = `Type:		certificate\nName:		%s\nRoot:		%s\nCertificate:		%s\nPrivate Key:	%s\nUpdated:	` + TIMESTAMP
 const GENERATE_REQUEST_JSON = `{"type":"%s","parameters":%s}`

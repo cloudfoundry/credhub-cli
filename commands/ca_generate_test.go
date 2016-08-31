@@ -83,7 +83,6 @@ var _ = Describe("Ca-Generate", func() {
 
 func setupPostCaServer(caType, name, certificate, priv string) {
 	params := `{
-	"overwrite":false,
 	"common_name":"my-common-name",
 	"organization":"my-organization",
 	"organization_unit":"my-unit",

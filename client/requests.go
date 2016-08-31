@@ -19,26 +19,20 @@ import (
 )
 
 func NewPutValueRequest(config config.Config, secretIdentifier string, secretContent string, overwrite bool) *http.Request {
-	parameters := models.SecretParameters{
-		Overwrite: overwrite,
-	}
 	secret := models.SecretBody{
 		ContentType: "value",
 		Value:       secretContent,
-		Parameters:  parameters,
+		Parameters:  models.NewSecretParameters(overwrite),
 	}
 
 	return newSecretRequest("PUT", config, secretIdentifier, secret)
 }
 
 func NewPutPasswordRequest(config config.Config, secretIdentifier string, secretContent string, overwrite bool) *http.Request {
-	parameters := models.SecretParameters{
-		Overwrite: overwrite,
-	}
 	secret := models.SecretBody{
 		ContentType: "password",
 		Value:       secretContent,
-		Parameters:  parameters,
+		Parameters:  models.NewSecretParameters(overwrite),
 	}
 
 	return newSecretRequest("PUT", config, secretIdentifier, secret)
@@ -50,13 +44,10 @@ func NewPutCertificateRequest(config config.Config, secretIdentifier string, roo
 		Certificate: cert,
 		PrivateKey:  priv,
 	}
-	parameters := models.SecretParameters{
-		Overwrite: overwrite,
-	}
 	secret := models.SecretBody{
 		ContentType: "certificate",
 		Value:       &certificate,
-		Parameters:  parameters,
+		Parameters:  models.NewSecretParameters(overwrite),
 	}
 
 	return newSecretRequest("PUT", config, secretIdentifier, secret)
@@ -77,8 +68,8 @@ func NewPutCaRequest(config config.Config, caIdentifier, caType, cert, priv stri
 
 func NewPostCaRequest(config config.Config, caIdentifier, caType string, params models.SecretParameters) *http.Request {
 	caGenerateRequestBody := models.GenerateRequest{
-		ContentType: caType,
-		Parameters:  params,
+		ContentType:  caType,
+		Parameters:  &params,
 	}
 
 	return newCaRequest("POST", config, caIdentifier, caGenerateRequestBody)
@@ -90,8 +81,8 @@ func NewGetCaRequest(config config.Config, caIdentifier string) *http.Request {
 
 func NewGenerateSecretRequest(config config.Config, secretIdentifier string, parameters models.SecretParameters, contentType string) *http.Request {
 	generateRequest := models.GenerateRequest{
-		Parameters:  parameters,
 		ContentType: contentType,
+		Parameters:  &parameters,
 	}
 
 	return newSecretRequest("POST", config, secretIdentifier, generateRequest)
