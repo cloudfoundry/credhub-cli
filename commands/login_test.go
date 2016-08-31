@@ -121,15 +121,12 @@ var _ = Describe("Login", func() {
 			)
 
 			apiServer = NewServer()
-			apiServer.AppendHandlers(
-				CombineHandlers(
-					VerifyRequest("GET", "/info"),
-					RespondWith(http.StatusOK, fmt.Sprintf(`{
-					"app":{"version":"0.1.0 build DEV","name":"Pivotal Credential Manager"},
-					"auth-server":{"url":"%s"}
-					}`, uaaServer.URL())),
-				),
-			)
+			setupServer(apiServer, uaaServer.URL())
+		})
+
+		AfterEach(func() {
+			apiServer.Close()
+			uaaServer.Close()
 		})
 
 		It("sets the target to the server's url and auth server url", func() {
@@ -142,6 +139,73 @@ var _ = Describe("Login", func() {
 			cfg, _ := config.ReadConfig()
 			Expect(cfg.ApiURL).To(Equal(apiServer.URL()))
 			Expect(cfg.AuthURL).To(Equal(uaaServer.URL()))
+		})
+
+		Context("when the user skips TLS validation", func() {
+
+			It("prints warning when --skip-tls-validation flag is present", func() {
+				apiServer.Close()
+				apiServer = NewTLSServer()
+				setupServer(apiServer, uaaServer.URL())
+				session := runCommand("login", "-s", apiServer.URL(), "-u", "user", "-p", "pass", "--skip-tls-validation")
+
+				Eventually(session).Should(Exit(0))
+				Eventually(session.Out).Should(Say("Warning: The targeted TLS certificate has not been verified for this connection."))
+			})
+
+			It("sets skip-tls flag in the config file", func() {
+				apiServer.Close()
+				apiServer = NewTLSServer()
+				setupServer(apiServer, uaaServer.URL())
+				session := runCommand("login", "-s", apiServer.URL(), "-u", "user", "-p", "pass", "--skip-tls-validation")
+
+				Eventually(session).Should(Exit(0))
+				cfg, error := config.ReadConfig()
+				Expect(error).NotTo(HaveOccurred())
+				Expect(cfg.InsecureSkipVerify).To(Equal(true))
+			})
+
+			It("resets skip-tls flag in the config file", func() {
+				cfg, err := config.ReadConfig()
+				Expect(err).NotTo(HaveOccurred())
+				cfg.InsecureSkipVerify = true
+				err = config.WriteConfig(cfg)
+				Expect(err).NotTo(HaveOccurred())
+
+				session := runCommand("login", "-s", apiServer.URL(), "-u", "user", "-p", "pass")
+
+				Eventually(session).Should(Exit(0))
+				cfg, err = config.ReadConfig()
+				Expect(err).NotTo(HaveOccurred())
+				Expect(cfg.InsecureSkipVerify).To(Equal(false))
+			})
+
+			It("using a TLS server without the skip-tls flag set will fail on certificate verification", func() {
+				apiServer.Close()
+				apiServer = NewTLSServer()
+				setupServer(apiServer, uaaServer.URL())
+				session := runCommand("login", "-s", apiServer.URL(), "-u", "user", "-p", "pass")
+
+				Eventually(session).Should(Exit(1))
+				Eventually(session.Err).Should(Say("No response received for the command. Please validate that you are targeting an active credential manager with `credhub api` and retry your request."))
+			})
+
+			It("using a TLS server with the skip-tls flag set will succeed", func() {
+				apiServer.Close()
+				apiServer = NewTLSServer()
+				setupServer(apiServer, uaaServer.URL())
+				session := runCommand("login", "-s", apiServer.URL(), "-u", "user", "-p", "pass", "--skip-tls-validation")
+
+				Eventually(session).Should(Exit(0))
+			})
+
+			It("records skip-tls into config file even with http URLs (will do nothing with that value)", func() {
+				session := runCommand("login", "-s", apiServer.URL(), "-u", "user", "-p", "pass", "--skip-tls-validation")
+				cfg, _ := config.ReadConfig()
+
+				Eventually(session).Should(Exit(0))
+				Expect(cfg.InsecureSkipVerify).To(Equal(true))
+			})
 		})
 
 		It("saves the oauth tokens", func() {
@@ -254,4 +318,16 @@ func setConfigAuthUrl(authUrl string) {
 	cfg, _ := config.ReadConfig()
 	cfg.AuthURL = authUrl
 	config.WriteConfig(cfg)
+}
+
+func setupServer(theServer *Server, uaaUrl string) {
+	theServer.AppendHandlers(
+		CombineHandlers(
+			VerifyRequest("GET", "/info"),
+			RespondWith(http.StatusOK, fmt.Sprintf(`{
+					"app":{"version":"0.1.0 build DEV","name":"Pivotal Credential Manager"},
+					"auth-server":{"url":"%s"}
+					}`, uaaUrl)),
+		),
+	)
 }

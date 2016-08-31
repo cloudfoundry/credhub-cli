@@ -338,7 +338,7 @@ var _ = Describe("API", func() {
 })
 
 func setUpServer(aServer *Server) string {
-	apiHttpsServerUrl := aServer.URL()
+	aUrl := aServer.URL()
 
 	aServer.AppendHandlers(
 		CombineHandlers(
@@ -350,5 +350,5 @@ func setUpServer(aServer *Server) string {
 		),
 	)
 
-	return apiHttpsServerUrl
+	return aUrl
 }

@@ -11,16 +11,17 @@ import (
 )
 
 type LoginCommand struct {
-	Username  string `short:"u" long:"username" description:"Sets username"`
-	Password  string `short:"p" long:"password" description:"Sets password"`
-	ServerUrl string `short:"s" long:"server" description:"API endpoint"`
+	Username          string `short:"u" long:"username" description:"Sets username"`
+	Password          string `short:"p" long:"password" description:"Sets password"`
+	ServerUrl         string `short:"s" long:"server" description:"API endpoint"`
+	SkipTlsValidation bool   `long:"skip-tls-validation" description:"Skip certificate validation of the API endpoint. Not recommended!"`
 }
 
 func (cmd LoginCommand) Execute([]string) error {
 	cfg, _ := config.ReadConfig()
 
 	if cmd.ServerUrl != "" {
-		err := GetApiInfo(&cfg, cmd.ServerUrl, false) // todo arg should be from Skip flag
+		err := GetApiInfo(&cfg, cmd.ServerUrl, cmd.SkipTlsValidation)
 		if err != nil {
 			return err
 		}
