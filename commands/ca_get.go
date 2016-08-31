@@ -14,14 +14,11 @@ type CaGetCommand struct {
 }
 
 func (cmd CaGetCommand) Execute([]string) error {
-	config, _ := config.ReadConfig()
-	caRepository := repositories.NewCaRepository(client.NewHttpClient(config))
-	action := actions.NewAction(caRepository, config)
+	cfg := config.ReadConfig()
+	caRepository := repositories.NewCaRepository(client.NewHttpClient(cfg))
+	action := actions.NewAction(caRepository, cfg)
 
-	ca, err := action.DoAction(
-		client.NewGetCaRequest(
-			config,
-			cmd.CaIdentifier), cmd.CaIdentifier)
+	ca, err := action.DoAction(client.NewGetCaRequest(cfg, cmd.CaIdentifier), cmd.CaIdentifier)
 
 	if err != nil {
 		return err

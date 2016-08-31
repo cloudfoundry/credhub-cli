@@ -62,7 +62,7 @@ func runLogoutCommand() {
 	session := runCommand("logout")
 	Eventually(session).Should(Exit(0))
 	Eventually(session).Should(Say("Logout Successful"))
-	cfg, _ := config.ReadConfig()
+	cfg := config.ReadConfig()
 	Expect(cfg.AccessToken).To(Equal("revoked"))
 	Expect(cfg.RefreshToken).To(Equal("revoked"))
 }

@@ -26,20 +26,17 @@ func ConfigPath() string {
 	return path.Join(ConfigDir(), "config.json")
 }
 
-func ReadConfig() (Config, error) {
+func ReadConfig() (Config) {
 	c := Config{}
 
 	data, err := ioutil.ReadFile(ConfigPath())
 	if err != nil {
-		return c, err
+		return c
 	}
 
-	err = json.Unmarshal(data, &c)
-	if err != nil {
-		return c, err
-	}
+  json.Unmarshal(data, &c)
 
-	return c, nil
+	return c
 }
 
 func WriteConfig(c Config) error {

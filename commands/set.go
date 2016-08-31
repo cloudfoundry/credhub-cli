@@ -31,11 +31,11 @@ func (cmd SetCommand) Execute([]string) error {
 		cmd.ContentType = "password"
 	}
 
-	config, _ := config.ReadConfig()
-	repository := repositories.NewSecretRepository(client.NewHttpClient(config))
+	cfg := config.ReadConfig()
+	repository := repositories.NewSecretRepository(client.NewHttpClient(cfg))
 
-	action := actions.NewAction(repository, config)
-	request, err := getRequest(cmd, config)
+	action := actions.NewAction(repository, cfg)
+	request, err := getRequest(cmd, cfg)
 	if err != nil {
 		return err
 	}

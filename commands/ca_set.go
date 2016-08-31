@@ -23,10 +23,10 @@ type CaSetCommand struct {
 func (cmd CaSetCommand) Execute([]string) error {
 	var err error
 
-	config, _ := config.ReadConfig()
-	caRepository := repositories.NewCaRepository(client.NewHttpClient(config))
+	cfg := config.ReadConfig()
+	caRepository := repositories.NewCaRepository(client.NewHttpClient(cfg))
 
-	action := actions.NewAction(caRepository, config)
+	action := actions.NewAction(caRepository, cfg)
 
 	if cmd.CaPublicFileName != "" {
 		if cmd.CaPublic != "" {
@@ -52,7 +52,7 @@ func (cmd CaSetCommand) Execute([]string) error {
 
 	ca, err := action.DoAction(
 		client.NewPutCaRequest(
-			config,
+			cfg,
 			cmd.CaIdentifier,
 			cmd.CaType,
 			cmd.CaPublic,

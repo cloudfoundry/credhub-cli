@@ -14,10 +14,10 @@ type GetCommand struct {
 }
 
 func (cmd GetCommand) Execute([]string) error {
-	config, _ := config.ReadConfig()
-	repository := repositories.NewSecretRepository(client.NewHttpClient(config))
-	action := actions.NewAction(repository, config)
-	secret, err := action.DoAction(client.NewGetSecretRequest(config, cmd.SecretIdentifier), cmd.SecretIdentifier)
+	cfg := config.ReadConfig()
+	repository := repositories.NewSecretRepository(client.NewHttpClient(cfg))
+	action := actions.NewAction(repository, cfg)
+	secret, err := action.DoAction(client.NewGetSecretRequest(cfg, cmd.SecretIdentifier), cmd.SecretIdentifier)
 	if err != nil {
 		return err
 	}

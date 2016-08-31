@@ -26,8 +26,8 @@ type CaGenerateCommand struct {
 func (cmd CaGenerateCommand) Execute([]string) error {
 	var err error
 
-	config, _ := config.ReadConfig()
-	caRepository := repositories.NewCaRepository(client.NewHttpClient(config))
+	cfg := config.ReadConfig()
+	caRepository := repositories.NewCaRepository(client.NewHttpClient(cfg))
 
 	parameters := models.SecretParameters{
 		CommonName:       cmd.CaCommonName,
@@ -40,13 +40,13 @@ func (cmd CaGenerateCommand) Execute([]string) error {
 		Duration:         cmd.CaDuration,
 	}
 
-	action := actions.NewAction(caRepository, config)
+	action := actions.NewAction(caRepository, cfg)
 
 	if cmd.CaType == "" {
 		cmd.CaType = "root"
 	}
 
-	request := client.NewPostCaRequest(config, cmd.CaIdentifier, cmd.CaType, parameters)
+	request := client.NewPostCaRequest(cfg, cmd.CaIdentifier, cmd.CaType, parameters)
 
 	ca, err := action.DoAction(request, cmd.CaIdentifier)
 

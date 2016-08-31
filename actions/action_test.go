@@ -98,7 +98,7 @@ var _ = Describe("Action", func() {
 
 					Expect(err).ToNot(HaveOccurred())
 					Expect(secret).To(Equal(expectedItem))
-					cfg, _ := config.ReadConfig()
+					cfg := config.ReadConfig()
 					Expect(cfg.AccessToken).To(Equal("access_token"))
 					Expect(cfg.RefreshToken).To(Equal("refresh_token"))
 				})
@@ -126,7 +126,7 @@ var _ = Describe("Action", func() {
 
 						Expect(err).To(HaveOccurred())
 						Expect(expectedError).To(Equal(err))
-						cfg, _ := config.ReadConfig()
+						cfg := config.ReadConfig()
 						Expect(cfg.AccessToken).To(Equal("access_token"))
 						Expect(cfg.RefreshToken).To(Equal("refresh_token"))
 					})

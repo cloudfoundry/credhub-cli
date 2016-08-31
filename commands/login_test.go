@@ -49,7 +49,7 @@ var _ = Describe("Login", func() {
 				Expect(uaaServer.ReceivedRequests()).Should(HaveLen(1))
 				Eventually(session).Should(Exit(0))
 				Eventually(session.Out).Should(Say("Login Successful"))
-				cfg, _ := config.ReadConfig()
+				cfg := config.ReadConfig()
 				Expect(cfg.AccessToken).To(Equal("2YotnFZFEjr1zCsicMWpAA"))
 			})
 		})
@@ -60,7 +60,7 @@ var _ = Describe("Login", func() {
 				Eventually(session.Out).Should(Say("password:"))
 				Eventually(session.Wait("10s").Out).Should(Say("Login Successful"))
 				Eventually(session).Should(Exit(0))
-				cfg, _ := config.ReadConfig()
+				cfg := config.ReadConfig()
 				Expect(cfg.AccessToken).To(Equal("2YotnFZFEjr1zCsicMWpAA"))
 			})
 		})
@@ -136,7 +136,7 @@ var _ = Describe("Login", func() {
 			Expect(uaaServer.ReceivedRequests()).Should(HaveLen(1))
 			Eventually(session).Should(Exit(0))
 			Eventually(session.Out).Should(Say("Login Successful"))
-			cfg, _ := config.ReadConfig()
+			cfg := config.ReadConfig()
 			Expect(cfg.ApiURL).To(Equal(apiServer.URL()))
 			Expect(cfg.AuthURL).To(Equal(uaaServer.URL()))
 		})
@@ -160,23 +160,20 @@ var _ = Describe("Login", func() {
 				session := runCommand("login", "-s", apiServer.URL(), "-u", "user", "-p", "pass", "--skip-tls-validation")
 
 				Eventually(session).Should(Exit(0))
-				cfg, error := config.ReadConfig()
-				Expect(error).NotTo(HaveOccurred())
+				cfg := config.ReadConfig()
 				Expect(cfg.InsecureSkipVerify).To(Equal(true))
 			})
 
 			It("resets skip-tls flag in the config file", func() {
-				cfg, err := config.ReadConfig()
-				Expect(err).NotTo(HaveOccurred())
+				cfg := config.ReadConfig()
 				cfg.InsecureSkipVerify = true
-				err = config.WriteConfig(cfg)
+				err := config.WriteConfig(cfg)
 				Expect(err).NotTo(HaveOccurred())
 
 				session := runCommand("login", "-s", apiServer.URL(), "-u", "user", "-p", "pass")
 
 				Eventually(session).Should(Exit(0))
-				cfg, err = config.ReadConfig()
-				Expect(err).NotTo(HaveOccurred())
+				cfg = config.ReadConfig()
 				Expect(cfg.InsecureSkipVerify).To(Equal(false))
 			})
 
@@ -201,7 +198,7 @@ var _ = Describe("Login", func() {
 
 			It("records skip-tls into config file even with http URLs (will do nothing with that value)", func() {
 				session := runCommand("login", "-s", apiServer.URL(), "-u", "user", "-p", "pass", "--skip-tls-validation")
-				cfg, _ := config.ReadConfig()
+				cfg := config.ReadConfig()
 
 				Eventually(session).Should(Exit(0))
 				Expect(cfg.InsecureSkipVerify).To(Equal(true))
@@ -211,7 +208,7 @@ var _ = Describe("Login", func() {
 		It("saves the oauth tokens", func() {
 			runCommand("login", "-u", "user", "-p", "pass", "-s", apiServer.URL())
 
-			cfg, _ := config.ReadConfig()
+			cfg := config.ReadConfig()
 			Expect(cfg.AccessToken).To(Equal("2YotnFZFEjr1zCsicMWpAA"))
 			Expect(cfg.RefreshToken).To(Equal("erousflkajqwer"))
 		})
@@ -240,7 +237,7 @@ var _ = Describe("Login", func() {
 			})
 
 			It("should not override config's existing API URL value", func() {
-				cfg, _ := config.ReadConfig()
+				cfg := config.ReadConfig()
 				cfg.ApiURL = "foo"
 				config.WriteConfig(cfg)
 
@@ -249,7 +246,7 @@ var _ = Describe("Login", func() {
 				Eventually(session).Should(Exit(1))
 				Eventually(session.Err).Should(Say("The targeted API does not appear to be valid. Please validate the API address and retry your request."))
 				Expect(uaaServer.ReceivedRequests()).Should(HaveLen(0))
-				cfg2, _ := config.ReadConfig()
+				cfg2 := config.ReadConfig()
 				Expect(cfg2.ApiURL).To(Equal("foo"))
 			})
 		})
@@ -277,7 +274,7 @@ var _ = Describe("Login", func() {
 					),
 				)
 
-				cfg, _ := config.ReadConfig()
+				cfg := config.ReadConfig()
 				cfg.AuthURL = badUaaServer.URL()
 				cfg.AccessToken = "fake_token"
 				cfg.RefreshToken = "eyJhbGciOiJSUzI1NiIsImtpZCI6ImxlZ2FjeS10b2tlbi1rZXkiLCJ0eXAiOiJKV1QifQ.eyJqdGkiOiI1YjljOWZkNTFiYTE0ODM4YWMyZTZiMjIyZDQ4NzEwNi1yIiwic3ViIjoiYzE0ZGJjZGQtNzNkOC00ZDdjLWI5NDctYzM4ODVhODAxYzY2Iiwic2NvcGUiOlsiY3JlZGh1Yi53cml0ZSIsImNyZWRodWIucmVhZCJdLCJpYXQiOjE0NzEzMTAwMTIsImV4cCI6MTQ3MTM5NjQxMiwiY2lkIjoiY3JlZGh1YiIsImNsaWVudF9pZCI6ImNyZWRodWIiLCJpc3MiOiJodHRwczovLzUyLjIwNC40OS4xMDc6ODQ0My9vYXV0aC90b2tlbiIsInppZCI6InVhYSIsInJldm9jYWJsZSI6dHJ1ZSwiZ3JhbnRfdHlwZSI6InBhc3N3b3JkIiwidXNlcl9uYW1lIjoiY3JlZGh1Yl9jbGkiLCJvcmlnaW4iOiJ1YWEiLCJ1c2VyX2lkIjoiYzE0ZGJjZGQtNzNkOC00ZDdjLWI5NDctYzM4ODVhODAxYzY2IiwicmV2X3NpZyI6ImQ3MTkyZmUxIiwiYXVkIjpbImNyZWRodWIiXX0.UAp6Ou24f18mdE0XOqG9RLVWZAx3khNHHPeHfuzmcOUYojtILa0_izlGVHhCtNx07f4M9pcRKpo-AijXRw1vSimSTHBeVCDjuuc2nBdznIMhyQSlPpd2stW-WG7Gix82K4gy4oCb1wlTqsK3UKGYoy8JWs6XZqhoZZ6JZM7-Xjj2zag3Q4kgvEBReWC5an_IP6SeCpNt5xWvGdxtTz7ki1WPweUBy0M73ZjRi9_poQT2JmeSIbrePukkfsfCxHG1vM7ApIdzzhdCx6T_KmmMU3xHqhpI_ueLOuvfHjdBinm2atypeTHD83yRRFxhfjRsG1-XguTn-lo_Z2Jis89r5g"
@@ -294,7 +291,7 @@ var _ = Describe("Login", func() {
 
 			It("revokes any existing tokens", func() {
 				Eventually(session).Should(Exit(1))
-				cfg, _ := config.ReadConfig()
+				cfg := config.ReadConfig()
 				Expect(cfg.AccessToken).To(Equal("revoked"))
 				Expect(cfg.RefreshToken).To(Equal("revoked"))
 				Expect(badUaaServer.ReceivedRequests()).Should(HaveLen(2))
@@ -315,7 +312,7 @@ var _ = Describe("Login", func() {
 })
 
 func setConfigAuthUrl(authUrl string) {
-	cfg, _ := config.ReadConfig()
+	cfg := config.ReadConfig()
 	cfg.AuthURL = authUrl
 	config.WriteConfig(cfg)
 }

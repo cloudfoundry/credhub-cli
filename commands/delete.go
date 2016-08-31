@@ -14,11 +14,11 @@ type DeleteCommand struct {
 }
 
 func (cmd DeleteCommand) Execute([]string) error {
-	config, _ := config.ReadConfig()
-	repository := repositories.NewSecretRepository(client.NewHttpClient(config))
-	action := actions.NewAction(repository, config)
+	cfg := config.ReadConfig()
+	repository := repositories.NewSecretRepository(client.NewHttpClient(cfg))
+	action := actions.NewAction(repository, cfg)
 
-	_, err := action.DoAction(client.NewDeleteSecretRequest(config, cmd.SecretIdentifier), cmd.SecretIdentifier)
+	_, err := action.DoAction(client.NewDeleteSecretRequest(cfg, cmd.SecretIdentifier), cmd.SecretIdentifier)
 
 	if err == nil {
 		fmt.Println("Secret successfully deleted")

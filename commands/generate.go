@@ -36,8 +36,8 @@ func (cmd GenerateCommand) Execute([]string) error {
 		cmd.ContentType = "password"
 	}
 
-	config, _ := config.ReadConfig()
-	repository := repositories.NewSecretRepository(client.NewHttpClient(config))
+	cfg := config.ReadConfig()
+	repository := repositories.NewSecretRepository(client.NewHttpClient(cfg))
 
 	parameters := models.SecretParameters{
 		Overwrite:        !cmd.NoOverwrite,
@@ -58,8 +58,8 @@ func (cmd GenerateCommand) Execute([]string) error {
 		Ca:               cmd.Ca,
 	}
 
-	action := actions.NewAction(repository, config)
-	request := client.NewGenerateSecretRequest(config, cmd.SecretIdentifier, parameters, cmd.ContentType)
+	action := actions.NewAction(repository, cfg)
+	request := client.NewGenerateSecretRequest(cfg, cmd.SecretIdentifier, parameters, cmd.ContentType)
 	secret, err := action.DoAction(request, cmd.SecretIdentifier)
 
 	if err != nil {

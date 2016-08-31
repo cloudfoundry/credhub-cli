@@ -12,7 +12,7 @@ type LogoutCommand struct {
 }
 
 func (cmd LogoutCommand) Execute([]string) error {
-	cfg, _ := config.ReadConfig()
+	cfg := config.ReadConfig()
 	SendLogoutIfNecessary(cfg)
 	cfg = RevokedConfig(cfg)
 	config.WriteConfig(cfg)
