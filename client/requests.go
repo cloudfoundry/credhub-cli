@@ -40,7 +40,7 @@ func NewPutPasswordRequest(config config.Config, secretIdentifier string, secret
 
 func NewPutCertificateRequest(config config.Config, secretIdentifier string, root string, cert string, priv string, overwrite bool) *http.Request {
 	certificate := models.Certificate{
-		Root:        root,
+		Ca:        root,
 		Certificate: cert,
 		PrivateKey:  priv,
 	}
