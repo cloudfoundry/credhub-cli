@@ -1,6 +1,6 @@
 package models
 
 type GenerateRequest struct {
-	ContentType  string           `json:"type"`
+	ContentType string            `json:"type"`
 	Parameters  *SecretParameters `json:"parameters"`
 }

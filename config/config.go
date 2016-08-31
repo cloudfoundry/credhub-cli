@@ -26,7 +26,7 @@ func ConfigPath() string {
 	return path.Join(ConfigDir(), "config.json")
 }
 
-func ReadConfig() (Config) {
+func ReadConfig() Config {
 	c := Config{}
 
 	data, err := ioutil.ReadFile(ConfigPath())
@@ -34,7 +34,7 @@ func ReadConfig() (Config) {
 		return c
 	}
 
-  json.Unmarshal(data, &c)
+	json.Unmarshal(data, &c)
 
 	return c
 }
