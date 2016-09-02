@@ -16,104 +16,104 @@ import (
 
 var _ = Describe("Generate", func() {
 	It("without parameters", func() {
-		doValueDefaultTypeOptionTest(`{"overwrite":true}`)
+		doValueDefaultTypeOptionTest(`{}`, true)
 	})
 
 	Describe("with a variety of value parameters", func() {
 		It("with with no-overwrite", func() {
-			doValueOptionTest(`{}`, "--no-overwrite")
+			doValueOptionTest(`{}`, false, "--no-overwrite")
 		})
 
 		It("including length", func() {
-			doValueOptionTest(`{"overwrite":true,"length":42}`, "-l", "42")
+			doValueOptionTest(`{"length":42}`, true, "-l", "42")
 		})
 
 		It("excluding upper case", func() {
-			doValueOptionTest(`{"overwrite":true,"exclude_upper":true}`, "--exclude-upper")
+			doValueOptionTest(`{"exclude_upper":true}`, true, "--exclude-upper")
 		})
 
 		It("excluding lower case", func() {
-			doValueOptionTest(`{"overwrite":true,"exclude_lower":true}`, "--exclude-lower")
+			doValueOptionTest(`{"exclude_lower":true}`, true, "--exclude-lower")
 		})
 
 		It("excluding special characters", func() {
-			doValueOptionTest(`{"overwrite":true,"exclude_special":true}`, "--exclude-special")
+			doValueOptionTest(`{"exclude_special":true}`, true, "--exclude-special")
 		})
 
 		It("excluding numbers", func() {
-			doValueOptionTest(`{"overwrite":true,"exclude_number":true}`, "--exclude-number")
+			doValueOptionTest(`{"exclude_number":true}`, true, "--exclude-number")
 		})
 	})
 
 	Describe("with a variety of password parameters", func() {
 		It("with with no-overwrite", func() {
-			doPasswordOptionTest(`{}`, "--no-overwrite")
+			doPasswordOptionTest(`{}`, false, "--no-overwrite")
 		})
 
 		It("including length", func() {
-			doPasswordOptionTest(`{"overwrite":true,"length":42}`, "-l", "42")
+			doPasswordOptionTest(`{"length":42}`, true, "-l", "42")
 		})
 
 		It("excluding upper case", func() {
-			doPasswordOptionTest(`{"overwrite":true,"exclude_upper":true}`, "--exclude-upper")
+			doPasswordOptionTest(`{"exclude_upper":true}`, true, "--exclude-upper")
 		})
 
 		It("excluding lower case", func() {
-			doPasswordOptionTest(`{"overwrite":true,"exclude_lower":true}`, "--exclude-lower")
+			doPasswordOptionTest(`{"exclude_lower":true}`, true, "--exclude-lower")
 		})
 
 		It("excluding special characters", func() {
-			doPasswordOptionTest(`{"overwrite":true,"exclude_special":true}`, "--exclude-special")
+			doPasswordOptionTest(`{"exclude_special":true}`, true, "--exclude-special")
 		})
 
 		It("excluding numbers", func() {
-			doPasswordOptionTest(`{"overwrite":true,"exclude_number":true}`, "--exclude-number")
+			doPasswordOptionTest(`{"exclude_number":true}`, true, "--exclude-number")
 		})
 	})
 
 	Describe("with a variety of certificate parameters", func() {
 		It("including common name", func() {
-			doCertificateOptionTest(`{"overwrite":true,"common_name":"common.name.io"}`, "--common-name", "common.name.io")
+			doCertificateOptionTest(`{"common_name":"common.name.io"}`, true, "--common-name", "common.name.io")
 		})
 
 		It("including common name with no-overwrite", func() {
-			doCertificateOptionTest(`{"common_name":"common.name.io"}`, "--common-name", "common.name.io", "--no-overwrite")
+			doCertificateOptionTest(`{"common_name":"common.name.io"}`, false, "--common-name", "common.name.io", "--no-overwrite")
 		})
 
 		It("including organization", func() {
-			doCertificateOptionTest(`{"overwrite":true,"organization":"organization.io"}`, "--organization", "organization.io")
+			doCertificateOptionTest(`{"organization":"organization.io"}`, true, "--organization", "organization.io")
 		})
 
 		It("including organization unit", func() {
-			doCertificateOptionTest(`{"overwrite":true,"organization_unit":"My Unit"}`, "--organization-unit", "My Unit")
+			doCertificateOptionTest(`{"organization_unit":"My Unit"}`, true, "--organization-unit", "My Unit")
 		})
 
 		It("including locality", func() {
-			doCertificateOptionTest(`{"overwrite":true,"locality":"My Locality"}`, "--locality", "My Locality")
+			doCertificateOptionTest(`{"locality":"My Locality"}`, true, "--locality", "My Locality")
 		})
 
 		It("including state", func() {
-			doCertificateOptionTest(`{"overwrite":true,"state":"My State"}`, "--state", "My State")
+			doCertificateOptionTest(`{"state":"My State"}`, true, "--state", "My State")
 		})
 
 		It("including country", func() {
-			doCertificateOptionTest(`{"overwrite":true,"country":"My Country"}`, "--country", "My Country")
+			doCertificateOptionTest(`{"country":"My Country"}`, true, "--country", "My Country")
 		})
 
 		It("including multiple alternative names", func() {
-			doCertificateOptionTest(`{"overwrite":true,"alternative_names": [ "Alt1", "Alt2" ]}`, "--alternative-name", "Alt1", "--alternative-name", "Alt2")
+			doCertificateOptionTest(`{"alternative_names": [ "Alt1", "Alt2" ]}`, true, "--alternative-name", "Alt1", "--alternative-name", "Alt2")
 		})
 
 		It("including key length", func() {
-			doCertificateOptionTest(`{"overwrite":true,"key_length":2048}`, "--key-length", "2048")
+			doCertificateOptionTest(`{"key_length":2048}`, true, "--key-length", "2048")
 		})
 
 		It("including duration", func() {
-			doCertificateOptionTest(`{"overwrite":true,"duration":1000}`, "--duration", "1000")
+			doCertificateOptionTest(`{"duration":1000}`, true, "--duration", "1000")
 		})
 
 		It("including certificate authority", func() {
-			doCertificateOptionTest(`{"overwrite":true,"ca":"my_ca"}`, "--ca", "my_ca")
+			doCertificateOptionTest(`{"ca":"my_ca"}`, true, "--ca", "my_ca")
 		})
 	})
 
@@ -163,34 +163,34 @@ func setupPostServer(name string, value string, requestJson string) {
 	)
 }
 
-func generateRequestJson(secretType string, params string) string {
-	return fmt.Sprintf(GENERATE_REQUEST_JSON, secretType, params)
+func generateRequestJson(secretType string, params string, overwrite bool) string {
+	return fmt.Sprintf(GENERATE_SECRET_REQUEST_JSON, secretType, overwrite, params)
 }
 
-func generateDefaultTypeRequestJson(params string) string {
-	return fmt.Sprintf(GENERATE_DEFAULT_TYPE_REQUEST_JSON, params)
+func generateDefaultTypeRequestJson(params string, overwrite bool) string {
+	return fmt.Sprintf(GENERATE_DEFAULT_TYPE_REQUEST_JSON, overwrite, params)
 }
 
-func doValueDefaultTypeOptionTest(optionJson string, options ...string) {
-	setupPostServer("my-password", "potatoes", generateDefaultTypeRequestJson(optionJson))
+func doValueDefaultTypeOptionTest(optionJson string, overwrite bool, options ...string) {
+	setupPostServer("my-password", "potatoes", generateDefaultTypeRequestJson(optionJson, overwrite))
 
 	doTest([]string{"generate", "-n", "my-password"}, options...)
 }
 
-func doValueOptionTest(optionJson string, options ...string) {
-	setupPostServer("my-value", "potatoes", generateRequestJson("value", optionJson))
+func doValueOptionTest(optionJson string, overwrite bool, options ...string) {
+	setupPostServer("my-value", "potatoes", generateRequestJson("value", optionJson, overwrite))
 
 	doTest([]string{"generate", "-n", "my-value", "-t", "value"}, options...)
 }
 
-func doPasswordOptionTest(optionJson string, options ...string) {
-	setupPostServer("my-password", "potatoes", generateRequestJson("password", optionJson))
+func doPasswordOptionTest(optionJson string, overwrite bool, options ...string) {
+	setupPostServer("my-password", "potatoes", generateRequestJson("password", optionJson, overwrite))
 
 	doTest([]string{"generate", "-n", "my-password", "-t", "password"}, options...)
 }
 
-func doCertificateOptionTest(optionJson string, options ...string) {
-	setupPostServer("my-secret", "potatoes", generateRequestJson("certificate", optionJson))
+func doCertificateOptionTest(optionJson string, overwrite bool, options ...string) {
+	setupPostServer("my-secret", "potatoes", generateRequestJson("certificate", optionJson, overwrite))
 
 	doTest([]string{"generate", "-n", "my-secret", "-t", "certificate"}, options...)
 }

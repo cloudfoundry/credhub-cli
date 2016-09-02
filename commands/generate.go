@@ -40,7 +40,6 @@ func (cmd GenerateCommand) Execute([]string) error {
 	repository := repositories.NewSecretRepository(client.NewHttpClient(cfg))
 
 	parameters := models.SecretParameters{
-		Overwrite:        !cmd.NoOverwrite,
 		ExcludeSpecial:   cmd.ExcludeSpecial,
 		ExcludeNumber:    cmd.ExcludeNumber,
 		ExcludeUpper:     cmd.ExcludeUpper,
@@ -59,7 +58,7 @@ func (cmd GenerateCommand) Execute([]string) error {
 	}
 
 	action := actions.NewAction(repository, cfg)
-	request := client.NewGenerateSecretRequest(cfg, cmd.SecretIdentifier, parameters, cmd.ContentType)
+	request := client.NewGenerateSecretRequest(cfg, cmd.SecretIdentifier, parameters, cmd.ContentType, !cmd.NoOverwrite)
 	secret, err := action.DoAction(request, cmd.SecretIdentifier)
 
 	if err != nil {

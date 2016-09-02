@@ -95,7 +95,7 @@ func setupPostCaServer(caType, name, certificate, priv string) {
 	server.AppendHandlers(
 		CombineHandlers(
 			VerifyRequest("POST", fmt.Sprintf("/api/v1/ca/%s", name)),
-			VerifyJSON(fmt.Sprintf(GENERATE_REQUEST_JSON, caType, params)),
+			VerifyJSON(fmt.Sprintf(`{"type":"%s","parameters":%s}`, caType, params)),
 			RespondWith(http.StatusOK, fmt.Sprintf(CA_RESPONSE_JSON, caType, certificate, priv)),
 		),
 	)

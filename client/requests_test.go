@@ -111,7 +111,7 @@ var _ = Describe("API", func() {
 
 		Describe("NewPutValueRequest", func() {
 			It("Returns a request for the put-value endpoint", func() {
-				requestBody := bytes.NewReader([]byte(`{"type":"value","value":"my-value","parameters":{"overwrite":true}}`))
+				requestBody := bytes.NewReader([]byte(`{"type":"value","value":"my-value","overwrite":true}`))
 				expectedRequest, _ := http.NewRequest("PUT", "http://example.com/api/v1/data/my-name", requestBody)
 				expectedRequest.Header.Set("Content-Type", "application/json")
 				expectedRequest.Header.Set("Authorization", "Bearer access-token")
@@ -120,11 +120,23 @@ var _ = Describe("API", func() {
 
 				Expect(request).To(Equal(expectedRequest))
 			})
+
+			It("Returns a request that will not overwrite", func() {
+				requestBody := bytes.NewReader([]byte(`{"type":"value","value":"my-value","overwrite":false}`))
+				expectedRequest, _ := http.NewRequest("PUT", "http://example.com/api/v1/data/my-name", requestBody)
+				expectedRequest.Header.Set("Content-Type", "application/json")
+				expectedRequest.Header.Set("Authorization", "Bearer access-token")
+
+				request := NewPutValueRequest(cfg, "my-name", "my-value", false)
+
+				Expect(request).To(Equal(expectedRequest))
+
+			})
 		})
 
 		Describe("NewPutPasswordRequest", func() {
 			It("Returns a request for the put-password endpoint", func() {
-				requestBody := bytes.NewReader([]byte(`{"type":"password","value":"my-password","parameters":{"overwrite":true}}`))
+				requestBody := bytes.NewReader([]byte(`{"type":"password","value":"my-password","overwrite":true}`))
 				expectedRequest, _ := http.NewRequest("PUT", "http://example.com/api/v1/data/my-name", requestBody)
 				expectedRequest.Header.Set("Content-Type", "application/json")
 				expectedRequest.Header.Set("Authorization", "Bearer access-token")
@@ -137,7 +149,7 @@ var _ = Describe("API", func() {
 
 		Describe("NewPutCertificateRequest", func() {
 			It("Returns a request for the put-certificate endpoint", func() {
-				json := fmt.Sprintf(`{"type":"certificate","value":{"ca":"%s","certificate":"%s","private_key":"%s"},"parameters":{"overwrite":true}}`,
+				json := fmt.Sprintf(`{"type":"certificate","value":{"ca":"%s","certificate":"%s","private_key":"%s"},"overwrite":true}`,
 					"my-ca", "my-cert", "my-priv")
 				requestBody := bytes.NewReader([]byte(json))
 				expectedRequest, _ := http.NewRequest("PUT", "http://example.com/api/v1/data/my-name", requestBody)
@@ -217,13 +229,13 @@ var _ = Describe("API", func() {
 
 		Describe("NewGenerateSecretRequest", func() {
 			It("returns a request with only overwrite", func() {
-				requestBody := bytes.NewReader([]byte(`{"type":"my-type","parameters":{}}`))
+				requestBody := bytes.NewReader([]byte(`{"type":"my-type","overwrite":true,"parameters":{}}`))
 				expectedRequest, _ := http.NewRequest("POST", "http://example.com/api/v1/data/my-name", requestBody)
 				expectedRequest.Header.Set("Content-Type", "application/json")
 				expectedRequest.Header.Set("Authorization", "Bearer access-token")
 
 				params := models.SecretParameters{}
-				request := NewGenerateSecretRequest(cfg, "my-name", params, "my-type")
+				request := NewGenerateSecretRequest(cfg, "my-name", params, "my-type", true)
 
 				Expect(request).To(Equal(expectedRequest))
 			})
@@ -238,6 +250,7 @@ var _ = Describe("API", func() {
 				}
 				expectedRequestBody := `{
 				"type":"value",
+				"overwrite":false,
 				"parameters": {
 					"exclude_special": true,
 					"exclude_number": true,
@@ -247,7 +260,7 @@ var _ = Describe("API", func() {
 				}
 			}`
 
-				request := NewGenerateSecretRequest(cfg, "my-name", parameters, "value")
+				request := NewGenerateSecretRequest(cfg, "my-name", parameters, "value", false)
 
 				bodyBuffer := new(bytes.Buffer)
 				bodyBuffer.ReadFrom(request.Body)

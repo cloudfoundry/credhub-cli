@@ -148,11 +148,7 @@ func setupPutValueServer(name string, secretType string, value string) {
 
 func setupOverwritePutValueServer(name string, secretType string, value string, overwrite bool) {
 	var jsonRequest string
-	if overwrite {
-		jsonRequest = fmt.Sprintf(SECRET_STRING_OVERWRITE_REQUEST_JSON, secretType, value, overwrite)
-	} else {
-		jsonRequest = fmt.Sprintf(SECRET_STRING_REQUEST_JSON, secretType, value)
-	}
+	jsonRequest = fmt.Sprintf(SECRET_STRING_OVERWRITE_REQUEST_JSON, secretType, value, overwrite)
 	server.AppendHandlers(
 		CombineHandlers(
 			VerifyRequest("PUT", fmt.Sprintf("/api/v1/data/%s", name)),
@@ -168,11 +164,7 @@ func setupPutCertificateServer(name string, ca string, cert string, priv string)
 
 func setupOverwritePutCertificateServer(name string, ca string, cert string, priv string, overwrite bool) {
 	var jsonRequest string
-	if overwrite {
-		jsonRequest = fmt.Sprintf(SECRET_CERTIFICATE_REQUEST_JSON, ca, cert, priv, overwrite)
-	} else {
-		jsonRequest = fmt.Sprintf(SECRET_CERTIFICATE_REQUEST_NO_OVERWRITE_JSON, ca, cert, priv)
-	}
+	jsonRequest = fmt.Sprintf(SECRET_CERTIFICATE_REQUEST_JSON, ca, cert, priv, overwrite)
 	server.AppendHandlers(
 		CombineHandlers(
 			VerifyRequest("PUT", fmt.Sprintf("/api/v1/data/%s", name)),
