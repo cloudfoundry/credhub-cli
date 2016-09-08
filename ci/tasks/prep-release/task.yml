@@ -1,5 +1,5 @@
 ---
-platform: linux
+platform: darwin
 image: docker:///golang
 
 inputs:
