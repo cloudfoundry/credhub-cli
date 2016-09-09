@@ -9,6 +9,8 @@ import (
 
 	"os"
 
+	"strings"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -53,6 +55,16 @@ var _ = Describe("Set", func() {
 
 			Eventually(session).Should(Exit(0))
 			Eventually(session.Out).Should(Say(responseMyPasswordPotatoes))
+		})
+
+		It("prompts for value if value is not provided", func() {
+			setupPutValueServer("my-password", "password", "potatoes")
+
+			session := runCommandWithStdin(strings.NewReader("potatoes\n"), "set", "-n", "my-password", "-t", "password")
+
+			Eventually(session.Out).Should(Say("value:"))
+			Eventually(session.Wait("10s").Out).Should(Say(responseMyPasswordPotatoes))
+			Eventually(session).Should(Exit(0))
 		})
 	})
 
