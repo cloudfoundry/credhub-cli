@@ -8,6 +8,7 @@ import (
 	"github.com/pivotal-cf/credhub-cli/actions"
 	"github.com/pivotal-cf/credhub-cli/client"
 	"github.com/pivotal-cf/credhub-cli/config"
+	. "github.com/pivotal-cf/credhub-cli/util"
 )
 
 type ApiCommand struct {
@@ -29,12 +30,12 @@ func (cmd ApiCommand) Execute([]string) error {
 	} else {
 		existingCfg := cfg
 		err := GetApiInfo(&cfg, serverUrl, cmd.SkipTlsValidation)
-
-		fmt.Println("Setting the target url:", cfg.ApiURL)
-
 		if err != nil {
 			return err
 		}
+
+		fmt.Println("Setting the target url:", cfg.ApiURL)
+
 		if existingCfg.AuthURL != cfg.AuthURL {
 			SendLogoutIfNecessary(existingCfg)
 			cfg = RevokedConfig(cfg)
@@ -62,15 +63,11 @@ func GetApiInfo(cfg *config.Config, serverUrl string, skipTlsValidation bool) er
 	cfg.AuthURL = cmInfo.AuthServer.Url
 
 	if parsedUrl.Scheme != "https" {
-		fmt.Println("\033[38;2;255;255;0m" +
-			"Warning: Insecure HTTP API detected. Data sent to this API could be intercepted" +
-			" in transit by third parties. Secure HTTPS API endpoints are recommended." +
-			"\033[0m")
+		Warning("Warning: Insecure HTTP API detected. Data sent to this API could be intercepted" +
+			" in transit by third parties. Secure HTTPS API endpoints are recommended.")
 	} else {
 		if skipTlsValidation {
-			fmt.Println("\033[38;2;255;255;0m" +
-				"Warning: The targeted TLS certificate has not been verified for this connection." +
-				"\033[0m")
+			Warning("Warning: The targeted TLS certificate has not been verified for this connection.")
 		}
 	}
 
