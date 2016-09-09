@@ -44,7 +44,10 @@ func (cmd LoginCommand) Execute([]string) error {
 	cfg.RefreshToken = token.RefreshToken
 	config.WriteConfig(cfg)
 
-	fmt.Println("Setting the target url:", cfg.ApiURL)
+	if cmd.ServerUrl != "" {
+		fmt.Println("Setting the target url:", cfg.ApiURL)
+	}
+
 	fmt.Println("Login Successful")
 
 	return nil
