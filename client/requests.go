@@ -82,7 +82,7 @@ func NewGetCaRequest(config config.Config, caIdentifier string) *http.Request {
 func NewGenerateSecretRequest(config config.Config, secretIdentifier string, parameters models.SecretParameters, contentType string, overwrite bool) *http.Request {
 	generateRequest := models.GenerateSecretRequest{
 		ContentType: contentType,
-		Overwrite: overwrite,
+		Overwrite:   overwrite,
 		Parameters:  &parameters,
 	}
 

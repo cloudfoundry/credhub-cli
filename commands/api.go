@@ -29,6 +29,9 @@ func (cmd ApiCommand) Execute([]string) error {
 	} else {
 		existingCfg := cfg
 		err := GetApiInfo(&cfg, serverUrl, cmd.SkipTlsValidation)
+
+		fmt.Println("Setting the target url:", cfg.ApiURL)
+
 		if err != nil {
 			return err
 		}
@@ -70,8 +73,6 @@ func GetApiInfo(cfg *config.Config, serverUrl string, skipTlsValidation bool) er
 				"\033[0m")
 		}
 	}
-
-	fmt.Println("Setting the target url:", cfg.ApiURL)
 
 	return nil
 }

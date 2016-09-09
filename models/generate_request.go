@@ -2,7 +2,7 @@ package models
 
 type GenerateSecretRequest struct {
 	ContentType string            `json:"type"`
-	Overwrite bool								`json:"overwrite"`
+	Overwrite   bool              `json:"overwrite"`
 	Parameters  *SecretParameters `json:"parameters"`
 }
 

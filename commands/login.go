@@ -43,7 +43,10 @@ func (cmd LoginCommand) Execute([]string) error {
 	cfg.AccessToken = token.AccessToken
 	cfg.RefreshToken = token.RefreshToken
 	config.WriteConfig(cfg)
+
+	fmt.Println("Setting the target url:", cfg.ApiURL)
 	fmt.Println("Login Successful")
+
 	return nil
 }
 
