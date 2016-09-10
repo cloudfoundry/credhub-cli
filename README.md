@@ -26,12 +26,12 @@ CREDENTIAL MANAGEMENT:
 
 	get --name <cred name>
 		Get the value and attributes of a Credential
-		-n, --name 'CRED'									Name of credential to retrieve
+		-n, --name 'CRED'									Name of the credential to retrieve
 
 	set --type <cred type> --name <cred name> [set params]
 		Set the value and attributes of a credential
-		-t, --type ['password', 'value', 'certificate']		Sets the type of credential to store (Default: 'password')
-		-n, --name 'CRED'									Selects the credential being set
+		-t, --type ['password', 'value', 'certificate']		Sets the credential type (Default: 'password')
+		-n, --name 'CRED'									Name of the credential to set
 		-O, --no-overwrite									Credential is not modified if stored value already exists
 
 		Set parameters by [Type]
@@ -45,8 +45,8 @@ CREDENTIAL MANAGEMENT:
 
 	generate --type <cred type> --name <cred name> [generate params]
 		Generate and set a credential value based on generation parameters
-		-t, --type ['password', 'certificate']				Sets the type of credential to generate (Default: 'password')
-		-n, --name 'CRED'									Selects the credential being set
+		-t, --type ['password', 'certificate']				Sets the credential type to generate (Default: 'password')
+		-n, --name 'CRED'									Name of the credential to generate
 		-O, --no-overwrite									Credential is not modified if stored value already exists
 
 
@@ -54,13 +54,12 @@ CREDENTIAL MANAGEMENT:
 		-l, --length [4-200]								[Password] Length of generated value (Default: 20)
 		-U, --exclude-upper									[Password] Exclude upper alpha characters from generated value
 		-L, --exclude-lower									[Password] Exclude lower alpha characters from generated value
-		-N, --exclude-number								[Password] Exclude numbers from generated value
+		-N, --exclude-number								[Password] Exclude number characters from generated value
 		-S, --exclude-special								[Password] Exclude special characters from generated value
 		    --ca 'CA NAME'									[Certificate] Name of CA used to sign the generated certificate (Default: 'default')
 		-d, --duration [1-3650]								[Certificate] Valid duration (in days) of the generated certificate (Default: 365)
 		-k, --key-length [2048, 3072, 4096]					[Certificate] Bit length of the generated key (Default: 2048)
-		-c, --common-name 'COMMON NAME'						[Certificate] Common name of the generated certificate
-
+		-c, --common-name 'COMMON NAME'						[Certificate] Common name of the generated certificate 
 		-a, --alternative-name 'ALT NAME'					[Certificate] Alternative name(s) of the generated certificate
 		-o, --organization 'ORG'							[Certificate] Organization of the generated certificate
 		-u, --organization-unit 'ORG UNIT'					[Certificate] Organization unit of the generated certificate
