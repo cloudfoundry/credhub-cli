@@ -66,6 +66,18 @@ var _ = Describe("Set", func() {
 			Eventually(session.Wait("10s").Out).Should(Say(responseMyPasswordPotatoes))
 			Eventually(session).Should(Exit(0))
 		})
+
+		It("can set password that contains spaces interactively", func() {
+			setupPutValueServer("my-password", "password", "potatoes potatoes")
+
+			session := runCommandWithStdin(strings.NewReader("potatoes potatoes\n"), "set", "-n", "my-password", "-t", "password")
+
+			response := fmt.Sprintf(SECRET_STRING_RESPONSE_TABLE, "password", "my-password", "potatoes potatoes")
+
+			Eventually(session.Out).Should(Say("value:"))
+			Eventually(session.Wait("10s").Out).Should(Say(response))
+			Eventually(session).Should(Exit(0))
+		})
 	})
 
 	Describe("setting certificate secrets", func() {

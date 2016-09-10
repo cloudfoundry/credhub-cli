@@ -10,6 +10,10 @@ import (
 	"github.com/pivotal-cf/credhub-cli/config"
 	"github.com/pivotal-cf/credhub-cli/repositories"
 
+	"bufio"
+	"os"
+	"strings"
+
 	cmcli_errors "github.com/pivotal-cf/credhub-cli/errors"
 )
 
@@ -93,4 +97,11 @@ func getRequest(cmd SetCommand, config config.Config) (*http.Request, error) {
 	}
 
 	return request, nil
+}
+
+func promptForInput(prompt string, value *string) {
+	fmt.Printf(prompt)
+	reader := bufio.NewReader(os.Stdin)
+	val, _ := reader.ReadString('\n')
+	*value = string(strings.TrimSpace(val))
 }

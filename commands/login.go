@@ -58,21 +58,14 @@ func getUsernameAndPassword(cmd *LoginCommand) error {
 		return errors.NewAuthorizationParametersError()
 	}
 	if cmd.Username == "" {
-		promptForInput("username: ", &cmd.Username)
+		fmt.Printf("username: ")
+		username, _ := gopass.GetPasswd()
+		cmd.Username = string(username)
 	}
 	if cmd.Password == "" {
-		promptForInputWithoutEcho("password: ", &cmd.Password)
+		fmt.Printf("password: ")
+		pass, _ := gopass.GetPasswdMasked()
+		cmd.Password = string(pass)
 	}
 	return nil
-}
-
-func promptForInput(prompt string, value *string) {
-	fmt.Printf(prompt)
-	fmt.Scanln(value)
-}
-
-func promptForInputWithoutEcho(prompt string, value *string) {
-	fmt.Printf(prompt)
-	pass, _ := gopass.GetPasswdMasked()
-	*value = string(pass)
 }
