@@ -69,7 +69,7 @@ CREDENTIAL MANAGEMENT:
 
 	delete --name <cred name>
 		Delete a credential
-		-n, --name 'CRED'									Name of credential to delete
+		-n, --name 'CRED'									Name of the credential to delete
 		
 CERTIFICATE AUTHORITY:
 
@@ -77,12 +77,12 @@ NOTE: CA with name 'default' will be used when generating a certificate credenti
 
 	ca-get --name <ca name>
 		Get the value and attributes of a CA
-		-n, --name 'CA'										Name of CA to retrieve
+		-n, --name 'CA'										Name of the CA to retrieve
 
 	ca-set --type <ca type> --name <ca name> [set params]
 		Set the value and attributes of a CA
-		-t, --type ['root']									Sets the type of CA to store (Default: 'root')
-		-n, --name 'CA'										Selects the CA being set
+		-t, --type ['root']									Sets the CA type (Default: 'root')
+		-n, --name 'CA'										Name of the CA to set
 
 		Set parameters by [Type]
 		-c, --certificate <FILE>							[Root] Sets the CA certificate from file
@@ -92,16 +92,16 @@ NOTE: CA with name 'default' will be used when generating a certificate credenti
 
 	ca-generate --type <ca type> --name <ca name> [generate params]
 		Generate and set a credential value based on generation parameters
-		-t, --type ['root']									Sets the type of CA to generate (Default: 'root')
-		-n, --name 'CRED'									Selects the CA to generate
+		-t, --type ['root']									Sets the CA type to generate (Default: 'root')
+		-n, --name 'CRED'									Name of the CA to generate
 
 		Generate parameters by [Type]
-		-d, --duration [1-3650]								[Root] Valid duration (in days) of the generated certificate (Default: 365)
+		-d, --duration [1-3650]								[Root] Valid duration (in days) of the generated CA (Default: 365)
 		-k, --key-length [2048, 3072, 4096]					[Root] Bit length of the generated key (Default: 2048)
-		-c, --common-name 'COMMON NAME'						[Root] Common name of the generated certificate
-		-o, --organization 'ORG'							[Root] Organization of the generated certificate
-		-u, --organization-unit 'ORG UNIT'					[Root] Organization unit of the generated certificate
-		-i, --locality 'LOCALITY'							[Root] Locality/city of the generated certificate
-		-s, --state	'ST'									[Root] State/province of the generated certificate
-		-y, --country 'CC'									[Root] Country of the generated certificate
+		-c, --common-name 'COMMON NAME'						[Root] Common name of the generated CA
+		-o, --organization 'ORG'							[Root] Organization of the generated CA
+		-u, --organization-unit 'ORG UNIT'					[Root] Organization unit of the generated CA
+		-i, --locality 'LOCALITY'							[Root] Locality/city of the generated CA
+		-s, --state	'ST'									[Root] State/province of the generated CA
+		-y, --country 'CC'									[Root] Country of the generated CA
 ```
