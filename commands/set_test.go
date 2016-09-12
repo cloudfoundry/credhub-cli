@@ -132,6 +132,44 @@ var _ = Describe("Set", func() {
 	})
 
 	Describe("Help", func() {
+		Describe("short flags", func() {
+			Context("short flags without values", func() {
+				It("can use -O flag for no-overwrite", func() {
+					setupOverwritePutValueServer("my-password", "password", "potatoes", false)
+
+					session := runCommand("set", "-n", "my-password", "-v", "potatoes", "-O")
+
+					Eventually(session).Should(Exit(0))
+				})
+			})
+
+			Context("short flags with values", func() {
+				var shortFlagMapping map[string]string
+
+				BeforeEach(func() {
+					shortFlagMapping = map[string]string{
+						"--root": "-r",
+						"--certificate": "-c",
+						"--private": "-p",
+						"--root-string": "-R",
+						"--certificate-string": "-C",
+						"--private-string": "-P",
+					}
+				})
+
+				It("can use short flags", func() {
+					for longName, shortName := range shortFlagMapping {
+						setupPutValueServer("my-password", "password", "potatoes")
+						session := runCommand("set", "-n", "my-password", "-v", "potatoes", shortName, "some-value")
+						errorMessage := fmt.Sprintf("Expected '%s' to have short flag '%s'", longName, shortName)
+						Eventually(session).Should(Exit(0), errorMessage)
+					}
+				})
+
+			})
+		})
+
+
 		It("displays help", func() {
 			session := runCommand("set", "-h")
 

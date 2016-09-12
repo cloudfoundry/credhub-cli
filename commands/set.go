@@ -21,13 +21,13 @@ type SetCommand struct {
 	SecretIdentifier           string `short:"n" required:"yes" long:"name" description:"Selects the secret being set"`
 	ContentType                string `short:"t" long:"type" description:"Sets the type of secret to store or generate. Default: 'value'"`
 	Value                      string `short:"v" long:"value" description:"Sets a value for a secret name"`
-	NoOverwrite                bool   `long:"no-overwrite" description:"Credential is not modified if stored value already exists"`
-	RootCAFileName             string `long:"root" description:"Sets the Root CA based on an input file"`
-	CertificatePublicFileName  string `long:"certificate" description:"Sets the Certificate based on an input file"`
-	CertificatePrivateFileName string `long:"private" description:"Sets the Private Key based on an input file"`
-	RootCA                     string `long:"root-string" description:"Sets the Root Certificate Authority"`
-	CertificatePublic          string `long:"certificate-string" description:"Sets the Certificate"`
-	CertificatePrivate         string `long:"private-string" description:"Sets the Private Key"`
+	NoOverwrite                bool   `short:"O" long:"no-overwrite" description:"Credential is not modified if stored value already exists"`
+	RootCAFileName             string `short:"r" long:"root" description:"Sets the Root CA based on an input file"`
+	CertificatePublicFileName  string `short:"c" long:"certificate" description:"Sets the Certificate based on an input file"`
+	CertificatePrivateFileName string `short:"p" long:"private" description:"Sets the Private Key based on an input file"`
+	RootCA                     string `short:"R" long:"root-string" description:"Sets the Root Certificate Authority"`
+	CertificatePublic          string `short:"C" long:"certificate-string" description:"Sets the Certificate"`
+	CertificatePrivate         string `short:"P" long:"private-string" description:"Sets the Private Key"`
 }
 
 func (cmd SetCommand) Execute([]string) error {
