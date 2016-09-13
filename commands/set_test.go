@@ -16,6 +16,8 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
 	. "github.com/onsi/gomega/ghttp"
+	"reflect"
+	"github.com/pivotal-cf/credhub-cli/commands"
 )
 
 var _ = Describe("Set", func() {
@@ -133,42 +135,30 @@ var _ = Describe("Set", func() {
 
 	Describe("Help", func() {
 		Describe("short flags", func() {
-			Context("short flags without values", func() {
-				It("can use -O flag for no-overwrite", func() {
-					setupOverwritePutValueServer("my-password", "password", "potatoes", false)
+			shortFlagMapping := map[string]string{
+				"name":               "n",
+				"type":               "t",
+				"value":              "v",
+				"no-overwrite":       "O",
+				"root":               "r",
+				"certificate":        "c",
+				"private":            "p",
+				"root-string":        "R",
+				"certificate-string": "C",
+				"private-string":     "P",
+			}
 
-					session := runCommand("set", "-n", "my-password", "-v", "potatoes", "-O")
+			t := reflect.TypeOf(commands.SetCommand{})
+			for i := 0; i < t.NumField(); i++ {
+				field := t.Field(i)
 
-					Eventually(session).Should(Exit(0))
+				It("has correct shortname", func() {
+					short := field.Tag.Get("short")
+					long := field.Tag.Get("long")
+					Expect(short).To(Equal(shortFlagMapping[long]))
 				})
-			})
-
-			Context("short flags with values", func() {
-				var shortFlagMapping map[string]string
-
-				BeforeEach(func() {
-					shortFlagMapping = map[string]string{
-						"--root": "-r",
-						"--certificate": "-c",
-						"--private": "-p",
-						"--root-string": "-R",
-						"--certificate-string": "-C",
-						"--private-string": "-P",
-					}
-				})
-
-				It("can use short flags", func() {
-					for longName, shortName := range shortFlagMapping {
-						setupPutValueServer("my-password", "password", "potatoes")
-						session := runCommand("set", "-n", "my-password", "-v", "potatoes", shortName, "some-value")
-						errorMessage := fmt.Sprintf("Expected '%s' to have short flag '%s'", longName, shortName)
-						Eventually(session).Should(Exit(0), errorMessage)
-					}
-				})
-
-			})
+			}
 		})
-
 
 		It("displays help", func() {
 			session := runCommand("set", "-h")

@@ -9,11 +9,14 @@ import (
 
 	"os"
 
+	"reflect"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
 	. "github.com/onsi/gomega/ghttp"
+	"github.com/pivotal-cf/credhub-cli/commands"
 )
 
 var _ = Describe("Ca-Set", func() {
@@ -67,6 +70,28 @@ var _ = Describe("Ca-Set", func() {
 	})
 
 	Describe("Help", func() {
+		Describe("short flags", func() {
+			shortFlagMapping := map[string]string{
+				"name":               "n",
+				"type":               "t",
+				"certificate":        "c",
+				"private":            "p",
+				"certificate-string": "C",
+				"private-string":     "P",
+			}
+
+			t := reflect.TypeOf(commands.CaSetCommand{})
+			for i := 0; i < t.NumField(); i++ {
+				field := t.Field(i)
+
+				It("has correct shortname", func() {
+					short := field.Tag.Get("short")
+					long := field.Tag.Get("long")
+					Expect(short).To(Equal(shortFlagMapping[long]))
+				})
+			}
+		})
+
 		It("displays help", func() {
 			session := runCommand("ca-set", "-h")
 
