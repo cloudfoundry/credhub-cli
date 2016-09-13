@@ -12,6 +12,7 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
 	. "github.com/onsi/gomega/ghttp"
+	"github.com/pivotal-cf/credhub-cli/commands"
 )
 
 var _ = Describe("Ca-Generate", func() {
@@ -54,6 +55,21 @@ var _ = Describe("Ca-Generate", func() {
 			Expect(session.Err).To(Say("country"))
 			Expect(session.Err).To(Say("key-length"))
 			Expect(session.Err).To(Say("duration"))
+		})
+
+		It("short flags", func() {
+			Expect(commands.CaGenerateCommand{}).To(SatisfyAll(
+				commands.HaveFlag("name", "n"),
+				commands.HaveFlag("type", "t"),
+				commands.HaveFlag("common-name", "c"),
+				commands.HaveFlag("organization", "o"),
+				commands.HaveFlag("organization-unit", "u"),
+				commands.HaveFlag("locality", "i"),
+				commands.HaveFlag("state", "s"),
+				commands.HaveFlag("country", "y"),
+				commands.HaveFlag("key-length", "k"),
+				commands.HaveFlag("duration", "d"),
+			))
 		})
 
 		It("displays missing 'n' option as required parameter", func() {

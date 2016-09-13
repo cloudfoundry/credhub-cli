@@ -12,6 +12,7 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
 	. "github.com/onsi/gomega/ghttp"
+	"github.com/pivotal-cf/credhub-cli/commands"
 )
 
 var _ = Describe("Generate", func() {
@@ -125,6 +126,28 @@ var _ = Describe("Generate", func() {
 			Expect(session.Err).To(Say("generate"))
 			Expect(session.Err).To(Say("name"))
 			Expect(session.Err).To(Say("length"))
+		})
+
+		It("short flags", func() {
+			Expect(commands.GenerateCommand{}).To(SatisfyAll(
+				commands.HaveFlag("name", "n"),
+				commands.HaveFlag("type", "t"),
+				commands.HaveFlag("no-overwrite", "O"),
+				commands.HaveFlag("length", "l"),
+				commands.HaveFlag("exclude-special", "S"),
+				commands.HaveFlag("exclude-number", "N"),
+				commands.HaveFlag("exclude-upper", "U"),
+				commands.HaveFlag("exclude-lower", "L"),
+				commands.HaveFlag("common-name", "c"),
+				commands.HaveFlag("organization", "o"),
+				commands.HaveFlag("organization-unit", "u"),
+				commands.HaveFlag("locality", "i"),
+				commands.HaveFlag("state", "s"),
+				commands.HaveFlag("country", "y"),
+				commands.HaveFlag("alternative-name", "a"),
+				commands.HaveFlag("key-length", "k"),
+				commands.HaveFlag("duration", "d"),
+			))
 		})
 
 		It("displays missing 'n' option as required parameters", func() {

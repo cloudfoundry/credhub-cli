@@ -16,7 +16,6 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
 	. "github.com/onsi/gomega/ghttp"
-	"reflect"
 	"github.com/pivotal-cf/credhub-cli/commands"
 )
 
@@ -134,30 +133,19 @@ var _ = Describe("Set", func() {
 	})
 
 	Describe("Help", func() {
-		Describe("short flags", func() {
-			shortFlagMapping := map[string]string{
-				"name":               "n",
-				"type":               "t",
-				"value":              "v",
-				"no-overwrite":       "O",
-				"root":               "r",
-				"certificate":        "c",
-				"private":            "p",
-				"root-string":        "R",
-				"certificate-string": "C",
-				"private-string":     "P",
-			}
-
-			t := reflect.TypeOf(commands.SetCommand{})
-			for i := 0; i < t.NumField(); i++ {
-				field := t.Field(i)
-
-				It("has correct shortname", func() {
-					short := field.Tag.Get("short")
-					long := field.Tag.Get("long")
-					Expect(short).To(Equal(shortFlagMapping[long]))
-				})
-			}
+		It("short flags", func() {
+			Expect(commands.SetCommand{}).To(SatisfyAll(
+				commands.HaveFlag("name", "n"),
+				commands.HaveFlag("type", "t"),
+				commands.HaveFlag("value", "v"),
+				commands.HaveFlag("no-overwrite", "O"),
+				commands.HaveFlag("root", "r"),
+				commands.HaveFlag("certificate", "c"),
+				commands.HaveFlag("private", "p"),
+				commands.HaveFlag("root-string", "R"),
+				commands.HaveFlag("certificate-string", "C"),
+				commands.HaveFlag("private-string", "P"),
+			))
 		})
 
 		It("displays help", func() {

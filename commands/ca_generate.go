@@ -13,14 +13,14 @@ import (
 type CaGenerateCommand struct {
 	CaIdentifier       string `short:"n" required:"yes" long:"name" description:"Sets the name of the CA"`
 	CaType             string `short:"t" long:"type" description:"Sets the type of the CA"`
-	CaCommonName       string `long:"common-name" description:"Sets the common name of the generated CA"`
-	CaOrganization     string `long:"organization" description:"Sets the organization of the generated CA"`
-	CaOrganizationUnit string `long:"organization-unit" description:"Sets the organization unit of the generated CA"`
-	CaLocality         string `long:"locality" description:"Sets the locality/city of the generated CA"`
-	CaState            string `long:"state" description:"Sets the state/province of the generated CA"`
-	CaCountry          string `long:"country" description:"Sets the country of the generated CA"`
-	CaKeyLength        int    `long:"key-length" description:"Sets the bit length of the generated CA key"`
-	CaDuration         int    `long:"duration" description:"Sets the valid duration (in days) for the generated CA"`
+	CaCommonName       string `short:"c" long:"common-name" description:"Sets the common name of the generated CA"`
+	CaOrganization     string `short:"o" long:"organization" description:"Sets the organization of the generated CA"`
+	CaOrganizationUnit string `short:"u" long:"organization-unit" description:"Sets the organization unit of the generated CA"`
+	CaLocality         string `short:"i" long:"locality" description:"Sets the locality/city of the generated CA"`
+	CaState            string `short:"s" long:"state" description:"Sets the state/province of the generated CA"`
+	CaCountry          string `short:"y" long:"country" description:"Sets the country of the generated CA"`
+	CaKeyLength        int    `short:"k" long:"key-length" description:"Sets the bit length of the generated CA key"`
+	CaDuration         int    `short:"d" long:"duration" description:"Sets the valid duration (in days) for the generated CA"`
 }
 
 func (cmd CaGenerateCommand) Execute([]string) error {
