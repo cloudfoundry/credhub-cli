@@ -60,9 +60,8 @@ var _ = Describe("Find", func() {
 				]
 			}`
 			responseTable := "Name                 Updated Date\n" +
-                       "dan.password         2016-09-06T23:26:58Z\n" +
-                       "deploy1/dan/id.key   2016-09-06T23:26:58Z"
-
+				"dan.password         2016-09-06T23:26:58Z\n" +
+				"deploy1/dan/id.key   2016-09-06T23:26:58Z"
 
 			server.AppendHandlers(
 				CombineHandlers(

@@ -40,7 +40,7 @@ var _ = Describe("FindRepository", func() {
 
 			responseObj := http.Response{
 				StatusCode: 200,
-				Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{
+				Body: ioutil.NopCloser(bytes.NewReader([]byte(`{
 					"credentials": [
 							{
 								"name": "dan.password",
@@ -63,17 +63,17 @@ var _ = Describe("FindRepository", func() {
 			expectedFindResponseBody := models.SecretQueryResponseBody{
 				Credentials: []models.SecretQueryCredential{
 					{
-						Name: "dan.password",
+						Name:      "dan.password",
 						UpdatedAt: "2016-09-06T23:26:58Z",
 					},
 					{
-						Name: "deploy1/dan/id.key",
+						Name:      "deploy1/dan/id.key",
 						UpdatedAt: "2016-09-06T23:26:58Z",
 					},
 				},
 			}
 
-			findResponseBody, err := repository.SendRequest(request, "");
+			findResponseBody, err := repository.SendRequest(request, "")
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(findResponseBody).To(Equal(expectedFindResponseBody))

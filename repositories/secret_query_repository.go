@@ -3,9 +3,10 @@ package repositories
 import (
 	"net/http"
 
+	"encoding/json"
+
 	"github.com/pivotal-cf/credhub-cli/client"
 	"github.com/pivotal-cf/credhub-cli/models"
-	"encoding/json"
 
 	cm_errors "github.com/pivotal-cf/credhub-cli/errors"
 )

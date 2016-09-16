@@ -1,21 +1,22 @@
 package commands
 
 import (
-	"github.com/onsi/gomega/types"
 	"reflect"
+
 	"github.com/onsi/gomega/format"
+	"github.com/onsi/gomega/types"
 )
 
 func HaveFlag(long, short string) types.GomegaMatcher {
 	return &CommandFlagMatcher{
-		Long: long,
+		Long:  long,
 		Short: short,
 	}
 }
 
 type CommandFlagMatcher struct {
-	Long string
-  Short string
+	Long  string
+	Short string
 }
 
 func (matcher *CommandFlagMatcher) Match(actual interface{}) (success bool, err error) {
@@ -24,7 +25,7 @@ func (matcher *CommandFlagMatcher) Match(actual interface{}) (success bool, err 
 		field := t.Field(i)
 		short := field.Tag.Get("short")
 		long := field.Tag.Get("long")
-		if long ==  matcher.Long {
+		if long == matcher.Long {
 			return short == matcher.Short, nil
 		}
 	}

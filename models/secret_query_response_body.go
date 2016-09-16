@@ -1,9 +1,9 @@
 package models
 
 import (
-	"strings"
 	"fmt"
 	"strconv"
+	"strings"
 )
 
 type SecretQueryResponseBody struct {
