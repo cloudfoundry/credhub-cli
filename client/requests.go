@@ -163,6 +163,12 @@ func NewBodyClone(req *http.Request) io.ReadCloser {
 	return result
 }
 
+func NewFindSecretsRequest(config config.Config, partialSecretIdentifier string) *http.Request {
+	url := config.ApiURL + "/api/v1/data?name-like=" + partialSecretIdentifier
+
+	return newRequest("GET", config, url, nil)
+}
+
 func newSecretRequest(requestType string, config config.Config, secretIdentifier string, bodyModel interface{}) *http.Request {
 	url := config.ApiURL + "/api/v1/data/" + secretIdentifier
 

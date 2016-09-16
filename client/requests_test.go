@@ -188,16 +188,16 @@ var _ = Describe("API", func() {
 					Country:          "my-country",
 				}
 				expectedRequestJson := `{
-				"type":"root",
-				"parameters": {
-					"common_name": "my-common-name",
-					"organization": "my-organization",
-					"organization_unit": "my-unit",
-					"locality": "my-locality",
-					"state": "my-state",
-					"country": "my-country"
-				}
-			}`
+					"type":"root",
+					"parameters": {
+						"common_name": "my-common-name",
+						"organization": "my-organization",
+						"organization_unit": "my-unit",
+						"locality": "my-locality",
+						"state": "my-state",
+						"country": "my-country"
+					}
+				}`
 
 				expectedRequestBody := bytes.NewReader([]byte(expectedRequestJson))
 
@@ -249,16 +249,16 @@ var _ = Describe("API", func() {
 					Length:         42,
 				}
 				expectedRequestBody := `{
-				"type":"value",
-				"overwrite":false,
-				"parameters": {
-					"exclude_special": true,
-					"exclude_number": true,
-					"exclude_upper": true,
-					"exclude_lower": true,
-					"length": 42
-				}
-			}`
+					"type":"value",
+					"overwrite":false,
+					"parameters": {
+						"exclude_special": true,
+						"exclude_number": true,
+						"exclude_upper": true,
+						"exclude_lower": true,
+						"length": 42
+					}
+				}`
 
 				request := NewGenerateSecretRequest(cfg, "my-name", parameters, "value", false)
 
@@ -277,6 +277,17 @@ var _ = Describe("API", func() {
 				expectedRequest.Header.Set("Authorization", "Bearer access-token")
 
 				request := NewGetSecretRequest(cfg, "my-name")
+
+				Expect(request).To(Equal(expectedRequest))
+			})
+		})
+
+		Describe("NewFindSecretsRequest", func() {
+			It("Returns a request for getting secret", func() {
+				expectedRequest, _ := http.NewRequest("GET", "http://example.com/api/v1/data?name-like=my-name", nil)
+				expectedRequest.Header.Set("Authorization", "Bearer access-token")
+
+				request := NewFindSecretsRequest(cfg, "my-name")
 
 				Expect(request).To(Equal(expectedRequest))
 			})
