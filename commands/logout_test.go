@@ -16,29 +16,29 @@ var _ = Describe("Logout", func() {
 		config.RemoveConfig()
 	})
 
-	Context("user logs out", func() {
-
-		It("marks the access token and refresh token as revoked if no config exists", func() {
-			config.RemoveConfig()
-			runLogoutCommand()
-		})
-
-		It("leaves the access token and refresh token as revoked if config exists and they were already revoked", func() {
-			cfg := config.Config{RefreshToken: "revoked", AccessToken: "revoked"}
-			config.WriteConfig(cfg)
-			runLogoutCommand()
-		})
-
-		It("asks UAA to revoke the refresh token (and UAA succeeds)", func() {
-			doRevoke(http.StatusOK)
-		})
-
-		It("asks UAA to revoke the refresh token (and reports no error when UAA fails)", func() {
-			doRevoke(http.StatusUnauthorized)
-		})
-
+	It("marks the access token and refresh token as revoked if no config exists", func() {
+		config.RemoveConfig()
+		runLogoutCommand()
 	})
 
+	It("leaves the access token and refresh token as revoked if config exists and they were already revoked", func() {
+		cfg := config.Config{RefreshToken: "revoked", AccessToken: "revoked"}
+		config.WriteConfig(cfg)
+		runLogoutCommand()
+	})
+
+	It("asks UAA to revoke the refresh token (and UAA succeeds)", func() {
+		doRevoke(http.StatusOK)
+	})
+
+	It("asks UAA to revoke the refresh token (and reports no error when UAA fails)", func() {
+		doRevoke(http.StatusUnauthorized)
+	})
+
+	ItBehavesLikeHelp("logout", "o", func(session *Session) {
+		Expect(session.Err).To(Say("Usage:"))
+		Expect(session.Err).To(Say(`credhub-cli \[OPTIONS\] logout`))
+	})
 })
 
 func doRevoke(uaaResponseStatus int) {

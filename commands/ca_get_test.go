@@ -13,6 +13,10 @@ import (
 )
 
 var _ = Describe("Ca-Get", func() {
+	ItBehavesLikeHelp("ca-get", "cg", func(session *Session) {
+		Expect(session.Err).To(Say("ca-get command options"))
+	})
+
 	Describe("getting certificate authorities", func() {
 		It("gets a root CA", func() {
 			var responseMyCertificate = fmt.Sprintf(CA_RESPONSE_TABLE, "root", "my-ca-name", "my-cert", "my-priv")

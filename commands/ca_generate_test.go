@@ -36,14 +36,10 @@ var _ = Describe("Ca-Generate", func() {
 			Eventually(session).Should(Exit(0))
 			Eventually(session.Out).Should(Say(responseMyCertificate))
 		})
-
 	})
 
 	Describe("Help", func() {
-		It("displays help", func() {
-			session := runCommand("ca-generate", "-h")
-
-			Eventually(session).Should(Exit(1))
+		ItBehavesLikeHelp("ca-generate", "cn", func(session *Session) {
 			Expect(session.Err).To(Say("ca-generate"))
 			Expect(session.Err).To(Say("name"))
 			Expect(session.Err).To(Say("type"))

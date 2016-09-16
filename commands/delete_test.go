@@ -15,10 +15,7 @@ import (
 
 var _ = Describe("Delete", func() {
 	Describe("Help", func() {
-		It("displays help", func() {
-			session := runCommand("delete", "-h")
-
-			Eventually(session).Should(Exit(1))
+		ItBehavesLikeHelp("delete", "d", func(session *Session) {
 			Expect(session.Err).To(Say("delete"))
 			Expect(session.Err).To(Say("name"))
 		})

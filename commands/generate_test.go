@@ -119,10 +119,7 @@ var _ = Describe("Generate", func() {
 	})
 
 	Describe("Help", func() {
-		It("displays help", func() {
-			session := runCommand("generate", "-h")
-
-			Eventually(session).Should(Exit(1))
+		ItBehavesLikeHelp("generate", "n", func(session *Session) {
 			Expect(session.Err).To(Say("generate"))
 			Expect(session.Err).To(Say("name"))
 			Expect(session.Err).To(Say("length"))

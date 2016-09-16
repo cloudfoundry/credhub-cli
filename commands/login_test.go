@@ -311,10 +311,7 @@ var _ = Describe("Login", func() {
 	})
 
 	Describe("Help", func() {
-		It("displays help", func() {
-			session := runCommand("login", "-h")
-
-			Eventually(session).Should(Exit(1))
+		ItBehavesLikeHelp("login", "l", func(session *Session) {
 			Expect(session.Err).To(Say("login"))
 			Expect(session.Err).To(Say("username"))
 			Expect(session.Err).To(Say("password"))

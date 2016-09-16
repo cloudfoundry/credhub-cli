@@ -13,10 +13,8 @@ import (
 )
 
 var _ = Describe("Get", func() {
-	It("displays help", func() {
-		session := runCommand("get", "-h")
 
-		Eventually(session).Should(Exit(1))
+	ItBehavesLikeHelp("get", "g", func(session *Session) {
 		Expect(session.Err).To(Say("Usage"))
 		if runtime.GOOS == "windows" {
 			Expect(session.Err).To(Say("credhub-cli.exe \\[OPTIONS\\] get \\[get-OPTIONS\\]"))

@@ -133,6 +133,17 @@ var _ = Describe("Set", func() {
 	})
 
 	Describe("Help", func() {
+		helpBehaviorWithCommand := func(command string) func() {
+			return func() {
+				session := runCommand(command, "-h")
+
+				Eventually(session).Should(Exit(1))
+				Expect(session.Err).To(Say("set"))
+				Expect(session.Err).To(Say("name"))
+				Expect(session.Err).To(Say("secret"))
+			}
+		}
+
 		It("short flags", func() {
 			Expect(commands.SetCommand{}).To(SatisfyAll(
 				commands.HaveFlag("name", "n"),
@@ -148,14 +159,9 @@ var _ = Describe("Set", func() {
 			))
 		})
 
-		It("displays help", func() {
-			session := runCommand("set", "-h")
+		It("displays help", helpBehaviorWithCommand("set"))
 
-			Eventually(session).Should(Exit(1))
-			Expect(session.Err).To(Say("set"))
-			Expect(session.Err).To(Say("name"))
-			Expect(session.Err).To(Say("secret"))
-		})
+		It("displays help using the alias", helpBehaviorWithCommand("s"))
 
 		It("displays missing 'n' option as required parameter", func() {
 			session := runCommand("set", "-v", "potatoes")

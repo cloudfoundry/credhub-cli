@@ -14,14 +14,10 @@ import (
 )
 
 var _ = Describe("API", func() {
-	Describe("Help", func() {
-		It("displays help", func() {
-			session := runCommand("api", "-h")
 
-			Eventually(session).Should(Exit(1))
-			Expect(session.Err).To(Say("api"))
-			Expect(session.Err).To(Say("SERVER_URL"))
-		})
+	ItBehavesLikeHelp("api", "a", func(session *Session) {
+		Expect(session.Err).To(Say("api"))
+		Expect(session.Err).To(Say("SERVER_URL"))
 	})
 
 	It("revokes existing auth tokens when setting a new api successfully with a different auth server", func() {

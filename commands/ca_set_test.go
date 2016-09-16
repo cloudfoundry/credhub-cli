@@ -79,10 +79,7 @@ var _ = Describe("Ca-Set", func() {
 			))
 		})
 
-		It("displays help", func() {
-			session := runCommand("ca-set", "-h")
-
-			Eventually(session).Should(Exit(1))
+		ItBehavesLikeHelp("ca-set", "cs", func(session *Session) {
 			Expect(session.Err).To(Say("ca-set"))
 			Expect(session.Err).To(Say("name"))
 			Expect(session.Err).To(Say("certificate-string"))

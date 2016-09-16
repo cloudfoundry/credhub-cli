@@ -32,5 +32,5 @@ func (secretQueryResponseBody SecretQueryResponseBody) String() string {
 }
 
 func buildLineWithLength(leftItem string, rightItem string, leftItemSize int) string {
-	return fmt.Sprintf("%-" + strconv.Itoa(leftItemSize) + "s   %s", leftItem, rightItem)
+	return fmt.Sprintf("%-"+strconv.Itoa(leftItemSize)+"s   %s", leftItem, rightItem)
 }

@@ -133,3 +133,17 @@ func createSecretFile(dir, filename string, contents string) string {
 	}
 	return path
 }
+
+func ItBehavesLikeHelp(command string, alias string, validate func(*Session)) {
+	It("displays help", func() {
+		session := runCommand(command, "-h")
+		Eventually(session).Should(Exit(1))
+		validate(session)
+	})
+
+	It("displays help using the alias", func() {
+		session := runCommand(alias, "-h")
+		Eventually(session).Should(Exit(1))
+		validate(session)
+	})
+}

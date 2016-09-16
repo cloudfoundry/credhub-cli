@@ -15,10 +15,7 @@ import (
 
 var _ = Describe("Find", func() {
 	Describe("Help", func() {
-		It("displays help", func() {
-			session := runCommand("find", "-h")
-
-			Eventually(session).Should(Exit(1))
+		ItBehavesLikeHelp("find", "f", func(session *Session) {
 			Expect(session.Err).To(Say("Usage"))
 			if runtime.GOOS == "windows" {
 				Expect(session.Err).To(Say("credhub-cli.exe \\[OPTIONS\\] find \\[find-OPTIONS\\]"))
