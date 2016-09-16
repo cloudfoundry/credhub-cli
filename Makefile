@@ -15,7 +15,8 @@ dependencies :
 		go get github.com/onsi/ginkgo/ginkgo
 		go get golang.org/x/tools/cmd/goimports
 		go get github.com/maxbrunsfeld/counterfeiter
-		go get -v -t ./...
+		go get -u github.com/kardianos/govendor
+		govendor sync
 
 format : dependencies
 		goimports -w .
