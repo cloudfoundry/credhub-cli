@@ -3,6 +3,8 @@ package commands_test
 import (
 	"net/http"
 
+	"runtime"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -37,7 +39,11 @@ var _ = Describe("Logout", func() {
 
 	ItBehavesLikeHelp("logout", "o", func(session *Session) {
 		Expect(session.Err).To(Say("Usage:"))
-		Expect(session.Err).To(Say(`credhub-cli \[OPTIONS\] logout`))
+		if runtime.GOOS == "windows" {
+			Expect(session.Err).To(Say("credhub-cli.exe \\[OPTIONS\\] logout"))
+		} else {
+			Expect(session.Err).To(Say("credhub-cli \\[OPTIONS\\] logout"))
+		}
 	})
 })
 
