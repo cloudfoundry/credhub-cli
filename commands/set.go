@@ -18,16 +18,16 @@ import (
 )
 
 type SetCommand struct {
-	SecretIdentifier           string `short:"n" required:"yes" long:"name" description:"Selects the secret being set"`
-	ContentType                string `short:"t" long:"type" description:"Sets the type of secret to store or generate. Default: 'value'"`
-	Value                      string `short:"v" long:"value" description:"Sets a value for a secret name"`
+	SecretIdentifier           string `short:"n" required:"yes" long:"name" description:"Name of the credential to set"`
+	ContentType                string `short:"t" long:"type" description:"Sets the credential type (Default: 'password')"`
+	Value                      string `short:"v" long:"value" description:"[Password, Value] Sets the value for the credential"`
+	RootCAFileName             string `short:"r" long:"root" description:"[Certificate] Sets the root CA from file"`
+	CertificatePublicFileName  string `short:"c" long:"certificate" description:"[Certificate] Sets the certificate from file"`
+	CertificatePrivateFileName string `short:"p" long:"private" description:"[Certificate] Sets the private key from file"`
+	RootCA                     string `short:"R" long:"root-string" description:"[Certificate] Sets the root CA from string input"`
+	CertificatePublic          string `short:"C" long:"certificate-string" description:"[Certificate] Sets the certificate from string input"`
+	CertificatePrivate         string `short:"P" long:"private-string" description:"[Certificate] Sets the private key from string input"`
 	NoOverwrite                bool   `short:"O" long:"no-overwrite" description:"Credential is not modified if stored value already exists"`
-	RootCAFileName             string `short:"r" long:"root" description:"Sets the Root CA based on an input file"`
-	CertificatePublicFileName  string `short:"c" long:"certificate" description:"Sets the Certificate based on an input file"`
-	CertificatePrivateFileName string `short:"p" long:"private" description:"Sets the Private Key based on an input file"`
-	RootCA                     string `short:"R" long:"root-string" description:"Sets the Root Certificate Authority"`
-	CertificatePublic          string `short:"C" long:"certificate-string" description:"Sets the Certificate"`
-	CertificatePrivate         string `short:"P" long:"private-string" description:"Sets the Private Key"`
 }
 
 func (cmd SetCommand) Execute([]string) error {

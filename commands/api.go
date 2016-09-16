@@ -13,12 +13,12 @@ import (
 
 type ApiCommand struct {
 	Server            ApiPositionalArgs `positional-args:"yes"`
-	ServerFlagUrl     string            `short:"s" long:"server" description:"API endpoint"`
+	ServerFlagUrl     string            `short:"s" long:"server" description:"URI of API server to target"`
 	SkipTlsValidation bool              `long:"skip-tls-validation" description:"Skip certificate validation of the API endpoint. Not recommended!"`
 }
 
 type ApiPositionalArgs struct {
-	ServerUrl string `positional-arg-name:"SERVER_URL" description:"The app name"`
+	ServerUrl string `positional-arg-name:"SERVER" description:"URI of API server to target"`
 }
 
 func (cmd ApiCommand) Execute([]string) error {

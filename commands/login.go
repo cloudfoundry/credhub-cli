@@ -11,9 +11,9 @@ import (
 )
 
 type LoginCommand struct {
-	Username          string `short:"u" long:"username" description:"Sets username"`
-	Password          string `short:"p" long:"password" description:"Sets password"`
-	ServerUrl         string `short:"s" long:"server" description:"API endpoint"`
+	Username          string `short:"u" long:"username" description:"Authentication username"`
+	Password          string `short:"p" long:"password" description:"Authentication password"`
+	ServerUrl         string `short:"s" long:"server" description:"URI of API server to target"`
 	SkipTlsValidation bool   `long:"skip-tls-validation" description:"Skip certificate validation of the API endpoint. Not recommended!"`
 }
 

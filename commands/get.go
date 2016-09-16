@@ -10,7 +10,7 @@ import (
 )
 
 type GetCommand struct {
-	SecretIdentifier string `short:"n" required:"yes" long:"name" description:"Selects the secret to retrieve"`
+	SecretIdentifier string `short:"n" required:"yes" long:"name" description:"Name of the credential to retrieve"`
 }
 
 func (cmd GetCommand) Execute([]string) error {

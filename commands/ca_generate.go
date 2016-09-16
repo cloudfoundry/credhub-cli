@@ -11,16 +11,16 @@ import (
 )
 
 type CaGenerateCommand struct {
-	CaIdentifier       string `short:"n" required:"yes" long:"name" description:"Sets the name of the CA"`
-	CaType             string `short:"t" long:"type" description:"Sets the type of the CA"`
-	CaCommonName       string `short:"c" long:"common-name" description:"Sets the common name of the generated CA"`
-	CaOrganization     string `short:"o" long:"organization" description:"Sets the organization of the generated CA"`
-	CaOrganizationUnit string `short:"u" long:"organization-unit" description:"Sets the organization unit of the generated CA"`
-	CaLocality         string `short:"i" long:"locality" description:"Sets the locality/city of the generated CA"`
-	CaState            string `short:"s" long:"state" description:"Sets the state/province of the generated CA"`
-	CaCountry          string `short:"y" long:"country" description:"Sets the country of the generated CA"`
-	CaKeyLength        int    `short:"k" long:"key-length" description:"Sets the bit length of the generated CA key"`
-	CaDuration         int    `short:"d" long:"duration" description:"Sets the valid duration (in days) for the generated CA"`
+	CaIdentifier       string `short:"n" required:"yes" long:"name" description:"Name of the CA to generate"`
+	CaType             string `short:"t" long:"type" description:"Sets the CA type to generate (Default: 'root')"`
+	CaDuration         int    `short:"d" long:"duration" description:"[Root] Valid duration (in days) of the generated CA certificate (Default: 365)"`
+	CaKeyLength        int    `short:"k" long:"key-length" description:"[Root] Bit length of the generated key (Default: 2048)"`
+	CaCommonName       string `short:"c" long:"common-name" description:"[Root] Common name of the generated CA certificate"`
+	CaOrganization     string `short:"o" long:"organization" description:"[Root] Organization of the generated CA certificate"`
+	CaOrganizationUnit string `short:"u" long:"organization-unit" description:"[Root] Organization unit of the generated CA certificate"`
+	CaLocality         string `short:"i" long:"locality" description:"[Root] Locality/city of the generated CA certificate"`
+	CaState            string `short:"s" long:"state" description:"[Root] State/province of the generated CA certificate"`
+	CaCountry          string `short:"y" long:"country" description:"[Root] Country of the generated CA certificate"`
 }
 
 func (cmd CaGenerateCommand) Execute([]string) error {

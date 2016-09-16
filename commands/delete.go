@@ -10,7 +10,7 @@ import (
 )
 
 type DeleteCommand struct {
-	SecretIdentifier string `short:"n" long:"name" required:"yes" description:"Selects the secret to delete"`
+	SecretIdentifier string `short:"n" long:"name" required:"yes" description:"Name of the credential to delete"`
 }
 
 func (cmd DeleteCommand) Execute([]string) error {

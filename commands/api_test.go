@@ -17,7 +17,7 @@ var _ = Describe("API", func() {
 
 	ItBehavesLikeHelp("api", "a", func(session *Session) {
 		Expect(session.Err).To(Say("api"))
-		Expect(session.Err).To(Say("SERVER_URL"))
+		Expect(session.Err).To(Say("SERVER"))
 	})
 
 	It("revokes existing auth tokens when setting a new api successfully with a different auth server", func() {

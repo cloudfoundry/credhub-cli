@@ -43,14 +43,14 @@ var _ = Describe("Ca-Generate", func() {
 			Expect(session.Err).To(Say("ca-generate"))
 			Expect(session.Err).To(Say("name"))
 			Expect(session.Err).To(Say("type"))
+			Expect(session.Err).To(Say("duration"))
+			Expect(session.Err).To(Say("key-length"))
 			Expect(session.Err).To(Say("common-name"))
 			Expect(session.Err).To(Say("organization"))
 			Expect(session.Err).To(Say("organization-unit"))
 			Expect(session.Err).To(Say("locality"))
 			Expect(session.Err).To(Say("state"))
 			Expect(session.Err).To(Say("country"))
-			Expect(session.Err).To(Say("key-length"))
-			Expect(session.Err).To(Say("duration"))
 		})
 
 		It("short flags", func() {
