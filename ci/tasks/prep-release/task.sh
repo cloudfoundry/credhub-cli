@@ -3,6 +3,7 @@
 set -eux
 
 export GOPATH=$PWD/go
+export PATH=$PATH:$GOPATH/bin
 export GOARCH=amd64
 BUILD_ROOT=$PWD
 
