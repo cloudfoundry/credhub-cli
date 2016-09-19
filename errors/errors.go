@@ -44,3 +44,7 @@ func NewRefreshError() error {
 func NewForbiddenError() error {
 	return errors.New("You are not authorized to perform this action. You must log in with an elevated user or contact your administrator to continue.")
 }
+
+func NewNoMatchingCredentialsFoundError() error {
+	return errors.New("No credentials exist which match the provided parameters.")
+}

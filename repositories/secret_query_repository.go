@@ -3,6 +3,8 @@ package repositories
 import (
 	"net/http"
 
+	"github.com/pivotal-cf/credhub-cli/errors"
+
 	"encoding/json"
 
 	"github.com/pivotal-cf/credhub-cli/client"
@@ -30,6 +32,8 @@ func (r secretQueryRepository) SendRequest(request *http.Request, identifier str
 	err = decoder.Decode(&findResponseBody)
 	if err != nil {
 		return models.SecretQueryResponseBody{}, cm_errors.NewResponseError()
+	} else if len(findResponseBody.Credentials) < 1 {
+		return models.SecretQueryResponseBody{}, errors.NewNoMatchingCredentialsFoundError()
 	}
 	return findResponseBody, nil
 }

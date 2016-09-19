@@ -72,6 +72,34 @@ var _ = Describe("Find", func() {
 			Eventually(session).Should(Exit(0))
 			Eventually(session.Out).Should(Say(responseTable))
 		})
-	})
 
+		Describe("when there are no matches for the supplied string", func() {
+			var session *Session
+
+			BeforeEach(func() {
+				responseJson := `{
+					"credentials": []
+				}`
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest("GET", "/api/v1/data", "name-like=dan"),
+						RespondWith(http.StatusOK, responseJson),
+					),
+				)
+
+				session = runCommand("find", "-n", "dan")
+			})
+
+			It("lets the user know that there are no results", func() {
+				expectedMessage := "No credentials exist which match the provided parameters."
+
+				Eventually(session.Err).Should(Say(expectedMessage))
+			})
+
+			It("exits with code 1", func() {
+				Eventually(session).Should(Exit(1))
+			})
+		})
+	})
 })
