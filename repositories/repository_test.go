@@ -96,6 +96,35 @@ var _ = Describe("Repository", func() {
 				_, error := DoSendRequest(&httpClient, request)
 				Expect(error).To(MatchError(cmcli_errors.NewForbiddenError()))
 			})
+
+			It("returns an error when response is 500", func() {
+				responseObj := http.Response{
+					StatusCode: 500,
+					Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"error": "My error"}`))),
+				}
+
+				httpClient.DoReturns(&responseObj, nil)
+
+				request, _ := http.NewRequest("GET", "http://example.com/foo", nil)
+				_, error := DoSendRequest(&httpClient, request)
+
+				Expect(error.Error()).To(Equal("My error"))
+			})
+
+			It("returns generic 500 error when response is 500 and there is no body response from the server", func() {
+				responseObj := http.Response{
+					StatusCode: 500,
+					Body:       ioutil.NopCloser(bytes.NewReader([]byte(``))),
+				}
+
+				httpClient.DoReturns(&responseObj, nil)
+
+				request, _ := http.NewRequest("GET", "http://example.com/foo", nil)
+				_, error := DoSendRequest(&httpClient, request)
+
+				Expect(error.Error()).NotTo(Equal("EOF"))
+				Expect(error.Error()).To(Equal("The targeted API was unable to perform the request. Please validate and retry your request."))
+			})
 		})
 	})
 })

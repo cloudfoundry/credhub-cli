@@ -27,6 +27,9 @@ func DoSendRequest(httpClient client.HttpClient, request *http.Request) (*http.R
 		serverError := models.ServerError{}
 		err = decoder.Decode(&serverError)
 		if err != nil {
+			if response.StatusCode == http.StatusInternalServerError {
+				return nil, cm_errors.NewCatchAllError()
+			}
 			return nil, err
 		}
 
