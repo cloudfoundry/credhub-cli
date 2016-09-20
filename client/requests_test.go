@@ -282,12 +282,23 @@ var _ = Describe("API", func() {
 			})
 		})
 
-		Describe("NewFindSecretsRequest", func() {
+		Describe("NewFindCredentialsBySubstringRequest", func() {
 			It("Returns a request for getting secret", func() {
 				expectedRequest, _ := http.NewRequest("GET", "http://example.com/api/v1/data?name-like=my-name", nil)
 				expectedRequest.Header.Set("Authorization", "Bearer access-token")
 
-				request := NewFindSecretsRequest(cfg, "my-name")
+				request := NewFindCredentialsBySubstringRequest(cfg, "my-name")
+
+				Expect(request).To(Equal(expectedRequest))
+			})
+		})
+
+		Describe("NewFindCredentialsByPathRequest", func() {
+			It("Returns a request for getting secret", func() {
+				expectedRequest, _ := http.NewRequest("GET", "http://example.com/api/v1/data?path=my-path", nil)
+				expectedRequest.Header.Set("Authorization", "Bearer access-token")
+
+				request := NewFindCredentialsByPathRequest(cfg, "my-path")
 
 				Expect(request).To(Equal(expectedRequest))
 			})
