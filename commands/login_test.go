@@ -91,6 +91,8 @@ var _ = Describe("Login", func() {
 					),
 				)
 
+				// TODO:  devise an input which echoes the input characters for the user name, much as gopass.GetPasswdMasked()
+				// echoes '*', for that we may regression-test the echoing of the username
 				setConfigAuthUrl(uaaServer.URL())
 				session := runCommandWithStdin(strings.NewReader("user\npass\n"), "login")
 				Eventually(session.Out).Should(Say("username:"))

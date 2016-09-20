@@ -59,8 +59,7 @@ func getUsernameAndPassword(cmd *LoginCommand) error {
 	}
 	if cmd.Username == "" {
 		fmt.Printf("username: ")
-		username, _ := gopass.GetPasswd()
-		cmd.Username = string(username)
+		fmt.Scanln(&cmd.Username)
 	}
 	if cmd.Password == "" {
 		fmt.Printf("password: ")
