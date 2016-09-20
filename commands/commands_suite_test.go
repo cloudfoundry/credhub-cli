@@ -3,36 +3,31 @@ package commands_test
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-
-	"os/exec"
-	"testing"
-
-	"io/ioutil"
-	"os"
-	"runtime"
-
-	"net/http"
-
-	"fmt"
-
-	"io"
-
 	. "github.com/onsi/gomega/gexec"
 	. "github.com/onsi/gomega/ghttp"
+
+	"fmt"
+	"io"
+	"io/ioutil"
+	"net/http"
+	"os"
+	"os/exec"
+	"runtime"
+	"testing"
 )
 
 const TIMESTAMP = `2016-01-01T12:00:00Z`
 const SECRET_STRING_OVERWRITE_REQUEST_JSON = `{"type":"%s","value":"%s","overwrite":%t}`
 const SECRET_STRING_RESPONSE_JSON = `{"type":"%s", "value":"%s", "updated_at":"` + TIMESTAMP + `"}`
-const SECRET_STRING_RESPONSE_TABLE = `Type:		%s\nName:		%s\nValue:\t\t%s\nUpdated:	` + TIMESTAMP
+const SECRET_STRING_RESPONSE_TABLE = `Type:          %s\nName:          %s\nValue:         %s\nUpdated:       ` + TIMESTAMP
 const SECRET_CERTIFICATE_REQUEST_JSON = `{"type":"certificate","value":{"ca":"%s","certificate":"%s","private_key":"%s"},"overwrite":%t}`
 const SECRET_CERTIFICATE_RESPONSE_JSON = `{"type":"certificate","value":{"ca":"%s","certificate":"%s","private_key":"%s"},"updated_at":"` + TIMESTAMP + `"}`
-const SECRET_CERTIFICATE_RESPONSE_TABLE = `Type:		certificate\nName:		%s\nCa:		%s\nCertificate:		%s\nPrivate Key:	%s\nUpdated:	` + TIMESTAMP
+const SECRET_CERTIFICATE_RESPONSE_TABLE = `Type:          certificate\nName:          %s\nCa:            %s\nCertificate:   %s\nPrivate Key:   %s\nUpdated:       ` + TIMESTAMP
 const GENERATE_SECRET_REQUEST_JSON = `{"type":"%s","overwrite":%t,"parameters":%s}`
 const GENERATE_DEFAULT_TYPE_REQUEST_JSON = `{"type":"password","overwrite":%t,"parameters":%s}`
 const CA_REQUEST_JSON = `{"type":"%s","value":{"certificate":"%s","private_key":"%s"}}`
 const CA_RESPONSE_JSON = `{"type":"%s","value":{"certificate":"%s","private_key":"%s"},"updated_at":"` + TIMESTAMP + `"}`
-const CA_RESPONSE_TABLE = `Type:		%s\nName:		%s\nCertificate:		%s\nPrivate Key:	%s\nUpdated:	` + TIMESTAMP
+const CA_RESPONSE_TABLE = `Type:          %s\nName:          %s\nCertificate:   %s\nPrivate Key:   %s\nUpdated:       ` + TIMESTAMP
 
 var responseMyValuePotatoes = fmt.Sprintf(SECRET_STRING_RESPONSE_TABLE, "value", "my-value", "potatoes")
 var responseMyPasswordPotatoes = fmt.Sprintf(SECRET_STRING_RESPONSE_TABLE, "password", "my-password", "potatoes")

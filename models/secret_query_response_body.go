@@ -1,8 +1,6 @@
 package models
 
 import (
-	"fmt"
-	"strconv"
 	"strings"
 )
 
@@ -29,8 +27,4 @@ func (secretQueryResponseBody SecretQueryResponseBody) String() string {
 		lines = append(lines, buildLineWithLength(credential.Name, credential.UpdatedAt, longestNameLength))
 	}
 	return strings.Join(lines, "\n")
-}
-
-func buildLineWithLength(leftItem string, rightItem string, leftItemSize int) string {
-	return fmt.Sprintf("%-"+strconv.Itoa(leftItemSize)+"s   %s", leftItem, rightItem)
 }

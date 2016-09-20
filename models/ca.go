@@ -1,7 +1,6 @@
 package models
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -22,20 +21,20 @@ func (ca Ca) String() string {
 
 	caBody := ca.CaBody
 	lines = append(lines,
-		fmt.Sprintf("Type:		%s", caBody.ContentType),
-		fmt.Sprintf("Name:		%s", ca.Name),
+		buildLineOfFixedLength("Type:", caBody.ContentType),
+		buildLineOfFixedLength("Name:", ca.Name),
 	)
 
 	if caBody.Value.Certificate != "" {
-		lines = append(lines, fmt.Sprintf("Certificate:		%s", caBody.Value.Certificate))
+		lines = append(lines, buildLineOfFixedLength("Certificate:", caBody.Value.Certificate))
 	}
 
 	if caBody.Value.PrivateKey != "" {
-		lines = append(lines, fmt.Sprintf("Private Key:	%s", caBody.Value.PrivateKey))
+		lines = append(lines, buildLineOfFixedLength("Private Key:", caBody.Value.PrivateKey))
 	}
 
 	if caBody.UpdatedAt != "" {
-		lines = append(lines, fmt.Sprintf("Updated:	%s", caBody.UpdatedAt))
+		lines = append(lines, buildLineOfFixedLength("Updated:", caBody.UpdatedAt))
 	}
 
 	return strings.Join(lines, "\n")

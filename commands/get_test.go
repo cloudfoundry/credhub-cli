@@ -5,6 +5,8 @@ import (
 
 	"runtime"
 
+	"fmt"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -36,8 +38,7 @@ var _ = Describe("Get", func() {
 	})
 
 	It("gets a string secret", func() {
-		responseJson := `{"type":"value","value":"potatoes"}`
-		responseTable := `Type:		value\nName:		my-value\nValue:		potatoes`
+		responseJson := fmt.Sprintf(SECRET_STRING_RESPONSE_JSON, "value", "potatoes")
 
 		server.AppendHandlers(
 			CombineHandlers(
@@ -49,12 +50,11 @@ var _ = Describe("Get", func() {
 		session := runCommand("get", "-n", "my-value")
 
 		Eventually(session).Should(Exit(0))
-		Eventually(session.Out).Should(Say(responseTable))
+		Eventually(session.Out).Should(Say(responseMyValuePotatoes))
 	})
 
 	It("gets a password secret", func() {
-		responseJson := `{"type":"password","value":"potatoes"}`
-		responseTable := `Type:		password\nName:		my-password\nValue:		potatoes`
+		responseJson := fmt.Sprintf(SECRET_STRING_RESPONSE_JSON, "password", "potatoes")
 
 		server.AppendHandlers(
 			CombineHandlers(
@@ -66,6 +66,6 @@ var _ = Describe("Get", func() {
 		session := runCommand("get", "-n", "my-password")
 
 		Eventually(session).Should(Exit(0))
-		Eventually(session.Out).Should(Say(responseTable))
+		Eventually(session.Out).Should(Say(responseMyPasswordPotatoes))
 	})
 })
