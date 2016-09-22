@@ -1,6 +1,10 @@
 ---
 platform: linux
-image: docker:///golang
+image_resource:
+  type: docker
+  source:
+    repository: golang
+
 inputs:
   - name: task-repo
   - name: code-repo

@@ -1,6 +1,9 @@
 ---
 platform: darwin
-image: docker:///golang
+image_resource:
+  type: docker
+  source:
+    repository: golang
 
 inputs:
   - name: clock
