@@ -73,6 +73,11 @@ CREDENTIAL MANAGEMENT:
 		Delete a credential (short command: d)
 		-n, --name 'CRED'									Name of the credential to delete
 		
+	find [find params]
+		Find existing credentials based on query parameters
+		-n, --name-like 'CRED'								Find credentials by partial name search
+		-p, --path 'PATH'									Find credentials by path
+		
 CERTIFICATE AUTHORITY:
 
 NOTE: CA with name 'default' will be used when generating a certificate credential without a named CA
