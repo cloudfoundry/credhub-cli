@@ -20,7 +20,7 @@ func PrintVersion() error {
 		cmVersion = cmInfo.App.Version
 	}
 
-	fmt.Println("CLI Version:", version.Version+" build "+version.BuildNumber)
+	fmt.Println("CLI Version:", version.Version)
 	fmt.Println("CM Version:", cmVersion)
 
 	return nil

@@ -5,7 +5,6 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
 	. "github.com/onsi/gomega/ghttp"
 )
@@ -27,8 +26,9 @@ var _ = Describe("Version", func() {
 			session := runCommand("--version")
 
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say("CLI Version: 0.1.0 build DEV"))
-			Eventually(session.Out).Should(Say("CM Version: 0.2.0"))
+			sout := string(session.Out.Contents())
+			testVersion(sout)
+			Expect(sout).To(ContainSubstring("CM Version: 0.2.0"))
 		})
 	})
 
@@ -46,8 +46,15 @@ var _ = Describe("Version", func() {
 			session := runCommand("--version")
 
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say("CLI Version: 0.1.0 build DEV"))
-			Eventually(session.Out).Should(Say("CM Version: Not Found"))
+			sout := string(session.Out.Contents())
+			testVersion(sout)
+			Expect(sout).To(ContainSubstring("CM Version: Not Found"))
 		})
 	})
+
 })
+
+func testVersion(sout string) {
+	Expect(sout).To(ContainSubstring("CLI Version: 0.2.0"))
+	Expect(sout).ToNot(ContainSubstring("build DEV"))
+}
