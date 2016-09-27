@@ -13,14 +13,14 @@ type LogoutCommand struct {
 
 func (cmd LogoutCommand) Execute([]string) error {
 	cfg := config.ReadConfig()
-	SendLogoutIfNecessary(cfg)
-	cfg = RevokedConfig(cfg)
+	RevokeTokenIfNecessary(cfg)
+	cfg = MarkTokensAsRevokedInConfig(cfg)
 	config.WriteConfig(cfg)
 	fmt.Println("Logout Successful")
 	return nil
 }
 
-func SendLogoutIfNecessary(cfg config.Config) {
+func RevokeTokenIfNecessary(cfg config.Config) {
 	if cfg.RefreshToken != "" && cfg.RefreshToken != "revoked" {
 		authRepository := repositories.NewAuthRepository(client.NewHttpClient(cfg), false)
 		request, err := client.NewTokenRevocationRequest(cfg)
@@ -30,7 +30,7 @@ func SendLogoutIfNecessary(cfg config.Config) {
 	}
 }
 
-func RevokedConfig(cfg config.Config) config.Config {
+func MarkTokensAsRevokedInConfig(cfg config.Config) config.Config {
 	cfg.AccessToken = "revoked"
 	cfg.RefreshToken = "revoked"
 	return cfg

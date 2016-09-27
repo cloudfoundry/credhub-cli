@@ -12,10 +12,6 @@ import (
 
 	"github.com/pivotal-cf/credhub-cli/config"
 	"github.com/pivotal-cf/credhub-cli/models"
-
-	"errors"
-
-	"github.com/dgrijalva/jwt-go"
 )
 
 func NewPutValueRequest(config config.Config, secretIdentifier string, secretContent string, overwrite bool) *http.Request {
@@ -132,12 +128,7 @@ func NewRefreshTokenRequest(cfg config.Config) *http.Request {
 }
 
 func NewTokenRevocationRequest(cfg config.Config) (*http.Request, error) {
-	claims := jwt.MapClaims{}
-	jwt.ParseWithClaims(cfg.RefreshToken, claims, nil)
-	if claims["jti"] == nil {
-		return nil, errors.New("Claims could not be retrieved from token")
-	}
-	requestUrl := cfg.AuthURL + "/oauth/token/revoke/" + claims["jti"].(string)
+	requestUrl := cfg.AuthURL + "/oauth/token/revoke/" + cfg.RefreshToken
 	request, err := http.NewRequest("DELETE", requestUrl, nil)
 	if err != nil {
 		return nil, err

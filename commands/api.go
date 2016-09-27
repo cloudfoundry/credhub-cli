@@ -37,8 +37,8 @@ func (cmd ApiCommand) Execute([]string) error {
 		fmt.Println("Setting the target url:", cfg.ApiURL)
 
 		if existingCfg.AuthURL != cfg.AuthURL {
-			SendLogoutIfNecessary(existingCfg)
-			cfg = RevokedConfig(cfg)
+			RevokeTokenIfNecessary(existingCfg)
+			cfg = MarkTokensAsRevokedInConfig(cfg)
 		}
 		config.WriteConfig(cfg)
 	}
