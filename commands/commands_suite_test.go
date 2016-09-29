@@ -23,6 +23,9 @@ const SECRET_STRING_RESPONSE_TABLE = `Type:          %s\nName:          %s\nValu
 const SECRET_CERTIFICATE_REQUEST_JSON = `{"type":"certificate","value":{"ca":"%s","certificate":"%s","private_key":"%s"},"overwrite":%t}`
 const SECRET_CERTIFICATE_RESPONSE_JSON = `{"type":"certificate","value":{"ca":"%s","certificate":"%s","private_key":"%s"},"updated_at":"` + TIMESTAMP + `"}`
 const SECRET_CERTIFICATE_RESPONSE_TABLE = `Type:          certificate\nName:          %s\nCa:            %s\nCertificate:   %s\nPrivate Key:   %s\nUpdated:       ` + TIMESTAMP
+const SECRET_SSH_REQUEST_JSON = `{"type":"ssh","value":{"public_key":"%s","private_key":"%s"},"overwrite":%t}`
+const SECRET_SSH_RESPONSE_JSON = `{"type":"ssh","value":{"public_key":"%s","private_key":"%s"},"updated_at":"` + TIMESTAMP + `"}`
+const SECRET_SSH_RESPONSE_TABLE = `Type:          ssh\nName:          %s\nPublic Key:    %s\nPrivate Key:   %s\nUpdated:       ` + TIMESTAMP
 const GENERATE_SECRET_REQUEST_JSON = `{"type":"%s","overwrite":%t,"parameters":%s}`
 const GENERATE_DEFAULT_TYPE_REQUEST_JSON = `{"type":"password","overwrite":%t,"parameters":%s}`
 const CA_REQUEST_JSON = `{"type":"%s","value":{"certificate":"%s","private_key":"%s"}}`
@@ -33,6 +36,7 @@ var responseMyValuePotatoes = fmt.Sprintf(SECRET_STRING_RESPONSE_TABLE, "value",
 var responseMyPasswordPotatoes = fmt.Sprintf(SECRET_STRING_RESPONSE_TABLE, "password", "my-password", "potatoes")
 var responseMyCertificate = fmt.Sprintf(SECRET_CERTIFICATE_RESPONSE_TABLE, "my-secret", "my-ca", "my-cert", "my-priv")
 var responseMyCertificateAuthority = fmt.Sprintf(CA_RESPONSE_TABLE, "root", "my-secret", "my-cert", "my-priv")
+var responseMySSHFoo = fmt.Sprintf(SECRET_SSH_RESPONSE_TABLE, "foo-key", "some-public-key", "some-private-key")
 
 func TestCommands(t *testing.T) {
 	RegisterFailHandler(Fail)

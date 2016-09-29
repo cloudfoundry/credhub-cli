@@ -29,6 +29,16 @@ func (secret Secret) String() string {
 	if secretBody.ContentType == "value" || secretBody.ContentType == "password" {
 		value := secretBody.Value.(string)
 		lines = append(lines, buildLineOfFixedLength("Value:", value))
+	} else if secretBody.ContentType == "ssh" {
+		json_ssh, _ := json.Marshal(secretBody.Value)
+		ssh := Ssh{}
+		json.Unmarshal(json_ssh, &ssh)
+		if ssh.PublicKey != "" {
+			lines = append(lines, buildLineOfFixedLength("Public Key:", ssh.PublicKey))
+		}
+		if ssh.PrivateKey != "" {
+			lines = append(lines, buildLineOfFixedLength("Private Key:", ssh.PrivateKey))
+		}
 	} else {
 		// We are marshaling again here because there isn't a simple way
 		// to convert map[string]interface{} to a Certificate struct

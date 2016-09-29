@@ -18,24 +18,26 @@ import (
 )
 
 type SetCommand struct {
-	SecretIdentifier           string `short:"n" required:"yes" long:"name" description:"Name of the credential to set"`
-	ContentType                string `short:"t" long:"type" description:"Sets the credential type (Default: 'password')"`
-	Value                      string `short:"v" long:"value" description:"[Password, Value] Sets the value for the credential"`
-	RootCAFileName             string `short:"r" long:"root" description:"[Certificate] Sets the root CA from file"`
-	CertificatePublicFileName  string `short:"c" long:"certificate" description:"[Certificate] Sets the certificate from file"`
-	CertificatePrivateFileName string `short:"p" long:"private" description:"[Certificate] Sets the private key from file"`
-	RootCA                     string `short:"R" long:"root-string" description:"[Certificate] Sets the root CA from string input"`
-	CertificatePublic          string `short:"C" long:"certificate-string" description:"[Certificate] Sets the certificate from string input"`
-	CertificatePrivate         string `short:"P" long:"private-string" description:"[Certificate] Sets the private key from string input"`
-	NoOverwrite                bool   `short:"O" long:"no-overwrite" description:"Credential is not modified if stored value already exists"`
+	SecretIdentifier  string `short:"n" required:"yes" long:"name" description:"Name of the credential to set"`
+	Type              string `short:"t" long:"type" description:"Sets the credential type (Default: 'password')"`
+	Value             string `short:"v" long:"value" description:"[Password, Value] Sets the value for the credential"`
+	Root              string `short:"r" long:"root" description:"[Certificate] Sets the root CA from file"`
+	Certificate       string `short:"c" long:"certificate" description:"[Certificate] Sets the certificate from file"`
+	Private           string `short:"p" long:"private" description:"[Certificate] Sets the private key from file"`
+	Public            string `short:"u" long:"public" description:"[SSH] Sets the public key from file"`
+	RootString        string `short:"R" long:"root-string" description:"[Certificate] Sets the root CA from string input"`
+	CertificateString string `short:"C" long:"certificate-string" description:"[Certificate] Sets the certificate from string input"`
+	PrivateString     string `short:"P" long:"private-string" description:"[Certificate, SSH] Sets the private key from string input"`
+	PublicString      string `short:"U" long:"public-string" description:"[SSH] Sets the public key from  string input"`
+	NoOverwrite       bool   `short:"O" long:"no-overwrite" description:"Credential is not modified if stored value already exists"`
 }
 
 func (cmd SetCommand) Execute([]string) error {
-	if cmd.ContentType == "" {
-		cmd.ContentType = "password"
+	if cmd.Type == "" {
+		cmd.Type = "password"
 	}
 
-	if cmd.Value == "" && (cmd.ContentType == "password" || cmd.ContentType == "value") {
+	if cmd.Value == "" && (cmd.Type == "password" || cmd.Type == "value") {
 		promptForInput("value: ", &cmd.Value)
 	}
 
@@ -60,40 +62,55 @@ func (cmd SetCommand) Execute([]string) error {
 
 func getRequest(cmd SetCommand, config config.Config) (*http.Request, error) {
 	var request *http.Request
-	if cmd.ContentType == "value" {
+	if cmd.Type == "value" {
 		request = client.NewPutValueRequest(config, cmd.SecretIdentifier, cmd.Value, !cmd.NoOverwrite)
-	} else if cmd.ContentType == "password" {
+	} else if cmd.Type == "password" {
 		request = client.NewPutPasswordRequest(config, cmd.SecretIdentifier, cmd.Value, !cmd.NoOverwrite)
+	} else if cmd.Type == "ssh" {
+		var err error
+		if cmd.Public != "" {
+			cmd.PublicString, err = ReadFile(cmd.Public)
+			if err != nil {
+				return nil, err
+			}
+		}
+		if cmd.Private != "" {
+			cmd.PrivateString, err = ReadFile(cmd.Private)
+			if err != nil {
+				return nil, err
+			}
+		}
+		request = client.NewPutSshRequest(config, cmd.SecretIdentifier, cmd.PublicString, cmd.PrivateString, !cmd.NoOverwrite)
 	} else {
 		var err error
-		if cmd.RootCAFileName != "" {
-			if cmd.RootCA != "" {
+		if cmd.Root != "" {
+			if cmd.RootString != "" {
 				return nil, cmcli_errors.NewCombinationOfParametersError()
 			}
-			cmd.RootCA, err = ReadFile(cmd.RootCAFileName)
+			cmd.RootString, err = ReadFile(cmd.Root)
 			if err != nil {
 				return nil, err
 			}
 		}
-		if cmd.CertificatePublicFileName != "" {
-			if cmd.CertificatePublic != "" {
+		if cmd.Certificate != "" {
+			if cmd.CertificateString != "" {
 				return nil, cmcli_errors.NewCombinationOfParametersError()
 			}
-			cmd.CertificatePublic, err = ReadFile(cmd.CertificatePublicFileName)
+			cmd.CertificateString, err = ReadFile(cmd.Certificate)
 			if err != nil {
 				return nil, err
 			}
 		}
-		if cmd.CertificatePrivateFileName != "" {
-			if cmd.CertificatePrivate != "" {
+		if cmd.Private != "" {
+			if cmd.PrivateString != "" {
 				return nil, cmcli_errors.NewCombinationOfParametersError()
 			}
-			cmd.CertificatePrivate, err = ReadFile(cmd.CertificatePrivateFileName)
+			cmd.PrivateString, err = ReadFile(cmd.Private)
 			if err != nil {
 				return nil, err
 			}
 		}
-		request = client.NewPutCertificateRequest(config, cmd.SecretIdentifier, cmd.RootCA, cmd.CertificatePublic, cmd.CertificatePrivate, !cmd.NoOverwrite)
+		request = client.NewPutCertificateRequest(config, cmd.SecretIdentifier, cmd.RootString, cmd.CertificateString, cmd.PrivateString, !cmd.NoOverwrite)
 	}
 
 	return request, nil

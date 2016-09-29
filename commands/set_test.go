@@ -31,6 +31,42 @@ var _ = Describe("Set", func() {
 		})
 	})
 
+	Describe("setting SSH secrets", func() {
+		It("puts a secret using explicit ssh type", func() {
+			setupPutSshServer("foo-key", "some-public-key", "some-private-key", true)
+
+			session := runCommand("set", "-n", "foo-key", "-U", "some-public-key", "-P", "some-private-key", "-t", "ssh")
+
+			Eventually(session).Should(Exit(0))
+			Eventually(session.Out).Should(Say(responseMySSHFoo))
+		})
+
+		It("puts a secret using values read from files", func() {
+			setupPutSshServer("foo-key", "some-public-key", "some-private-key", true)
+
+			tempDir := createTempDir("sshFilesForTesting")
+			publicFileName := createSecretFile(tempDir, "rsa.pub", "some-public-key")
+			privateFilename := createSecretFile(tempDir, "rsa.key", "some-private-key")
+
+			session := runCommand("set", "-n", "foo-key",
+				"-t", "ssh",
+				"-u", publicFileName,
+				"-p", privateFilename)
+
+			os.RemoveAll(tempDir)
+			Eventually(session).Should(Exit(0))
+			Eventually(session.Out).Should(Say(responseMySSHFoo))
+		})
+
+		It("puts a secret specifying no-overwrite", func() {
+			setupPutSshServer("foo-key", "some-public-key", "some-private-key", false)
+
+			session := runCommand("set", "-n", "foo-key", "-t", "ssh", "-U", "some-public-key", "-P", "some-private-key", "--no-overwrite")
+
+			Eventually(session).Should(Exit(0))
+		})
+	})
+
 	Describe("setting password secrets", func() {
 		It("puts a secret using default type", func() {
 			setupPutValueServer("my-password", "password", "potatoes")
@@ -179,11 +215,23 @@ var _ = Describe("Set", func() {
 	})
 })
 
-func setupPutValueServer(name string, secretType string, value string) {
+func setupPutSshServer(name, publicKey, privateKey string, overwrite bool) {
+	var jsonRequest string
+	jsonRequest = fmt.Sprintf(SECRET_SSH_REQUEST_JSON, publicKey, privateKey, overwrite)
+	server.AppendHandlers(
+		CombineHandlers(
+			VerifyRequest("PUT", fmt.Sprintf("/api/v1/data/%s", name)),
+			VerifyJSON(jsonRequest),
+			RespondWith(http.StatusOK, fmt.Sprintf(SECRET_SSH_RESPONSE_JSON, publicKey, privateKey)),
+		),
+	)
+}
+
+func setupPutValueServer(name, secretType, value string) {
 	setupOverwritePutValueServer(name, secretType, value, true)
 }
 
-func setupOverwritePutValueServer(name string, secretType string, value string, overwrite bool) {
+func setupOverwritePutValueServer(name, secretType, value string, overwrite bool) {
 	var jsonRequest string
 	jsonRequest = fmt.Sprintf(SECRET_STRING_OVERWRITE_REQUEST_JSON, secretType, value, overwrite)
 	server.AppendHandlers(
@@ -195,11 +243,11 @@ func setupOverwritePutValueServer(name string, secretType string, value string, 
 	)
 }
 
-func setupPutCertificateServer(name string, ca string, cert string, priv string) {
+func setupPutCertificateServer(name, ca, cert, priv string) {
 	setupOverwritePutCertificateServer(name, ca, cert, priv, true)
 }
 
-func setupOverwritePutCertificateServer(name string, ca string, cert string, priv string, overwrite bool) {
+func setupOverwritePutCertificateServer(name, ca, cert, priv string, overwrite bool) {
 	var jsonRequest string
 	jsonRequest = fmt.Sprintf(SECRET_CERTIFICATE_REQUEST_JSON, ca, cert, priv, overwrite)
 	server.AppendHandlers(

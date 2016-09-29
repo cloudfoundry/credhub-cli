@@ -16,6 +16,17 @@ var _ = Describe("String function", func() {
 			"Updated:       2016-01-01T12:00:00Z"))
 	})
 
+	It("renders ssh secrets", func() {
+		ssh := Ssh{PublicKey: "my-pub", PrivateKey: "my-priv"}
+		sshSecret := NewSecret("sshSecret", SecretBody{ContentType: "ssh", Value: &ssh, UpdatedAt: "2016-01-01T12:00:00Z"})
+		Expect(sshSecret.String()).To(Equal("" +
+			"Type:          ssh\n" +
+			"Name:          sshSecret\n" +
+			"Public Key:    my-pub\n" +
+			"Private Key:   my-priv\n" +
+			"Updated:       2016-01-01T12:00:00Z"))
+	})
+
 	Describe("renders certificate secrets", func() {
 
 		It("when fields have non-nil values", func() {

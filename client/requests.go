@@ -49,6 +49,20 @@ func NewPutCertificateRequest(config config.Config, secretIdentifier string, roo
 	return newSecretRequest("PUT", config, secretIdentifier, secret)
 }
 
+func NewPutSshRequest(config config.Config, secretIdentifier, publicKey, privateKey string, overwrite bool) *http.Request {
+	ssh := models.Ssh{
+		PublicKey:  publicKey,
+		PrivateKey: privateKey,
+	}
+
+	secret := models.SecretBody{
+		ContentType: "ssh",
+		Value:       &ssh,
+		Overwrite:   overwrite,
+	}
+	return newSecretRequest("PUT", config, secretIdentifier, secret)
+}
+
 func NewPutCaRequest(config config.Config, caIdentifier, caType, cert, priv string) *http.Request {
 	ca := models.CaParameters{
 		Certificate: cert,
