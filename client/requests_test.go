@@ -240,7 +240,7 @@ var _ = Describe("API", func() {
 					Length:         42,
 				}
 				expectedRequestBody := `{
-					"type":"value",
+					"type":"password",
 					"overwrite":false,
 					"parameters": {
 						"exclude_special": true,
@@ -251,7 +251,7 @@ var _ = Describe("API", func() {
 					}
 				}`
 
-				request := NewGenerateSecretRequest(cfg, "my-name", parameters, "value", false)
+				request := NewGenerateSecretRequest(cfg, "my-name", parameters, "password", false)
 
 				bodyBuffer := new(bytes.Buffer)
 				bodyBuffer.ReadFrom(request.Body)

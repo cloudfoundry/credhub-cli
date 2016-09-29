@@ -20,32 +20,6 @@ var _ = Describe("Generate", func() {
 		doValueDefaultTypeOptionTest(`{}`, true)
 	})
 
-	Describe("with a variety of value parameters", func() {
-		It("with with no-overwrite", func() {
-			doValueOptionTest(`{}`, false, "--no-overwrite")
-		})
-
-		It("including length", func() {
-			doValueOptionTest(`{"length":42}`, true, "-l", "42")
-		})
-
-		It("excluding upper case", func() {
-			doValueOptionTest(`{"exclude_upper":true}`, true, "--exclude-upper")
-		})
-
-		It("excluding lower case", func() {
-			doValueOptionTest(`{"exclude_lower":true}`, true, "--exclude-lower")
-		})
-
-		It("excluding special characters", func() {
-			doValueOptionTest(`{"exclude_special":true}`, true, "--exclude-special")
-		})
-
-		It("excluding numbers", func() {
-			doValueOptionTest(`{"exclude_number":true}`, true, "--exclude-number")
-		})
-	})
-
 	Describe("with a variety of password parameters", func() {
 		It("with with no-overwrite", func() {
 			doPasswordOptionTest(`{}`, false, "--no-overwrite")
@@ -178,7 +152,7 @@ func setupPostServer(name string, value string, requestJson string) {
 		CombineHandlers(
 			VerifyRequest("POST", fmt.Sprintf("/api/v1/data/%s", name)),
 			VerifyJSON(requestJson),
-			RespondWith(http.StatusOK, fmt.Sprintf(SECRET_STRING_RESPONSE_JSON, "value", value)),
+			RespondWith(http.StatusOK, fmt.Sprintf(SECRET_STRING_RESPONSE_JSON, "password", value)),
 		),
 	)
 }
@@ -195,12 +169,6 @@ func doValueDefaultTypeOptionTest(optionJson string, overwrite bool, options ...
 	setupPostServer("my-password", "potatoes", generateDefaultTypeRequestJson(optionJson, overwrite))
 
 	doTest([]string{"generate", "-n", "my-password"}, options...)
-}
-
-func doValueOptionTest(optionJson string, overwrite bool, options ...string) {
-	setupPostServer("my-value", "potatoes", generateRequestJson("value", optionJson, overwrite))
-
-	doTest([]string{"generate", "-n", "my-value", "-t", "value"}, options...)
 }
 
 func doPasswordOptionTest(optionJson string, overwrite bool, options ...string) {
