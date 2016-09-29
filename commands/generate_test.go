@@ -16,8 +16,20 @@ import (
 )
 
 var _ = Describe("Generate", func() {
-	It("without parameters", func() {
-		doValueDefaultTypeOptionTest(`{}`, true)
+	Describe("Without parameters", func() {
+		It("uses default parameters", func() {
+			setupPostServer("my-password", "potatoes", generateDefaultTypeRequestJson(`{}`, true))
+
+			doTest([]string{"generate", "-n", "my-password"})
+		})
+
+		It("prints the generated password secret", func() {
+			setupPostServer("my-password", "potatoes", generateDefaultTypeRequestJson(`{}`, true))
+
+			result := doTest([]string{"generate", "-n", "my-password"})
+
+			Expect(result.Out).To(Say(responseMyPasswordPotatoes))
+		})
 	})
 
 	Describe("with a variety of password parameters", func() {
@@ -165,12 +177,6 @@ func generateDefaultTypeRequestJson(params string, overwrite bool) string {
 	return fmt.Sprintf(GENERATE_DEFAULT_TYPE_REQUEST_JSON, overwrite, params)
 }
 
-func doValueDefaultTypeOptionTest(optionJson string, overwrite bool, options ...string) {
-	setupPostServer("my-password", "potatoes", generateDefaultTypeRequestJson(optionJson, overwrite))
-
-	doTest([]string{"generate", "-n", "my-password"}, options...)
-}
-
 func doPasswordOptionTest(optionJson string, overwrite bool, options ...string) {
 	setupPostServer("my-password", "potatoes", generateRequestJson("password", optionJson, overwrite))
 
@@ -183,9 +189,10 @@ func doCertificateOptionTest(optionJson string, overwrite bool, options ...strin
 	doTest([]string{"generate", "-n", "my-secret", "-t", "certificate"}, options...)
 }
 
-func doTest(leftOpts []string, options ...string) {
+func doTest(leftOpts []string, options ...string) *Session {
 	stuff := append(leftOpts, options...)
 	session := runCommand(stuff...)
 
 	Eventually(session).Should(Exit(0))
+	return session
 }

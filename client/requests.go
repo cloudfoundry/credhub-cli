@@ -40,13 +40,12 @@ func NewPutCertificateRequest(config config.Config, secretIdentifier string, roo
 		Certificate: cert,
 		PrivateKey:  priv,
 	}
-	secret := models.SecretBody{
+	secretBody := models.SecretBody{
 		ContentType: "certificate",
 		Value:       &certificate,
 		Overwrite:   overwrite,
 	}
-
-	return newSecretRequest("PUT", config, secretIdentifier, secret)
+	return newSecretRequest("PUT", config, secretIdentifier, secretBody)
 }
 
 func NewPutSshRequest(config config.Config, secretIdentifier, publicKey, privateKey string, overwrite bool) *http.Request {

@@ -15,7 +15,6 @@ import (
 	cm_errors "github.com/pivotal-cf/credhub-cli/errors"
 	"github.com/pivotal-cf/credhub-cli/models"
 	"github.com/pivotal-cf/credhub-cli/repositories/repositoriesfakes"
-	"github.com/pivotal-cf/credhub-cli/util"
 )
 
 var _ = Describe("Action", func() {
@@ -25,7 +24,7 @@ var _ = Describe("Action", func() {
 		repository   repositoriesfakes.FakeRepository
 		cfg          config.Config
 		expectedBody models.SecretBody
-		expectedItem models.Item
+		expectedItem interface{}
 	)
 
 	BeforeEach(func() {
@@ -48,7 +47,7 @@ var _ = Describe("Action", func() {
 	Describe("DoAction", func() {
 		It("performs a network request", func() {
 			request, _ := http.NewRequest("POST", "my-url", nil)
-			repository.SendRequestStub = func(req *http.Request, identifier string) (models.Item, error) {
+			repository.SendRequestStub = func(req *http.Request, identifier string) (interface{}, error) {
 				Expect(req).To(Equal(request))
 				return expectedItem, nil
 			}
@@ -74,14 +73,14 @@ var _ = Describe("Action", func() {
 					authRepository.SendRequestReturns(models.Token{AccessToken: "access_token", RefreshToken: "refresh_token"}, nil)
 					subject.AuthRepository = &authRepository
 
-					repository.SendRequestStub = util.SequentialStub(
-						func(req *http.Request, identifier string) (models.Item, error) {
+					repository.SendRequestStub = SequentialStub(
+						func(req *http.Request, identifier string) (interface{}, error) {
 							buf := new(bytes.Buffer)
 							buf.ReadFrom(req.Body)
 							Expect(buf.String()).To(Equal("{}"))
-							return models.NewItem(), cm_errors.NewUnauthorizedError()
+							return struct{}{}, cm_errors.NewUnauthorizedError()
 						},
-						func(req *http.Request, identifier string) (models.Item, error) {
+						func(req *http.Request, identifier string) (interface{}, error) {
 							Expect(req.Header.Get("Authorization")).To(Equal("Bearer access_token"))
 
 							buf := new(bytes.Buffer)
@@ -110,13 +109,13 @@ var _ = Describe("Action", func() {
 						subject.AuthRepository = &authRepository
 						expectedError := errors.New("Custom Server Error")
 
-						repository.SendRequestStub = util.SequentialStub(
-							func(req *http.Request, identifier string) (models.Item, error) {
-								return models.NewItem(), cm_errors.NewUnauthorizedError()
+						repository.SendRequestStub = SequentialStub(
+							func(req *http.Request, identifier string) (interface{}, error) {
+								return struct{}{}, cm_errors.NewUnauthorizedError()
 							},
-							func(req *http.Request, identifier string) (models.Item, error) {
+							func(req *http.Request, identifier string) (interface{}, error) {
 								Expect(req.Header.Get("Authorization")).To(Equal("Bearer access_token"))
-								return models.NewItem(), expectedError
+								return struct{}{}, expectedError
 							},
 						)
 
@@ -135,3 +134,13 @@ var _ = Describe("Action", func() {
 		})
 	})
 })
+
+type RepositoryStub func(req *http.Request, identifier string) (interface{}, error)
+
+func SequentialStub(stubs ...RepositoryStub) RepositoryStub {
+	return func(req *http.Request, identifier string) (interface{}, error) {
+		var s RepositoryStub
+		s, stubs = stubs[0], stubs[1:]
+		return s(req, identifier)
+	}
+}

@@ -2,6 +2,7 @@ package models
 
 import (
 	"strings"
+	"github.com/pivotal-cf/credhub-cli/util"
 )
 
 type SecretQueryResponseBody struct {
@@ -22,9 +23,9 @@ func (secretQueryResponseBody SecretQueryResponseBody) String() string {
 			longestNameLength = nameLength
 		}
 	}
-	lines = append(lines, buildLineWithLength("Name", "Updated Date", longestNameLength))
+	lines = append(lines, util.BuildLineWithLength("Name", "Updated Date", longestNameLength))
 	for _, credential := range secretQueryResponseBody.Credentials {
-		lines = append(lines, buildLineWithLength(credential.Name, credential.UpdatedAt, longestNameLength))
+		lines = append(lines, util.BuildLineWithLength(credential.Name, credential.UpdatedAt, longestNameLength))
 	}
 	return strings.Join(lines, "\n")
 }

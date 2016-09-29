@@ -12,7 +12,7 @@ import (
 )
 
 type Repository interface {
-	SendRequest(request *http.Request, identifier string) (models.Item, error)
+	SendRequest(request *http.Request, identifier string) (interface{}, error)
 }
 
 func DoSendRequest(httpClient client.HttpClient, request *http.Request) (*http.Response, error) {

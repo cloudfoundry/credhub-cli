@@ -5,24 +5,23 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/pivotal-cf/credhub-cli/models"
 	"github.com/pivotal-cf/credhub-cli/repositories"
 )
 
 type FakeRepository struct {
-	SendRequestStub        func(request *http.Request, identifier string) (models.Item, error)
+	SendRequestStub        func(request *http.Request, identifier string) (interface{}, error)
 	sendRequestMutex       sync.RWMutex
 	sendRequestArgsForCall []struct {
 		request *http.Request
 	}
 	sendRequestReturns struct {
-		result1 models.Item
+		result1 interface{}
 		result2 error
 	}
 	invocations map[string][][]interface{}
 }
 
-func (fake *FakeRepository) SendRequest(request *http.Request, identifier string) (models.Item, error) {
+func (fake *FakeRepository) SendRequest(request *http.Request, identifier string) (interface{}, error) {
 	fake.sendRequestMutex.Lock()
 	fake.sendRequestArgsForCall = append(fake.sendRequestArgsForCall, struct {
 		request *http.Request
@@ -49,10 +48,10 @@ func (fake *FakeRepository) SendRequestArgsForCall(i int) *http.Request {
 	return fake.sendRequestArgsForCall[i].request
 }
 
-func (fake *FakeRepository) SendRequestReturns(result1 models.Item, result2 error) {
+func (fake *FakeRepository) SendRequestReturns(result1 interface{}, result2 error) {
 	fake.SendRequestStub = nil
 	fake.sendRequestReturns = struct {
-		result1 models.Item
+		result1 interface{}
 		result2 error
 	}{result1, result2}
 }

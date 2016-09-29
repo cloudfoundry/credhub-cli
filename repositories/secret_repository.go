@@ -17,7 +17,7 @@ func NewSecretRepository(httpClient client.HttpClient) Repository {
 	return secretRepository{httpClient: httpClient}
 }
 
-func (r secretRepository) SendRequest(request *http.Request, identifier string) (models.Item, error) {
+func (r secretRepository) SendRequest(request *http.Request, identifier string) (interface{}, error) {
 	response, err := DoSendRequest(r.httpClient, request)
 	if err != nil {
 		return models.Secret{}, err

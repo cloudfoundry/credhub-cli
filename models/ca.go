@@ -2,6 +2,7 @@ package models
 
 import (
 	"strings"
+	"github.com/pivotal-cf/credhub-cli/util"
 )
 
 type Ca struct {
@@ -9,7 +10,7 @@ type Ca struct {
 	CaBody CaBody
 }
 
-func NewCa(name string, caBody CaBody) Item {
+func NewCa(name string, caBody CaBody) Ca {
 	return Ca{
 		Name:   name,
 		CaBody: caBody,
@@ -21,20 +22,20 @@ func (ca Ca) String() string {
 
 	caBody := ca.CaBody
 	lines = append(lines,
-		buildLineOfFixedLength("Type:", caBody.ContentType),
-		buildLineOfFixedLength("Name:", ca.Name),
+		util.BuildLineOfFixedLength("Type:", caBody.ContentType),
+		util.BuildLineOfFixedLength("Name:", ca.Name),
 	)
 
 	if caBody.Value.Certificate != "" {
-		lines = append(lines, buildLineOfFixedLength("Certificate:", caBody.Value.Certificate))
+		lines = append(lines, util.BuildLineOfFixedLength("Certificate:", caBody.Value.Certificate))
 	}
 
 	if caBody.Value.PrivateKey != "" {
-		lines = append(lines, buildLineOfFixedLength("Private Key:", caBody.Value.PrivateKey))
+		lines = append(lines, util.BuildLineOfFixedLength("Private Key:", caBody.Value.PrivateKey))
 	}
 
 	if caBody.UpdatedAt != "" {
-		lines = append(lines, buildLineOfFixedLength("Updated:", caBody.UpdatedAt))
+		lines = append(lines, util.BuildLineOfFixedLength("Updated:", caBody.UpdatedAt))
 	}
 
 	return strings.Join(lines, "\n")

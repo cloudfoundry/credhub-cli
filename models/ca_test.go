@@ -1,8 +1,9 @@
-package models
+package models_test
 
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	. "github.com/pivotal-cf/credhub-cli/models"
 )
 
 var _ = Describe("String function", func() {

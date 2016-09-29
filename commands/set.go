@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/pivotal-cf/credhub-cli/actions"
+	"github.com/pivotal-cf/credhub-cli/models"
 	"github.com/pivotal-cf/credhub-cli/client"
 	"github.com/pivotal-cf/credhub-cli/config"
 	"github.com/pivotal-cf/credhub-cli/repositories"
@@ -54,8 +55,7 @@ func (cmd SetCommand) Execute([]string) error {
 	if err != nil {
 		return err
 	}
-
-	fmt.Println(secret)
+	fmt.Println(NewPrinterFactory(secret.(models.Secret)).PrintableSecret())
 
 	return nil
 }
@@ -68,48 +68,36 @@ func getRequest(cmd SetCommand, config config.Config) (*http.Request, error) {
 		request = client.NewPutPasswordRequest(config, cmd.SecretIdentifier, cmd.Value, !cmd.NoOverwrite)
 	} else if cmd.Type == "ssh" {
 		var err error
-		if cmd.Public != "" {
-			cmd.PublicString, err = ReadFile(cmd.Public)
-			if err != nil {
-				return nil, err
-			}
+
+		err = setStringFieldFromFile(&cmd.Public, &cmd.PublicString)
+		if err != nil {
+			return nil, err
 		}
-		if cmd.Private != "" {
-			cmd.PrivateString, err = ReadFile(cmd.Private)
-			if err != nil {
-				return nil, err
-			}
+
+		err = setStringFieldFromFile(&cmd.Private, &cmd.PrivateString)
+		if err != nil {
+			return nil, err
 		}
+
 		request = client.NewPutSshRequest(config, cmd.SecretIdentifier, cmd.PublicString, cmd.PrivateString, !cmd.NoOverwrite)
 	} else {
 		var err error
-		if cmd.Root != "" {
-			if cmd.RootString != "" {
-				return nil, cmcli_errors.NewCombinationOfParametersError()
-			}
-			cmd.RootString, err = ReadFile(cmd.Root)
-			if err != nil {
-				return nil, err
-			}
+
+		err = setStringFieldFromFile(&cmd.Root, &cmd.RootString)
+		if err != nil {
+			return nil, err
 		}
-		if cmd.Certificate != "" {
-			if cmd.CertificateString != "" {
-				return nil, cmcli_errors.NewCombinationOfParametersError()
-			}
-			cmd.CertificateString, err = ReadFile(cmd.Certificate)
-			if err != nil {
-				return nil, err
-			}
+
+		err = setStringFieldFromFile(&cmd.Certificate, &cmd.CertificateString)
+		if err != nil {
+			return nil, err
 		}
-		if cmd.Private != "" {
-			if cmd.PrivateString != "" {
-				return nil, cmcli_errors.NewCombinationOfParametersError()
-			}
-			cmd.PrivateString, err = ReadFile(cmd.Private)
-			if err != nil {
-				return nil, err
-			}
+
+		err = setStringFieldFromFile(&cmd.Private, &cmd.PrivateString)
+		if err != nil {
+			return nil, err
 		}
+
 		request = client.NewPutCertificateRequest(config, cmd.SecretIdentifier, cmd.RootString, cmd.CertificateString, cmd.PrivateString, !cmd.NoOverwrite)
 	}
 
@@ -121,4 +109,18 @@ func promptForInput(prompt string, value *string) {
 	reader := bufio.NewReader(os.Stdin)
 	val, _ := reader.ReadString('\n')
 	*value = string(strings.TrimSpace(val))
+}
+
+func setStringFieldFromFile(fileField, stringField *string) error {
+	var err error
+	if *fileField != "" {
+		if *stringField != "" {
+			return cmcli_errors.NewCombinationOfParametersError()
+		}
+		*stringField, err = ReadFile(*fileField)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

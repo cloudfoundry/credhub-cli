@@ -18,7 +18,7 @@ func NewAuthRepository(httpClient client.HttpClient, expectResponseBody bool) Re
 	return authRepository{httpClient: httpClient, expectResponseBody: expectResponseBody}
 }
 
-func (r authRepository) SendRequest(request *http.Request, identifier string) (models.Item, error) {
+func (r authRepository) SendRequest(request *http.Request, identifier string) (interface{}, error) {
 	response, err := DoSendRequest(r.httpClient, request)
 	if err != nil {
 		return models.Token{}, err
