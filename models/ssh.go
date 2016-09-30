@@ -1,8 +1,9 @@
 package models
 
 import (
-	"github.com/pivotal-cf/credhub-cli/util"
 	"strings"
+
+	"github.com/pivotal-cf/credhub-cli/util"
 )
 
 type Ssh struct {

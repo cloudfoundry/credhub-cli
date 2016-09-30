@@ -1,8 +1,9 @@
 package models
 
 import (
-	"github.com/pivotal-cf/credhub-cli/util"
 	"encoding/json"
+
+	"github.com/pivotal-cf/credhub-cli/util"
 )
 
 type SecretBody struct {

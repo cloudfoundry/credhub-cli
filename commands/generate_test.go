@@ -94,7 +94,7 @@ var _ = Describe("Generate", func() {
 
 		It("including organization unit", func() {
 			setupPostServer("my-secret", "potatoes", generateRequestJson("certificate", `{"organization_unit":"My Unit"}`, true))
-			session := runCommand("generate", "-n", "my-secret", "-t", "certificate",  "--organization-unit", "My Unit")
+			session := runCommand("generate", "-n", "my-secret", "-t", "certificate", "--organization-unit", "My Unit")
 			Eventually(session).Should(Exit(0))
 		})
 
@@ -124,19 +124,19 @@ var _ = Describe("Generate", func() {
 
 		It("including key length", func() {
 			setupPostServer("my-secret", "potatoes", generateRequestJson("certificate", `{"key_length":2048}`, true))
-			session := runCommand("generate", "-n", "my-secret", "-t", "certificate",  "--key-length", "2048")
+			session := runCommand("generate", "-n", "my-secret", "-t", "certificate", "--key-length", "2048")
 			Eventually(session).Should(Exit(0))
 		})
 
 		It("including duration", func() {
 			setupPostServer("my-secret", "potatoes", generateRequestJson("certificate", `{"duration":1000}`, true))
-			session := runCommand("generate", "-n", "my-secret", "-t", "certificate",  "--duration", "1000")
+			session := runCommand("generate", "-n", "my-secret", "-t", "certificate", "--duration", "1000")
 			Eventually(session).Should(Exit(0))
 		})
 
 		It("including certificate authority", func() {
 			setupPostServer("my-secret", "potatoes", generateRequestJson("certificate", `{"ca":"my_ca"}`, true))
-			session := runCommand("generate", "-n", "my-secret", "-t", "certificate",  "--ca", "my_ca")
+			session := runCommand("generate", "-n", "my-secret", "-t", "certificate", "--ca", "my_ca")
 			Eventually(session).Should(Exit(0))
 		})
 	})

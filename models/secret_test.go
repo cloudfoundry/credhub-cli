@@ -1,9 +1,10 @@
 package models
 
 import (
+	"encoding/json"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"encoding/json"
 )
 
 var _ = Describe("String function", func() {
@@ -64,7 +65,7 @@ var _ = Describe("String function", func() {
 })
 
 func unmarshal(jsonBytes []byte) map[string]interface{} {
-	itemMap := map[string]interface{} {}
+	itemMap := map[string]interface{}{}
 	json.Unmarshal(jsonBytes, &itemMap)
 	return itemMap
 }
