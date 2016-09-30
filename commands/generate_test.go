@@ -20,87 +20,124 @@ var _ = Describe("Generate", func() {
 		It("uses default parameters", func() {
 			setupPostServer("my-password", "potatoes", generateDefaultTypeRequestJson(`{}`, true))
 
-			doTest([]string{"generate", "-n", "my-password"})
+			session := runCommand("generate", "-n", "my-password")
+
+			Eventually(session).Should(Exit(0))
 		})
 
 		It("prints the generated password secret", func() {
 			setupPostServer("my-password", "potatoes", generateDefaultTypeRequestJson(`{}`, true))
 
-			result := doTest([]string{"generate", "-n", "my-password"})
+			session := runCommand("generate", "-n", "my-password")
 
-			Expect(result.Out).To(Say(responseMyPasswordPotatoes))
+			Eventually(session).Should(Exit(0))
+			Expect(session.Out).To(Say(responseMyPasswordPotatoes))
 		})
 	})
 
 	Describe("with a variety of password parameters", func() {
 		It("with with no-overwrite", func() {
-			doPasswordOptionTest(`{}`, false, "--no-overwrite")
+			setupPostServer("my-password", "potatoes", generateRequestJson("password", `{}`, false))
+			session := runCommand("generate", "-n", "my-password", "-t", "password", "--no-overwrite")
+			Eventually(session).Should(Exit(0))
 		})
 
 		It("including length", func() {
-			doPasswordOptionTest(`{"length":42}`, true, "-l", "42")
+			setupPostServer("my-password", "potatoes", generateRequestJson("password", `{"length":42}`, true))
+			session := runCommand("generate", "-n", "my-password", "-t", "password", "-l", "42")
+			Eventually(session).Should(Exit(0))
 		})
 
 		It("excluding upper case", func() {
-			doPasswordOptionTest(`{"exclude_upper":true}`, true, "--exclude-upper")
+			setupPostServer("my-password", "potatoes", generateRequestJson("password", `{"exclude_upper":true}`, true))
+			session := runCommand("generate", "-n", "my-password", "-t", "password", "--exclude-upper")
+			Eventually(session).Should(Exit(0))
 		})
 
 		It("excluding lower case", func() {
-			doPasswordOptionTest(`{"exclude_lower":true}`, true, "--exclude-lower")
+			setupPostServer("my-password", "potatoes", generateRequestJson("password", `{"exclude_lower":true}`, true))
+			session := runCommand("generate", "-n", "my-password", "-t", "password", "--exclude-lower")
+			Eventually(session).Should(Exit(0))
 		})
 
 		It("excluding special characters", func() {
-			doPasswordOptionTest(`{"exclude_special":true}`, true, "--exclude-special")
+			setupPostServer("my-password", "potatoes", generateRequestJson("password", `{"exclude_special":true}`, true))
+			session := runCommand("generate", "-n", "my-password", "-t", "password", "--exclude-special")
+			Eventually(session).Should(Exit(0))
 		})
 
 		It("excluding numbers", func() {
-			doPasswordOptionTest(`{"exclude_number":true}`, true, "--exclude-number")
+			setupPostServer("my-password", "potatoes", generateRequestJson("password", `{"exclude_number":true}`, true))
+			session := runCommand("generate", "-n", "my-password", "-t", "password", "--exclude-number")
+			Eventually(session).Should(Exit(0))
 		})
 	})
 
 	Describe("with a variety of certificate parameters", func() {
 		It("including common name", func() {
-			doCertificateOptionTest(`{"common_name":"common.name.io"}`, true, "--common-name", "common.name.io")
+			setupPostServer("my-secret", "potatoes", generateRequestJson("certificate", `{"common_name":"common.name.io"}`, true))
+			session := runCommand("generate", "-n", "my-secret", "-t", "certificate", "--common-name", "common.name.io")
+			Eventually(session).Should(Exit(0))
 		})
 
 		It("including common name with no-overwrite", func() {
-			doCertificateOptionTest(`{"common_name":"common.name.io"}`, false, "--common-name", "common.name.io", "--no-overwrite")
+			setupPostServer("my-secret", "potatoes", generateRequestJson("certificate", `{"common_name":"common.name.io"}`, false))
+			session := runCommand("generate", "-n", "my-secret", "-t", "certificate", "--common-name", "common.name.io", "--no-overwrite")
+			Eventually(session).Should(Exit(0))
 		})
 
 		It("including organization", func() {
-			doCertificateOptionTest(`{"organization":"organization.io"}`, true, "--organization", "organization.io")
+			setupPostServer("my-secret", "potatoes", generateRequestJson("certificate", `{"organization":"organization.io"}`, true))
+			session := runCommand("generate", "-n", "my-secret", "-t", "certificate", "--organization", "organization.io")
+			Eventually(session).Should(Exit(0))
 		})
 
 		It("including organization unit", func() {
-			doCertificateOptionTest(`{"organization_unit":"My Unit"}`, true, "--organization-unit", "My Unit")
+			setupPostServer("my-secret", "potatoes", generateRequestJson("certificate", `{"organization_unit":"My Unit"}`, true))
+			session := runCommand("generate", "-n", "my-secret", "-t", "certificate",  "--organization-unit", "My Unit")
+			Eventually(session).Should(Exit(0))
 		})
 
 		It("including locality", func() {
-			doCertificateOptionTest(`{"locality":"My Locality"}`, true, "--locality", "My Locality")
+			setupPostServer("my-secret", "potatoes", generateRequestJson("certificate", `{"locality":"My Locality"}`, true))
+			session := runCommand("generate", "-n", "my-secret", "-t", "certificate", "--locality", "My Locality")
+			Eventually(session).Should(Exit(0))
 		})
 
 		It("including state", func() {
-			doCertificateOptionTest(`{"state":"My State"}`, true, "--state", "My State")
+			setupPostServer("my-secret", "potatoes", generateRequestJson("certificate", `{"state":"My State"}`, true))
+			session := runCommand("generate", "-n", "my-secret", "-t", "certificate", "--state", "My State")
+			Eventually(session).Should(Exit(0))
 		})
 
 		It("including country", func() {
-			doCertificateOptionTest(`{"country":"My Country"}`, true, "--country", "My Country")
+			setupPostServer("my-secret", "potatoes", generateRequestJson("certificate", `{"country":"My Country"}`, true))
+			session := runCommand("generate", "-n", "my-secret", "-t", "certificate", "--country", "My Country")
+			Eventually(session).Should(Exit(0))
 		})
 
 		It("including multiple alternative names", func() {
-			doCertificateOptionTest(`{"alternative_names": [ "Alt1", "Alt2" ]}`, true, "--alternative-name", "Alt1", "--alternative-name", "Alt2")
+			setupPostServer("my-secret", "potatoes", generateRequestJson("certificate", `{"alternative_names": [ "Alt1", "Alt2" ]}`, true))
+			session := runCommand("generate", "-n", "my-secret", "-t", "certificate", "--alternative-name", "Alt1", "--alternative-name", "Alt2")
+			Eventually(session).Should(Exit(0))
 		})
 
 		It("including key length", func() {
-			doCertificateOptionTest(`{"key_length":2048}`, true, "--key-length", "2048")
+			setupPostServer("my-secret", "potatoes", generateRequestJson("certificate", `{"key_length":2048}`, true))
+			session := runCommand("generate", "-n", "my-secret", "-t", "certificate",  "--key-length", "2048")
+			Eventually(session).Should(Exit(0))
 		})
 
 		It("including duration", func() {
-			doCertificateOptionTest(`{"duration":1000}`, true, "--duration", "1000")
+			setupPostServer("my-secret", "potatoes", generateRequestJson("certificate", `{"duration":1000}`, true))
+			session := runCommand("generate", "-n", "my-secret", "-t", "certificate",  "--duration", "1000")
+			Eventually(session).Should(Exit(0))
 		})
 
 		It("including certificate authority", func() {
-			doCertificateOptionTest(`{"ca":"my_ca"}`, true, "--ca", "my_ca")
+			setupPostServer("my-secret", "potatoes", generateRequestJson("certificate", `{"ca":"my_ca"}`, true))
+			session := runCommand("generate", "-n", "my-secret", "-t", "certificate",  "--ca", "my_ca")
+			Eventually(session).Should(Exit(0))
 		})
 	})
 
@@ -175,24 +212,4 @@ func generateRequestJson(secretType string, params string, overwrite bool) strin
 
 func generateDefaultTypeRequestJson(params string, overwrite bool) string {
 	return fmt.Sprintf(GENERATE_DEFAULT_TYPE_REQUEST_JSON, overwrite, params)
-}
-
-func doPasswordOptionTest(optionJson string, overwrite bool, options ...string) {
-	setupPostServer("my-password", "potatoes", generateRequestJson("password", optionJson, overwrite))
-
-	doTest([]string{"generate", "-n", "my-password", "-t", "password"}, options...)
-}
-
-func doCertificateOptionTest(optionJson string, overwrite bool, options ...string) {
-	setupPostServer("my-secret", "potatoes", generateRequestJson("certificate", optionJson, overwrite))
-
-	doTest([]string{"generate", "-n", "my-secret", "-t", "certificate"}, options...)
-}
-
-func doTest(leftOpts []string, options ...string) *Session {
-	stuff := append(leftOpts, options...)
-	session := runCommand(stuff...)
-
-	Eventually(session).Should(Exit(0))
-	return session
 }
