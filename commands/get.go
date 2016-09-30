@@ -7,7 +7,6 @@ import (
 	"github.com/pivotal-cf/credhub-cli/client"
 	"github.com/pivotal-cf/credhub-cli/config"
 	"github.com/pivotal-cf/credhub-cli/repositories"
-	"github.com/pivotal-cf/credhub-cli/models"
 )
 
 type GetCommand struct {
@@ -23,7 +22,7 @@ func (cmd GetCommand) Execute([]string) error {
 		return err
 	}
 
-	fmt.Println(NewPrinterFactory(secret.(models.Secret)).PrintableSecret())
+	fmt.Println(secret)
 
 	return nil
 }

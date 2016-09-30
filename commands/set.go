@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/pivotal-cf/credhub-cli/actions"
-	"github.com/pivotal-cf/credhub-cli/models"
 	"github.com/pivotal-cf/credhub-cli/client"
 	"github.com/pivotal-cf/credhub-cli/config"
 	"github.com/pivotal-cf/credhub-cli/repositories"
@@ -55,7 +54,7 @@ func (cmd SetCommand) Execute([]string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(NewPrinterFactory(secret.(models.Secret)).PrintableSecret())
+	fmt.Println(secret)
 
 	return nil
 }

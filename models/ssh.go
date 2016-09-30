@@ -1,13 +1,16 @@
 package models
 
-import "github.com/pivotal-cf/credhub-cli/util"
+import (
+	"github.com/pivotal-cf/credhub-cli/util"
+	"strings"
+)
 
 type Ssh struct {
 	PublicKey  string `json:"public_key,omitempty"`
 	PrivateKey string `json:"private_key,omitempty"`
 }
 
-func (ssh Ssh) StringLines() []string {
+func (ssh Ssh) String() string {
 	lines := []string{}
 	if ssh.PublicKey != "" {
 		lines = append(lines, util.BuildLineOfFixedLength("Public Key:", ssh.PublicKey))
@@ -15,5 +18,5 @@ func (ssh Ssh) StringLines() []string {
 	if ssh.PrivateKey != "" {
 		lines = append(lines, util.BuildLineOfFixedLength("Private Key:", ssh.PrivateKey))
 	}
-	return lines
+	return strings.Join(lines, "\n") + "\n"
 }

@@ -65,7 +65,7 @@ func (cmd GenerateCommand) Execute([]string) error {
 		return err
 	}
 
-	fmt.Println(NewPrinterFactory(secret.(models.Secret)).PrintableSecret())
+	fmt.Println(secret)
 
 	return nil
 }

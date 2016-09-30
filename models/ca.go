@@ -21,10 +21,6 @@ func (ca Ca) String() string {
 	lines := []string{}
 
 	caBody := ca.CaBody
-	lines = append(lines,
-		util.BuildLineOfFixedLength("Type:", caBody.ContentType),
-		util.BuildLineOfFixedLength("Name:", ca.Name),
-	)
 
 	if caBody.Value.Certificate != "" {
 		lines = append(lines, util.BuildLineOfFixedLength("Certificate:", caBody.Value.Certificate))
@@ -34,9 +30,5 @@ func (ca Ca) String() string {
 		lines = append(lines, util.BuildLineOfFixedLength("Private Key:", caBody.Value.PrivateKey))
 	}
 
-	if caBody.UpdatedAt != "" {
-		lines = append(lines, util.BuildLineOfFixedLength("Updated:", caBody.UpdatedAt))
-	}
-
-	return strings.Join(lines, "\n")
+	return util.Header(caBody.ContentType, ca.Name) + strings.Join(lines, "\n") + "\n" + util.Footer(ca.CaBody.UpdatedAt)
 }

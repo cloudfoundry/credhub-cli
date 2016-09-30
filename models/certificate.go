@@ -1,6 +1,9 @@
 package models
 
-import "github.com/pivotal-cf/credhub-cli/util"
+import (
+	"github.com/pivotal-cf/credhub-cli/util"
+	"strings"
+)
 
 type Certificate struct {
 	Ca          string `json:"ca,omitempty"`
@@ -8,7 +11,7 @@ type Certificate struct {
 	PrivateKey  string `json:"private_key,omitempty"`
 }
 
-func (cert Certificate) StringLines() []string {
+func (cert Certificate) String() string {
 	lines := []string{}
 	if cert.Ca != "" {
 		lines = append(lines, util.BuildLineOfFixedLength("Ca:", cert.Ca))
@@ -21,5 +24,9 @@ func (cert Certificate) StringLines() []string {
 	if cert.PrivateKey != "" {
 		lines = append(lines, util.BuildLineOfFixedLength("Private Key:", cert.PrivateKey))
 	}
-	return lines
+	result := strings.Join(lines, "\n")
+	if len(result) > 0 {
+		result += "\n"
+	}
+	return result
 }
