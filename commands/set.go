@@ -23,7 +23,7 @@ type SetCommand struct {
 	Value             string `short:"v" long:"value" description:"[Password, Value] Sets the value for the credential"`
 	Root              string `short:"r" long:"root" description:"[Certificate] Sets the root CA from file"`
 	Certificate       string `short:"c" long:"certificate" description:"[Certificate] Sets the certificate from file"`
-	Private           string `short:"p" long:"private" description:"[Certificate] Sets the private key from file"`
+	Private           string `short:"p" long:"private" description:"[Certificate, SSH] Sets the private key from file"`
 	Public            string `short:"u" long:"public" description:"[SSH] Sets the public key from file"`
 	RootString        string `short:"R" long:"root-string" description:"[Certificate] Sets the root CA from string input"`
 	CertificateString string `short:"C" long:"certificate-string" description:"[Certificate] Sets the certificate from string input"`

@@ -40,10 +40,10 @@ CREDENTIAL MANAGEMENT:
 		-v, --value 'VALUE'									[Password, Value] Sets the value for the credential
 		-r, --root	<FILE>									[Certificate] Sets the root CA from file
 		-c, --certificate <FILE>							[Certificate] Sets the certificate from file
-		-p, --private <FILE>								[Certificate] Sets the private key from file
+		-p, --private <FILE>								[Certificate, SSH] Sets the private key from file
 		-R, --root-string 'ROOT'							[Certificate] Sets the root CA from string input
 		-C, --certificate-string 'CERT'       				[Certificate] Sets the certificate from string input
-		-P, --private-string 'PRIVATE'						[Certificate] Sets the private key from string input
+		-P, --private-string 'PRIVATE'						[Certificate, SSH] Sets the private key from string input
 
 	generate --type <cred type> --name <cred name> [generate params]
 		Generate and set a credential value based on generation parameters (short command: n)
