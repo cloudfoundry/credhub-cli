@@ -18,13 +18,14 @@ type FindCommand struct {
 func (cmd FindCommand) Execute([]string) error {
 	var credentials interface{}
 	var err error
+	var repository repositories.Repository
 
 	cfg := config.ReadConfig()
-	repository := repositories.NewSecretQueryRepository(client.NewHttpClient(cfg))
 
-	// TODO: what the right way to do this? declaring a 'var repository Repository' didn't work.
 	if cmd.AllPaths {
 		repository = repositories.NewAllPathRepository(client.NewHttpClient(cfg))
+	} else {
+		repository = repositories.NewSecretQueryRepository(client.NewHttpClient(cfg))
 	}
 
 	action := actions.NewAction(repository, cfg)
