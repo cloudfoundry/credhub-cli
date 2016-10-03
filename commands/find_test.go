@@ -28,7 +28,55 @@ var _ = Describe("Find", func() {
 			Expect(commands.FindCommand{}).To(SatisfyAll(
 				commands.HaveFlag("name-like", "n"),
 				commands.HaveFlag("path", "p"),
+				commands.HaveFlag("all-paths", "a"),
 			))
+		})
+	})
+
+	Describe("finding all paths in the system", func() {
+		It("lists all existing credential paths", func() {
+			responseJson := `{
+				"paths": [
+						{
+							"path": "consul/"
+						},
+						{
+							"path": "consul/deploy123/"
+						},
+						{
+							"path": "deploy12/"
+						},
+						{
+							"path": "deploy123/"
+						},
+						{
+							"path": "deploy123/dan/"
+						},
+						{
+							"path": "deploy123/dan/consul/"
+						}
+				]
+			}`
+
+			responseTable := "Path\n" +
+				"consul/\n" +
+				"consul/deploy123/\n" +
+				"deploy12/\n" +
+				"deploy123/\n" +
+				"deploy123/dan/\n" +
+				"deploy123/dan/consul/\n"
+
+			server.AppendHandlers(
+				CombineHandlers(
+					VerifyRequest("GET", "/api/v1/data", "paths=true"),
+					RespondWith(http.StatusOK, responseJson),
+				),
+			)
+
+			session := runCommand("find", "-a")
+
+			Eventually(session.Out).Should(Say(responseTable))
+			Eventually(session).Should(Exit(0))
 		})
 	})
 

@@ -167,6 +167,12 @@ func NewBodyClone(req *http.Request) io.ReadCloser {
 	return result
 }
 
+func NewFindAllCredentialPathsRequest(config config.Config) *http.Request {
+	url := config.ApiURL + "/api/v1/data?paths=true"
+
+	return newRequest("GET", config, url, nil)
+}
+
 func NewFindCredentialsBySubstringRequest(config config.Config, partialSecretIdentifier string) *http.Request {
 	url := config.ApiURL + "/api/v1/data?name-like=" + partialSecretIdentifier
 

@@ -299,6 +299,17 @@ var _ = Describe("API", func() {
 			})
 		})
 
+		Describe("NewFindAllCredentialPathsRequest", func() {
+			It("Returns a request for getting all credential paths", func() {
+				expectedRequest, _ := http.NewRequest("GET", "http://example.com/api/v1/data?paths=true", nil)
+				expectedRequest.Header.Set("Authorization", "Bearer access-token")
+
+				request := NewFindAllCredentialPathsRequest(cfg)
+
+				Expect(request).To(Equal(expectedRequest))
+			})
+		})
+
 		Describe("NewFindCredentialsByPathRequest", func() {
 			It("Returns a request for getting secret", func() {
 				expectedRequest, _ := http.NewRequest("GET", "http://example.com/api/v1/data?path=my-path", nil)

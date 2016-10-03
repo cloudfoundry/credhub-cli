@@ -12,6 +12,7 @@ import (
 type FindCommand struct {
 	PartialSecretIdentifier string `short:"n" long:"name-like" description:"Find credentials whose name contains the query string"`
 	PathIdentifier          string `short:"p" long:"path" description:"Find credentials that exist under the provided path"`
+	AllPaths                bool   `short:"a" long:"all-paths" description:"List all existing credential paths"`
 }
 
 func (cmd FindCommand) Execute([]string) error {
@@ -20,9 +21,17 @@ func (cmd FindCommand) Execute([]string) error {
 
 	cfg := config.ReadConfig()
 	repository := repositories.NewSecretQueryRepository(client.NewHttpClient(cfg))
+
+	// TODO: what the right way to do this? declaring a 'var repository Repository' didn't work.
+	if cmd.AllPaths {
+		repository = repositories.NewAllPathRepository(client.NewHttpClient(cfg))
+	}
+
 	action := actions.NewAction(repository, cfg)
 
-	if cmd.PartialSecretIdentifier != "" {
+	if cmd.AllPaths {
+		credentials, err = action.DoAction(client.NewFindAllCredentialPathsRequest(cfg), "")
+	} else if cmd.PartialSecretIdentifier != "" {
 		credentials, err = action.DoAction(client.NewFindCredentialsBySubstringRequest(cfg, cmd.PartialSecretIdentifier), cmd.PartialSecretIdentifier)
 	} else {
 		credentials, err = action.DoAction(client.NewFindCredentialsByPathRequest(cfg, cmd.PathIdentifier), cmd.PartialSecretIdentifier)
