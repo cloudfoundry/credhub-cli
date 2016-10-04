@@ -41,9 +41,11 @@ CREDENTIAL MANAGEMENT:
 		-r, --root	<FILE>									[Certificate] Sets the root CA from file
 		-c, --certificate <FILE>							[Certificate] Sets the certificate from file
 		-p, --private <FILE>								[Certificate, SSH] Sets the private key from file
+		-u, --public <FILE>									[SSH, RSA] Sets the public key from file
 		-R, --root-string 'ROOT'							[Certificate] Sets the root CA from string input
 		-C, --certificate-string 'CERT'       				[Certificate] Sets the certificate from string input
 		-P, --private-string 'PRIVATE'						[Certificate, SSH] Sets the private key from string input
+		-U, --public-string 'PUBLIC'						[SSH, RSA] Sets the public key from string input
 
 	generate --type <cred type> --name <cred name> [generate params]
 		Generate and set a credential value based on generation parameters (short command: n)
@@ -60,7 +62,8 @@ CREDENTIAL MANAGEMENT:
 		-S, --exclude-special								[Password] Exclude special characters from generated value
 		    --ca 'CA NAME'									[Certificate] Name of CA used to sign the generated certificate (Default: 'default')
 		-d, --duration [1-3650]								[Certificate] Valid duration (in days) of the generated certificate (Default: 365)
-		-k, --key-length [2048, 3072, 4096]					[Certificate] Bit length of the generated key (Default: 2048)
+		-k, --key-length [2048, 3072, 4096]					[Certificate, SSH, RSA] Bit length of the generated key (Default: 2048)
+		-m, --ssh-comment 'COMMENT'							[SSH] A comment appended to the SSH public key for identification
 		-c, --common-name 'COMMON NAME'						[Certificate] Common name of the generated certificate 
 		-a, --alternative-name 'ALT NAME'					[Certificate] A subject alternative name of the generated certificate (may be specified multiple times)
 		-o, --organization 'ORG'							[Certificate] Organization of the generated certificate
