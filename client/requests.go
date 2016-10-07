@@ -48,15 +48,15 @@ func NewPutCertificateRequest(config config.Config, secretIdentifier string, roo
 	return newSecretRequest("PUT", config, secretIdentifier, secretBody)
 }
 
-func NewPutSshRequest(config config.Config, secretIdentifier, publicKey, privateKey string, overwrite bool) *http.Request {
-	ssh := models.Ssh{
+func NewPutRsaSshRequest(config config.Config, secretIdentifier, keyType, publicKey, privateKey string, overwrite bool) *http.Request {
+	key := models.RsaSsh{
 		PublicKey:  publicKey,
 		PrivateKey: privateKey,
 	}
 
 	secret := models.SecretBody{
-		ContentType: "ssh",
-		Value:       &ssh,
+		ContentType: keyType,
+		Value:       &key,
 		Overwrite:   overwrite,
 	}
 	return newSecretRequest("PUT", config, secretIdentifier, secret)

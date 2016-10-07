@@ -23,12 +23,12 @@ type SetCommand struct {
 	Value             string `short:"v" long:"value" description:"[Password, Value] Sets the value for the credential"`
 	Root              string `short:"r" long:"root" description:"[Certificate] Sets the root CA from file"`
 	Certificate       string `short:"c" long:"certificate" description:"[Certificate] Sets the certificate from file"`
-	Private           string `short:"p" long:"private" description:"[Certificate, SSH] Sets the private key from file"`
-	Public            string `short:"u" long:"public" description:"[SSH] Sets the public key from file"`
+	Private           string `short:"p" long:"private" description:"[Certificate, SSH, RSA] Sets the private key from file"`
+	Public            string `short:"u" long:"public" description:"[SSH, RSA] Sets the public key from file"`
 	RootString        string `short:"R" long:"root-string" description:"[Certificate] Sets the root CA from string input"`
 	CertificateString string `short:"C" long:"certificate-string" description:"[Certificate] Sets the certificate from string input"`
-	PrivateString     string `short:"P" long:"private-string" description:"[Certificate, SSH] Sets the private key from string input"`
-	PublicString      string `short:"U" long:"public-string" description:"[SSH] Sets the public key from  string input"`
+	PrivateString     string `short:"P" long:"private-string" description:"[Certificate, SSH, RSA] Sets the private key from string input"`
+	PublicString      string `short:"U" long:"public-string" description:"[SSH, RSA] Sets the public key from  string input"`
 	NoOverwrite       bool   `short:"O" long:"no-overwrite" description:"Credential is not modified if stored value already exists"`
 }
 
@@ -65,7 +65,7 @@ func getRequest(cmd SetCommand, config config.Config) (*http.Request, error) {
 		request = client.NewPutValueRequest(config, cmd.SecretIdentifier, cmd.Value, !cmd.NoOverwrite)
 	} else if cmd.Type == "password" {
 		request = client.NewPutPasswordRequest(config, cmd.SecretIdentifier, cmd.Value, !cmd.NoOverwrite)
-	} else if cmd.Type == "ssh" {
+	} else if cmd.Type == "ssh" || cmd.Type == "rsa" {
 		var err error
 
 		err = setStringFieldFromFile(&cmd.Public, &cmd.PublicString)
@@ -78,7 +78,7 @@ func getRequest(cmd SetCommand, config config.Config) (*http.Request, error) {
 			return nil, err
 		}
 
-		request = client.NewPutSshRequest(config, cmd.SecretIdentifier, cmd.PublicString, cmd.PrivateString, !cmd.NoOverwrite)
+		request = client.NewPutRsaSshRequest(config, cmd.SecretIdentifier, cmd.Type, cmd.PublicString, cmd.PrivateString, !cmd.NoOverwrite)
 	} else {
 		var err error
 

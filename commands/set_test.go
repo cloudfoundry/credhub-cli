@@ -33,22 +33,22 @@ var _ = Describe("Set", func() {
 
 	Describe("setting SSH secrets", func() {
 		It("puts a secret using explicit ssh type", func() {
-			setupPutSshServer("foo-key", "some-public-key", "some-private-key", true)
+			setupPutRsaSshServer("foo-ssh-key", "ssh", "some-public-key", "some-private-key", true)
 
-			session := runCommand("set", "-n", "foo-key", "-U", "some-public-key", "-P", "some-private-key", "-t", "ssh")
+			session := runCommand("set", "-n", "foo-ssh-key", "-U", "some-public-key", "-P", "some-private-key", "-t", "ssh")
 
 			Eventually(session).Should(Exit(0))
 			Eventually(session.Out).Should(Say(responseMySSHFoo))
 		})
 
 		It("puts a secret using values read from files", func() {
-			setupPutSshServer("foo-key", "some-public-key", "some-private-key", true)
+			setupPutRsaSshServer("foo-ssh-key", "ssh", "some-public-key", "some-private-key", true)
 
 			tempDir := createTempDir("sshFilesForTesting")
 			publicFileName := createSecretFile(tempDir, "rsa.pub", "some-public-key")
 			privateFilename := createSecretFile(tempDir, "rsa.key", "some-private-key")
 
-			session := runCommand("set", "-n", "foo-key",
+			session := runCommand("set", "-n", "foo-ssh-key",
 				"-t", "ssh",
 				"-u", publicFileName,
 				"-p", privateFilename)
@@ -59,9 +59,45 @@ var _ = Describe("Set", func() {
 		})
 
 		It("puts a secret specifying no-overwrite", func() {
-			setupPutSshServer("foo-key", "some-public-key", "some-private-key", false)
+			setupPutRsaSshServer("foo-ssh-key", "ssh", "some-public-key", "some-private-key", false)
 
-			session := runCommand("set", "-n", "foo-key", "-t", "ssh", "-U", "some-public-key", "-P", "some-private-key", "--no-overwrite")
+			session := runCommand("set", "-n", "foo-ssh-key", "-t", "ssh", "-U", "some-public-key", "-P", "some-private-key", "--no-overwrite")
+
+			Eventually(session).Should(Exit(0))
+		})
+	})
+
+	Describe("setting RSA secrets", func() {
+		It("puts a secret using explicit rsa type", func() {
+			setupPutRsaSshServer("foo-rsa-key", "rsa", "some-public-key", "some-private-key", true)
+
+			session := runCommand("set", "-n", "foo-rsa-key", "-U", "some-public-key", "-P", "some-private-key", "-t", "rsa")
+
+			Eventually(session).Should(Exit(0))
+			Eventually(session.Out).Should(Say(responseMyRSAFoo))
+		})
+
+		It("puts a secret using values read from files", func() {
+			setupPutRsaSshServer("foo-rsa-key", "rsa", "some-public-key", "some-private-key", true)
+
+			tempDir := createTempDir("rsaFilesForTesting")
+			publicFileName := createSecretFile(tempDir, "rsa.pub", "some-public-key")
+			privateFilename := createSecretFile(tempDir, "rsa.key", "some-private-key")
+
+			session := runCommand("set", "-n", "foo-rsa-key",
+				"-t", "rsa",
+				"-u", publicFileName,
+				"-p", privateFilename)
+
+			os.RemoveAll(tempDir)
+			Eventually(session).Should(Exit(0))
+			Eventually(session.Out).Should(Say(responseMyRSAFoo))
+		})
+
+		It("puts a secret specifying no-overwrite", func() {
+			setupPutRsaSshServer("foo-rsa-key", "rsa", "some-public-key", "some-private-key", false)
+
+			session := runCommand("set", "-n", "foo-rsa-key", "-t", "rsa", "-U", "some-public-key", "-P", "some-private-key", "--no-overwrite")
 
 			Eventually(session).Should(Exit(0))
 		})
@@ -215,14 +251,14 @@ var _ = Describe("Set", func() {
 	})
 })
 
-func setupPutSshServer(name, publicKey, privateKey string, overwrite bool) {
+func setupPutRsaSshServer(name, keyType, publicKey, privateKey string, overwrite bool) {
 	var jsonRequest string
-	jsonRequest = fmt.Sprintf(SECRET_SSH_REQUEST_JSON, publicKey, privateKey, overwrite)
+	jsonRequest = fmt.Sprintf(SECRET_RSA_SSH_REQUEST_JSON, keyType, publicKey, privateKey, overwrite)
 	server.AppendHandlers(
 		CombineHandlers(
 			VerifyRequest("PUT", fmt.Sprintf("/api/v1/data/%s", name)),
 			VerifyJSON(jsonRequest),
-			RespondWith(http.StatusOK, fmt.Sprintf(SECRET_SSH_RESPONSE_JSON, publicKey, privateKey)),
+			RespondWith(http.StatusOK, fmt.Sprintf(SECRET_RSA_SSH_RESPONSE_JSON, keyType, publicKey, privateKey)),
 		),
 	)
 }

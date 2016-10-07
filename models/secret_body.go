@@ -19,18 +19,16 @@ func (body SecretBody) String() string {
 	switch body.ContentType {
 	case "value", "password":
 		result = util.BuildLineOfFixedLength("Value:", body.Value.(string)) + "\n"
+		break
 	case "certificate":
 		cert := Certificate{}
 		json.Unmarshal(marshalBackIntoJson(body.Value.(map[string]interface{})), &cert)
 		result = cert.String()
-	case "ssh":
-		ssh := Ssh{}
-		json.Unmarshal(marshalBackIntoJson(body.Value.(map[string]interface{})), &ssh)
-		result = ssh.String()
-	case "rsa":
-		rsa := Rsa{}
-		json.Unmarshal(marshalBackIntoJson(body.Value.(map[string]interface{})), &rsa)
-		result = rsa.String()
+		break
+	case "ssh", "rsa":
+		rsaSsh := RsaSsh{}
+		json.Unmarshal(marshalBackIntoJson(body.Value.(map[string]interface{})), &rsaSsh)
+		result = rsaSsh.String()
 	}
 
 	return result

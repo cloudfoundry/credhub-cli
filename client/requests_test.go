@@ -153,18 +153,35 @@ var _ = Describe("API", func() {
 			})
 		})
 
-		Describe("NewPutSshRequest", func() {
-			It("Returns a request for the put-ssh endpoint", func() {
-				json := fmt.Sprintf(`{"type":"ssh","value":{"public_key":"%s","private_key":"%s"},"overwrite":true}`,
-					"my-pub", "my-priv")
-				requestBody := bytes.NewReader([]byte(json))
-				expectedRequest, _ := http.NewRequest("PUT", "http://example.com/api/v1/data/my-name", requestBody)
-				expectedRequest.Header.Set("Content-Type", "application/json")
-				expectedRequest.Header.Set("Authorization", "Bearer access-token")
+		Describe("NewPutRsaSshRequest", func() {
+			Describe("of type SSH", func() {
+				It("Returns a request for the put-rsa-ssh endpoint", func() {
+					json := fmt.Sprintf(`{"type":"%s","value":{"public_key":"%s","private_key":"%s"},"overwrite":true}`,
+						"ssh", "my-pub", "my-priv")
+					requestBody := bytes.NewReader([]byte(json))
+					expectedRequest, _ := http.NewRequest("PUT", "http://example.com/api/v1/data/my-name", requestBody)
+					expectedRequest.Header.Set("Content-Type", "application/json")
+					expectedRequest.Header.Set("Authorization", "Bearer access-token")
 
-				request := NewPutSshRequest(cfg, "my-name", "my-pub", "my-priv", true)
+					request := NewPutRsaSshRequest(cfg, "my-name", "ssh", "my-pub", "my-priv", true)
 
-				Expect(request).To(Equal(expectedRequest))
+					Expect(request).To(Equal(expectedRequest))
+				})
+			})
+
+			Describe("of type RSA", func() {
+				It("Returns a request for the put-rsa-ssh endpoint", func() {
+					json := fmt.Sprintf(`{"type":"%s","value":{"public_key":"%s","private_key":"%s"},"overwrite":true}`,
+						"rsa", "my-pub", "my-priv")
+					requestBody := bytes.NewReader([]byte(json))
+					expectedRequest, _ := http.NewRequest("PUT", "http://example.com/api/v1/data/my-name", requestBody)
+					expectedRequest.Header.Set("Content-Type", "application/json")
+					expectedRequest.Header.Set("Authorization", "Bearer access-token")
+
+					request := NewPutRsaSshRequest(cfg, "my-name", "rsa", "my-pub", "my-priv", true)
+
+					Expect(request).To(Equal(expectedRequest))
+				})
 			})
 		})
 
