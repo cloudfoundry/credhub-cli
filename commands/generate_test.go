@@ -73,6 +73,34 @@ var _ = Describe("Generate", func() {
 		})
 	})
 
+	Describe("with a variety of SSH parameters", func() {
+		It("with with no-overwrite", func() {
+			setupPostServer("my-ssh", "potatoes", generateRequestJson("ssh", `{}`, false))
+			session := runCommand("generate", "-n", "my-ssh", "-t", "ssh", "--no-overwrite")
+			Eventually(session).Should(Exit(0))
+		})
+
+		It("including length", func() {
+			setupPostServer("my-ssh", "potatoes", generateRequestJson("ssh", `{"key_length":3072}`, true))
+			session := runCommand("generate", "-n", "my-ssh", "-t", "ssh", "-k", "3072")
+			Eventually(session).Should(Exit(0))
+		})
+	})
+
+	Describe("with a variety of RSA parameters", func() {
+		It("with with no-overwrite", func() {
+			setupPostServer("my-rsa", "potatoes", generateRequestJson("rsa", `{}`, false))
+			session := runCommand("generate", "-n", "my-rsa", "-t", "rsa", "--no-overwrite")
+			Eventually(session).Should(Exit(0))
+		})
+
+		It("including length", func() {
+			setupPostServer("my-rsa", "potatoes", generateRequestJson("rsa", `{"key_length":3072}`, true))
+			session := runCommand("generate", "-n", "my-rsa", "-t", "rsa", "-k", "3072")
+			Eventually(session).Should(Exit(0))
+		})
+	})
+
 	Describe("with a variety of certificate parameters", func() {
 		It("including common name", func() {
 			setupPostServer("my-secret", "potatoes", generateRequestJson("certificate", `{"common_name":"common.name.io"}`, true))

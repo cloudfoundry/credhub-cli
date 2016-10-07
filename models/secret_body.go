@@ -24,7 +24,7 @@ func (body SecretBody) String() string {
 		json.Unmarshal(marshalBackIntoJson(body.Value.(map[string]interface{})), &cert)
 		result = cert.String()
 	case "ssh":
-		ssh := Rsa{}
+		ssh := Ssh{}
 		json.Unmarshal(marshalBackIntoJson(body.Value.(map[string]interface{})), &ssh)
 		result = ssh.String()
 	case "rsa":

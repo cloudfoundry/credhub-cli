@@ -49,7 +49,7 @@ func NewPutCertificateRequest(config config.Config, secretIdentifier string, roo
 }
 
 func NewPutSshRequest(config config.Config, secretIdentifier, publicKey, privateKey string, overwrite bool) *http.Request {
-	ssh := models.Rsa{
+	ssh := models.Ssh{
 		PublicKey:  publicKey,
 		PrivateKey: privateKey,
 	}

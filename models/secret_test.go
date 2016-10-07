@@ -19,7 +19,7 @@ var _ = Describe("String function", func() {
 	})
 
 	It("renders ssh secrets", func() {
-		jsonBytes, _ := json.Marshal(Rsa{PublicKey: "my-pub", PrivateKey: "my-priv"})
+		jsonBytes, _ := json.Marshal(Ssh{PublicKey: "my-pub", PrivateKey: "my-priv"})
 		sshSecret := NewSecret("sshSecret", SecretBody{ContentType: "ssh", Value: unmarshal(jsonBytes), UpdatedAt: "2016-01-01T12:00:00Z"})
 		Expect(sshSecret.String()).To(Equal("" +
 			"Type:          ssh\n" +
