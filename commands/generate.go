@@ -13,6 +13,7 @@ import (
 type GenerateCommand struct {
 	SecretIdentifier string   `short:"n" required:"yes" long:"name" description:"Name of the credential to generate"`
 	ContentType      string   `short:"t" long:"type" description:"Sets the credential type to generate (Default: 'password')"`
+	NoOverwrite      bool     `short:"O" long:"no-overwrite" description:"Credential is not modified if stored value already exists"`
 	Length           int      `short:"l" long:"length" description:"[Password] Length of the generated value (Default: 20)"`
 	ExcludeSpecial   bool     `short:"S" long:"exclude-special" description:"[Password] Exclude special characters from the generated value"`
 	ExcludeNumber    bool     `short:"N" long:"exclude-number" description:"[Password] Exclude number characters from the generated value"`
@@ -28,7 +29,7 @@ type GenerateCommand struct {
 	State            string   `short:"s" long:"state" description:"[Certificate] State/province of the generated certificate"`
 	Country          string   `short:"y" long:"country" description:"[Certificate] Country of the generated certificate"`
 	AlternativeName  []string `short:"a" long:"alternative-name" description:"[Certificate] A subject alternative name of the generated certificate (may be specified multiple times)"`
-	NoOverwrite      bool     `short:"O" long:"no-overwrite" description:"Credential is not modified if stored value already exists"`
+	SshComment       string   `short:"m" long:"ssh-comment" description:"[SSH] Comment appended to public key to help identify in environment"`
 }
 
 func (cmd GenerateCommand) Execute([]string) error {
@@ -55,6 +56,7 @@ func (cmd GenerateCommand) Execute([]string) error {
 		KeyLength:        cmd.KeyLength,
 		Duration:         cmd.Duration,
 		Ca:               cmd.Ca,
+		SshComment:       cmd.SshComment,
 	}
 
 	action := actions.NewAction(repository, cfg)

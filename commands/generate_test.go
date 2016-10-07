@@ -85,6 +85,12 @@ var _ = Describe("Generate", func() {
 			session := runCommand("generate", "-n", "my-ssh", "-t", "ssh", "-k", "3072")
 			Eventually(session).Should(Exit(0))
 		})
+
+		It("including comment", func() {
+			setupPostServer("my-ssh", "potatoes", generateRequestJson("ssh", `{"ssh_comment":"i am an ssh comment"}`, true))
+			session := runCommand("generate", "-n", "my-ssh", "-t", "ssh", "-m", "i am an ssh comment")
+			Eventually(session).Should(Exit(0))
+		})
 	})
 
 	Describe("with a variety of RSA parameters", func() {
