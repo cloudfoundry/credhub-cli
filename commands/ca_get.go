@@ -1,16 +1,16 @@
 package commands
 
 import (
-	"fmt"
-
 	"github.com/pivotal-cf/credhub-cli/actions"
 	"github.com/pivotal-cf/credhub-cli/client"
 	"github.com/pivotal-cf/credhub-cli/config"
+	"github.com/pivotal-cf/credhub-cli/models"
 	"github.com/pivotal-cf/credhub-cli/repositories"
 )
 
 type CaGetCommand struct {
 	CaIdentifier string `short:"n" required:"yes" long:"name" description:"Name of the CA to retrieve"`
+	OutputJson   bool   `long:"output-json"`
 }
 
 func (cmd CaGetCommand) Execute([]string) error {
@@ -24,7 +24,7 @@ func (cmd CaGetCommand) Execute([]string) error {
 		return err
 	}
 
-	fmt.Println(ca.Terminal())
+	models.Println(ca, cmd.OutputJson)
 
 	return nil
 }

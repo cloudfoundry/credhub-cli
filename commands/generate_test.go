@@ -18,7 +18,7 @@ import (
 var _ = Describe("Generate", func() {
 	Describe("Without parameters", func() {
 		It("uses default parameters", func() {
-			setupPostServer("my-password", "potatoes", generateDefaultTypeRequestJson(`{}`, true))
+			setupPasswordPostServer("my-password", "potatoes", generateDefaultTypeRequestJson(`{}`, true))
 
 			session := runCommand("generate", "-n", "my-password")
 
@@ -26,150 +26,274 @@ var _ = Describe("Generate", func() {
 		})
 
 		It("prints the generated password secret", func() {
-			setupPostServer("my-password", "potatoes", generateDefaultTypeRequestJson(`{}`, true))
+			setupPasswordPostServer("my-password", "potatoes", generateDefaultTypeRequestJson(`{}`, true))
 
 			session := runCommand("generate", "-n", "my-password")
 
 			Eventually(session).Should(Exit(0))
 			Expect(session.Out).To(Say(responseMyPasswordPotatoes))
 		})
+
+		It("can the generated password secret as JSON", func() {
+			setupPasswordPostServer("my-password", "potatoes", generateDefaultTypeRequestJson(`{}`, true))
+
+			session := runCommand("generate", "-n", "my-password", "--output-json")
+
+			Eventually(session).Should(Exit(0))
+			Expect(string(session.Out.Contents())).To(MatchJSON(`{
+				"type": "password",
+				"updated_at": "` + TIMESTAMP + `",
+				"value": "potatoes"
+			}`))
+		})
 	})
 
 	Describe("with a variety of password parameters", func() {
+		It("prints the secret", func() {
+			setupPasswordPostServer("my-password", "potatoes", generateDefaultTypeRequestJson(`{}`, true))
+
+			session := runCommand("generate", "-n", "my-password", "-t", "password")
+
+			Eventually(session).Should(Exit(0))
+			Expect(session.Out).To(Say(responseMyPasswordPotatoes))
+		})
+
+		It("can print the secret as JSON", func() {
+			setupPasswordPostServer("my-password", "potatoes", generateDefaultTypeRequestJson(`{}`, true))
+
+			session := runCommand(
+				"generate",
+				"-n", "my-password",
+				"-t", "password",
+				"--output-json",
+			)
+
+			Eventually(session).Should(Exit(0))
+			Expect(string(session.Out.Contents())).To(MatchJSON(`{
+				"type": "password",
+				"updated_at": "` + TIMESTAMP + `",
+				"value": "potatoes"
+			}`))
+		})
+
 		It("with with no-overwrite", func() {
-			setupPostServer("my-password", "potatoes", generateRequestJson("password", `{}`, false))
+			setupPasswordPostServer("my-password", "potatoes", generateRequestJson("password", `{}`, false))
 			session := runCommand("generate", "-n", "my-password", "-t", "password", "--no-overwrite")
 			Eventually(session).Should(Exit(0))
 		})
 
 		It("including length", func() {
-			setupPostServer("my-password", "potatoes", generateRequestJson("password", `{"length":42}`, true))
+			setupPasswordPostServer("my-password", "potatoes", generateRequestJson("password", `{"length":42}`, true))
 			session := runCommand("generate", "-n", "my-password", "-t", "password", "-l", "42")
 			Eventually(session).Should(Exit(0))
 		})
 
 		It("excluding upper case", func() {
-			setupPostServer("my-password", "potatoes", generateRequestJson("password", `{"exclude_upper":true}`, true))
+			setupPasswordPostServer("my-password", "potatoes", generateRequestJson("password", `{"exclude_upper":true}`, true))
 			session := runCommand("generate", "-n", "my-password", "-t", "password", "--exclude-upper")
 			Eventually(session).Should(Exit(0))
 		})
 
 		It("excluding lower case", func() {
-			setupPostServer("my-password", "potatoes", generateRequestJson("password", `{"exclude_lower":true}`, true))
+			setupPasswordPostServer("my-password", "potatoes", generateRequestJson("password", `{"exclude_lower":true}`, true))
 			session := runCommand("generate", "-n", "my-password", "-t", "password", "--exclude-lower")
 			Eventually(session).Should(Exit(0))
 		})
 
 		It("excluding special characters", func() {
-			setupPostServer("my-password", "potatoes", generateRequestJson("password", `{"exclude_special":true}`, true))
+			setupPasswordPostServer("my-password", "potatoes", generateRequestJson("password", `{"exclude_special":true}`, true))
 			session := runCommand("generate", "-n", "my-password", "-t", "password", "--exclude-special")
 			Eventually(session).Should(Exit(0))
 		})
 
 		It("excluding numbers", func() {
-			setupPostServer("my-password", "potatoes", generateRequestJson("password", `{"exclude_number":true}`, true))
+			setupPasswordPostServer("my-password", "potatoes", generateRequestJson("password", `{"exclude_number":true}`, true))
 			session := runCommand("generate", "-n", "my-password", "-t", "password", "--exclude-number")
 			Eventually(session).Should(Exit(0))
 		})
 	})
 
 	Describe("with a variety of SSH parameters", func() {
+		It("prints the SSH key", func() {
+			setupRsaSshPostServer("foo-ssh-key", "ssh", "some-public-key", "some-private-key", generateRequestJson("ssh", `{}`, true))
+
+			session := runCommand("generate", "-n", "foo-ssh-key", "-t", "ssh")
+
+			Eventually(session).Should(Exit(0))
+			Expect(session.Out).To(Say(responseMySSHFoo))
+		})
+
+		It("can print the SSH key as JSON", func() {
+			setupRsaSshPostServer("foo-ssh-key", "ssh", "some-public-key", "some-private-key", generateRequestJson("ssh", `{}`, true))
+
+			session := runCommand("generate", "-n", "foo-ssh-key", "-t", "ssh", "--output-json")
+
+			Eventually(session).Should(Exit(0))
+			Expect(string(session.Out.Contents())).To(MatchJSON(`{
+				"type": "ssh",
+				"updated_at": "` + TIMESTAMP + `",
+				"public_key": "some-public-key",
+				"private_key": "some-private-key"
+			}`))
+		})
+
 		It("with with no-overwrite", func() {
-			setupPostServer("my-ssh", "potatoes", generateRequestJson("ssh", `{}`, false))
+			setupRsaSshPostServer("my-ssh", "ssh", "some-public-key", "some-private-key", generateRequestJson("ssh", `{}`, false))
 			session := runCommand("generate", "-n", "my-ssh", "-t", "ssh", "--no-overwrite")
 			Eventually(session).Should(Exit(0))
 		})
 
 		It("including length", func() {
-			setupPostServer("my-ssh", "potatoes", generateRequestJson("ssh", `{"key_length":3072}`, true))
+			setupRsaSshPostServer("my-ssh", "ssh", "some-public-key", "some-private-key", generateRequestJson("ssh", `{"key_length":3072}`, true))
 			session := runCommand("generate", "-n", "my-ssh", "-t", "ssh", "-k", "3072")
 			Eventually(session).Should(Exit(0))
 		})
 
 		It("including comment", func() {
-			setupPostServer("my-ssh", "potatoes", generateRequestJson("ssh", `{"ssh_comment":"i am an ssh comment"}`, true))
+			expectedRequestJson := generateRequestJson("ssh", `{"ssh_comment":"i am an ssh comment"}`, true)
+			setupRsaSshPostServer("my-ssh", "ssh", "some-public-key", "some-private-key", expectedRequestJson)
 			session := runCommand("generate", "-n", "my-ssh", "-t", "ssh", "-m", "i am an ssh comment")
 			Eventually(session).Should(Exit(0))
 		})
 	})
 
 	Describe("with a variety of RSA parameters", func() {
+		It("prints the RSA key", func() {
+			setupRsaSshPostServer("foo-rsa-key", "rsa", "some-public-key", "some-private-key", generateRequestJson("rsa", `{}`, true))
+
+			session := runCommand("generate", "-n", "foo-rsa-key", "-t", "rsa")
+
+			Eventually(session).Should(Exit(0))
+			Expect(session.Out).To(Say(responseMyRSAFoo))
+		})
+
+		It("can print the RSA key as JSON", func() {
+			setupRsaSshPostServer("foo-rsa-key", "rsa", "some-public-key", "some-private-key", generateRequestJson("rsa", `{}`, true))
+
+			session := runCommand("generate", "-n", "foo-rsa-key", "-t", "rsa", "--output-json")
+
+			Eventually(session).Should(Exit(0))
+			Expect(string(session.Out.Contents())).To(MatchJSON(`{
+				"type": "rsa",
+				"updated_at": "` + TIMESTAMP + `",
+				"public_key": "some-public-key",
+				"private_key": "some-private-key"
+			}`))
+		})
+
 		It("with with no-overwrite", func() {
-			setupPostServer("my-rsa", "potatoes", generateRequestJson("rsa", `{}`, false))
+			setupRsaSshPostServer("my-rsa", "rsa", "some-public-key", "some-private-key", generateRequestJson("rsa", `{}`, false))
 			session := runCommand("generate", "-n", "my-rsa", "-t", "rsa", "--no-overwrite")
 			Eventually(session).Should(Exit(0))
 		})
 
 		It("including length", func() {
-			setupPostServer("my-rsa", "potatoes", generateRequestJson("rsa", `{"key_length":3072}`, true))
+			setupRsaSshPostServer("my-rsa", "rsa", "some-public-key", "some-private-key", generateRequestJson("rsa", `{"key_length":3072}`, true))
 			session := runCommand("generate", "-n", "my-rsa", "-t", "rsa", "-k", "3072")
 			Eventually(session).Should(Exit(0))
 		})
 	})
 
 	Describe("with a variety of certificate parameters", func() {
+		It("prints the certificate", func() {
+			expectedRequestJson := generateRequestJson("certificate", `{"common_name":"common.name.io"}`, true)
+			setupCertificatePostServer("my-secret", "my-ca", "my-cert", "my-priv", expectedRequestJson)
+
+			session := runCommand("generate", "-n", "my-secret", "-t", "certificate", "--common-name", "common.name.io")
+
+			Eventually(session).Should(Exit(0))
+			Expect(session.Out).To(Say(responseMyCertificate))
+		})
+
+		It("can print the certificate as JSON", func() {
+			expectedRequestJson := generateRequestJson("certificate", `{"common_name":"common.name.io"}`, true)
+			setupCertificatePostServer("my-secret", "my-ca", "my-cert", "my-priv", expectedRequestJson)
+
+			session := runCommand("generate", "-n", "my-secret", "-t", "certificate", "--common-name", "common.name.io", "--output-json")
+
+			Eventually(session).Should(Exit(0))
+			Expect(string(session.Out.Contents())).To(MatchJSON(`{
+				"type": "certificate",
+				"updated_at": "` + TIMESTAMP + `",
+				"ca": "my-ca",
+				"certificate": "my-cert",
+				"private_key": "my-priv"
+			}`))
+		})
+
 		It("including common name", func() {
-			setupPostServer("my-secret", "potatoes", generateRequestJson("certificate", `{"common_name":"common.name.io"}`, true))
+			expectedRequestJson := generateRequestJson("certificate", `{"common_name":"common.name.io"}`, true)
+			setupCertificatePostServer("my-secret", "potatoes-ca", "potatoes-cert", "potatoes-priv-key", expectedRequestJson)
 			session := runCommand("generate", "-n", "my-secret", "-t", "certificate", "--common-name", "common.name.io")
 			Eventually(session).Should(Exit(0))
 		})
 
 		It("including common name with no-overwrite", func() {
-			setupPostServer("my-secret", "potatoes", generateRequestJson("certificate", `{"common_name":"common.name.io"}`, false))
+			expectedRequestJson := generateRequestJson("certificate", `{"common_name":"common.name.io"}`, false)
+			setupCertificatePostServer("my-secret", "potatoes-ca", "potatoes-cert", "potatoes-priv-key", expectedRequestJson)
 			session := runCommand("generate", "-n", "my-secret", "-t", "certificate", "--common-name", "common.name.io", "--no-overwrite")
 			Eventually(session).Should(Exit(0))
 		})
 
 		It("including organization", func() {
-			setupPostServer("my-secret", "potatoes", generateRequestJson("certificate", `{"organization":"organization.io"}`, true))
+			expectedRequestJson := generateRequestJson("certificate", `{"organization":"organization.io"}`, true)
+			setupCertificatePostServer("my-secret", "potatoes-ca", "potatoes-cert", "potatoes-priv-key", expectedRequestJson)
 			session := runCommand("generate", "-n", "my-secret", "-t", "certificate", "--organization", "organization.io")
 			Eventually(session).Should(Exit(0))
 		})
 
 		It("including organization unit", func() {
-			setupPostServer("my-secret", "potatoes", generateRequestJson("certificate", `{"organization_unit":"My Unit"}`, true))
+			expectedRequestJson := generateRequestJson("certificate", `{"organization_unit":"My Unit"}`, true)
+			setupCertificatePostServer("my-secret", "potatoes-ca", "potatoes-cert", "potatoes-priv-key", expectedRequestJson)
 			session := runCommand("generate", "-n", "my-secret", "-t", "certificate", "--organization-unit", "My Unit")
 			Eventually(session).Should(Exit(0))
 		})
 
 		It("including locality", func() {
-			setupPostServer("my-secret", "potatoes", generateRequestJson("certificate", `{"locality":"My Locality"}`, true))
+			expectedRequestJson := generateRequestJson("certificate", `{"locality":"My Locality"}`, true)
+			setupCertificatePostServer("my-secret", "potatoes-ca", "potatoes-cert", "potatoes-priv-key", expectedRequestJson)
 			session := runCommand("generate", "-n", "my-secret", "-t", "certificate", "--locality", "My Locality")
 			Eventually(session).Should(Exit(0))
 		})
 
 		It("including state", func() {
-			setupPostServer("my-secret", "potatoes", generateRequestJson("certificate", `{"state":"My State"}`, true))
+			expectedRequestJson := generateRequestJson("certificate", `{"state":"My State"}`, true)
+			setupCertificatePostServer("my-secret", "potatoes-ca", "potatoes-cert", "potatoes-priv-key", expectedRequestJson)
 			session := runCommand("generate", "-n", "my-secret", "-t", "certificate", "--state", "My State")
 			Eventually(session).Should(Exit(0))
 		})
 
 		It("including country", func() {
-			setupPostServer("my-secret", "potatoes", generateRequestJson("certificate", `{"country":"My Country"}`, true))
+			expectedRequestJson := generateRequestJson("certificate", `{"country":"My Country"}`, true)
+			setupCertificatePostServer("my-secret", "potatoes-ca", "potatoes-cert", "potatoes-priv-key", expectedRequestJson)
 			session := runCommand("generate", "-n", "my-secret", "-t", "certificate", "--country", "My Country")
 			Eventually(session).Should(Exit(0))
 		})
 
 		It("including multiple alternative names", func() {
-			setupPostServer("my-secret", "potatoes", generateRequestJson("certificate", `{"alternative_names": [ "Alt1", "Alt2" ]}`, true))
+			expectedRequestJson := generateRequestJson("certificate", `{"alternative_names": [ "Alt1", "Alt2" ]}`, true)
+			setupCertificatePostServer("my-secret", "potatoes-ca", "potatoes-cert", "potatoes-priv-key", expectedRequestJson)
 			session := runCommand("generate", "-n", "my-secret", "-t", "certificate", "--alternative-name", "Alt1", "--alternative-name", "Alt2")
 			Eventually(session).Should(Exit(0))
 		})
 
 		It("including key length", func() {
-			setupPostServer("my-secret", "potatoes", generateRequestJson("certificate", `{"key_length":2048}`, true))
+			expectedRequestJson := generateRequestJson("certificate", `{"key_length":2048}`, true)
+			setupCertificatePostServer("my-secret", "potatoes-ca", "potatoes-cert", "potatoes-priv-key", expectedRequestJson)
 			session := runCommand("generate", "-n", "my-secret", "-t", "certificate", "--key-length", "2048")
 			Eventually(session).Should(Exit(0))
 		})
 
 		It("including duration", func() {
-			setupPostServer("my-secret", "potatoes", generateRequestJson("certificate", `{"duration":1000}`, true))
+			expectedRequestJson := generateRequestJson("certificate", `{"duration":1000}`, true)
+			setupCertificatePostServer("my-secret", "potatoes-ca", "potatoes-cert", "potatoes-priv-key", expectedRequestJson)
 			session := runCommand("generate", "-n", "my-secret", "-t", "certificate", "--duration", "1000")
 			Eventually(session).Should(Exit(0))
 		})
 
 		It("including certificate authority", func() {
-			setupPostServer("my-secret", "potatoes", generateRequestJson("certificate", `{"ca":"my_ca"}`, true))
+			expectedRequestJson := generateRequestJson("certificate", `{"ca":"my_ca"}`, true)
+			setupCertificatePostServer("my-secret", "potatoes-ca", "potatoes-cert", "potatoes-priv-key", expectedRequestJson)
 			session := runCommand("generate", "-n", "my-secret", "-t", "certificate", "--ca", "my_ca")
 			Eventually(session).Should(Exit(0))
 		})
@@ -230,12 +354,32 @@ var _ = Describe("Generate", func() {
 	})
 })
 
-func setupPostServer(name string, value string, requestJson string) {
+func setupPasswordPostServer(name string, value string, requestJson string) {
 	server.AppendHandlers(
 		CombineHandlers(
 			VerifyRequest("POST", fmt.Sprintf("/api/v1/data/%s", name)),
 			VerifyJSON(requestJson),
 			RespondWith(http.StatusOK, fmt.Sprintf(SECRET_STRING_RESPONSE_JSON, "password", value)),
+		),
+	)
+}
+
+func setupRsaSshPostServer(name string, contentType string, publicKey string, privateKey string, requestJson string) {
+	server.AppendHandlers(
+		CombineHandlers(
+			VerifyRequest("POST", fmt.Sprintf("/api/v1/data/%s", name)),
+			VerifyJSON(requestJson),
+			RespondWith(http.StatusOK, fmt.Sprintf(SECRET_RSA_SSH_RESPONSE_JSON, contentType, publicKey, privateKey)),
+		),
+	)
+}
+
+func setupCertificatePostServer(name string, ca string, certificate string, privateKey string, requestJson string) {
+	server.AppendHandlers(
+		CombineHandlers(
+			VerifyRequest("POST", fmt.Sprintf("/api/v1/data/%s", name)),
+			VerifyJSON(requestJson),
+			RespondWith(http.StatusOK, fmt.Sprintf(SECRET_CERTIFICATE_RESPONSE_JSON, ca, certificate, privateKey)),
 		),
 	)
 }

@@ -1,8 +1,6 @@
 package commands
 
 import (
-	"fmt"
-
 	"github.com/pivotal-cf/credhub-cli/actions"
 	"github.com/pivotal-cf/credhub-cli/client"
 	"github.com/pivotal-cf/credhub-cli/config"
@@ -30,6 +28,7 @@ type GenerateCommand struct {
 	Country          string   `short:"y" long:"country" description:"[Certificate] Country of the generated certificate"`
 	AlternativeName  []string `short:"a" long:"alternative-name" description:"[Certificate] A subject alternative name of the generated certificate (may be specified multiple times)"`
 	SshComment       string   `short:"m" long:"ssh-comment" description:"[SSH] Comment appended to public key to help identify in environment"`
+	OutputJson       bool     `long:"output-json"`
 }
 
 func (cmd GenerateCommand) Execute([]string) error {
@@ -67,7 +66,7 @@ func (cmd GenerateCommand) Execute([]string) error {
 		return err
 	}
 
-	fmt.Println(secret.Terminal())
+	models.Println(secret, cmd.OutputJson)
 
 	return nil
 }

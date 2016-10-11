@@ -21,7 +21,3 @@ func (rsaSsh RsaSsh) Terminal() string {
 	}
 	return strings.Join(lines, "\n") + "\n"
 }
-
-func (rsaSsh RsaSsh) Json() string {
-	return ""
-}

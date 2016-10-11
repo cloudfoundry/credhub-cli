@@ -31,7 +31,3 @@ func (cert Certificate) Terminal() string {
 	}
 	return result
 }
-
-func (certificate Certificate) Json() string {
-	return ""
-}

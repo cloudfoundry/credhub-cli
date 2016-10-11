@@ -35,5 +35,10 @@ func (ca Ca) Terminal() string {
 }
 
 func (ca Ca) Json() string {
-	return ""
+	return prettyPrintJson(map[string]interface{}{
+		"type":        ca.CaBody.ContentType,
+		"updated_at":  ca.CaBody.UpdatedAt,
+		"certificate": ca.CaBody.Value.Certificate,
+		"private_key": ca.CaBody.Value.PrivateKey,
+	})
 }

@@ -1,8 +1,6 @@
 package commands
 
 import (
-	"fmt"
-
 	"github.com/pivotal-cf/credhub-cli/actions"
 	"github.com/pivotal-cf/credhub-cli/client"
 	"github.com/pivotal-cf/credhub-cli/config"
@@ -21,6 +19,7 @@ type CaGenerateCommand struct {
 	CaLocality         string `short:"i" long:"locality" description:"[Root] Locality/city of the generated CA certificate"`
 	CaState            string `short:"s" long:"state" description:"[Root] State/province of the generated CA certificate"`
 	CaCountry          string `short:"y" long:"country" description:"[Root] Country of the generated CA certificate"`
+	OutputJson         bool   `long:"output-json"`
 }
 
 func (cmd CaGenerateCommand) Execute([]string) error {
@@ -54,7 +53,7 @@ func (cmd CaGenerateCommand) Execute([]string) error {
 		return err
 	}
 
-	fmt.Println(ca.Terminal())
+	models.Println(ca, cmd.OutputJson)
 
 	return nil
 }

@@ -29,6 +29,27 @@ var _ = Describe("Ca-Set", func() {
 			Eventually(session.Out).Should(Say(responseMyCertificate))
 		})
 
+		It("puts a root CA", func() {
+			setupPutCaServer("root", "my-ca", "my-cert", "my-priv")
+
+			session := runCommand(
+				"ca-set",
+				"-n", "my-ca",
+				"-t", "root",
+				"--certificate-string", "my-cert",
+				"--private-string", "my-priv",
+				"--output-json",
+			)
+
+			Eventually(session).Should(Exit(0))
+			Eventually(string(session.Out.Contents())).Should(MatchJSON(`{
+				"type": "root",
+				"updated_at": "` + TIMESTAMP + `",
+				"certificate": "my-cert",
+				"private_key": "my-priv"
+			}`))
+		})
+
 		It("sets the type as root if no type is given", func() {
 			var responseMyCertificate = fmt.Sprintf(CA_RESPONSE_TABLE, "root", "my-ca", "my-cert", "my-priv")
 			setupPutCaServer("root", "my-ca", "my-cert", "my-priv")
