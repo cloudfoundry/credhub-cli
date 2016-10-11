@@ -98,6 +98,14 @@ func NewGenerateSecretRequest(config config.Config, secretIdentifier string, par
 	return newSecretRequest("POST", config, secretIdentifier, generateRequest)
 }
 
+func NewRegenerateSecretRequest(config config.Config, secretIdentifier string) *http.Request {
+	regenerateRequest := models.RegenerateSecretRequest{
+		Regenerate: true,
+	}
+
+	return newSecretRequest("POST", config, secretIdentifier, regenerateRequest)
+}
+
 func NewGetSecretRequest(config config.Config, secretIdentifier string) *http.Request {
 	return newSecretRequest("GET", config, secretIdentifier, nil)
 }

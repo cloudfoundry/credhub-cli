@@ -294,6 +294,19 @@ var _ = Describe("API", func() {
 			})
 		})
 
+		Describe("NewRegenerateSecretRequest", func() {
+			It("returns a request with only regenerate", func() {
+				requestBody := bytes.NewReader([]byte(`{"regenerate":true}`))
+				expectedRequest, _ := http.NewRequest("POST", "http://example.com/api/v1/data/my-name", requestBody)
+				expectedRequest.Header.Set("Content-Type", "application/json")
+				expectedRequest.Header.Set("Authorization", "Bearer access-token")
+
+				request := NewRegenerateSecretRequest(cfg, "my-name")
+
+				Expect(request).To(Equal(expectedRequest))
+			})
+		})
+
 		Describe("NewGetSecretRequest", func() {
 			It("Returns a request for getting secret", func() {
 				expectedRequest, _ := http.NewRequest("GET", "http://example.com/api/v1/data/my-name", nil)
