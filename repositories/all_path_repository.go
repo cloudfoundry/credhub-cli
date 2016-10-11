@@ -21,7 +21,7 @@ func NewAllPathRepository(httpClient client.HttpClient) Repository {
 	return allPathRepository{httpClient: httpClient}
 }
 
-func (r allPathRepository) SendRequest(request *http.Request, ignoredIdentifier string) (interface{}, error) {
+func (r allPathRepository) SendRequest(request *http.Request, ignoredIdentifier string) (models.Printable, error) {
 	response, err := DoSendRequest(r.httpClient, request)
 	if err != nil {
 		return models.AllPathResponseBody{}, err

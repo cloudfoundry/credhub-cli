@@ -5,29 +5,32 @@ import (
 	"net/http"
 	"sync"
 
+	"github.com/pivotal-cf/credhub-cli/models"
 	"github.com/pivotal-cf/credhub-cli/repositories"
 )
 
 type FakeRepository struct {
-	SendRequestStub        func(request *http.Request, identifier string) (interface{}, error)
+	SendRequestStub        func(request *http.Request, identifier string) (models.Printable, error)
 	sendRequestMutex       sync.RWMutex
 	sendRequestArgsForCall []struct {
-		request *http.Request
+		request    *http.Request
+		identifier string
 	}
 	sendRequestReturns struct {
-		result1 interface{}
+		result1 models.Printable
 		result2 error
 	}
-	invocations map[string][][]interface{}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeRepository) SendRequest(request *http.Request, identifier string) (interface{}, error) {
+func (fake *FakeRepository) SendRequest(request *http.Request, identifier string) (models.Printable, error) {
 	fake.sendRequestMutex.Lock()
 	fake.sendRequestArgsForCall = append(fake.sendRequestArgsForCall, struct {
-		request *http.Request
-	}{request})
-	fake.guard("SendRequest")
-	fake.invocations["SendRequest"] = append(fake.invocations["SendRequest"], []interface{}{request})
+		request    *http.Request
+		identifier string
+	}{request, identifier})
+	fake.recordInvocation("SendRequest", []interface{}{request, identifier})
 	fake.sendRequestMutex.Unlock()
 	if fake.SendRequestStub != nil {
 		return fake.SendRequestStub(request, identifier)
@@ -42,31 +45,38 @@ func (fake *FakeRepository) SendRequestCallCount() int {
 	return len(fake.sendRequestArgsForCall)
 }
 
-func (fake *FakeRepository) SendRequestArgsForCall(i int) *http.Request {
+func (fake *FakeRepository) SendRequestArgsForCall(i int) (*http.Request, string) {
 	fake.sendRequestMutex.RLock()
 	defer fake.sendRequestMutex.RUnlock()
-	return fake.sendRequestArgsForCall[i].request
+	return fake.sendRequestArgsForCall[i].request, fake.sendRequestArgsForCall[i].identifier
 }
 
-func (fake *FakeRepository) SendRequestReturns(result1 interface{}, result2 error) {
+func (fake *FakeRepository) SendRequestReturns(result1 models.Printable, result2 error) {
 	fake.SendRequestStub = nil
 	fake.sendRequestReturns = struct {
-		result1 interface{}
+		result1 models.Printable
 		result2 error
 	}{result1, result2}
 }
 
 func (fake *FakeRepository) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.sendRequestMutex.RLock()
+	defer fake.sendRequestMutex.RUnlock()
 	return fake.invocations
 }
 
-func (fake *FakeRepository) guard(key string) {
+func (fake *FakeRepository) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
 	if fake.invocations == nil {
 		fake.invocations = map[string][][]interface{}{}
 	}
 	if fake.invocations[key] == nil {
 		fake.invocations[key] = [][]interface{}{}
 	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ repositories.Repository = new(FakeRepository)

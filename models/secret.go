@@ -14,6 +14,10 @@ func NewSecret(name string, secretBody SecretBody) Secret {
 	}
 }
 
-func (s Secret) String() string {
-	return util.Header(s.SecretBody.ContentType, s.Name) + s.SecretBody.String() + util.Footer(s.SecretBody.UpdatedAt)
+func (s Secret) Terminal() string {
+	return util.Header(s.SecretBody.ContentType, s.Name) + s.SecretBody.Terminal() + util.Footer(s.SecretBody.UpdatedAt)
+}
+
+func (secret Secret) Json() string {
+	return ""
 }

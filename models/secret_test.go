@@ -11,7 +11,7 @@ var _ = Describe("String function", func() {
 
 	It("renders string secrets", func() {
 		stringSecret := NewSecret("stringSecret", SecretBody{ContentType: "value", Value: "my-value", UpdatedAt: "2016-01-01T12:00:00Z"})
-		Expect(stringSecret.String()).To(Equal("" +
+		Expect(stringSecret.Terminal()).To(Equal("" +
 			"Type:          value\n" +
 			"Name:          stringSecret\n" +
 			"Value:         my-value\n" +
@@ -21,7 +21,7 @@ var _ = Describe("String function", func() {
 	It("renders ssh secrets", func() {
 		jsonBytes, _ := json.Marshal(RsaSsh{PublicKey: "my-pub", PrivateKey: "my-priv"})
 		sshSecret := NewSecret("sshSecret", SecretBody{ContentType: "ssh", Value: unmarshal(jsonBytes), UpdatedAt: "2016-01-01T12:00:00Z"})
-		Expect(sshSecret.String()).To(Equal("" +
+		Expect(sshSecret.Terminal()).To(Equal("" +
 			"Type:          ssh\n" +
 			"Name:          sshSecret\n" +
 			"Public Key:    my-pub\n" +
@@ -32,7 +32,7 @@ var _ = Describe("String function", func() {
 	It("renders rsa secrets", func() {
 		jsonBytes, _ := json.Marshal(RsaSsh{PublicKey: "my-pub", PrivateKey: "my-priv"})
 		sshSecret := NewSecret("rsaSecret", SecretBody{ContentType: "rsa", Value: unmarshal(jsonBytes), UpdatedAt: "2016-01-01T12:00:00Z"})
-		Expect(sshSecret.String()).To(Equal("" +
+		Expect(sshSecret.Terminal()).To(Equal("" +
 			"Type:          rsa\n" +
 			"Name:          rsaSecret\n" +
 			"Public Key:    my-pub\n" +
@@ -44,7 +44,7 @@ var _ = Describe("String function", func() {
 		It("when fields have non-nil values", func() {
 			jsonBytes, _ := json.Marshal(Certificate{Ca: "my-ca", Certificate: "my-cert", PrivateKey: "my-priv"})
 			certificateSecret := NewSecret("nonNulledSecret", SecretBody{ContentType: "certificate", Value: unmarshal(jsonBytes), UpdatedAt: "2016-01-01T12:00:00Z"})
-			Expect(certificateSecret.String()).To(Equal("" +
+			Expect(certificateSecret.Terminal()).To(Equal("" +
 				"Type:          certificate\n" +
 				"Name:          nonNulledSecret\n" +
 				"Ca:            my-ca\n" +
@@ -56,7 +56,7 @@ var _ = Describe("String function", func() {
 		It("when some fields have nil values", func() {
 			jsonBytes, _ := json.Marshal(Certificate{Ca: "my-ca", Certificate: "", PrivateKey: "my-priv"})
 			certificateSecret := NewSecret("nonNulledSecret", SecretBody{ContentType: "certificate", Value: unmarshal(jsonBytes), UpdatedAt: "2016-01-01T12:00:00Z"})
-			Expect(certificateSecret.String()).To(Equal("" +
+			Expect(certificateSecret.Terminal()).To(Equal("" +
 				"Type:          certificate\n" +
 				"Name:          nonNulledSecret\n" +
 				"Ca:            my-ca\n" +
@@ -66,7 +66,7 @@ var _ = Describe("String function", func() {
 
 		It("when fields all have nil values", func() {
 			certificateSecret := NewSecret("nulledSecret", SecretBody{ContentType: "certificate", Value: unmarshal([]byte{}), UpdatedAt: "2016-01-01T12:00:00Z"})
-			Expect(certificateSecret.String()).To(Equal("" +
+			Expect(certificateSecret.Terminal()).To(Equal("" +
 				"Type:          certificate\n" +
 				"Name:          nulledSecret\n" +
 				"Updated:       2016-01-01T12:00:00Z"))

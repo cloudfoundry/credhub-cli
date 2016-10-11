@@ -6,6 +6,7 @@ import (
 	"github.com/pivotal-cf/credhub-cli/actions"
 	"github.com/pivotal-cf/credhub-cli/client"
 	"github.com/pivotal-cf/credhub-cli/config"
+	"github.com/pivotal-cf/credhub-cli/models"
 	"github.com/pivotal-cf/credhub-cli/repositories"
 )
 
@@ -16,7 +17,7 @@ type FindCommand struct {
 }
 
 func (cmd FindCommand) Execute([]string) error {
-	var credentials interface{}
+	var credentials models.Printable
 	var err error
 	var repository repositories.Repository
 
@@ -41,7 +42,7 @@ func (cmd FindCommand) Execute([]string) error {
 		return err
 	}
 
-	fmt.Println(credentials)
+	fmt.Println(credentials.Terminal())
 
 	return nil
 }

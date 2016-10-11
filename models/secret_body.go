@@ -14,7 +14,7 @@ type SecretBody struct {
 	UpdatedAt   string            `json:"updated_at,omitempty"`
 }
 
-func (body SecretBody) String() string {
+func (body SecretBody) Terminal() string {
 	result := ""
 	switch body.ContentType {
 	case "value", "password":
@@ -23,12 +23,12 @@ func (body SecretBody) String() string {
 	case "certificate":
 		cert := Certificate{}
 		json.Unmarshal(marshalBackIntoJson(body.Value.(map[string]interface{})), &cert)
-		result = cert.String()
+		result = cert.Terminal()
 		break
 	case "ssh", "rsa":
 		rsaSsh := RsaSsh{}
 		json.Unmarshal(marshalBackIntoJson(body.Value.(map[string]interface{})), &rsaSsh)
-		result = rsaSsh.String()
+		result = rsaSsh.Terminal()
 	}
 
 	return result

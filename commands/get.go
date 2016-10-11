@@ -22,7 +22,7 @@ func (cmd GetCommand) Execute([]string) error {
 		return err
 	}
 
-	fmt.Println(secret)
+	fmt.Println(secret.Terminal())
 
 	return nil
 }

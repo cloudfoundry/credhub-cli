@@ -54,7 +54,7 @@ func (cmd SetCommand) Execute([]string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(secret)
+	fmt.Println(secret.Terminal())
 
 	return nil
 }

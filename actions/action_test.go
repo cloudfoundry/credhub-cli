@@ -24,7 +24,7 @@ var _ = Describe("Action", func() {
 		repository   repositoriesfakes.FakeRepository
 		cfg          config.Config
 		expectedBody models.SecretBody
-		expectedItem interface{}
+		expectedItem models.Printable
 	)
 
 	BeforeEach(func() {
@@ -47,7 +47,7 @@ var _ = Describe("Action", func() {
 	Describe("DoAction", func() {
 		It("performs a network request", func() {
 			request, _ := http.NewRequest("POST", "my-url", nil)
-			repository.SendRequestStub = func(req *http.Request, identifier string) (interface{}, error) {
+			repository.SendRequestStub = func(req *http.Request, identifier string) (models.Printable, error) {
 				Expect(req).To(Equal(request))
 				return expectedItem, nil
 			}
@@ -74,13 +74,13 @@ var _ = Describe("Action", func() {
 					subject.AuthRepository = &authRepository
 
 					repository.SendRequestStub = SequentialStub(
-						func(req *http.Request, identifier string) (interface{}, error) {
+						func(req *http.Request, identifier string) (models.Printable, error) {
 							buf := new(bytes.Buffer)
 							buf.ReadFrom(req.Body)
 							Expect(buf.String()).To(Equal("{}"))
-							return struct{}{}, cm_errors.NewUnauthorizedError()
+							return nil, cm_errors.NewUnauthorizedError()
 						},
-						func(req *http.Request, identifier string) (interface{}, error) {
+						func(req *http.Request, identifier string) (models.Printable, error) {
 							Expect(req.Header.Get("Authorization")).To(Equal("Bearer access_token"))
 
 							buf := new(bytes.Buffer)
@@ -110,12 +110,12 @@ var _ = Describe("Action", func() {
 						expectedError := errors.New("Custom Server Error")
 
 						repository.SendRequestStub = SequentialStub(
-							func(req *http.Request, identifier string) (interface{}, error) {
-								return struct{}{}, cm_errors.NewUnauthorizedError()
+							func(req *http.Request, identifier string) (models.Printable, error) {
+								return nil, cm_errors.NewUnauthorizedError()
 							},
-							func(req *http.Request, identifier string) (interface{}, error) {
+							func(req *http.Request, identifier string) (models.Printable, error) {
 								Expect(req.Header.Get("Authorization")).To(Equal("Bearer access_token"))
-								return struct{}{}, expectedError
+								return nil, expectedError
 							},
 						)
 
@@ -135,10 +135,10 @@ var _ = Describe("Action", func() {
 	})
 })
 
-type RepositoryStub func(req *http.Request, identifier string) (interface{}, error)
+type RepositoryStub func(req *http.Request, identifier string) (models.Printable, error)
 
 func SequentialStub(stubs ...RepositoryStub) RepositoryStub {
-	return func(req *http.Request, identifier string) (interface{}, error) {
+	return func(req *http.Request, identifier string) (models.Printable, error) {
 		var s RepositoryStub
 		s, stubs = stubs[0], stubs[1:]
 		return s(req, identifier)

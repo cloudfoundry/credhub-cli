@@ -67,7 +67,7 @@ func (cmd GenerateCommand) Execute([]string) error {
 		return err
 	}
 
-	fmt.Println(secret)
+	fmt.Println(secret.Terminal())
 
 	return nil
 }

@@ -11,7 +11,7 @@ type RsaSsh struct {
 	PrivateKey string `json:"private_key,omitempty"`
 }
 
-func (rsaSsh RsaSsh) String() string {
+func (rsaSsh RsaSsh) Terminal() string {
 	lines := []string{}
 	if rsaSsh.PublicKey != "" {
 		lines = append(lines, util.BuildLineOfFixedLength("Public Key:", rsaSsh.PublicKey))
@@ -20,4 +20,8 @@ func (rsaSsh RsaSsh) String() string {
 		lines = append(lines, util.BuildLineOfFixedLength("Private Key:", rsaSsh.PrivateKey))
 	}
 	return strings.Join(lines, "\n") + "\n"
+}
+
+func (rsaSsh RsaSsh) Json() string {
+	return ""
 }

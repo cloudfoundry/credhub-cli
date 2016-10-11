@@ -17,7 +17,7 @@ func NewCaRepository(httpClient client.HttpClient) Repository {
 	return caRepository{httpClient: httpClient}
 }
 
-func (r caRepository) SendRequest(request *http.Request, caIdentifier string) (interface{}, error) {
+func (r caRepository) SendRequest(request *http.Request, caIdentifier string) (models.Printable, error) {
 	response, err := DoSendRequest(r.httpClient, request)
 	if err != nil {
 		return models.Ca{}, err
