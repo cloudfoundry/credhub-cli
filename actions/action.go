@@ -41,11 +41,6 @@ func (action Action) DoAction(req *http.Request, identifier string) (models.Prin
 	}
 
 	return item, err
-	//if err != nil {
-	//	return nil, err
-	//}
-	//
-	//return item, nil
 }
 
 func (action Action) refreshTokenAndResendRequest(req *http.Request, identifier string) (models.Printable, error) {

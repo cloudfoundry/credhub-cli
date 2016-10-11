@@ -27,6 +27,7 @@ func (r secretRepository) SendRequest(request *http.Request, identifier string) 
 		return models.Secret{}, nil
 	}
 
+	// TODO: use json path to reconstruct the correct types in nested values
 	decoder := json.NewDecoder(response.Body)
 	secretBody := models.SecretBody{}
 	err = decoder.Decode(&secretBody)

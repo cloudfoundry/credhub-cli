@@ -17,7 +17,7 @@ import (
 
 var _ = Describe("Ca-Generate", func() {
 	Describe("generating certificate authorities", func() {
-		It("posts a valid root CA", func() {
+		It("prints a valid root CA", func() {
 			var responseMyCertificate = fmt.Sprintf(CA_RESPONSE_TABLE, "root", "my-ca", "my-cert-generated", "my-priv-generated")
 			setupPostCaServer("root", "my-ca", "my-cert-generated", "my-priv-generated")
 
@@ -35,6 +35,32 @@ var _ = Describe("Ca-Generate", func() {
 
 			Eventually(session).Should(Exit(0))
 			Eventually(session.Out).Should(Say(responseMyCertificate))
+		})
+
+		It("JSON prints a valid root CA", func() {
+			setupPostCaServer("root", "my-ca", "my-cert-generated", "my-priv-generated")
+
+			session := runCommand("ca-generate",
+				"-n", "my-ca",
+				"-t", "root",
+				"--common-name", "my-common-name",
+				"--organization", "my-organization",
+				"--organization-unit", "my-unit",
+				"--locality", "my-locality",
+				"--state", "my-state",
+				"--country", "my-country",
+				"--key-length", "512",
+				"--duration", "364",
+				"--output-json",
+			)
+
+			Eventually(session).Should(Exit(0))
+			Eventually(string(session.Out.Contents())).Should(MatchJSON(`{
+				"type": "root",
+				"updated_at": "` + TIMESTAMP + `",
+				"certificate": "my-cert-generated",
+				"private_key": "my-priv-generated"
+			}`))
 		})
 	})
 

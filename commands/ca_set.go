@@ -1,14 +1,13 @@
 package commands
 
 import (
-	"fmt"
-
 	"github.com/pivotal-cf/credhub-cli/actions"
 	"github.com/pivotal-cf/credhub-cli/client"
 	"github.com/pivotal-cf/credhub-cli/config"
 	"github.com/pivotal-cf/credhub-cli/repositories"
 
 	cmcli_errors "github.com/pivotal-cf/credhub-cli/errors"
+	"github.com/pivotal-cf/credhub-cli/models"
 )
 
 type CaSetCommand struct {
@@ -18,6 +17,7 @@ type CaSetCommand struct {
 	CaPrivateFileName string `short:"p" long:"private" description:"[Certificate] Sets the CA private key from file"`
 	CaPublic          string `short:"C" long:"certificate-string" description:"[Certificate] Sets the CA certificate from string input"`
 	CaPrivate         string `short:"P" long:"private-string" description:"[Certificate] Sets the CA private key from string input"`
+	OutputJson        bool   `long:"output-json"`
 }
 
 func (cmd CaSetCommand) Execute([]string) error {
@@ -62,7 +62,7 @@ func (cmd CaSetCommand) Execute([]string) error {
 		return err
 	}
 
-	fmt.Println(ca.Terminal())
+	models.Println(ca, cmd.OutputJson)
 
 	return nil
 }

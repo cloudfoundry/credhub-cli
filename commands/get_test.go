@@ -68,4 +68,24 @@ var _ = Describe("Get", func() {
 		Eventually(session).Should(Exit(0))
 		Eventually(session.Out).Should(Say(responseMyPasswordPotatoes))
 	})
+
+	It("can output json", func() {
+		responseJson := fmt.Sprintf(SECRET_STRING_RESPONSE_JSON, "password", "potatoes")
+
+		server.AppendHandlers(
+			CombineHandlers(
+				VerifyRequest("GET", "/api/v1/data/my-password"),
+				RespondWith(http.StatusOK, responseJson),
+			),
+		)
+
+		session := runCommand("get", "-n", "my-password", "--output-json")
+
+		Eventually(session).Should(Exit(0))
+		Eventually(string(session.Out.Contents())).Should(MatchJSON(`{
+			"type": "password",
+			"updated_at": "` + TIMESTAMP + `",
+			"value": "potatoes"
+		}`))
+	})
 })

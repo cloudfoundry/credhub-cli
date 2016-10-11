@@ -1,16 +1,16 @@
 package commands
 
 import (
-	"fmt"
-
 	"github.com/pivotal-cf/credhub-cli/actions"
 	"github.com/pivotal-cf/credhub-cli/client"
 	"github.com/pivotal-cf/credhub-cli/config"
+	"github.com/pivotal-cf/credhub-cli/models"
 	"github.com/pivotal-cf/credhub-cli/repositories"
 )
 
 type GetCommand struct {
 	SecretIdentifier string `short:"n" required:"yes" long:"name" description:"Name of the credential to retrieve"`
+	OutputJson       bool   `long:"output-json"`
 }
 
 func (cmd GetCommand) Execute([]string) error {
@@ -22,7 +22,7 @@ func (cmd GetCommand) Execute([]string) error {
 		return err
 	}
 
-	fmt.Println(secret.Terminal())
+	models.Println(secret, cmd.OutputJson)
 
 	return nil
 }

@@ -28,6 +28,20 @@ var _ = Describe("Ca-Get", func() {
 			Eventually(session.Out).Should(Say(responseMyCertificate))
 		})
 
+		It("can output a root CA as JSON", func() {
+			setupGetCaServer("root", "my-ca-name", "my-cert", "my-priv")
+
+			session := runCommand("ca-get", "-n", "my-ca-name", "--output-json")
+
+			Eventually(session).Should(Exit(0))
+			Eventually(string(session.Out.Contents())).Should(MatchJSON(`{
+				"type": "root",
+				"updated_at": "` + TIMESTAMP + `",
+				"certificate": "my-cert",
+				"private_key": "my-priv"
+			}`))
+		})
+
 		It("displays the server provided error if it cannot get ca by name", func() {
 			server.AppendHandlers(
 				RespondWith(http.StatusBadRequest, `{"error": "you fail."}`),
