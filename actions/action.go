@@ -24,11 +24,11 @@ func NewAction(repository repositories.Repository, config config.Config) Action 
 	return action
 }
 
-func (action Action) DoAction(req *http.Request, identifier string) (interface{}, error) {
+func (action Action) DoAction(req *http.Request, identifier string) (models.Printable, error) {
 	err := config.ValidateConfig(action.config)
 
 	if err != nil {
-		return struct{}{}, err
+		return nil, err
 	}
 
 	bodyClone := client.NewBodyClone(req)
@@ -40,23 +40,24 @@ func (action Action) DoAction(req *http.Request, identifier string) (interface{}
 		item, err = action.refreshTokenAndResendRequest(req, identifier)
 	}
 
-	if err != nil {
-		return struct{}{}, err
-	}
-
-	return item, nil
+	return item, err
+	//if err != nil {
+	//	return nil, err
+	//}
+	//
+	//return item, nil
 }
 
-func (action Action) refreshTokenAndResendRequest(req *http.Request, identifier string) (interface{}, error) {
+func (action Action) refreshTokenAndResendRequest(req *http.Request, identifier string) (models.Printable, error) {
 	err := action.refreshToken()
 	if err != nil {
-		return struct{}{}, err
+		return nil, err
 	}
 
 	req.Header.Set("Authorization", "Bearer "+action.config.AccessToken)
 	item, err := action.repository.SendRequest(req, identifier)
 	if err != nil {
-		return struct{}{}, err
+		return nil, err
 	}
 
 	return item, nil

@@ -12,7 +12,7 @@ type Certificate struct {
 	PrivateKey  string `json:"private_key,omitempty"`
 }
 
-func (cert Certificate) String() string {
+func (cert Certificate) Terminal() string {
 	lines := []string{}
 	if cert.Ca != "" {
 		lines = append(lines, util.BuildLineOfFixedLength("Ca:", cert.Ca))
@@ -30,4 +30,8 @@ func (cert Certificate) String() string {
 		result += "\n"
 	}
 	return result
+}
+
+func (certificate Certificate) Json() string {
+	return ""
 }

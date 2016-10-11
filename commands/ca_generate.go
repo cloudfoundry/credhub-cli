@@ -54,7 +54,7 @@ func (cmd CaGenerateCommand) Execute([]string) error {
 		return err
 	}
 
-	fmt.Println(ca)
+	fmt.Println(ca.Terminal())
 
 	return nil
 }
