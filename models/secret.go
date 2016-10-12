@@ -11,7 +11,9 @@ type Secret struct {
 	SecretBody SecretBody
 }
 
-func NewSecret(name string, secretBody SecretBody) Secret {
+func NewSecret(name string, secretBodyMap map[string]interface{}) Secret {
+	secretBody := NewSecretBody(secretBodyMap)
+
 	return Secret{
 		Name:       name,
 		SecretBody: secretBody,
@@ -27,14 +29,10 @@ func (s Secret) Terminal() string {
 		result = util.BuildLineOfFixedLength("Value:", secretBody.Value.(string)) + "\n"
 		break
 	case "certificate":
-		cert := Certificate{}
-		json.Unmarshal(marshalBackIntoJson(secretBody.Value.(map[string]interface{})), &cert)
-		result = cert.Terminal()
+		result = secretBody.Value.(Certificate).Terminal()
 		break
 	case "ssh", "rsa":
-		rsaSsh := RsaSsh{}
-		json.Unmarshal(marshalBackIntoJson(secretBody.Value.(map[string]interface{})), &rsaSsh)
-		result = rsaSsh.Terminal()
+		result = secretBody.Value.(RsaSsh).Terminal()
 		break
 	}
 
@@ -62,15 +60,13 @@ func (secret Secret) Json() string {
 		body.Value = secretBody.Value.(string)
 		break
 	case "certificate":
-		certificate := Certificate{}
-		json.Unmarshal(marshalBackIntoJson(secretBody.Value.(map[string]interface{})), &certificate)
+		certificate := secretBody.Value.(Certificate)
 		body.Ca = certificate.Ca
 		body.Certificate = certificate.Certificate
 		body.PrivateKey = certificate.PrivateKey
 		break
 	case "ssh", "rsa":
-		rsaSsh := RsaSsh{}
-		json.Unmarshal(marshalBackIntoJson(secretBody.Value.(map[string]interface{})), &rsaSsh)
+		rsaSsh := secretBody.Value.(RsaSsh)
 		body.PublicKey = rsaSsh.PublicKey
 		body.PrivateKey = rsaSsh.PrivateKey
 		break
@@ -78,9 +74,4 @@ func (secret Secret) Json() string {
 
 	s, _ := json.MarshalIndent(body, "", JSON_PRETTY_PRINT_INDENT_STRING)
 	return string(s)
-}
-
-func marshalBackIntoJson(value map[string]interface{}) []byte {
-	item, _ := json.Marshal(value)
-	return item
 }
