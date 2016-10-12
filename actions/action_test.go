@@ -37,7 +37,10 @@ var _ = Describe("Action", func() {
 			ContentType: "value",
 			Value:       "potatoes",
 		}
-		expectedItem = models.NewSecret("my-item", expectedBody)
+		expectedItem = models.Secret{
+			Name:       "my-item",
+			SecretBody: expectedBody,
+		}
 	})
 
 	AfterEach(func() {

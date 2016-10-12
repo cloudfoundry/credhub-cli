@@ -27,12 +27,14 @@ func (r secretRepository) SendRequest(request *http.Request, identifier string) 
 		return models.Secret{}, nil
 	}
 
-	// TODO: use json path to reconstruct the correct types in nested values
 	decoder := json.NewDecoder(response.Body)
-	secretBody := models.SecretBody{}
-	err = decoder.Decode(&secretBody)
+	decoded := map[string]interface{}{}
+
+	err = decoder.Decode(&decoded)
+
 	if err != nil {
 		return models.Secret{}, cm_errors.NewResponseError()
 	}
-	return models.NewSecret(identifier, secretBody), nil
+
+	return models.NewSecret(identifier, decoded), nil
 }

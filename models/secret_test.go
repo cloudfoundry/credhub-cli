@@ -1,8 +1,6 @@
 package models
 
 import (
-	"encoding/json"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -10,7 +8,14 @@ import (
 var _ = Describe("Secret", func() {
 	Describe("Terminal", func() {
 		It("renders string secrets", func() {
-			stringSecret := NewSecret("stringSecret", SecretBody{ContentType: "value", Value: "my-value", UpdatedAt: "2016-01-01T12:00:00Z"})
+			stringSecret := Secret{
+				Name: "stringSecret",
+				SecretBody: SecretBody{
+					ContentType: "value",
+					Value:       "my-value",
+					UpdatedAt:   "2016-01-01T12:00:00Z",
+				},
+			}
 
 			Expect(stringSecret.Terminal()).To(Equal("" +
 				"Type:          value\n" +
@@ -20,8 +25,15 @@ var _ = Describe("Secret", func() {
 		})
 
 		It("renders ssh secrets", func() {
-			jsonBytes, _ := json.Marshal(RsaSsh{PublicKey: "my-pub", PrivateKey: "my-priv"})
-			sshSecret := NewSecret("sshSecret", SecretBody{ContentType: "ssh", Value: unmarshal(jsonBytes), UpdatedAt: "2016-01-01T12:00:00Z"})
+			ssh := RsaSsh{PublicKey: "my-pub", PrivateKey: "my-priv"}
+			sshSecret := Secret{
+				Name: "sshSecret",
+				SecretBody: SecretBody{
+					ContentType: "ssh",
+					Value:       ssh,
+					UpdatedAt:   "2016-01-01T12:00:00Z",
+				},
+			}
 
 			Expect(sshSecret.Terminal()).To(Equal("" +
 				"Type:          ssh\n" +
@@ -32,8 +44,15 @@ var _ = Describe("Secret", func() {
 		})
 
 		It("renders rsa secrets", func() {
-			jsonBytes, _ := json.Marshal(RsaSsh{PublicKey: "my-pub", PrivateKey: "my-priv"})
-			sshSecret := NewSecret("rsaSecret", SecretBody{ContentType: "rsa", Value: unmarshal(jsonBytes), UpdatedAt: "2016-01-01T12:00:00Z"})
+			rsa := RsaSsh{PublicKey: "my-pub", PrivateKey: "my-priv"}
+			sshSecret := Secret{
+				Name: "rsaSecret",
+				SecretBody: SecretBody{
+					ContentType: "rsa",
+					Value:       rsa,
+					UpdatedAt:   "2016-01-01T12:00:00Z",
+				},
+			}
 
 			Expect(sshSecret.Terminal()).To(Equal("" +
 				"Type:          rsa\n" +
@@ -45,8 +64,15 @@ var _ = Describe("Secret", func() {
 
 		Describe("renders certificate secrets", func() {
 			It("when fields have non-nil values", func() {
-				jsonBytes, _ := json.Marshal(Certificate{Ca: "my-ca", Certificate: "my-cert", PrivateKey: "my-priv"})
-				certificateSecret := NewSecret("nonNulledSecret", SecretBody{ContentType: "certificate", Value: unmarshal(jsonBytes), UpdatedAt: "2016-01-01T12:00:00Z"})
+				certificate := Certificate{Ca: "my-ca", Certificate: "my-cert", PrivateKey: "my-priv"}
+				certificateSecret := Secret{
+					Name: "nonNulledSecret",
+					SecretBody: SecretBody{
+						ContentType: "certificate",
+						Value:       certificate,
+						UpdatedAt:   "2016-01-01T12:00:00Z",
+					},
+				}
 
 				Expect(certificateSecret.Terminal()).To(Equal("" +
 					"Type:          certificate\n" +
@@ -58,8 +84,15 @@ var _ = Describe("Secret", func() {
 			})
 
 			It("when some fields have nil values", func() {
-				jsonBytes, _ := json.Marshal(Certificate{Ca: "my-ca", Certificate: "", PrivateKey: "my-priv"})
-				certificateSecret := NewSecret("nonNulledSecret", SecretBody{ContentType: "certificate", Value: unmarshal(jsonBytes), UpdatedAt: "2016-01-01T12:00:00Z"})
+				certificate := Certificate{Ca: "my-ca", Certificate: "", PrivateKey: "my-priv"}
+				certificateSecret := Secret{
+					Name: "nonNulledSecret",
+					SecretBody: SecretBody{
+						ContentType: "certificate",
+						Value:       certificate,
+						UpdatedAt:   "2016-01-01T12:00:00Z",
+					},
+				}
 
 				Expect(certificateSecret.Terminal()).To(Equal("" +
 					"Type:          certificate\n" +
@@ -70,7 +103,14 @@ var _ = Describe("Secret", func() {
 			})
 
 			It("when fields all have nil values", func() {
-				certificateSecret := NewSecret("nulledSecret", SecretBody{ContentType: "certificate", Value: unmarshal([]byte{}), UpdatedAt: "2016-01-01T12:00:00Z"})
+				certificateSecret := Secret{
+					Name: "nulledSecret",
+					SecretBody: SecretBody{
+						ContentType: "certificate",
+						Value:       Certificate{},
+						UpdatedAt:   "2016-01-01T12:00:00Z",
+					},
+				}
 
 				Expect(certificateSecret.Terminal()).To(Equal("" +
 					"Type:          certificate\n" +
@@ -82,7 +122,14 @@ var _ = Describe("Secret", func() {
 
 	Describe("JSON", func() {
 		It("renders string secrets", func() {
-			stringSecret := NewSecret("stringSecret", SecretBody{ContentType: "value", Value: "my-value", UpdatedAt: "2016-01-01T12:00:00Z"})
+			stringSecret := Secret{
+				Name: "stringSecret",
+				SecretBody: SecretBody{
+					ContentType: "value",
+					Value:       "my-value",
+					UpdatedAt:   "2016-01-01T12:00:00Z",
+				},
+			}
 
 			Expect(stringSecret.Json()).To(MatchJSON(`{
 				"type": "value",
@@ -92,8 +139,15 @@ var _ = Describe("Secret", func() {
 		})
 
 		It("renders ssh secrets", func() {
-			jsonBytes, _ := json.Marshal(RsaSsh{PublicKey: "my-pub", PrivateKey: "my-priv"})
-			sshSecret := NewSecret("sshSecret", SecretBody{ContentType: "ssh", Value: unmarshal(jsonBytes), UpdatedAt: "2016-01-01T12:00:00Z"})
+			ssh := RsaSsh{PublicKey: "my-pub", PrivateKey: "my-priv"}
+			sshSecret := Secret{
+				Name: "sshSecret",
+				SecretBody: SecretBody{
+					ContentType: "ssh",
+					Value:       ssh,
+					UpdatedAt:   "2016-01-01T12:00:00Z",
+				},
+			}
 
 			Expect(sshSecret.Json()).To(MatchJSON(`{
 				"type": "ssh",
@@ -104,8 +158,15 @@ var _ = Describe("Secret", func() {
 		})
 
 		It("renders rsa secrets", func() {
-			jsonBytes, _ := json.Marshal(RsaSsh{PublicKey: "my-pub", PrivateKey: "my-priv"})
-			sshSecret := NewSecret("rsaSecret", SecretBody{ContentType: "rsa", Value: unmarshal(jsonBytes), UpdatedAt: "2016-01-01T12:00:00Z"})
+			rsa := RsaSsh{PublicKey: "my-pub", PrivateKey: "my-priv"}
+			sshSecret := Secret{
+				Name: "rsaSecret",
+				SecretBody: SecretBody{
+					ContentType: "rsa",
+					Value:       rsa,
+					UpdatedAt:   "2016-01-01T12:00:00Z",
+				},
+			}
 
 			Expect(sshSecret.Json()).To(MatchJSON(`{
 				"type": "rsa",
@@ -117,8 +178,15 @@ var _ = Describe("Secret", func() {
 
 		Describe("renders certificate secrets", func() {
 			It("when fields have non-nil values", func() {
-				jsonBytes, _ := json.Marshal(Certificate{Ca: "my-ca", Certificate: "my-cert", PrivateKey: "my-priv"})
-				certificateSecret := NewSecret("nonNulledSecret", SecretBody{ContentType: "certificate", Value: unmarshal(jsonBytes), UpdatedAt: "2016-01-01T12:00:00Z"})
+				certificate := Certificate{Ca: "my-ca", Certificate: "my-cert", PrivateKey: "my-priv"}
+				certificateSecret := Secret{
+					Name: "nonNulledSecret",
+					SecretBody: SecretBody{
+						ContentType: "certificate",
+						Value:       certificate,
+						UpdatedAt:   "2016-01-01T12:00:00Z",
+					},
+				}
 
 				Expect(certificateSecret.Json()).To(MatchJSON(`{
 					"type": "certificate",
@@ -130,8 +198,15 @@ var _ = Describe("Secret", func() {
 			})
 
 			It("when some fields have nil values", func() {
-				jsonBytes, _ := json.Marshal(Certificate{Ca: "my-ca", Certificate: "", PrivateKey: "my-priv"})
-				certificateSecret := NewSecret("nonNulledSecret", SecretBody{ContentType: "certificate", Value: unmarshal(jsonBytes), UpdatedAt: "2016-01-01T12:00:00Z"})
+				certificate := Certificate{Ca: "my-ca", Certificate: "", PrivateKey: "my-priv"}
+				certificateSecret := Secret{
+					Name: "nonNulledSecret",
+					SecretBody: SecretBody{
+						ContentType: "certificate",
+						Value:       certificate,
+						UpdatedAt:   "2016-01-01T12:00:00Z",
+					},
+				}
 
 				Expect(certificateSecret.Json()).To(MatchJSON(`{
 					"type": "certificate",
@@ -142,7 +217,14 @@ var _ = Describe("Secret", func() {
 			})
 
 			It("when fields all have nil values", func() {
-				certificateSecret := NewSecret("nulledSecret", SecretBody{ContentType: "certificate", Value: unmarshal([]byte{}), UpdatedAt: "2016-01-01T12:00:00Z"})
+				certificateSecret := Secret{
+					Name: "nulledSecret",
+					SecretBody: SecretBody{
+						ContentType: "certificate",
+						Value:       Certificate{},
+						UpdatedAt:   "2016-01-01T12:00:00Z",
+					},
+				}
 
 				Expect(certificateSecret.Json()).To(MatchJSON(`{
 					"type": "certificate",
@@ -152,9 +234,3 @@ var _ = Describe("Secret", func() {
 		})
 	})
 })
-
-func unmarshal(jsonBytes []byte) map[string]interface{} {
-	itemMap := map[string]interface{}{}
-	json.Unmarshal(jsonBytes, &itemMap)
-	return itemMap
-}
