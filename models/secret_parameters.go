@@ -5,6 +5,7 @@ type SecretParameters struct {
 	ExcludeNumber    bool     `json:"exclude_number,omitempty"`
 	ExcludeUpper     bool     `json:"exclude_upper,omitempty"`
 	ExcludeLower     bool     `json:"exclude_lower,omitempty"`
+	OnlyHex          bool     `json:"only_hex,omitempty"`
 	Length           int      `json:"length,omitempty"`
 	CommonName       string   `json:"common_name,omitempty"`
 	Organization     string   `json:"organization,omitempty"`

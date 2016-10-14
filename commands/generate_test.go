@@ -34,7 +34,7 @@ var _ = Describe("Generate", func() {
 			Expect(session.Out).To(Say(responseMyPasswordPotatoes))
 		})
 
-		It("can the generated password secret as JSON", func() {
+		It("can print the generated password secret as JSON", func() {
 			setupPasswordPostServer("my-password", "potatoes", generateDefaultTypeRequestJson(`{}`, true))
 
 			session := runCommand("generate", "-n", "my-password", "--output-json")
@@ -109,6 +109,12 @@ var _ = Describe("Generate", func() {
 		It("excluding numbers", func() {
 			setupPasswordPostServer("my-password", "potatoes", generateRequestJson("password", `{"exclude_number":true}`, true))
 			session := runCommand("generate", "-n", "my-password", "-t", "password", "--exclude-number")
+			Eventually(session).Should(Exit(0))
+		})
+
+		It("including only hex", func() {
+			setupPasswordPostServer("my-password", "potatoes", generateRequestJson("password", `{"only_hex":true}`, true))
+			session := runCommand("generate", "-n", "my-password", "-t", "password", "--only-hex")
 			Eventually(session).Should(Exit(0))
 		})
 	})
@@ -316,6 +322,7 @@ var _ = Describe("Generate", func() {
 				commands.HaveFlag("exclude-number", "N"),
 				commands.HaveFlag("exclude-upper", "U"),
 				commands.HaveFlag("exclude-lower", "L"),
+				commands.HaveFlag("only-hex", "H"),
 				commands.HaveFlag("common-name", "c"),
 				commands.HaveFlag("organization", "o"),
 				commands.HaveFlag("organization-unit", "u"),
