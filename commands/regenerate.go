@@ -4,8 +4,8 @@ import (
 	"github.com/pivotal-cf/credhub-cli/actions"
 	"github.com/pivotal-cf/credhub-cli/client"
 	"github.com/pivotal-cf/credhub-cli/config"
-	"github.com/pivotal-cf/credhub-cli/repositories"
 	"github.com/pivotal-cf/credhub-cli/models"
+	"github.com/pivotal-cf/credhub-cli/repositories"
 )
 
 type RegenerateCommand struct {
