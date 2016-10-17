@@ -1,12 +1,11 @@
 package commands
 
 import (
-	"fmt"
-
 	"github.com/pivotal-cf/credhub-cli/actions"
 	"github.com/pivotal-cf/credhub-cli/client"
 	"github.com/pivotal-cf/credhub-cli/config"
 	"github.com/pivotal-cf/credhub-cli/repositories"
+	"github.com/pivotal-cf/credhub-cli/models"
 )
 
 type RegenerateCommand struct {
@@ -23,7 +22,7 @@ func (cmd RegenerateCommand) Execute([]string) error {
 		return err
 	}
 
-	fmt.Println(secret)
+	models.Println(secret, false)
 
 	return nil
 }

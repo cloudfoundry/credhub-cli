@@ -17,20 +17,6 @@ const REGENERATE_SECRET_REQUEST_JSON = `{"regenerate":true}`
 
 var _ = Describe("Regenerate", func() {
 	Describe("Regenerating password", func() {
-		It("sends regenerate parameters", func() {
-			server.AppendHandlers(
-				CombineHandlers(
-					VerifyRequest("POST", fmt.Sprintf("/api/v1/data/%s", "my-password-stuffs")),
-					VerifyJSON(REGENERATE_SECRET_REQUEST_JSON),
-					RespondWith(http.StatusOK, "{}"),
-				),
-			)
-
-			session := runCommand("regenerate", "--name", "my-password-stuffs")
-
-			Eventually(session).Should(Exit(0))
-		})
-
 		It("prints the regenerated password secret", func() {
 			server.AppendHandlers(
 				CombineHandlers(
