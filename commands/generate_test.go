@@ -130,7 +130,7 @@ var _ = Describe("Generate", func() {
 		})
 
 		It("can print the SSH key as JSON", func() {
-			setupRsaSshPostServer("foo-ssh-key", "ssh", "some-public-key", "some-private-key", generateRequestJson("ssh", `{}`, true))
+			setupRsaSshPostServer("foo-ssh-key", "ssh", "some-public-key", "fake-private-key", generateRequestJson("ssh", `{}`, true))
 
 			session := runCommand("generate", "-n", "foo-ssh-key", "-t", "ssh", "--output-json")
 
@@ -139,7 +139,7 @@ var _ = Describe("Generate", func() {
 				"type": "ssh",
 				"updated_at": "` + TIMESTAMP + `",
 				"public_key": "some-public-key",
-				"private_key": "some-private-key"
+				"private_key": "fake-private-key"
 			}`))
 		})
 
@@ -174,7 +174,7 @@ var _ = Describe("Generate", func() {
 		})
 
 		It("can print the RSA key as JSON", func() {
-			setupRsaSshPostServer("foo-rsa-key", "rsa", "some-public-key", "some-private-key", generateRequestJson("rsa", `{}`, true))
+			setupRsaSshPostServer("foo-rsa-key", "rsa", "some-public-key", "fake-private-key", generateRequestJson("rsa", `{}`, true))
 
 			session := runCommand("generate", "-n", "foo-rsa-key", "-t", "rsa", "--output-json")
 
@@ -183,7 +183,7 @@ var _ = Describe("Generate", func() {
 				"type": "rsa",
 				"updated_at": "` + TIMESTAMP + `",
 				"public_key": "some-public-key",
-				"private_key": "some-private-key"
+				"private_key": "fake-private-key"
 			}`))
 		})
 

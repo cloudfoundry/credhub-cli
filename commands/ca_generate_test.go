@@ -38,7 +38,7 @@ var _ = Describe("Ca-Generate", func() {
 		})
 
 		It("JSON prints a valid root CA", func() {
-			setupPostCaServer("root", "my-ca", "my-cert-generated", "my-priv-generated")
+			setupPostCaServer("root", "my-ca", "my-cert-generated", "fake-priv-generated")
 
 			session := runCommand("ca-generate",
 				"-n", "my-ca",
@@ -59,7 +59,7 @@ var _ = Describe("Ca-Generate", func() {
 				"type": "root",
 				"updated_at": "` + TIMESTAMP + `",
 				"certificate": "my-cert-generated",
-				"private_key": "my-priv-generated"
+				"private_key": "fake-priv-generated"
 			}`))
 		})
 	})
