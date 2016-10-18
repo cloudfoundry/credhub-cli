@@ -60,6 +60,7 @@ CREDENTIAL MANAGEMENT:
 		-L, --exclude-lower							[Password] Exclude lower alpha characters from generated value
 		-N, --exclude-number						[Password] Exclude number characters from generated value
 		-S, --exclude-special						[Password] Exclude special characters from generated value
+		-H, --only-hex								[Password] Use only hexadecimal characters in generated value		
 		    --ca 'CA NAME'							[Certificate] Name of CA used to sign the generated certificate (Default: 'default')
 		-d, --duration [1-3650]						[Certificate] Valid duration (in days) of the generated certificate (Default: 365)
 		-k, --key-length [2048, 3072, 4096]			[Certificate, SSH, RSA] Bit length of the generated key (Default: 2048)
@@ -71,6 +72,10 @@ CREDENTIAL MANAGEMENT:
 		-i, --locality 'LOCALITY'					[Certificate] Locality/city of the generated certificate
 		-s, --state	'ST'							[Certificate] State/province of the generated certificate
 		-y, --country 'CC'							[Certificate] Country of the generated certificate
+		
+	regenerate --name <cred name>
+		Regenerates a credential using the same parameters that were previously used (short command: r)
+		-n, --name 'CRED'							Name of the credential to regenerate
 
 	delete --name <cred name>
 		Delete a credential (short command: d)
