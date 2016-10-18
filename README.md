@@ -29,6 +29,7 @@ CREDENTIAL MANAGEMENT:
 	get --name <cred name>
 		Get the value and attributes of a Credential (short command: g)
 		-n, --name 'CRED'							Name of the credential to retrieve
+		    --output-json							Return response in json format
 
 	set --type <cred type> --name <cred name> [set params]
 		Set the value and attributes of a credential. Supported types 'password', 'value', 'certificate', 'ssh' and 'rsa' (short command: s)
@@ -52,6 +53,8 @@ CREDENTIAL MANAGEMENT:
 		-n, --name 'CRED'							Name of the credential to generate
 		-t, --type [TYPE]							Sets the credential type to generate (Default: 'password')
 		-O, --no-overwrite							Credential is not modified if stored value already exists
+		    --output-json							Return response in json format
+
 
 
 		Generate parameters by [Type]
