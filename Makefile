@@ -8,7 +8,11 @@ else
 DEST = build/credhub
 endif
 
-GOFLAGS := -o $(DEST)
+ifndef VERSION
+VERSION = dev
+endif
+
+GOFLAGS := -o $(DEST) -ldflags "-X github.com/pivotal-cf/credhub-cli/version.Version=${VERSION}"
 
 dependencies :
 		go get github.com/onsi/ginkgo/ginkgo

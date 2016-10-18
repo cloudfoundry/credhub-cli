@@ -55,6 +55,6 @@ var _ = Describe("Version", func() {
 })
 
 func testVersion(sout string) {
-	Expect(sout).To(ContainSubstring("CLI Version: 0.2.0"))
+	Expect(sout).To(ContainSubstring("CLI Version: test-version"))
 	Expect(sout).ToNot(ContainSubstring("build DEV"))
 }
