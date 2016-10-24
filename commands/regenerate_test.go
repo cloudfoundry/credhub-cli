@@ -34,6 +34,11 @@ var _ = Describe("Regenerate", func() {
 	})
 
 	Describe("help", func() {
+		ItBehavesLikeHelp("regenerate", "r", func(session *Session) {
+			Expect(session.Err).To(Say("regenerate"))
+			Expect(session.Err).To(Say("name"))
+		})
+
 		It("has short flags", func() {
 			Expect(commands.RegenerateCommand{}).To(SatisfyAll(
 				commands.HaveFlag("name", "n"),
