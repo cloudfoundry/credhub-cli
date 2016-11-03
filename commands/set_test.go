@@ -274,7 +274,7 @@ func setupOverwritePutValueServer(name, secretType, value string, overwrite bool
 		CombineHandlers(
 			VerifyRequest("PUT", fmt.Sprintf("/api/v1/data/%s", name)),
 			VerifyJSON(jsonRequest),
-			RespondWith(http.StatusOK, fmt.Sprintf(SECRET_STRING_RESPONSE_JSON, secretType, value)),
+			RespondWith(http.StatusOK, fmt.Sprintf(SECRET_SET_STRING_RESPONSE_JSON, secretType, value)),
 		),
 	)
 }

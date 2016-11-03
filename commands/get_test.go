@@ -42,7 +42,7 @@ var _ = Describe("Get", func() {
 
 		server.AppendHandlers(
 			CombineHandlers(
-				VerifyRequest("GET", "/api/v1/data/my-value"),
+				VerifyRequest("GET", "/api/v1/data", "name=my-value&current=true"),
 				RespondWith(http.StatusOK, responseJson),
 			),
 		)
@@ -58,7 +58,7 @@ var _ = Describe("Get", func() {
 
 		server.AppendHandlers(
 			CombineHandlers(
-				VerifyRequest("GET", "/api/v1/data/my-password"),
+				VerifyRequest("GET", "/api/v1/data", "name=my-password&current=true"),
 				RespondWith(http.StatusOK, responseJson),
 			),
 		)
@@ -74,7 +74,7 @@ var _ = Describe("Get", func() {
 
 		server.AppendHandlers(
 			CombineHandlers(
-				VerifyRequest("GET", "/api/v1/data/my-password"),
+				VerifyRequest("GET", "/api/v1/data", "name=my-password&current=true"),
 				RespondWith(http.StatusOK, responseJson),
 			),
 		)

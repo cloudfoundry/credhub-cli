@@ -194,7 +194,12 @@ func NewFindCredentialsByPathRequest(config config.Config, path string) *http.Re
 }
 
 func newSecretRequest(requestType string, config config.Config, secretIdentifier string, bodyModel interface{}) *http.Request {
-	url := config.ApiURL + "/api/v1/data/" + secretIdentifier
+	var url string
+	if requestType == "GET" {
+		url = config.ApiURL + "/api/v1/data?name=" + secretIdentifier + "&current=true"
+	} else {
+		url = config.ApiURL + "/api/v1/data/" + secretIdentifier
+	}
 
 	return newRequest(requestType, config, url, bodyModel)
 }

@@ -36,7 +36,7 @@ var _ = Describe("FindRepository", func() {
 		})
 
 		It("sends a request to the server", func() {
-			request, _ := http.NewRequest("GET", "http://example.com/foo?name-like=find-me", nil)
+			request, _ := http.NewRequest("GET", "http://example.com/api/v1/data?name-like=find-me", nil)
 
 			responseObj := http.Response{
 				StatusCode: 200,

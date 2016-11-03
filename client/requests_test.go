@@ -309,7 +309,7 @@ var _ = Describe("API", func() {
 
 		Describe("NewGetSecretRequest", func() {
 			It("Returns a request for getting secret", func() {
-				expectedRequest, _ := http.NewRequest("GET", "http://example.com/api/v1/data/my-name", nil)
+				expectedRequest, _ := http.NewRequest("GET", "http://example.com/api/v1/data?name=my-name&current=true", nil)
 				expectedRequest.Header.Set("Authorization", "Bearer access-token")
 
 				request := NewGetSecretRequest(cfg, "my-name")
