@@ -102,8 +102,8 @@ var _ = Describe("API", func() {
 
 		Describe("NewPutValueRequest", func() {
 			It("Returns a request for the put-value endpoint", func() {
-				requestBody := bytes.NewReader([]byte(`{"type":"value","value":"my-value","overwrite":true}`))
-				expectedRequest, _ := http.NewRequest("PUT", "http://example.com/api/v1/data/my-name", requestBody)
+				requestBody := bytes.NewReader([]byte(`{"type":"value","name":"my-name","value":"my-value","overwrite":true}`))
+				expectedRequest, _ := http.NewRequest("PUT", "http://example.com/api/v1/data", requestBody)
 				expectedRequest.Header.Set("Content-Type", "application/json")
 				expectedRequest.Header.Set("Authorization", "Bearer access-token")
 
@@ -113,8 +113,8 @@ var _ = Describe("API", func() {
 			})
 
 			It("Returns a request that will not overwrite", func() {
-				requestBody := bytes.NewReader([]byte(`{"type":"value","value":"my-value","overwrite":false}`))
-				expectedRequest, _ := http.NewRequest("PUT", "http://example.com/api/v1/data/my-name", requestBody)
+				requestBody := bytes.NewReader([]byte(`{"type":"value","name":"my-name","value":"my-value","overwrite":false}`))
+				expectedRequest, _ := http.NewRequest("PUT", "http://example.com/api/v1/data", requestBody)
 				expectedRequest.Header.Set("Content-Type", "application/json")
 				expectedRequest.Header.Set("Authorization", "Bearer access-token")
 
@@ -127,8 +127,8 @@ var _ = Describe("API", func() {
 
 		Describe("NewPutPasswordRequest", func() {
 			It("Returns a request for the put-password endpoint", func() {
-				requestBody := bytes.NewReader([]byte(`{"type":"password","value":"my-password","overwrite":true}`))
-				expectedRequest, _ := http.NewRequest("PUT", "http://example.com/api/v1/data/my-name", requestBody)
+				requestBody := bytes.NewReader([]byte(`{"type":"password","name":"my-name","value":"my-password","overwrite":true}`))
+				expectedRequest, _ := http.NewRequest("PUT", "http://example.com/api/v1/data", requestBody)
 				expectedRequest.Header.Set("Content-Type", "application/json")
 				expectedRequest.Header.Set("Authorization", "Bearer access-token")
 
@@ -140,10 +140,10 @@ var _ = Describe("API", func() {
 
 		Describe("NewPutCertificateRequest", func() {
 			It("Returns a request for the put-certificate endpoint", func() {
-				json := fmt.Sprintf(`{"type":"certificate","value":{"ca":"%s","certificate":"%s","private_key":"%s"},"overwrite":true}`,
+				json := fmt.Sprintf(`{"type":"certificate","name":"my-name","value":{"ca":"%s","certificate":"%s","private_key":"%s"},"overwrite":true}`,
 					"my-ca", "my-cert", "my-priv")
 				requestBody := bytes.NewReader([]byte(json))
-				expectedRequest, _ := http.NewRequest("PUT", "http://example.com/api/v1/data/my-name", requestBody)
+				expectedRequest, _ := http.NewRequest("PUT", "http://example.com/api/v1/data", requestBody)
 				expectedRequest.Header.Set("Content-Type", "application/json")
 				expectedRequest.Header.Set("Authorization", "Bearer access-token")
 
@@ -156,10 +156,10 @@ var _ = Describe("API", func() {
 		Describe("NewPutRsaSshRequest", func() {
 			Describe("of type SSH", func() {
 				It("Returns a request for the put-rsa-ssh endpoint", func() {
-					json := fmt.Sprintf(`{"type":"%s","value":{"public_key":"%s","private_key":"%s"},"overwrite":true}`,
+					json := fmt.Sprintf(`{"type":"%s","name":"my-name","value":{"public_key":"%s","private_key":"%s"},"overwrite":true}`,
 						"ssh", "my-pub", "my-priv")
 					requestBody := bytes.NewReader([]byte(json))
-					expectedRequest, _ := http.NewRequest("PUT", "http://example.com/api/v1/data/my-name", requestBody)
+					expectedRequest, _ := http.NewRequest("PUT", "http://example.com/api/v1/data", requestBody)
 					expectedRequest.Header.Set("Content-Type", "application/json")
 					expectedRequest.Header.Set("Authorization", "Bearer access-token")
 
@@ -171,10 +171,10 @@ var _ = Describe("API", func() {
 
 			Describe("of type RSA", func() {
 				It("Returns a request for the put-rsa-ssh endpoint", func() {
-					json := fmt.Sprintf(`{"type":"%s","value":{"public_key":"%s","private_key":"%s"},"overwrite":true}`,
+					json := fmt.Sprintf(`{"type":"%s","name":"my-name","value":{"public_key":"%s","private_key":"%s"},"overwrite":true}`,
 						"rsa", "my-pub", "my-priv")
 					requestBody := bytes.NewReader([]byte(json))
-					expectedRequest, _ := http.NewRequest("PUT", "http://example.com/api/v1/data/my-name", requestBody)
+					expectedRequest, _ := http.NewRequest("PUT", "http://example.com/api/v1/data", requestBody)
 					expectedRequest.Header.Set("Content-Type", "application/json")
 					expectedRequest.Header.Set("Authorization", "Bearer access-token")
 

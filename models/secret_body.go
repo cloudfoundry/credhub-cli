@@ -2,6 +2,7 @@ package models
 
 type SecretBody struct {
 	ContentType string            `json:"type" binding:"required"`
+	Name        string            `json:"name",omitempty`
 	Value       interface{}       `json:"value,omitempty"`
 	Overwrite   bool              `json:"overwrite"`
 	Parameters  *SecretParameters `json:"parameters,omitempty"`

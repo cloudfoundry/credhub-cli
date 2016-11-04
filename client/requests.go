@@ -17,6 +17,7 @@ import (
 func NewPutValueRequest(config config.Config, secretIdentifier string, secretContent string, overwrite bool) *http.Request {
 	secret := models.SecretBody{
 		ContentType: "value",
+		Name:        secretIdentifier,
 		Value:       secretContent,
 		Overwrite:   overwrite,
 	}
@@ -27,6 +28,7 @@ func NewPutValueRequest(config config.Config, secretIdentifier string, secretCon
 func NewPutPasswordRequest(config config.Config, secretIdentifier string, secretContent string, overwrite bool) *http.Request {
 	secret := models.SecretBody{
 		ContentType: "password",
+		Name:        secretIdentifier,
 		Value:       secretContent,
 		Overwrite:   overwrite,
 	}
@@ -42,6 +44,7 @@ func NewPutCertificateRequest(config config.Config, secretIdentifier string, roo
 	}
 	secretBody := models.SecretBody{
 		ContentType: "certificate",
+		Name:        secretIdentifier,
 		Value:       &certificate,
 		Overwrite:   overwrite,
 	}
@@ -56,6 +59,7 @@ func NewPutRsaSshRequest(config config.Config, secretIdentifier, keyType, public
 
 	secret := models.SecretBody{
 		ContentType: keyType,
+		Name:        secretIdentifier,
 		Value:       &key,
 		Overwrite:   overwrite,
 	}
@@ -197,6 +201,8 @@ func newSecretRequest(requestType string, config config.Config, secretIdentifier
 	var url string
 	if requestType == "GET" {
 		url = config.ApiURL + "/api/v1/data?name=" + secretIdentifier + "&current=true"
+	} else if requestType == "PUT" {
+		url = config.ApiURL + "/api/v1/data"
 	} else {
 		url = config.ApiURL + "/api/v1/data/" + secretIdentifier
 	}

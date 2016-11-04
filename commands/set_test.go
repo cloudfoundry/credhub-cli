@@ -253,10 +253,10 @@ var _ = Describe("Set", func() {
 
 func setupPutRsaSshServer(name, keyType, publicKey, privateKey string, overwrite bool) {
 	var jsonRequest string
-	jsonRequest = fmt.Sprintf(SECRET_RSA_SSH_REQUEST_JSON, keyType, publicKey, privateKey, overwrite)
+	jsonRequest = fmt.Sprintf(SECRET_RSA_SSH_REQUEST_JSON, keyType, name, publicKey, privateKey, overwrite)
 	server.AppendHandlers(
 		CombineHandlers(
-			VerifyRequest("PUT", fmt.Sprintf("/api/v1/data/%s", name)),
+			VerifyRequest("PUT", "/api/v1/data"),
 			VerifyJSON(jsonRequest),
 			RespondWith(http.StatusOK, fmt.Sprintf(SECRET_RSA_SSH_RESPONSE_JSON, keyType, publicKey, privateKey)),
 		),
@@ -269,10 +269,10 @@ func setupPutValueServer(name, secretType, value string) {
 
 func setupOverwritePutValueServer(name, secretType, value string, overwrite bool) {
 	var jsonRequest string
-	jsonRequest = fmt.Sprintf(SECRET_STRING_OVERWRITE_REQUEST_JSON, secretType, value, overwrite)
+	jsonRequest = fmt.Sprintf(SECRET_STRING_OVERWRITE_REQUEST_JSON, secretType, name, value, overwrite)
 	server.AppendHandlers(
 		CombineHandlers(
-			VerifyRequest("PUT", fmt.Sprintf("/api/v1/data/%s", name)),
+			VerifyRequest("PUT", "/api/v1/data"),
 			VerifyJSON(jsonRequest),
 			RespondWith(http.StatusOK, fmt.Sprintf(SECRET_SET_STRING_RESPONSE_JSON, secretType, value)),
 		),
@@ -285,10 +285,10 @@ func setupPutCertificateServer(name, ca, cert, priv string) {
 
 func setupOverwritePutCertificateServer(name, ca, cert, priv string, overwrite bool) {
 	var jsonRequest string
-	jsonRequest = fmt.Sprintf(SECRET_CERTIFICATE_REQUEST_JSON, ca, cert, priv, overwrite)
+	jsonRequest = fmt.Sprintf(SECRET_CERTIFICATE_REQUEST_JSON, name, ca, cert, priv, overwrite)
 	server.AppendHandlers(
 		CombineHandlers(
-			VerifyRequest("PUT", fmt.Sprintf("/api/v1/data/%s", name)),
+			VerifyRequest("PUT", "/api/v1/data"),
 			VerifyJSON(jsonRequest),
 			RespondWith(http.StatusOK, fmt.Sprintf(SECRET_CERTIFICATE_RESPONSE_JSON, ca, cert, priv)),
 		),
