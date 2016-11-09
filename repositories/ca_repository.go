@@ -24,8 +24,16 @@ func (r caRepository) SendRequest(request *http.Request, caIdentifier string) (m
 	}
 
 	decoder := json.NewDecoder(response.Body)
-	caBody := models.CaBody{}
-	err = decoder.Decode(&caBody)
+	decoded := map[string]interface{}{}
+
+	err = decoder.Decode(&decoded)
+
+	if err != nil {
+		return models.Ca{}, errors.NewResponseError()
+	}
+
+	caBody := models.NewCaBody(decoded)
+
 	if err != nil {
 		return models.Ca{}, errors.NewResponseError()
 	}

@@ -31,7 +31,8 @@ const SECRET_RSA_RESPONSE_TABLE = "Type:          rsa\nName:          %s\nPublic
 const GENERATE_SECRET_REQUEST_JSON = `{"type":"%s","overwrite":%t,"parameters":%s}`
 const GENERATE_DEFAULT_TYPE_REQUEST_JSON = `{"type":"password","overwrite":%t,"parameters":%s}`
 const CA_REQUEST_JSON = `{"type":"%s","value":{"certificate":"%s","private_key":"%s"}}`
-const CA_RESPONSE_JSON = `{"type":"%s","value":{"certificate":"%s","private_key":"%s"},"updated_at":"` + TIMESTAMP + `"}`
+const CA_SET_RESPONSE_JSON = `{"type":"%s","value":{"certificate":"%s","private_key":"%s"},"updated_at":"` + TIMESTAMP + `"}`
+const CA_RESPONSE_JSON = `{"data":[{"type":"%s","value":{"certificate":"%s","private_key":"%s"},"updated_at":"` + TIMESTAMP + `"}]}`
 const CA_RESPONSE_TABLE = "Type:          %s\nName:          %s\nCertificate:   %s\nPrivate Key:   %s\nUpdated:       " + TIMESTAMP
 
 var responseMyValuePotatoes = fmt.Sprintf(SECRET_STRING_RESPONSE_TABLE, "value", "my-value", "potatoes")

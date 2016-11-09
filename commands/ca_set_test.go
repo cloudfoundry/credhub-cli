@@ -137,7 +137,7 @@ func setupPutCaServer(caType, name, certificate, priv string) {
 		CombineHandlers(
 			VerifyRequest("PUT", fmt.Sprintf("/api/v1/ca/%s", name)),
 			VerifyJSON(fmt.Sprintf(CA_REQUEST_JSON, caType, certificate, priv)),
-			RespondWith(http.StatusOK, fmt.Sprintf(CA_RESPONSE_JSON, caType, certificate, priv)),
+			RespondWith(http.StatusOK, fmt.Sprintf(CA_SET_RESPONSE_JSON, caType, certificate, priv)),
 		),
 	)
 }
