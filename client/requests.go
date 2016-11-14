@@ -211,7 +211,12 @@ func newSecretRequest(requestType string, config config.Config, secretIdentifier
 }
 
 func newCaRequest(requestType string, config config.Config, caIdentifier string, bodyModel interface{}) *http.Request {
-	url := config.ApiURL + "/api/v1/ca/" + caIdentifier
+	var url string
+	if requestType == "GET" {
+		url = config.ApiURL + "/api/v1/ca?name=" + caIdentifier + "&current=true"
+	} else {
+		url = config.ApiURL + "/api/v1/ca/" + caIdentifier
+	}
 
 	return newRequest(requestType, config, url, bodyModel)
 }

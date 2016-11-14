@@ -241,7 +241,7 @@ var _ = Describe("API", func() {
 
 		Describe("NewGetCaRequest", func() {
 			It("Returns a request for the get-root-ca endpoint", func() {
-				expectedRequest, _ := http.NewRequest("GET", "http://example.com/api/v1/ca/my-name", nil)
+				expectedRequest, _ := http.NewRequest("GET", "http://example.com/api/v1/ca?name=my-name&current=true", nil)
 				expectedRequest.Header.Set("Authorization", "Bearer access-token")
 
 				request := NewGetCaRequest(cfg, "my-name")
