@@ -2,6 +2,7 @@ package models
 
 type CaBody struct {
 	ContentType string        `json:"type" binding:"required"`
+	Name        string        `json:"name"`
 	Value       *CaParameters `json:"value,omitempty" binding:"required"`
 	UpdatedAt   string        `json:"updated_at,omitempty"`
 }
@@ -23,6 +24,9 @@ func NewCaBody(bodyAsJsonObject map[string]interface{}) CaBody {
 		ContentType: ca["type"].(string),
 		UpdatedAt:   ca["updated_at"].(string),
 		Value:       &valueBody,
+	}
+	if data, ok := ca["name"].(string); ok {
+		caBody.Name = data
 	}
 
 	return caBody

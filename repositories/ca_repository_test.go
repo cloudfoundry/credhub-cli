@@ -54,11 +54,11 @@ var _ = Describe("CaRepository", func() {
 				}
 				expectedCaBody := models.CaBody{
 					ContentType: "root",
+					Name:        "foo",
 					Value:       &caParams,
 					UpdatedAt:   "2016-01-01T12:00:00Z",
 				}
 				expectedCa := models.Ca{
-					Name:   "foo",
 					CaBody: expectedCaBody,
 				}
 

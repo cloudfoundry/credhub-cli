@@ -29,7 +29,7 @@ var _ = Describe("Ca-Set", func() {
 			Eventually(session.Out).Should(Say(responseMyCertificate))
 		})
 
-		It("puts a root CA", func() {
+		It("can output JSON after putting a root CA", func() {
 			setupPutCaServer("root", "my-ca", "my-cert", "my-priv")
 
 			session := runCommand(
@@ -135,8 +135,8 @@ var _ = Describe("Ca-Set", func() {
 func setupPutCaServer(caType, name, certificate, priv string) {
 	server.AppendHandlers(
 		CombineHandlers(
-			VerifyRequest("PUT", fmt.Sprintf("/api/v1/ca/%s", name)),
-			VerifyJSON(fmt.Sprintf(CA_REQUEST_JSON, caType, certificate, priv)),
+			VerifyRequest("PUT", "/api/v1/ca"),
+			VerifyJSON(fmt.Sprintf(CA_REQUEST_JSON, name, caType, certificate, priv)),
 			RespondWith(http.StatusOK, fmt.Sprintf(CA_SET_RESPONSE_JSON, caType, certificate, priv)),
 		),
 	)

@@ -72,6 +72,7 @@ func NewPutCaRequest(config config.Config, caIdentifier, caType, cert, priv stri
 		PrivateKey:  priv,
 	}
 	caBody := models.CaBody{
+		Name:        caIdentifier,
 		ContentType: caType,
 		Value:       &ca,
 	}
@@ -215,10 +216,8 @@ func newCaRequest(requestType string, config config.Config, caIdentifier string,
 	var url string
 	if requestType == "GET" {
 		url = config.ApiURL + "/api/v1/ca?name=" + caIdentifier + "&current=true"
-	} else if requestType == "POST" {
-		url = config.ApiURL + "/api/v1/ca"
 	} else {
-		url = config.ApiURL + "/api/v1/ca/" + caIdentifier
+		url = config.ApiURL + "/api/v1/ca"
 	}
 
 	return newRequest(requestType, config, url, bodyModel)
