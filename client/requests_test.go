@@ -212,6 +212,7 @@ var _ = Describe("API", func() {
 				}
 				expectedRequestJson := `{
 					"type":"root",
+					"name":"my-name",
 					"parameters": {
 						"common_name": "my-common-name",
 						"organization": "my-organization",
@@ -224,7 +225,7 @@ var _ = Describe("API", func() {
 
 				expectedRequestBody := bytes.NewReader([]byte(expectedRequestJson))
 
-				expectedRequest, _ := http.NewRequest("POST", "http://example.com/api/v1/ca/my-name", expectedRequestBody)
+				expectedRequest, _ := http.NewRequest("POST", "http://example.com/api/v1/ca", expectedRequestBody)
 				expectedRequest.Header.Set("Content-Type", "application/json")
 				expectedRequest.Header.Set("Authorization", "Bearer access-token")
 
@@ -234,7 +235,7 @@ var _ = Describe("API", func() {
 				bodyBuffer.ReadFrom(request.Body)
 				Expect(bodyBuffer).To(MatchJSON(expectedRequestJson))
 				Expect(request.Method).To(Equal("POST"))
-				Expect(request.URL.String()).To(Equal("http://example.com/api/v1/ca/my-name"))
+				Expect(request.URL.String()).To(Equal("http://example.com/api/v1/ca"))
 				Expect(request.Header.Get("Content-Type")).To(Equal("application/json"))
 			})
 		})

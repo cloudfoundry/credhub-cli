@@ -8,5 +8,6 @@ type GenerateSecretRequest struct {
 
 type GenerateCaRequest struct {
 	ContentType string            `json:"type"`
+	Name        string            `json:"name"`
 	Parameters  *SecretParameters `json:"parameters"`
 }
