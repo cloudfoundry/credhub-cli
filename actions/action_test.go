@@ -81,7 +81,7 @@ var _ = Describe("Action", func() {
 							buf := new(bytes.Buffer)
 							buf.ReadFrom(req.Body)
 							Expect(buf.String()).To(Equal("{}"))
-							return nil, cm_errors.NewUnauthorizedError()
+							return nil, cm_errors.NewAccessTokenExpiredError()
 						},
 						func(req *http.Request, identifier string) (models.Printable, error) {
 							Expect(req.Header.Get("Authorization")).To(Equal("Bearer access_token"))
@@ -114,7 +114,7 @@ var _ = Describe("Action", func() {
 
 						repository.SendRequestStub = SequentialStub(
 							func(req *http.Request, identifier string) (models.Printable, error) {
-								return nil, cm_errors.NewUnauthorizedError()
+								return nil, cm_errors.NewAccessTokenExpiredError()
 							},
 							func(req *http.Request, identifier string) (models.Printable, error) {
 								Expect(req.Header.Get("Authorization")).To(Equal("Bearer access_token"))

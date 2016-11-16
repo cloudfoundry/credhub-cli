@@ -52,3 +52,7 @@ func NewForbiddenError() error {
 func NewNoMatchingCredentialsFoundError() error {
 	return errors.New("No credentials exist which match the provided parameters.")
 }
+
+func NewAccessTokenExpiredError() error {
+	return errors.New("JWT access token expired")
+}

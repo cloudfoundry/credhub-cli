@@ -35,7 +35,7 @@ func (action Action) DoAction(req *http.Request, identifier string) (models.Prin
 
 	item, err := action.repository.SendRequest(req, identifier)
 
-	if reflect.DeepEqual(err, errors.NewUnauthorizedError()) {
+	if reflect.DeepEqual(err, errors.NewAccessTokenExpiredError()) {
 		req.Body = bodyClone
 		item, err = action.refreshTokenAndResendRequest(req, identifier)
 	}

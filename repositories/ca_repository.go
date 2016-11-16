@@ -34,8 +34,5 @@ func (r caRepository) SendRequest(request *http.Request, caIdentifier string) (m
 
 	caBody := models.NewCaBody(decoded)
 
-	if err != nil {
-		return models.Ca{}, errors.NewResponseError()
-	}
 	return models.NewCa(caIdentifier, caBody), nil
 }

@@ -76,13 +76,13 @@ var _ = Describe("Repository", func() {
 			It("returns UnauthorizedError when the CM server returns Unauthorized", func() {
 				responseObj := http.Response{
 					StatusCode: 401,
-					Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"error": "invalid_token","error_description":"Access token expired: "}`))),
+					Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"error": "invalid_token","error_description":"My long error text"}`))),
 				}
 				httpClient.DoReturns(&responseObj, nil)
 				request, _ := http.NewRequest("GET", "http://example.com/foo", nil)
 
 				_, error := DoSendRequest(&httpClient, request)
-				Expect(error).To(MatchError(cmcli_errors.NewUnauthorizedError()))
+				Expect(error).To(MatchError(errors.New("My long error text")))
 			})
 
 			It("returns ForbiddenError when the CM server returns Forbidden", func() {
@@ -124,6 +124,18 @@ var _ = Describe("Repository", func() {
 
 				Expect(error.Error()).NotTo(Equal("EOF"))
 				Expect(error.Error()).To(Equal("The targeted API was unable to perform the request. Please validate and retry your request."))
+			})
+
+			It("returns AccessTokenExpiredError when server indicates the token has expired", func() {
+				responseObj := http.Response{
+					StatusCode: 401,
+					Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"error": "access_token_expired","error_description":"More long error text"}`))),
+				}
+				httpClient.DoReturns(&responseObj, nil)
+				request, _ := http.NewRequest("GET", "http://example.com/foo", nil)
+
+				_, error := DoSendRequest(&httpClient, request)
+				Expect(error).To(MatchError(cmcli_errors.NewAccessTokenExpiredError()))
 			})
 		})
 	})

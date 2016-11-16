@@ -33,8 +33,10 @@ func DoSendRequest(httpClient client.HttpClient, request *http.Request) (*http.R
 			return nil, err
 		}
 
-		if response.StatusCode == http.StatusUnauthorized {
-			return nil, cm_errors.NewUnauthorizedError()
+		if serverError.Error == "access_token_expired" {
+			return nil, cm_errors.NewAccessTokenExpiredError()
+		} else if response.StatusCode == http.StatusUnauthorized {
+			return nil, errors.New(serverError.ErrorDescription)
 		} else if response.StatusCode == http.StatusForbidden {
 			return nil, cm_errors.NewForbiddenError()
 		}
