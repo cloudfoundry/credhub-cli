@@ -45,12 +45,6 @@
 			"revisionTime": "2016-08-06T12:27:52Z"
 		},
 		{
-			"checksumSHA1": "GOdQ6pHlSI6ccqalb7RyFBygi40=",
-			"path": "github.com/motemen/gore",
-			"revision": "3c59a5283090f86e1226026fcbe8746ea8fe21e6",
-			"revisionTime": "2016-06-11T14:10:53Z"
-		},
-		{
 			"checksumSHA1": "UwhLtKi/lHjArxgsqRe6iqSEu3I=",
 			"path": "github.com/onsi/ginkgo",
 			"revision": "5437a97bf824dec14e58d68c56ee36e772670c2e",
