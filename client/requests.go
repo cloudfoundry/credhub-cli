@@ -188,39 +188,41 @@ func NewFindAllCredentialPathsRequest(config config.Config) *http.Request {
 }
 
 func NewFindCredentialsBySubstringRequest(config config.Config, partialSecretIdentifier string) *http.Request {
-	url := config.ApiURL + "/api/v1/data?name-like=" + partialSecretIdentifier
+	urlString := config.ApiURL + "/api/v1/data?name-like=" + url.QueryEscape(partialSecretIdentifier)
 
-	return newRequest("GET", config, url, nil)
+	return newRequest("GET", config, urlString, nil)
 }
 
 func NewFindCredentialsByPathRequest(config config.Config, path string) *http.Request {
-	url := config.ApiURL + "/api/v1/data?path=" + path
+	urlString := config.ApiURL + "/api/v1/data?path=" + url.QueryEscape(path)
 
-	return newRequest("GET", config, url, nil)
+	return newRequest("GET", config, urlString, nil)
 }
 
 func newSecretRequest(requestType string, config config.Config, secretIdentifier string, bodyModel interface{}) *http.Request {
-	var url string
+	var urlString string
 	if requestType == "GET" {
-		url = config.ApiURL + "/api/v1/data?name=" + secretIdentifier + "&current=true"
+		urlString = config.ApiURL + "/api/v1/data?name=" + url.QueryEscape(secretIdentifier) + "&current=true"
+	} else if requestType == "DELETE" {
+		urlString = config.ApiURL + "/api/v1/data?name=" + url.QueryEscape(secretIdentifier)
 	} else if requestType == "PUT" {
-		url = config.ApiURL + "/api/v1/data"
+		urlString = config.ApiURL + "/api/v1/data"
 	} else {
-		url = config.ApiURL + "/api/v1/data/" + secretIdentifier
+		urlString = config.ApiURL + "/api/v1/data/" + secretIdentifier
 	}
 
-	return newRequest(requestType, config, url, bodyModel)
+	return newRequest(requestType, config, urlString, bodyModel)
 }
 
 func newCaRequest(requestType string, config config.Config, caIdentifier string, bodyModel interface{}) *http.Request {
-	var url string
+	var urlString string
 	if requestType == "GET" {
-		url = config.ApiURL + "/api/v1/ca?name=" + caIdentifier + "&current=true"
+		urlString = config.ApiURL + "/api/v1/ca?name=" + url.QueryEscape(caIdentifier) + "&current=true"
 	} else {
-		url = config.ApiURL + "/api/v1/ca"
+		urlString = config.ApiURL + "/api/v1/ca"
 	}
 
-	return newRequest(requestType, config, url, bodyModel)
+	return newRequest(requestType, config, urlString, bodyModel)
 }
 
 func newRequest(requestType string, config config.Config, url string, bodyModel interface{}) *http.Request {
@@ -233,6 +235,5 @@ func newRequest(requestType string, config config.Config, url string, bodyModel 
 		request.Header.Set("Content-Type", "application/json")
 	}
 	request.Header.Set("Authorization", "Bearer "+config.AccessToken)
-
 	return request
 }

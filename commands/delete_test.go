@@ -24,7 +24,7 @@ var _ = Describe("Delete", func() {
 	It("deletes a secret", func() {
 		server.AppendHandlers(
 			CombineHandlers(
-				VerifyRequest("DELETE", "/api/v1/data/my-secret"),
+				VerifyRequest("DELETE", "/api/v1/data", "name=my-secret"),
 				RespondWith(http.StatusOK, ""),
 			),
 		)

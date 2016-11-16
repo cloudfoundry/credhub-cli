@@ -241,11 +241,25 @@ var _ = Describe("API", func() {
 		})
 
 		Describe("NewGetCaRequest", func() {
-			It("Returns a request for the get-root-ca endpoint", func() {
+			It("returns a request for the get-root-ca endpoint", func() {
 				expectedRequest, _ := http.NewRequest("GET", "http://example.com/api/v1/ca?name=my-name&current=true", nil)
 				expectedRequest.Header.Set("Authorization", "Bearer access-token")
 
 				request := NewGetCaRequest(cfg, "my-name")
+
+				Expect(request).To(Equal(expectedRequest))
+			})
+
+			It("handles special characters like a boss", func() {
+				rawName := "dan:test/ing?danothertbe$in&the[stuff]=that@shouldn!"
+				escapedName := url.QueryEscape(rawName)
+
+				Expect(escapedName).To(Equal("dan%3Atest%2Fing%3Fdanothertbe%24in%26the%5Bstuff%5D%3Dthat%40shouldn%21"))
+
+				expectedRequest, _ := http.NewRequest("GET", "http://example.com/api/v1/ca?name="+escapedName+"&current=true", nil)
+				expectedRequest.Header.Set("Authorization", "Bearer access-token")
+
+				request := NewGetCaRequest(cfg, rawName)
 
 				Expect(request).To(Equal(expectedRequest))
 			})
@@ -317,6 +331,20 @@ var _ = Describe("API", func() {
 
 				Expect(request).To(Equal(expectedRequest))
 			})
+
+			It("handles special characters in the query string", func() {
+				rawName := "!wayt1cket/t0/cr@zy[town]?=AC/DC"
+				escapedName := url.QueryEscape(rawName)
+
+				Expect(escapedName).To(Equal("%21wayt1cket%2Ft0%2Fcr%40zy%5Btown%5D%3F%3DAC%2FDC"))
+
+				expectedRequest, _ := http.NewRequest("GET", "http://example.com/api/v1/data?name="+escapedName+"&current=true", nil)
+				expectedRequest.Header.Set("Authorization", "Bearer access-token")
+
+				request := NewGetSecretRequest(cfg, rawName)
+
+				Expect(request).To(Equal(expectedRequest))
+			})
 		})
 
 		Describe("NewFindCredentialsBySubstringRequest", func() {
@@ -325,6 +353,18 @@ var _ = Describe("API", func() {
 				expectedRequest.Header.Set("Authorization", "Bearer access-token")
 
 				request := NewFindCredentialsBySubstringRequest(cfg, "my-name")
+
+				Expect(request).To(Equal(expectedRequest))
+			})
+
+			It("handles special characters in the query string", func() {
+				rawName := "!wayt1cket/t0/cr@zy[town]?=AC/DC"
+				escapedName := url.QueryEscape(rawName)
+
+				expectedRequest, _ := http.NewRequest("GET", "http://example.com/api/v1/data?name-like="+escapedName, nil)
+				expectedRequest.Header.Set("Authorization", "Bearer access-token")
+
+				request := NewFindCredentialsBySubstringRequest(cfg, rawName)
 
 				Expect(request).To(Equal(expectedRequest))
 			})
@@ -350,14 +390,38 @@ var _ = Describe("API", func() {
 
 				Expect(request).To(Equal(expectedRequest))
 			})
+
+			It("handles special characters in the query string", func() {
+				rawName := "!wayt1cket/t0/cr@zy[town]?=AC/DC"
+				escapedName := url.QueryEscape(rawName)
+
+				expectedRequest, _ := http.NewRequest("GET", "http://example.com/api/v1/data?path="+escapedName, nil)
+				expectedRequest.Header.Set("Authorization", "Bearer access-token")
+
+				request := NewFindCredentialsByPathRequest(cfg, rawName)
+
+				Expect(request).To(Equal(expectedRequest))
+			})
 		})
 
 		Describe("NewDeleteSecretRequest", func() {
 			It("Returns a request for deleting", func() {
-				expectedRequest, _ := http.NewRequest("DELETE", "http://example.com/api/v1/data/my-name", nil)
+				expectedRequest, _ := http.NewRequest("DELETE", "http://example.com/api/v1/data?name=my-name", nil)
 				expectedRequest.Header.Set("Authorization", "Bearer access-token")
 
 				request := NewDeleteSecretRequest(cfg, "my-name")
+
+				Expect(request).To(Equal(expectedRequest))
+			})
+
+			It("handles special characters", func() {
+				rawName := "?testParam=foo&gunk=x/bar/piv0t@l"
+				escapedName := url.QueryEscape(rawName)
+
+				expectedRequest, _ := http.NewRequest("DELETE", "http://example.com/api/v1/data?name="+escapedName, nil)
+				expectedRequest.Header.Set("Authorization", "Bearer access-token")
+
+				request := NewDeleteSecretRequest(cfg, rawName)
 
 				Expect(request).To(Equal(expectedRequest))
 			})
