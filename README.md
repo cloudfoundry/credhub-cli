@@ -97,6 +97,7 @@ NOTE: CA with name 'default' will be used when generating a certificate credenti
 	ca-get --name <ca name>
 		Get the value and attributes of a CA (short command: cg)
 		-n, --name 'CA'								Name of the CA to retrieve
+		    --output-json							Return response in json format
 
 	ca-set --type <ca type> --name <ca name> [set params]
 		Set the value and attributes of a CA (short command: cs)
@@ -108,6 +109,7 @@ NOTE: CA with name 'default' will be used when generating a certificate credenti
 		-p, --private <FILE>						[Root] Sets the CA private key from file
 		-C, --certificate-string 'CERT'				[Root] Sets the CA certificate from string input
 		-P, --private-string 'PRIVATE'				[Root] Sets the CA private key from string input
+		    --output-json							Return response in json format
 
 	ca-generate --type <ca type> --name <ca name> [generate params]
 		Generate and set a credential value based on generation parameters (short command: cn)
@@ -123,4 +125,5 @@ NOTE: CA with name 'default' will be used when generating a certificate credenti
 		-i, --locality 'LOCALITY'					[Root] Locality/city of the generated CA certificate
 		-s, --state	'ST'							[Root] State/province of the generated CA certificate
 		-y, --country 'CC'							[Root] Country of the generated CA certificate
+		    --output-json							Return response in json format
 ```
