@@ -22,14 +22,14 @@ var _ = Describe("Regenerate", func() {
 				CombineHandlers(
 					VerifyRequest("POST", fmt.Sprintf("/api/v1/data/%s", "my-password-stuffs")),
 					VerifyJSON(REGENERATE_SECRET_REQUEST_JSON),
-					RespondWith(http.StatusOK, fmt.Sprintf(SECRET_STRING_RESPONSE_JSON, "password", "nu-potatoes")),
+					RespondWith(http.StatusOK, fmt.Sprintf(STRING_SECRET_RESPONSE_JSON, "password", "my-password-stuffs", "nu-potatoes")),
 				),
 			)
 
 			session := runCommand("regenerate", "--name", "my-password-stuffs")
 
 			Eventually(session).Should(Exit(0))
-			Expect(session.Out).To(Say(fmt.Sprintf(SECRET_STRING_RESPONSE_TABLE, "password", "my-password-stuffs", "nu-potatoes")))
+			Expect(session.Out).To(Say(fmt.Sprintf(STRING_SECRET_RESPONSE_TABLE, "password", "my-password-stuffs", "nu-potatoes")))
 		})
 	})
 

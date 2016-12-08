@@ -36,5 +36,5 @@ func (r secretRepository) SendRequest(request *http.Request, identifier string) 
 		return models.Secret{}, cm_errors.NewResponseError()
 	}
 
-	return models.NewSecret(identifier, decoded), nil
+	return models.NewSecret(decoded), nil
 }

@@ -17,30 +17,38 @@ import (
 )
 
 const TIMESTAMP = `2016-01-01T12:00:00Z`
-const SECRET_STRING_OVERWRITE_REQUEST_JSON = `{"type":"%s","name":"%s","value":"%s","overwrite":%t}`
-const SECRET_STRING_RESPONSE_JSON = `{"data":[{"type":"%s", "value":"%s", "updated_at":"` + TIMESTAMP + `"}]}`
-const SECRET_SET_STRING_RESPONSE_JSON = `{"type":"%s", "value":"%s", "updated_at":"` + TIMESTAMP + `"}`
-const SECRET_STRING_RESPONSE_TABLE = "Type:          %s\nName:          %s\nValue:         %s\nUpdated:       " + TIMESTAMP
-const SECRET_CERTIFICATE_REQUEST_JSON = `{"type":"certificate","name":"%s","value":{"ca":"%s","certificate":"%s","private_key":"%s"},"overwrite":%t}`
-const SECRET_CERTIFICATE_RESPONSE_JSON = `{"data":[{"type":"certificate","value":{"ca":"%s","certificate":"%s","private_key":"%s"},"updated_at":"` + TIMESTAMP + `"}]}`
-const SECRET_CERTIFICATE_RESPONSE_TABLE = "Type:          certificate\nName:          %s\nCa:            %s\nCertificate:   %s\nPrivate Key:   %s\nUpdated:       " + TIMESTAMP
-const SECRET_RSA_SSH_REQUEST_JSON = `{"type":"%s","name":"%s","value":{"public_key":"%s","private_key":"%s"},"overwrite":%t}`
-const SECRET_RSA_SSH_RESPONSE_JSON = `{"data":[{"type":"%s","value":{"public_key":"%s","private_key":"%s"},"updated_at":"` + TIMESTAMP + `"}]}`
-const SECRET_SSH_RESPONSE_TABLE = "Type:          ssh\nName:          %s\nPublic Key:    %s\nPrivate Key:   %s\nUpdated:       " + TIMESTAMP
-const SECRET_RSA_RESPONSE_TABLE = "Type:          rsa\nName:          %s\nPublic Key:    %s\nPrivate Key:   %s\nUpdated:       " + TIMESTAMP
+const UUID = `5a2edd4f-1686-4c8d-80eb-5daa866f9f86`
+
+const STRING_SECRET_OVERWRITE_REQUEST_JSON = `{"type":"%s","name":"%s","value":"%s","overwrite":%t}`
+const CERTIFICATE_SECRET_REQUEST_JSON = `{"type":"certificate","name":"%s","value":{"ca":"%s","certificate":"%s","private_key":"%s"},"overwrite":%t}`
 const GENERATE_SECRET_REQUEST_JSON = `{"type":"%s","overwrite":%t,"parameters":%s}`
+const RSA_SSH_SECRET_REQUEST_JSON = `{"type":"%s","name":"%s","value":{"public_key":"%s","private_key":"%s"},"overwrite":%t}`
 const GENERATE_DEFAULT_TYPE_REQUEST_JSON = `{"type":"password","overwrite":%t,"parameters":%s}`
+
+const STRING_SECRET_RESPONSE_JSON = `{"type":"%s","id":"` + UUID + `","name":"%s","updated_at":"` + TIMESTAMP + `","value":"%s"}`
+const CERTIFICATE_SECRET_RESPONSE_JSON = `{"type":"certificate","id":"` + UUID + `","name":"%s","updated_at":"` + TIMESTAMP + `","value":{"ca":"%s","certificate":"%s","private_key":"%s"}}`
+const RSA_SSH_SECRET_RESPONSE_JSON = `{"type":"%s","id":"` + UUID + `","name":"%s","updated_at":"` + TIMESTAMP + `","value":{"public_key":"%s","private_key":"%s"},"updated_at":"` + TIMESTAMP + `"}`
+
+const STRING_SECRET_ARRAY_RESPONSE_JSON = `{"data":[` + STRING_SECRET_RESPONSE_JSON + `]}`
+const CERTIFICATE_SECRET_ARRAY_RESPONSE_JSON = `{"data":[` + CERTIFICATE_SECRET_RESPONSE_JSON + `]}`
+const RSA_SSH_SECRET_ARRAY_RESPONSE_JSON = `{"data":[` + RSA_SSH_SECRET_RESPONSE_JSON + `]}`
+
+const STRING_SECRET_RESPONSE_TABLE = "Type:          %s\nName:          %s\nValue:         %s\nUpdated:       " + TIMESTAMP
+const CERTIFICATE_SECRET_RESPONSE_TABLE = "Type:          certificate\nName:          %s\nCa:            %s\nCertificate:   %s\nPrivate Key:   %s\nUpdated:       " + TIMESTAMP
+const SSH_SECRET_RESPONSE_TABLE = "Type:          ssh\nName:          %s\nPublic Key:    %s\nPrivate Key:   %s\nUpdated:       " + TIMESTAMP
+const RSA_SECRET_RESPONSE_TABLE = "Type:          rsa\nName:          %s\nPublic Key:    %s\nPrivate Key:   %s\nUpdated:       " + TIMESTAMP
+
 const CA_REQUEST_JSON = `{"name":"%s","type":"%s","value":{"certificate":"%s","private_key":"%s"}}`
-const CA_SET_RESPONSE_JSON = `{"type":"%s","value":{"certificate":"%s","private_key":"%s"},"updated_at":"` + TIMESTAMP + `"}`
-const CA_RESPONSE_JSON = `{"data":[{"type":"%s","value":{"certificate":"%s","private_key":"%s"},"updated_at":"` + TIMESTAMP + `"}]}`
+const CA_RESPONSE_JSON = `{"type":"%s","value":{"certificate":"%s","private_key":"%s"},"updated_at":"` + TIMESTAMP + `"}`
+const CA_ARRAY_RESPONSE_JSON = `{"data":[{"type":"%s","value":{"certificate":"%s","private_key":"%s"},"updated_at":"` + TIMESTAMP + `"}]}`
 const CA_RESPONSE_TABLE = "Type:          %s\nName:          %s\nCertificate:   %s\nPrivate Key:   %s\nUpdated:       " + TIMESTAMP
 
-var responseMyValuePotatoes = fmt.Sprintf(SECRET_STRING_RESPONSE_TABLE, "value", "my-value", "potatoes")
-var responseMyPasswordPotatoes = fmt.Sprintf(SECRET_STRING_RESPONSE_TABLE, "password", "my-password", "potatoes")
-var responseMyCertificate = fmt.Sprintf(SECRET_CERTIFICATE_RESPONSE_TABLE, "my-secret", "my-ca", "my-cert", "my-priv")
+var responseMyValuePotatoes = fmt.Sprintf(STRING_SECRET_RESPONSE_TABLE, "value", "my-value", "potatoes")
+var responseMyPasswordPotatoes = fmt.Sprintf(STRING_SECRET_RESPONSE_TABLE, "password", "my-password", "potatoes")
+var responseMyCertificate = fmt.Sprintf(CERTIFICATE_SECRET_RESPONSE_TABLE, "my-secret", "my-ca", "my-cert", "my-priv")
 var responseMyCertificateAuthority = fmt.Sprintf(CA_RESPONSE_TABLE, "root", "my-secret", "my-cert", "my-priv")
-var responseMySSHFoo = fmt.Sprintf(SECRET_SSH_RESPONSE_TABLE, "foo-ssh-key", "some-public-key", "some-private-key")
-var responseMyRSAFoo = fmt.Sprintf(SECRET_RSA_RESPONSE_TABLE, "foo-rsa-key", "some-public-key", "some-private-key")
+var responseMySSHFoo = fmt.Sprintf(SSH_SECRET_RESPONSE_TABLE, "foo-ssh-key", "some-public-key", "some-private-key")
+var responseMyRSAFoo = fmt.Sprintf(RSA_SECRET_RESPONSE_TABLE, "foo-rsa-key", "some-public-key", "some-private-key")
 
 func TestCommands(t *testing.T) {
 	RegisterFailHandler(Fail)

@@ -18,9 +18,10 @@ func NewSecretBody(bodyAsJsonObject map[string]interface{}) SecretBody {
 	}
 
 	secretBody := SecretBody{
+		Name: secret["name"].(string),
 		ContentType: secret["type"].(string),
+		UpdatedAt: secret["updated_at"].(string),
 	}
-	secretBody.UpdatedAt, _ = secret["updated_at"].(string)
 
 	switch secretBody.ContentType {
 	case "value", "password":

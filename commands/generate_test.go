@@ -3,8 +3,6 @@ package commands_test
 import (
 	"net/http"
 
-	"fmt"
-
 	"runtime"
 
 	. "github.com/onsi/ginkgo"
@@ -13,6 +11,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 	. "github.com/onsi/gomega/ghttp"
 	"github.com/pivotal-cf/credhub-cli/commands"
+	"fmt"
 )
 
 var _ = Describe("Generate", func() {
@@ -21,7 +20,6 @@ var _ = Describe("Generate", func() {
 			setupPasswordPostServer("my-password", "potatoes", generateDefaultTypeRequestJson(`{}`, true))
 
 			session := runCommand("generate", "-n", "my-password")
-
 			Eventually(session).Should(Exit(0))
 		})
 
@@ -40,7 +38,7 @@ var _ = Describe("Generate", func() {
 			session := runCommand("generate", "-n", "my-password", "--output-json")
 
 			Eventually(session).Should(Exit(0))
-			Expect(string(session.Out.Contents())).To(MatchJSON(`{
+			Expect(session.Out.Contents()).To(MatchJSON(`{
 				"type": "password",
 				"updated_at": "` + TIMESTAMP + `",
 				"value": "potatoes"
@@ -366,7 +364,7 @@ func setupPasswordPostServer(name string, value string, requestJson string) {
 		CombineHandlers(
 			VerifyRequest("POST", fmt.Sprintf("/api/v1/data/%s", name)),
 			VerifyJSON(requestJson),
-			RespondWith(http.StatusOK, fmt.Sprintf(SECRET_STRING_RESPONSE_JSON, "password", value)),
+			RespondWith(http.StatusOK, fmt.Sprintf(STRING_SECRET_RESPONSE_JSON, "password", name, value)),
 		),
 	)
 }
@@ -376,7 +374,7 @@ func setupRsaSshPostServer(name string, contentType string, publicKey string, pr
 		CombineHandlers(
 			VerifyRequest("POST", fmt.Sprintf("/api/v1/data/%s", name)),
 			VerifyJSON(requestJson),
-			RespondWith(http.StatusOK, fmt.Sprintf(SECRET_RSA_SSH_RESPONSE_JSON, contentType, publicKey, privateKey)),
+			RespondWith(http.StatusOK, fmt.Sprintf(RSA_SSH_SECRET_RESPONSE_JSON, contentType, name, publicKey, privateKey)),
 		),
 	)
 }
@@ -386,7 +384,7 @@ func setupCertificatePostServer(name string, ca string, certificate string, priv
 		CombineHandlers(
 			VerifyRequest("POST", fmt.Sprintf("/api/v1/data/%s", name)),
 			VerifyJSON(requestJson),
-			RespondWith(http.StatusOK, fmt.Sprintf(SECRET_CERTIFICATE_RESPONSE_JSON, ca, certificate, privateKey)),
+			RespondWith(http.StatusOK, fmt.Sprintf(CERTIFICATE_SECRET_RESPONSE_JSON, name, ca, certificate, privateKey)),
 		),
 	)
 }

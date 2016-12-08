@@ -38,7 +38,7 @@ var _ = Describe("Get", func() {
 	})
 
 	It("gets a string secret", func() {
-		responseJson := fmt.Sprintf(SECRET_STRING_RESPONSE_JSON, "value", "potatoes")
+		responseJson := fmt.Sprintf(STRING_SECRET_ARRAY_RESPONSE_JSON, "value", "my-value", "potatoes")
 
 		server.AppendHandlers(
 			CombineHandlers(
@@ -54,7 +54,7 @@ var _ = Describe("Get", func() {
 	})
 
 	It("gets a password secret", func() {
-		responseJson := fmt.Sprintf(SECRET_STRING_RESPONSE_JSON, "password", "potatoes")
+		responseJson := fmt.Sprintf(STRING_SECRET_ARRAY_RESPONSE_JSON, "password", "my-password", "potatoes")
 
 		server.AppendHandlers(
 			CombineHandlers(
@@ -69,8 +69,40 @@ var _ = Describe("Get", func() {
 		Eventually(session.Out).Should(Say(responseMyPasswordPotatoes))
 	})
 
+	It("gets a certificate secret", func() {
+		responseJson := fmt.Sprintf(CERTIFICATE_SECRET_ARRAY_RESPONSE_JSON, "my-secret", "my-ca", "my-cert", "my-priv")
+
+		server.AppendHandlers(
+			CombineHandlers(
+				VerifyRequest("GET", "/api/v1/data", "name=my-secret&current=true"),
+				RespondWith(http.StatusOK, responseJson),
+			),
+		)
+
+		session := runCommand("get", "-n", "my-secret")
+
+		Eventually(session).Should(Exit(0))
+		Eventually(session.Out).Should(Say(responseMyCertificate))
+	})
+
+	It("gets an rsa secret", func() {
+		responseJson := fmt.Sprintf(RSA_SSH_SECRET_ARRAY_RESPONSE_JSON, "rsa", "foo-rsa-key", "some-public-key", "some-private-key")
+
+		server.AppendHandlers(
+			CombineHandlers(
+				VerifyRequest("GET", "/api/v1/data", "name=foo-rsa-key&current=true"),
+				RespondWith(http.StatusOK, responseJson),
+			),
+		)
+
+		session := runCommand("get", "-n", "foo-rsa-key")
+
+		Eventually(session).Should(Exit(0))
+		Eventually(session.Out).Should(Say(responseMyRSAFoo))
+	})
+
 	It("can output json", func() {
-		responseJson := fmt.Sprintf(SECRET_STRING_RESPONSE_JSON, "password", "potatoes")
+		responseJson := fmt.Sprintf(STRING_SECRET_ARRAY_RESPONSE_JSON, "password", "my-password", "potatoes")
 
 		server.AppendHandlers(
 			CombineHandlers(

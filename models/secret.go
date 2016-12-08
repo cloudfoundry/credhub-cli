@@ -7,15 +7,13 @@ import (
 )
 
 type Secret struct {
-	Name       string
 	SecretBody SecretBody
 }
 
-func NewSecret(name string, secretBodyMap map[string]interface{}) Secret {
+func NewSecret(secretBodyMap map[string]interface{}) Secret {
 	secretBody := NewSecretBody(secretBodyMap)
 
 	return Secret{
-		Name:       name,
 		SecretBody: secretBody,
 	}
 }
@@ -36,7 +34,7 @@ func (s Secret) Terminal() string {
 		break
 	}
 
-	return util.Header(secretBody.ContentType, s.Name) + result + util.Footer(secretBody.UpdatedAt)
+	return util.Header(secretBody.ContentType, secretBody.Name) + result + util.Footer(secretBody.UpdatedAt)
 }
 
 func (secret Secret) Json() string {
@@ -54,6 +52,7 @@ func (secret Secret) Json() string {
 		Type:      secretBody.ContentType,
 		UpdatedAt: secretBody.UpdatedAt,
 	}
+
 
 	switch secretBody.ContentType {
 	case "value", "password":

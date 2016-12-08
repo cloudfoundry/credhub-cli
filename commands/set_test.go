@@ -145,7 +145,7 @@ var _ = Describe("Set", func() {
 
 			session := runCommandWithStdin(strings.NewReader("potatoes potatoes\n"), "set", "-n", "my-password", "-t", "password")
 
-			response := fmt.Sprintf(SECRET_STRING_RESPONSE_TABLE, "password", "my-password", "potatoes potatoes")
+			response := fmt.Sprintf(STRING_SECRET_RESPONSE_TABLE, "password", "my-password", "potatoes potatoes")
 
 			Eventually(session.Out).Should(Say("value:"))
 			Eventually(session.Wait("10s").Out).Should(Say(response))
@@ -253,12 +253,12 @@ var _ = Describe("Set", func() {
 
 func setupPutRsaSshServer(name, keyType, publicKey, privateKey string, overwrite bool) {
 	var jsonRequest string
-	jsonRequest = fmt.Sprintf(SECRET_RSA_SSH_REQUEST_JSON, keyType, name, publicKey, privateKey, overwrite)
+	jsonRequest = fmt.Sprintf(RSA_SSH_SECRET_REQUEST_JSON, keyType, name, publicKey, privateKey, overwrite)
 	server.AppendHandlers(
 		CombineHandlers(
 			VerifyRequest("PUT", "/api/v1/data"),
 			VerifyJSON(jsonRequest),
-			RespondWith(http.StatusOK, fmt.Sprintf(SECRET_RSA_SSH_RESPONSE_JSON, keyType, publicKey, privateKey)),
+			RespondWith(http.StatusOK, fmt.Sprintf(RSA_SSH_SECRET_RESPONSE_JSON, keyType, name, publicKey, privateKey)),
 		),
 	)
 }
@@ -269,12 +269,12 @@ func setupPutValueServer(name, secretType, value string) {
 
 func setupOverwritePutValueServer(name, secretType, value string, overwrite bool) {
 	var jsonRequest string
-	jsonRequest = fmt.Sprintf(SECRET_STRING_OVERWRITE_REQUEST_JSON, secretType, name, value, overwrite)
+	jsonRequest = fmt.Sprintf(STRING_SECRET_OVERWRITE_REQUEST_JSON, secretType, name, value, overwrite)
 	server.AppendHandlers(
 		CombineHandlers(
 			VerifyRequest("PUT", "/api/v1/data"),
 			VerifyJSON(jsonRequest),
-			RespondWith(http.StatusOK, fmt.Sprintf(SECRET_SET_STRING_RESPONSE_JSON, secretType, value)),
+			RespondWith(http.StatusOK, fmt.Sprintf(STRING_SECRET_RESPONSE_JSON, secretType, name, value)),
 		),
 	)
 }
@@ -285,12 +285,12 @@ func setupPutCertificateServer(name, ca, cert, priv string) {
 
 func setupOverwritePutCertificateServer(name, ca, cert, priv string, overwrite bool) {
 	var jsonRequest string
-	jsonRequest = fmt.Sprintf(SECRET_CERTIFICATE_REQUEST_JSON, name, ca, cert, priv, overwrite)
+	jsonRequest = fmt.Sprintf(CERTIFICATE_SECRET_REQUEST_JSON, name, ca, cert, priv, overwrite)
 	server.AppendHandlers(
 		CombineHandlers(
 			VerifyRequest("PUT", "/api/v1/data"),
 			VerifyJSON(jsonRequest),
-			RespondWith(http.StatusOK, fmt.Sprintf(SECRET_CERTIFICATE_RESPONSE_JSON, ca, cert, priv)),
+			RespondWith(http.StatusOK, fmt.Sprintf(CERTIFICATE_SECRET_RESPONSE_JSON, name, ca, cert, priv)),
 		),
 	)
 }

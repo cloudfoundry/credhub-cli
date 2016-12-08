@@ -58,7 +58,7 @@ func setupGetCaServer(caType, name, cert, priv string) {
 	server.AppendHandlers(
 		CombineHandlers(
 			VerifyRequest("GET", "/api/v1/ca", "name="+name+"&current=true"),
-			RespondWith(http.StatusOK, fmt.Sprintf(CA_RESPONSE_JSON, caType, cert, priv)),
+			RespondWith(http.StatusOK, fmt.Sprintf(CA_ARRAY_RESPONSE_JSON, caType, cert, priv)),
 		),
 	)
 }

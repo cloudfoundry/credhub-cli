@@ -35,12 +35,12 @@ var _ = Describe("SecretRepository", func() {
 		})
 
 		Context("when there is a response body", func() {
-			It("sends a request to the server", func() {
+			It("sends a request to the server which responds with a single credential", func() {
 				request, _ := http.NewRequest("GET", "http://example.com/foo", nil)
 
 				responseObj := http.Response{
 					StatusCode: 200,
-					Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"data":[{"type":"value","value":"my-value"}]}`))),
+					Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"name":"foo","id":"some-id","type":"value","value":"my-value","updated_at":"2016-12-07T22:57:04Z"}`))),
 				}
 
 				httpClient.DoStub = func(req *http.Request) (resp *http.Response, err error) {
@@ -50,12 +50,44 @@ var _ = Describe("SecretRepository", func() {
 				}
 
 				expectedSecretBody := models.SecretBody{
+					Name:        "foo",
 					ContentType: "value",
 					Value:       "my-value",
+					UpdatedAt:   "2016-12-07T22:57:04Z",
 				}
 
 				expectedSecret := models.Secret{
-					Name:       "foo",
+					SecretBody: expectedSecretBody,
+				}
+
+				secret, err := repository.SendRequest(request, "foo")
+
+				Expect(err).ToNot(HaveOccurred())
+				Expect(secret).To(Equal(expectedSecret))
+			})
+
+			It("sends a request to the server for an array of credentials", func() {
+				request, _ := http.NewRequest("GET", "http://example.com/bar", nil)
+
+				responseObj := http.Response{
+					StatusCode: 200,
+					Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"data":[{"name":"bar","id":"some-id","type":"password","value":"my-password","updated_at":"2016-12-07T22:57:04Z"}]}`))),
+				}
+
+				httpClient.DoStub = func(req *http.Request) (resp *http.Response, err error) {
+					Expect(req).To(Equal(request))
+
+					return &responseObj, nil
+				}
+
+				expectedSecretBody := models.SecretBody{
+					Name:        "bar",
+					ContentType: "password",
+					Value:       "my-password",
+					UpdatedAt:   "2016-12-07T22:57:04Z",
+				}
+
+				expectedSecret := models.Secret{
 					SecretBody: expectedSecretBody,
 				}
 
