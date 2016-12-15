@@ -11,7 +11,6 @@ fly \
   -t private \
   execute \
   -c task.yml \
-  -i clock=$PREP_RELEASE_INPUT \
   -i code-repo=../../.. \
   -i task-repo=../../.. \
   -o prep-release-output=$PREP_RELEASE_OUTPUT
