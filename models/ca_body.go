@@ -1,10 +1,10 @@
 package models
 
 type CaBody struct {
-	ContentType string        `json:"type" binding:"required"`
-	Name        string        `json:"name"`
-	Value       *CaParameters `json:"value,omitempty" binding:"required"`
-	UpdatedAt   string        `json:"updated_at,omitempty"`
+	SecretType string        `json:"type" binding:"required"`
+	Name       string        `json:"name"`
+	Value      *CaParameters `json:"value,omitempty" binding:"required"`
+	UpdatedAt  string        `json:"updated_at,omitempty"`
 }
 
 func NewCaBody(bodyAsJsonObject map[string]interface{}) CaBody {
@@ -21,9 +21,9 @@ func NewCaBody(bodyAsJsonObject map[string]interface{}) CaBody {
 		PrivateKey:  value["private_key"].(string),
 	}
 	caBody := CaBody{
-		ContentType: ca["type"].(string),
-		UpdatedAt:   ca["updated_at"].(string),
-		Value:       &valueBody,
+		SecretType: ca["type"].(string),
+		UpdatedAt:  ca["updated_at"].(string),
+		Value:      &valueBody,
 	}
 	if data, ok := ca["name"].(string); ok {
 		caBody.Name = data

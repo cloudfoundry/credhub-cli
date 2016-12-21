@@ -16,10 +16,10 @@ import (
 
 func NewPutValueRequest(config config.Config, secretIdentifier string, secretContent string, overwrite bool) *http.Request {
 	secret := models.SecretBody{
-		ContentType: "value",
-		Name:        secretIdentifier,
-		Value:       secretContent,
-		Overwrite:   overwrite,
+		SecretType: "value",
+		Name:       secretIdentifier,
+		Value:      secretContent,
+		Overwrite:  overwrite,
 	}
 
 	return newSecretRequest("PUT", config, secretIdentifier, secret)
@@ -27,10 +27,10 @@ func NewPutValueRequest(config config.Config, secretIdentifier string, secretCon
 
 func NewPutPasswordRequest(config config.Config, secretIdentifier string, secretContent string, overwrite bool) *http.Request {
 	secret := models.SecretBody{
-		ContentType: "password",
-		Name:        secretIdentifier,
-		Value:       secretContent,
-		Overwrite:   overwrite,
+		SecretType: "password",
+		Name:       secretIdentifier,
+		Value:      secretContent,
+		Overwrite:  overwrite,
 	}
 
 	return newSecretRequest("PUT", config, secretIdentifier, secret)
@@ -43,10 +43,10 @@ func NewPutCertificateRequest(config config.Config, secretIdentifier string, roo
 		PrivateKey:  priv,
 	}
 	secretBody := models.SecretBody{
-		ContentType: "certificate",
-		Name:        secretIdentifier,
-		Value:       &certificate,
-		Overwrite:   overwrite,
+		SecretType: "certificate",
+		Name:       secretIdentifier,
+		Value:      &certificate,
+		Overwrite:  overwrite,
 	}
 	return newSecretRequest("PUT", config, secretIdentifier, secretBody)
 }
@@ -58,10 +58,10 @@ func NewPutRsaSshRequest(config config.Config, secretIdentifier, keyType, public
 	}
 
 	secret := models.SecretBody{
-		ContentType: keyType,
-		Name:        secretIdentifier,
-		Value:       &key,
-		Overwrite:   overwrite,
+		SecretType: keyType,
+		Name:       secretIdentifier,
+		Value:      &key,
+		Overwrite:  overwrite,
 	}
 	return newSecretRequest("PUT", config, secretIdentifier, secret)
 }
@@ -72,9 +72,9 @@ func NewPutCaRequest(config config.Config, caIdentifier, caType, cert, priv stri
 		PrivateKey:  priv,
 	}
 	caBody := models.CaBody{
-		Name:        caIdentifier,
-		ContentType: caType,
-		Value:       &ca,
+		Name:       caIdentifier,
+		SecretType: caType,
+		Value:      &ca,
 	}
 
 	return newCaRequest("PUT", config, caIdentifier, caBody)
@@ -82,9 +82,9 @@ func NewPutCaRequest(config config.Config, caIdentifier, caType, cert, priv stri
 
 func NewPostCaRequest(config config.Config, caIdentifier, caType string, params models.SecretParameters) *http.Request {
 	caGenerateRequestBody := models.GenerateCaRequest{
-		ContentType: caType,
-		Name:        caIdentifier,
-		Parameters:  &params,
+		SecretType: caType,
+		Name:       caIdentifier,
+		Parameters: &params,
 	}
 
 	return newCaRequest("POST", config, caIdentifier, caGenerateRequestBody)
@@ -94,11 +94,11 @@ func NewGetCaRequest(config config.Config, caIdentifier string) *http.Request {
 	return newCaRequest("GET", config, caIdentifier, nil)
 }
 
-func NewGenerateSecretRequest(config config.Config, secretIdentifier string, parameters models.SecretParameters, contentType string, overwrite bool) *http.Request {
+func NewGenerateSecretRequest(config config.Config, secretIdentifier string, parameters models.SecretParameters, secretType string, overwrite bool) *http.Request {
 	generateRequest := models.GenerateSecretRequest{
-		ContentType: contentType,
-		Overwrite:   overwrite,
-		Parameters:  &parameters,
+		SecretType: secretType,
+		Overwrite:  overwrite,
+		Parameters: &parameters,
 	}
 
 	return newSecretRequest("POST", config, secretIdentifier, generateRequest)

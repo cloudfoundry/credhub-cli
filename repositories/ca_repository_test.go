@@ -53,10 +53,10 @@ var _ = Describe("CaRepository", func() {
 					PrivateKey:  "my-priv",
 				}
 				expectedCaBody := models.CaBody{
-					ContentType: "root",
-					Name:        "foo",
-					Value:       &caParams,
-					UpdatedAt:   "2016-01-01T12:00:00Z",
+					SecretType: "root",
+					Name:       "foo",
+					Value:      &caParams,
+					UpdatedAt:  "2016-01-01T12:00:00Z",
 				}
 				expectedCa := models.Ca{
 					CaBody: expectedCaBody,

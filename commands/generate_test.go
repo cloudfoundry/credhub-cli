@@ -5,13 +5,14 @@ import (
 
 	"runtime"
 
+	"fmt"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
 	. "github.com/onsi/gomega/ghttp"
 	"github.com/pivotal-cf/credhub-cli/commands"
-	"fmt"
 )
 
 var _ = Describe("Generate", func() {
@@ -369,12 +370,12 @@ func setupPasswordPostServer(name string, value string, requestJson string) {
 	)
 }
 
-func setupRsaSshPostServer(name string, contentType string, publicKey string, privateKey string, requestJson string) {
+func setupRsaSshPostServer(name string, secretType string, publicKey string, privateKey string, requestJson string) {
 	server.AppendHandlers(
 		CombineHandlers(
 			VerifyRequest("POST", fmt.Sprintf("/api/v1/data/%s", name)),
 			VerifyJSON(requestJson),
-			RespondWith(http.StatusOK, fmt.Sprintf(RSA_SSH_SECRET_RESPONSE_JSON, contentType, name, publicKey, privateKey)),
+			RespondWith(http.StatusOK, fmt.Sprintf(RSA_SSH_SECRET_RESPONSE_JSON, secretType, name, publicKey, privateKey)),
 		),
 	)
 }

@@ -22,7 +22,7 @@ func (s Secret) Terminal() string {
 	result := ""
 	secretBody := s.SecretBody
 
-	switch secretBody.ContentType {
+	switch secretBody.SecretType {
 	case "value", "password":
 		result = util.BuildLineOfFixedLength("Value:", secretBody.Value.(string)) + "\n"
 		break
@@ -34,7 +34,7 @@ func (s Secret) Terminal() string {
 		break
 	}
 
-	return util.Header(secretBody.ContentType, secretBody.Name) + result + util.Footer(secretBody.UpdatedAt)
+	return util.Header(secretBody.SecretType, secretBody.Name) + result + util.Footer(secretBody.UpdatedAt)
 }
 
 func (secret Secret) Json() string {
@@ -49,12 +49,11 @@ func (secret Secret) Json() string {
 		Type        string `json:"type"`
 		UpdatedAt   string `json:"updated_at"`
 	}{
-		Type:      secretBody.ContentType,
+		Type:      secretBody.SecretType,
 		UpdatedAt: secretBody.UpdatedAt,
 	}
 
-
-	switch secretBody.ContentType {
+	switch secretBody.SecretType {
 	case "value", "password":
 		body.Value = secretBody.Value.(string)
 		break

@@ -50,10 +50,10 @@ var _ = Describe("SecretRepository", func() {
 				}
 
 				expectedSecretBody := models.SecretBody{
-					Name:        "foo",
-					ContentType: "value",
-					Value:       "my-value",
-					UpdatedAt:   "2016-12-07T22:57:04Z",
+					Name:       "foo",
+					SecretType: "value",
+					Value:      "my-value",
+					UpdatedAt:  "2016-12-07T22:57:04Z",
 				}
 
 				expectedSecret := models.Secret{
@@ -81,10 +81,10 @@ var _ = Describe("SecretRepository", func() {
 				}
 
 				expectedSecretBody := models.SecretBody{
-					Name:        "bar",
-					ContentType: "password",
-					Value:       "my-password",
-					UpdatedAt:   "2016-12-07T22:57:04Z",
+					Name:       "bar",
+					SecretType: "password",
+					Value:      "my-password",
+					UpdatedAt:  "2016-12-07T22:57:04Z",
 				}
 
 				expectedSecret := models.Secret{

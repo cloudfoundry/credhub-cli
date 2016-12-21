@@ -10,10 +10,10 @@ var _ = Describe("Secret", func() {
 		It("renders string secrets", func() {
 			stringSecret := Secret{
 				SecretBody: SecretBody{
-					Name: "stringSecret",
-					ContentType: "value",
-					Value:       "my-value",
-					UpdatedAt:   "2016-01-01T12:00:00Z",
+					Name:       "stringSecret",
+					SecretType: "value",
+					Value:      "my-value",
+					UpdatedAt:  "2016-01-01T12:00:00Z",
 				},
 			}
 
@@ -28,10 +28,10 @@ var _ = Describe("Secret", func() {
 			ssh := RsaSsh{PublicKey: "my-pub", PrivateKey: "my-priv"}
 			sshSecret := Secret{
 				SecretBody: SecretBody{
-					Name: "sshSecret",
-					ContentType: "ssh",
-					Value:       ssh,
-					UpdatedAt:   "2016-01-01T12:00:00Z",
+					Name:       "sshSecret",
+					SecretType: "ssh",
+					Value:      ssh,
+					UpdatedAt:  "2016-01-01T12:00:00Z",
 				},
 			}
 
@@ -47,10 +47,10 @@ var _ = Describe("Secret", func() {
 			rsa := RsaSsh{PublicKey: "my-pub", PrivateKey: "my-priv"}
 			sshSecret := Secret{
 				SecretBody: SecretBody{
-					Name: "rsaSecret",
-					ContentType: "rsa",
-					Value:       rsa,
-					UpdatedAt:   "2016-01-01T12:00:00Z",
+					Name:       "rsaSecret",
+					SecretType: "rsa",
+					Value:      rsa,
+					UpdatedAt:  "2016-01-01T12:00:00Z",
 				},
 			}
 
@@ -67,10 +67,10 @@ var _ = Describe("Secret", func() {
 				certificate := Certificate{Ca: "my-ca", Certificate: "my-cert", PrivateKey: "my-priv"}
 				certificateSecret := Secret{
 					SecretBody: SecretBody{
-						Name: "nonNulledSecret",
-						ContentType: "certificate",
-						Value:       certificate,
-						UpdatedAt:   "2016-01-01T12:00:00Z",
+						Name:       "nonNulledSecret",
+						SecretType: "certificate",
+						Value:      certificate,
+						UpdatedAt:  "2016-01-01T12:00:00Z",
 					},
 				}
 
@@ -87,10 +87,10 @@ var _ = Describe("Secret", func() {
 				certificate := Certificate{Ca: "my-ca", Certificate: "", PrivateKey: "my-priv"}
 				certificateSecret := Secret{
 					SecretBody: SecretBody{
-						Name: "nonNulledSecret",
-						ContentType: "certificate",
-						Value:       certificate,
-						UpdatedAt:   "2016-01-01T12:00:00Z",
+						Name:       "nonNulledSecret",
+						SecretType: "certificate",
+						Value:      certificate,
+						UpdatedAt:  "2016-01-01T12:00:00Z",
 					},
 				}
 
@@ -105,10 +105,10 @@ var _ = Describe("Secret", func() {
 			It("when fields all have nil values", func() {
 				certificateSecret := Secret{
 					SecretBody: SecretBody{
-						Name: "nulledSecret",
-						ContentType: "certificate",
-						Value:       Certificate{},
-						UpdatedAt:   "2016-01-01T12:00:00Z",
+						Name:       "nulledSecret",
+						SecretType: "certificate",
+						Value:      Certificate{},
+						UpdatedAt:  "2016-01-01T12:00:00Z",
 					},
 				}
 
@@ -124,10 +124,10 @@ var _ = Describe("Secret", func() {
 		It("renders string secrets", func() {
 			stringSecret := Secret{
 				SecretBody: SecretBody{
-					Name: "stringSecret",
-					ContentType: "value",
-					Value:       "my-value",
-					UpdatedAt:   "2016-01-01T12:00:00Z",
+					Name:       "stringSecret",
+					SecretType: "value",
+					Value:      "my-value",
+					UpdatedAt:  "2016-01-01T12:00:00Z",
 				},
 			}
 
@@ -142,10 +142,10 @@ var _ = Describe("Secret", func() {
 			ssh := RsaSsh{PublicKey: "my-pub", PrivateKey: "my-priv"}
 			sshSecret := Secret{
 				SecretBody: SecretBody{
-					Name: "sshSecret",
-					ContentType: "ssh",
-					Value:       ssh,
-					UpdatedAt:   "2016-01-01T12:00:00Z",
+					Name:       "sshSecret",
+					SecretType: "ssh",
+					Value:      ssh,
+					UpdatedAt:  "2016-01-01T12:00:00Z",
 				},
 			}
 
@@ -161,10 +161,10 @@ var _ = Describe("Secret", func() {
 			rsa := RsaSsh{PublicKey: "my-pub", PrivateKey: "my-priv"}
 			sshSecret := Secret{
 				SecretBody: SecretBody{
-					Name: "rsaSecret",
-					ContentType: "rsa",
-					Value:       rsa,
-					UpdatedAt:   "2016-01-01T12:00:00Z",
+					Name:       "rsaSecret",
+					SecretType: "rsa",
+					Value:      rsa,
+					UpdatedAt:  "2016-01-01T12:00:00Z",
 				},
 			}
 
@@ -181,10 +181,10 @@ var _ = Describe("Secret", func() {
 				certificate := Certificate{Ca: "my-ca", Certificate: "my-cert", PrivateKey: "my-priv"}
 				certificateSecret := Secret{
 					SecretBody: SecretBody{
-						Name: "nonNulledSecret",
-						ContentType: "certificate",
-						Value:       certificate,
-						UpdatedAt:   "2016-01-01T12:00:00Z",
+						Name:       "nonNulledSecret",
+						SecretType: "certificate",
+						Value:      certificate,
+						UpdatedAt:  "2016-01-01T12:00:00Z",
 					},
 				}
 
@@ -201,10 +201,10 @@ var _ = Describe("Secret", func() {
 				certificate := Certificate{Ca: "my-ca", Certificate: "", PrivateKey: "my-priv"}
 				certificateSecret := Secret{
 					SecretBody: SecretBody{
-						Name: "nonNulledSecret",
-						ContentType: "certificate",
-						Value:       certificate,
-						UpdatedAt:   "2016-01-01T12:00:00Z",
+						Name:       "nonNulledSecret",
+						SecretType: "certificate",
+						Value:      certificate,
+						UpdatedAt:  "2016-01-01T12:00:00Z",
 					},
 				}
 
@@ -219,10 +219,10 @@ var _ = Describe("Secret", func() {
 			It("when fields all have nil values", func() {
 				certificateSecret := Secret{
 					SecretBody: SecretBody{
-						Name: "nulledSecret",
-						ContentType: "certificate",
-						Value:       Certificate{},
-						UpdatedAt:   "2016-01-01T12:00:00Z",
+						Name:       "nulledSecret",
+						SecretType: "certificate",
+						Value:      Certificate{},
+						UpdatedAt:  "2016-01-01T12:00:00Z",
 					},
 				}
 

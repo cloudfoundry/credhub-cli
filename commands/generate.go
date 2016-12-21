@@ -10,7 +10,7 @@ import (
 
 type GenerateCommand struct {
 	SecretIdentifier string   `short:"n" required:"yes" long:"name" description:"Name of the credential to generate"`
-	ContentType      string   `short:"t" long:"type" description:"Sets the credential type to generate (Default: 'password')"`
+	SecretType       string   `short:"t" long:"type" description:"Sets the credential type to generate (Default: 'password')"`
 	NoOverwrite      bool     `short:"O" long:"no-overwrite" description:"Credential is not modified if stored value already exists"`
 	Length           int      `short:"l" long:"length" description:"[Password] Length of the generated value (Default: 20)"`
 	ExcludeSpecial   bool     `short:"S" long:"exclude-special" description:"[Password] Exclude special characters from the generated value"`
@@ -33,8 +33,8 @@ type GenerateCommand struct {
 }
 
 func (cmd GenerateCommand) Execute([]string) error {
-	if cmd.ContentType == "" {
-		cmd.ContentType = "password"
+	if cmd.SecretType == "" {
+		cmd.SecretType = "password"
 	}
 
 	cfg := config.ReadConfig()
@@ -61,7 +61,7 @@ func (cmd GenerateCommand) Execute([]string) error {
 	}
 
 	action := actions.NewAction(repository, cfg)
-	request := client.NewGenerateSecretRequest(cfg, cmd.SecretIdentifier, parameters, cmd.ContentType, !cmd.NoOverwrite)
+	request := client.NewGenerateSecretRequest(cfg, cmd.SecretIdentifier, parameters, cmd.SecretType, !cmd.NoOverwrite)
 	secret, err := action.DoAction(request, cmd.SecretIdentifier)
 
 	if err != nil {
