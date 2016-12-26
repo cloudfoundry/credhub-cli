@@ -1,8 +1,0 @@
----
-platform: windows
-inputs:
-  - name: task-repo
-  - name: code-repo
-    path: go/src/github.com/pivotal-cf/credhub-cli
-run:
-  path: task-repo/ci/tasks/unit-tests-windows/task.bat
