@@ -21,7 +21,7 @@ func PrintVersion() error {
 	}
 
 	fmt.Println("CLI Version:", version.Version)
-	fmt.Println("CM Version:", cmVersion)
+	fmt.Println("API Version:", cmVersion)
 
 	return nil
 }
