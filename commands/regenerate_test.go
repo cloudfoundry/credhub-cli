@@ -13,14 +13,14 @@ import (
 	"github.com/pivotal-cf/credhub-cli/commands"
 )
 
-const REGENERATE_SECRET_REQUEST_JSON = `{"regenerate":true}`
+const REGENERATE_SECRET_REQUEST_JSON = `{"regenerate":true,"name":"my-password-stuffs"}`
 
 var _ = Describe("Regenerate", func() {
 	Describe("Regenerating password", func() {
 		It("prints the regenerated password secret", func() {
 			server.AppendHandlers(
 				CombineHandlers(
-					VerifyRequest("POST", fmt.Sprintf("/api/v1/data/%s", "my-password-stuffs")),
+					VerifyRequest("POST", "/api/v1/data"),
 					VerifyJSON(REGENERATE_SECRET_REQUEST_JSON),
 					RespondWith(http.StatusOK, fmt.Sprintf(STRING_SECRET_RESPONSE_JSON, "password", "my-password-stuffs", "nu-potatoes")),
 				),

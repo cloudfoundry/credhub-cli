@@ -267,8 +267,8 @@ var _ = Describe("API", func() {
 
 		Describe("NewGenerateSecretRequest", func() {
 			It("returns a request with only overwrite", func() {
-				requestBody := bytes.NewReader([]byte(`{"type":"my-type","overwrite":true,"parameters":{}}`))
-				expectedRequest, _ := http.NewRequest("POST", "http://example.com/api/v1/data/my-name", requestBody)
+				requestBody := bytes.NewReader([]byte(`{"name":"my-name","type":"my-type","overwrite":true,"parameters":{}}`))
+				expectedRequest, _ := http.NewRequest("POST", "http://example.com/api/v1/data", requestBody)
 				expectedRequest.Header.Set("Content-Type", "application/json")
 				expectedRequest.Header.Set("Authorization", "Bearer access-token")
 
@@ -287,6 +287,7 @@ var _ = Describe("API", func() {
 					Length:         42,
 				}
 				expectedRequestBody := `{
+					"name":"my-name",
 					"type":"password",
 					"overwrite":false,
 					"parameters": {
@@ -304,15 +305,15 @@ var _ = Describe("API", func() {
 				bodyBuffer.ReadFrom(request.Body)
 				Expect(bodyBuffer).To(MatchJSON(expectedRequestBody))
 				Expect(request.Method).To(Equal("POST"))
-				Expect(request.URL.String()).To(Equal("http://example.com/api/v1/data/my-name"))
+				Expect(request.URL.String()).To(Equal("http://example.com/api/v1/data"))
 				Expect(request.Header.Get("Content-Type")).To(Equal("application/json"))
 			})
 		})
 
 		Describe("NewRegenerateSecretRequest", func() {
 			It("returns a request with only regenerate", func() {
-				requestBody := bytes.NewReader([]byte(`{"regenerate":true}`))
-				expectedRequest, _ := http.NewRequest("POST", "http://example.com/api/v1/data/my-name", requestBody)
+				requestBody := bytes.NewReader([]byte(`{"name":"my-name","regenerate":true}`))
+				expectedRequest, _ := http.NewRequest("POST", "http://example.com/api/v1/data", requestBody)
 				expectedRequest.Header.Set("Content-Type", "application/json")
 				expectedRequest.Header.Set("Authorization", "Bearer access-token")
 

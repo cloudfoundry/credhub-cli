@@ -96,6 +96,7 @@ func NewGetCaRequest(config config.Config, caIdentifier string) *http.Request {
 
 func NewGenerateSecretRequest(config config.Config, secretIdentifier string, parameters models.SecretParameters, secretType string, overwrite bool) *http.Request {
 	generateRequest := models.GenerateSecretRequest{
+		Name:       secretIdentifier,
 		SecretType: secretType,
 		Overwrite:  overwrite,
 		Parameters: &parameters,
@@ -106,6 +107,7 @@ func NewGenerateSecretRequest(config config.Config, secretIdentifier string, par
 
 func NewRegenerateSecretRequest(config config.Config, secretIdentifier string) *http.Request {
 	regenerateRequest := models.RegenerateSecretRequest{
+		Name:       secretIdentifier,
 		Regenerate: true,
 	}
 
@@ -205,10 +207,8 @@ func newSecretRequest(requestType string, config config.Config, secretIdentifier
 		urlString = config.ApiURL + "/api/v1/data?name=" + url.QueryEscape(secretIdentifier) + "&current=true"
 	} else if requestType == "DELETE" {
 		urlString = config.ApiURL + "/api/v1/data?name=" + url.QueryEscape(secretIdentifier)
-	} else if requestType == "PUT" {
-		urlString = config.ApiURL + "/api/v1/data"
 	} else {
-		urlString = config.ApiURL + "/api/v1/data/" + secretIdentifier
+		urlString = config.ApiURL + "/api/v1/data"
 	}
 
 	return newRequest(requestType, config, urlString, bodyModel)

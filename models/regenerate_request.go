@@ -1,5 +1,6 @@
 package models
 
 type RegenerateSecretRequest struct {
-	Regenerate bool `json:"regenerate"`
+	Name       string `json:"name"`
+	Regenerate bool   `json:"regenerate"`
 }

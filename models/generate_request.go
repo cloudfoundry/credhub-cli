@@ -1,6 +1,7 @@
 package models
 
 type GenerateSecretRequest struct {
+	Name       string            `json:"name"`
 	SecretType string            `json:"type"`
 	Overwrite  bool              `json:"overwrite"`
 	Parameters *SecretParameters `json:"parameters"`
