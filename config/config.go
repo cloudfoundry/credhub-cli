@@ -7,7 +7,7 @@ import (
 	"path"
 )
 
-const AuthClient = "credhub"
+const AuthClient = "credhub_cli"
 const AuthPassword = ""
 
 type Config struct {
