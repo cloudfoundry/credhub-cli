@@ -50,7 +50,7 @@ var _ = Describe("API", func() {
 				"POST",
 				cfg.AuthURL+"/oauth/token/",
 				bytes.NewBufferString(data.Encode()))
-			expectedRequest.SetBasicAuth("credhub", "")
+			expectedRequest.SetBasicAuth("credhub_cli", "")
 			expectedRequest.Header.Add("Accept", "application/json")
 			expectedRequest.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
@@ -69,7 +69,7 @@ var _ = Describe("API", func() {
 				"POST",
 				cfg.AuthURL+"/oauth/token/",
 				bytes.NewBufferString(data.Encode()))
-			expectedRequest.SetBasicAuth("credhub", "")
+			expectedRequest.SetBasicAuth("credhub_cli", "")
 			expectedRequest.Header.Add("Accept", "application/json")
 			expectedRequest.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
