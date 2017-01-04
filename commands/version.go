@@ -14,14 +14,14 @@ import (
 func PrintVersion() error {
 	cfg := config.ReadConfig()
 
-	cmVersion := "Not Found"
+	credHubServerVersion := "Not Found"
 	cmInfo, err := actions.NewInfo(client.NewHttpClient(cfg), cfg).GetServerInfo()
 	if err == nil {
-		cmVersion = cmInfo.App.Version
+		credHubServerVersion = cmInfo.App.Version
 	}
 
 	fmt.Println("CLI Version:", version.Version)
-	fmt.Println("API Version:", cmVersion)
+	fmt.Println("Server Version:", credHubServerVersion)
 
 	return nil
 }

@@ -28,7 +28,7 @@ var _ = Describe("Version", func() {
 			Eventually(session).Should(Exit(0))
 			sout := string(session.Out.Contents())
 			testVersion(sout)
-			Expect(sout).To(ContainSubstring("API Version: 0.2.0"))
+			Expect(sout).To(ContainSubstring("Server Version: 0.2.0"))
 		})
 	})
 
@@ -48,7 +48,7 @@ var _ = Describe("Version", func() {
 			Eventually(session).Should(Exit(0))
 			sout := string(session.Out.Contents())
 			testVersion(sout)
-			Expect(sout).To(ContainSubstring("API Version: Not Found"))
+			Expect(sout).To(ContainSubstring("Server Version: Not Found"))
 		})
 	})
 
