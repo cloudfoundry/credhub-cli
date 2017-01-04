@@ -6,3 +6,4 @@ cm-cli
 *.key
 vendor/*
 !vendor/vendor.json
+tmp
