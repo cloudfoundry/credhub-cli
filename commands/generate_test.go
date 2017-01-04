@@ -282,6 +282,13 @@ var _ = Describe("Generate", func() {
 			Eventually(session).Should(Exit(0))
 		})
 
+		It("including multiple extended key usage settings", func() {
+			expectedRequestJson := generateRequestJson("certificate", "my-secret", `{"extended_key_usage": [ "server_auth", "client_auth" ]}`, true)
+			setupCertificatePostServer("my-secret", "potatoes-ca", "potatoes-cert", "potatoes-priv-key", expectedRequestJson)
+			session := runCommand("generate", "-n", "my-secret", "-t", "certificate", "-e", "server_auth", "--extended-key-usage=client_auth")
+			Eventually(session).Should(Exit(0))
+		})
+
 		It("including key length", func() {
 			expectedRequestJson := generateRequestJson("certificate", "my-secret", `{"key_length":2048}`, true)
 			setupCertificatePostServer("my-secret", "potatoes-ca", "potatoes-cert", "potatoes-priv-key", expectedRequestJson)
