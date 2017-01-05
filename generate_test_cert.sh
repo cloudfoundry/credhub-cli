@@ -12,7 +12,7 @@ CERTFILE="./tmp/$CERTNAME.cer"
 mkdir -p tmp
 
 ./build/credhub ca-generate -n default --common-name root 2>&1 > /dev/null
-./build/credhub generate -n $CERTNAME -t certificate --common-name $CERTNAME --ca default -e code_signing -e email_protection 2>&1 > /dev/null
+./build/credhub generate -n $CERTNAME -t certificate --common-name $CERTNAME --ca default -g digital_signature -g key_agreement -e code_signing -e email_protection 2>&1 > /dev/null
 ./build/credhub get -n $CERTNAME --output-json > $TMPFILE
 
 printf "$(cat $TMPFILE | jq '.certificate')" | sed -e 's/"//g' >  $CERTFILE
