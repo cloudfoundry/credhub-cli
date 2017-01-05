@@ -18,4 +18,4 @@ mkdir -p tmp
 printf "$(cat $TMPFILE | jq '.certificate')" | sed -e 's/"//g' >  $CERTFILE
 printf "$(cat $TMPFILE | jq '.private_key')" | sed -e 's/"//g' >> $CERTFILE
 
-echo "Generated $CERTFILE"
+echo "Generated $CERTNAME in $CERTFILE"
