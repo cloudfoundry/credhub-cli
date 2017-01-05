@@ -29,6 +29,7 @@ type GenerateCommand struct {
 	Country          string   `short:"y" long:"country" description:"[Certificate] Country of the generated certificate"`
 	AlternativeName  []string `short:"a" long:"alternative-name" description:"[Certificate] A subject alternative name of the generated certificate (may be specified multiple times)"`
 	ExtendedKeyUsage []string `short:"e" long:"ext-key-usage" description:"[Certificate] Extended Key Usage extensions for the generated certificate (may be specified multiple times)"`
+	KeyUsage         []string `short:"g" long:"key-usage" description:"[Certificate] Key Usage extensions for the generated certificate (may be specified multiple times)"`
 	SshComment       string   `short:"m" long:"ssh-comment" description:"[SSH] Comment appended to public key to help identify in environment"`
 	OutputJson       bool     `long:"output-json"`
 }
@@ -56,6 +57,7 @@ func (cmd GenerateCommand) Execute([]string) error {
 		Country:          cmd.Country,
 		AlternativeName:  cmd.AlternativeName,
 		ExtendedKeyUsage: cmd.ExtendedKeyUsage,
+		KeyUsage:         cmd.KeyUsage,
 		KeyLength:        cmd.KeyLength,
 		Duration:         cmd.Duration,
 		Ca:               cmd.Ca,
