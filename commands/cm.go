@@ -1,20 +1,20 @@
 package commands
 
 type CMCommand struct {
-	Api ApiCommand `command:"api" alias:"a" description:"Set the API server to use"`
+	Api ApiCommand `command:"api" alias:"a" description:"Set the CredHub API target to be used for subsequent commands"`
 
-	Get        GetCommand        `command:"get" alias:"g" description:"Get a secret value"`
-	Set        SetCommand        `command:"set" alias:"s" description:"Set a secret value"`
-	Generate   GenerateCommand   `command:"generate" alias:"n" description:"Generate a secret value"`
-	Regenerate RegenerateCommand `command:"regenerate" alias:"r" description:"Regenerate a secret value"`
-	Delete     DeleteCommand     `command:"delete" alias:"d" description:"Delete a secret value"`
+	Get        GetCommand        `command:"get" alias:"g" description:"Get a credential value"`
+	Set        SetCommand        `command:"set" alias:"s" description:"Set a credential with a provided value"`
+	Generate   GenerateCommand   `command:"generate" alias:"n" description:"Set a credential with a generated value"`
+	Regenerate RegenerateCommand `command:"regenerate" alias:"r" description:"Set a credential with a generated value using the same attributes as the stored value"`
+	Delete     DeleteCommand     `command:"delete" alias:"d" description:"Delete a credential value"`
 	CaSet      CaSetCommand      `command:"ca-set" alias:"cs" description:"Set a certificate authority for generating signed certificates"`
 	CaGet      CaGetCommand      `command:"ca-get" alias:"cg" description:"Get a certificate authority"`
-	CaGenerate CaGenerateCommand `command:"ca-generate" alias:"cn" description:"Configures a certificate authority with a generated key pair."`
-	Login      LoginCommand      `command:"login" alias:"l" description:"Authenticates user with CredHub"`
-	Logout     LogoutCommand     `command:"logout" alias:"o" description:"Discard authenticated user session."`
-	Find       FindCommand       `command:"find" alias:"f" description:"Find existing credentials with query parameters"`
-	Version    func()            `long:"version" description:"Version of Credential Manager"`
+	CaGenerate CaGenerateCommand `command:"ca-generate" alias:"cn" description:"Configures a certificate authority with a generated key pair"`
+	Login      LoginCommand      `command:"login" alias:"l" description:"Authenticate user with CredHub"`
+	Logout     LogoutCommand     `command:"logout" alias:"o" description:"Discard authenticated user session"`
+	Find       FindCommand       `command:"find" alias:"f" description:"Find stored credentials based on query parameters"`
+	Version    func()            `long:"version" description:"Version of CLI and targeted CredHub API"`
 }
 
 var CM CMCommand
