@@ -11,8 +11,8 @@ type SecretQueryResponseBody struct {
 }
 
 type SecretQueryCredential struct {
-	Name      string `json:"name,omitempty"`
-	UpdatedAt string `json:"updated_at,omitempty"`
+	Name             string `json:"name,omitempty"`
+	VersionCreatedAt string `json:"version_created_at,omitempty"`
 }
 
 func (secretQueryResponseBody SecretQueryResponseBody) Terminal() string {
@@ -26,7 +26,7 @@ func (secretQueryResponseBody SecretQueryResponseBody) Terminal() string {
 	}
 	lines = append(lines, util.BuildLineWithLength("Name", "Updated Date", longestNameLength))
 	for _, credential := range secretQueryResponseBody.Credentials {
-		lines = append(lines, util.BuildLineWithLength(credential.Name, credential.UpdatedAt, longestNameLength))
+		lines = append(lines, util.BuildLineWithLength(credential.Name, credential.VersionCreatedAt, longestNameLength))
 	}
 	return strings.Join(lines, "\n")
 }

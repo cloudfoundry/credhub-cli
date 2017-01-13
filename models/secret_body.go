@@ -1,12 +1,12 @@
 package models
 
 type SecretBody struct {
-	SecretType string            `json:"type" binding:"required"`
-	Name       string            `json:"name",omitempty`
-	Value      interface{}       `json:"value,omitempty"`
-	Overwrite  bool              `json:"overwrite"`
-	Parameters *SecretParameters `json:"parameters,omitempty"`
-	UpdatedAt  string            `json:"updated_at,omitempty"`
+	SecretType       string            `json:"type" binding:"required"`
+	Name             string            `json:"name",omitempty`
+	Value            interface{}       `json:"value,omitempty"`
+	Overwrite        bool              `json:"overwrite"`
+	Parameters       *SecretParameters `json:"parameters,omitempty"`
+	VersionCreatedAt string            `json:"version_created_at,omitempty"`
 }
 
 func NewSecretBody(bodyAsJsonObject map[string]interface{}) SecretBody {
@@ -18,9 +18,9 @@ func NewSecretBody(bodyAsJsonObject map[string]interface{}) SecretBody {
 	}
 
 	secretBody := SecretBody{
-		Name:       secret["name"].(string),
-		SecretType: secret["type"].(string),
-		UpdatedAt:  secret["updated_at"].(string),
+		Name:             secret["name"].(string),
+		SecretType:       secret["type"].(string),
+		VersionCreatedAt: secret["version_created_at"].(string),
 	}
 
 	switch secretBody.SecretType {

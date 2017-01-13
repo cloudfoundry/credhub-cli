@@ -40,7 +40,7 @@ var _ = Describe("SecretRepository", func() {
 
 				responseObj := http.Response{
 					StatusCode: 200,
-					Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"name":"foo","id":"some-id","type":"value","value":"my-value","updated_at":"2016-12-07T22:57:04Z"}`))),
+					Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"name":"foo","id":"some-id","type":"value","value":"my-value","version_created_at":"2016-12-07T22:57:04Z"}`))),
 				}
 
 				httpClient.DoStub = func(req *http.Request) (resp *http.Response, err error) {
@@ -50,10 +50,10 @@ var _ = Describe("SecretRepository", func() {
 				}
 
 				expectedSecretBody := models.SecretBody{
-					Name:       "foo",
-					SecretType: "value",
-					Value:      "my-value",
-					UpdatedAt:  "2016-12-07T22:57:04Z",
+					Name:             "foo",
+					SecretType:       "value",
+					Value:            "my-value",
+					VersionCreatedAt: "2016-12-07T22:57:04Z",
 				}
 
 				expectedSecret := models.Secret{
@@ -71,7 +71,7 @@ var _ = Describe("SecretRepository", func() {
 
 				responseObj := http.Response{
 					StatusCode: 200,
-					Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"data":[{"name":"bar","id":"some-id","type":"password","value":"my-password","updated_at":"2016-12-07T22:57:04Z"}]}`))),
+					Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"data":[{"name":"bar","id":"some-id","type":"password","value":"my-password","version_created_at":"2016-12-07T22:57:04Z"}]}`))),
 				}
 
 				httpClient.DoStub = func(req *http.Request) (resp *http.Response, err error) {
@@ -81,10 +81,10 @@ var _ = Describe("SecretRepository", func() {
 				}
 
 				expectedSecretBody := models.SecretBody{
-					Name:       "bar",
-					SecretType: "password",
-					Value:      "my-password",
-					UpdatedAt:  "2016-12-07T22:57:04Z",
+					Name:             "bar",
+					SecretType:       "password",
+					Value:            "my-password",
+					VersionCreatedAt: "2016-12-07T22:57:04Z",
 				}
 
 				expectedSecret := models.Secret{

@@ -87,11 +87,11 @@ var _ = Describe("Find", func() {
 					"credentials": [
 							{
 								"name": "dan.password",
-								"updated_at": "2016-09-06T23:26:58Z"
+								"version_created_at": "2016-09-06T23:26:58Z"
 							},
 							{
 								"name": "deploy1/dan/id.key",
-								"updated_at": "2016-09-06T23:26:58Z"
+								"version_created_at": "2016-09-06T23:26:58Z"
 							}
 					]
 				}`
@@ -148,15 +148,15 @@ var _ = Describe("Find", func() {
 					"credentials": [
 							{
 								"name": "deploy123/dan.password",
-								"updated_at": "2016-09-06T23:26:58Z"
+								"version_created_at": "2016-09-06T23:26:58Z"
 							},
 							{
 								"name": "deploy123/dan.key",
-								"updated_at": "2016-09-06T23:26:58Z"
+								"version_created_at": "2016-09-06T23:26:58Z"
 							},
 							{
 								"name": "deploy123/dan/id.key",
-								"updated_at": "2016-09-06T23:26:58Z"
+								"version_created_at": "2016-09-06T23:26:58Z"
 							}
 					]
 				}`

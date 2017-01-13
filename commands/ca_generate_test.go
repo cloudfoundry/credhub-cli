@@ -57,7 +57,7 @@ var _ = Describe("Ca-Generate", func() {
 			Eventually(session).Should(Exit(0))
 			Eventually(string(session.Out.Contents())).Should(MatchJSON(`{
 				"type": "root",
-				"updated_at": "` + TIMESTAMP + `",
+				"version_created_at": "` + TIMESTAMP + `",
 				"certificate": "my-cert-generated",
 				"private_key": "fake-priv-generated"
 			}`))

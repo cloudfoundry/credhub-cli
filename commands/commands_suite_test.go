@@ -25,9 +25,9 @@ const GENERATE_SECRET_REQUEST_JSON = `{"name":"%s","type":"%s","overwrite":%t,"p
 const RSA_SSH_SECRET_REQUEST_JSON = `{"type":"%s","name":"%s","value":{"public_key":"%s","private_key":"%s"},"overwrite":%t}`
 const GENERATE_DEFAULT_TYPE_REQUEST_JSON = `{"name":"%s","type":"password","overwrite":%t,"parameters":%s}`
 
-const STRING_SECRET_RESPONSE_JSON = `{"type":"%s","id":"` + UUID + `","name":"%s","updated_at":"` + TIMESTAMP + `","value":"%s"}`
-const CERTIFICATE_SECRET_RESPONSE_JSON = `{"type":"certificate","id":"` + UUID + `","name":"%s","updated_at":"` + TIMESTAMP + `","value":{"ca":"%s","certificate":"%s","private_key":"%s"}}`
-const RSA_SSH_SECRET_RESPONSE_JSON = `{"type":"%s","id":"` + UUID + `","name":"%s","updated_at":"` + TIMESTAMP + `","value":{"public_key":"%s","private_key":"%s"},"updated_at":"` + TIMESTAMP + `"}`
+const STRING_SECRET_RESPONSE_JSON = `{"type":"%s","id":"` + UUID + `","name":"%s","version_created_at":"` + TIMESTAMP + `","value":"%s"}`
+const CERTIFICATE_SECRET_RESPONSE_JSON = `{"type":"certificate","id":"` + UUID + `","name":"%s","version_created_at":"` + TIMESTAMP + `","value":{"ca":"%s","certificate":"%s","private_key":"%s"}}`
+const RSA_SSH_SECRET_RESPONSE_JSON = `{"type":"%s","id":"` + UUID + `","name":"%s","version_created_at":"` + TIMESTAMP + `","value":{"public_key":"%s","private_key":"%s"},"version_created_at":"` + TIMESTAMP + `"}`
 
 const STRING_SECRET_ARRAY_RESPONSE_JSON = `{"data":[` + STRING_SECRET_RESPONSE_JSON + `]}`
 const CERTIFICATE_SECRET_ARRAY_RESPONSE_JSON = `{"data":[` + CERTIFICATE_SECRET_RESPONSE_JSON + `]}`
@@ -39,8 +39,8 @@ const SSH_SECRET_RESPONSE_TABLE = "Type:          ssh\nName:          %s\nPublic
 const RSA_SECRET_RESPONSE_TABLE = "Type:          rsa\nName:          %s\nPublic Key:    %s\nPrivate Key:   %s\nUpdated:       " + TIMESTAMP
 
 const CA_REQUEST_JSON = `{"name":"%s","type":"%s","value":{"certificate":"%s","private_key":"%s"}}`
-const CA_RESPONSE_JSON = `{"type":"%s","value":{"certificate":"%s","private_key":"%s"},"updated_at":"` + TIMESTAMP + `"}`
-const CA_ARRAY_RESPONSE_JSON = `{"data":[{"type":"%s","value":{"certificate":"%s","private_key":"%s"},"updated_at":"` + TIMESTAMP + `"}]}`
+const CA_RESPONSE_JSON = `{"type":"%s","value":{"certificate":"%s","private_key":"%s"},"version_created_at":"` + TIMESTAMP + `"}`
+const CA_ARRAY_RESPONSE_JSON = `{"data":[{"type":"%s","value":{"certificate":"%s","private_key":"%s"},"version_created_at":"` + TIMESTAMP + `"}]}`
 const CA_RESPONSE_TABLE = "Type:          %s\nName:          %s\nCertificate:   %s\nPrivate Key:   %s\nUpdated:       " + TIMESTAMP
 
 var responseMyValuePotatoes = fmt.Sprintf(STRING_SECRET_RESPONSE_TABLE, "value", "my-value", "potatoes")

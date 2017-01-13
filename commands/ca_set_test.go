@@ -44,7 +44,7 @@ var _ = Describe("Ca-Set", func() {
 			Eventually(session).Should(Exit(0))
 			Eventually(string(session.Out.Contents())).Should(MatchJSON(`{
 				"type": "root",
-				"updated_at": "` + TIMESTAMP + `",
+				"version_created_at": "` + TIMESTAMP + `",
 				"certificate": "my-cert",
 				"private_key": "my-priv"
 			}`))

@@ -38,7 +38,7 @@ var _ = Describe("CaRepository", func() {
 				responseObj := http.Response{
 					StatusCode: 200,
 					Body: ioutil.NopCloser(
-						bytes.NewReader([]byte(`{"data":[{"type":"root","value":{"certificate":"my-cert","private_key":"my-priv"},"updated_at":"2016-01-01T12:00:00Z"}]}`)),
+						bytes.NewReader([]byte(`{"data":[{"type":"root","value":{"certificate":"my-cert","private_key":"my-priv"},"version_created_at":"2016-01-01T12:00:00Z"}]}`)),
 					),
 				}
 
@@ -53,10 +53,10 @@ var _ = Describe("CaRepository", func() {
 					PrivateKey:  "my-priv",
 				}
 				expectedCaBody := models.CaBody{
-					SecretType: "root",
-					Name:       "foo",
-					Value:      &caParams,
-					UpdatedAt:  "2016-01-01T12:00:00Z",
+					SecretType:       "root",
+					Name:             "foo",
+					Value:            &caParams,
+					VersionCreatedAt: "2016-01-01T12:00:00Z",
 				}
 				expectedCa := models.Ca{
 					CaBody: expectedCaBody,

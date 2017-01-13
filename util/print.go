@@ -9,6 +9,6 @@ func Header(modelType, name string) string {
 		BuildLineOfFixedLength("Name:", name) + "\n"
 }
 
-func Footer(updatedAt string) string {
-	return BuildLineOfFixedLength("Updated:", updatedAt)
+func Footer(versionCreatedAt string) string {
+	return BuildLineOfFixedLength("Updated:", versionCreatedAt)
 }

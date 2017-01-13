@@ -31,15 +31,15 @@ func (ca Ca) Terminal() string {
 		lines = append(lines, util.BuildLineOfFixedLength("Private Key:", caBody.Value.PrivateKey))
 	}
 
-	return util.Header(caBody.SecretType, ca.CaBody.Name) + strings.Join(lines, "\n") + "\n" + util.Footer(ca.CaBody.UpdatedAt)
+	return util.Header(caBody.SecretType, ca.CaBody.Name) + strings.Join(lines, "\n") + "\n" + util.Footer(ca.CaBody.VersionCreatedAt)
 }
 
 func (ca Ca) Json() string {
 	return prettyPrintJson(
 		map[string]interface{}{
-			"type":        ca.CaBody.SecretType,
-			"updated_at":  ca.CaBody.UpdatedAt,
-			"certificate": ca.CaBody.Value.Certificate,
-			"private_key": ca.CaBody.Value.PrivateKey,
+			"type":               ca.CaBody.SecretType,
+			"version_created_at": ca.CaBody.VersionCreatedAt,
+			"certificate":        ca.CaBody.Value.Certificate,
+			"private_key":        ca.CaBody.Value.PrivateKey,
 		})
 }

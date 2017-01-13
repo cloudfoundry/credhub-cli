@@ -44,11 +44,11 @@ var _ = Describe("FindRepository", func() {
 					"credentials": [
 							{
 								"name": "dan.password",
-								"updated_at": "2016-09-06T23:26:58Z"
+								"version_created_at": "2016-09-06T23:26:58Z"
 							},
 							{
 								"name": "deploy1/dan/id.key",
-								"updated_at": "2016-09-06T23:26:58Z"
+								"version_created_at": "2016-09-06T23:26:58Z"
 							}
 					]
 				}`))),
@@ -63,12 +63,12 @@ var _ = Describe("FindRepository", func() {
 			expectedFindResponseBody := models.SecretQueryResponseBody{
 				Credentials: []models.SecretQueryCredential{
 					{
-						Name:      "dan.password",
-						UpdatedAt: "2016-09-06T23:26:58Z",
+						Name:             "dan.password",
+						VersionCreatedAt: "2016-09-06T23:26:58Z",
 					},
 					{
-						Name:      "deploy1/dan/id.key",
-						UpdatedAt: "2016-09-06T23:26:58Z",
+						Name:             "deploy1/dan/id.key",
+						VersionCreatedAt: "2016-09-06T23:26:58Z",
 					},
 				},
 			}

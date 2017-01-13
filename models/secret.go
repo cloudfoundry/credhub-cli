@@ -34,23 +34,23 @@ func (s Secret) Terminal() string {
 		break
 	}
 
-	return util.Header(secretBody.SecretType, secretBody.Name) + result + util.Footer(secretBody.UpdatedAt)
+	return util.Header(secretBody.SecretType, secretBody.Name) + result + util.Footer(secretBody.VersionCreatedAt)
 }
 
 func (secret Secret) Json() string {
 	secretBody := secret.SecretBody
 
 	body := struct {
-		Value       string `json:"value,omitempty"`
-		Ca          string `json:"ca,omitempty"`
-		Certificate string `json:"certificate,omitempty"`
-		PrivateKey  string `json:"private_key,omitempty"`
-		PublicKey   string `json:"public_key,omitempty"`
-		Type        string `json:"type"`
-		UpdatedAt   string `json:"updated_at"`
+		Value            string `json:"value,omitempty"`
+		Ca               string `json:"ca,omitempty"`
+		Certificate      string `json:"certificate,omitempty"`
+		PrivateKey       string `json:"private_key,omitempty"`
+		PublicKey        string `json:"public_key,omitempty"`
+		Type             string `json:"type"`
+		VersionCreatedAt string `json:"version_created_at"`
 	}{
-		Type:      secretBody.SecretType,
-		UpdatedAt: secretBody.UpdatedAt,
+		Type:             secretBody.SecretType,
+		VersionCreatedAt: secretBody.VersionCreatedAt,
 	}
 
 	switch secretBody.SecretType {
