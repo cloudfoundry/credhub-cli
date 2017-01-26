@@ -19,5 +19,6 @@ type SecretParameters struct {
 	KeyLength        int      `json:"key_length,omitempty"`
 	Duration         int      `json:"duration,omitempty"`
 	Ca               string   `json:"ca,omitempty"`
+	SelfSign         bool     `json:"self_sign,omitempty"`
 	SshComment       string   `json:"ssh_comment,omitempty"`
 }

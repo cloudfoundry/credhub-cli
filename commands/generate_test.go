@@ -316,6 +316,13 @@ var _ = Describe("Generate", func() {
 			session := runCommand("generate", "-n", "my-secret", "-t", "certificate", "--ca", "my_ca")
 			Eventually(session).Should(Exit(0))
 		})
+
+		It("including self-signed flag", func() {
+			expectedRequestJson := generateRequestJson("certificate", "my-secret", `{"self_sign": true, "common_name": "my.name.io"}`, true)
+			setupCertificatePostServer("my-secret", "", "", "", expectedRequestJson)
+			session := runCommand("generate", "-n", "my-secret", "-t", "certificate", "-c", "my.name.io", "--self-sign")
+			Eventually(session).Should(Exit(0))
+		})
 	})
 
 	Describe("Help", func() {
