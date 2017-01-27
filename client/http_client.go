@@ -9,7 +9,7 @@ import (
 	"github.com/pivotal-cf/credhub-cli/config"
 )
 
-const TIMEOUT_SECS = 30
+const TIMEOUT_SECS = 45
 
 //go:generate counterfeiter . HttpClient
 
