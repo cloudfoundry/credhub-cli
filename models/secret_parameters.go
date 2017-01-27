@@ -20,5 +20,6 @@ type SecretParameters struct {
 	Duration         int      `json:"duration,omitempty"`
 	Ca               string   `json:"ca,omitempty"`
 	SelfSign         bool     `json:"self_sign,omitempty"`
+	IsCA             bool     `json:"is_ca,omitempty"`
 	SshComment       string   `json:"ssh_comment,omitempty"`
 }

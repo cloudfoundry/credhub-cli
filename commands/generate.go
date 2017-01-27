@@ -31,6 +31,7 @@ type GenerateCommand struct {
 	ExtendedKeyUsage []string `short:"e" long:"ext-key-usage" description:"[Certificate] Extended Key Usage extensions for the generated certificate (may be specified multiple times)"`
 	KeyUsage         []string `short:"g" long:"key-usage" description:"[Certificate] Key Usage extensions for the generated certificate (may be specified multiple times)"`
 	SelfSign         bool     `long:"self-sign" description:"[Certificate] The generated certificate will be self-signed"`
+	IsCA             bool     `long:"is-ca" description:"[Certificate] The generated certificate is a certificate authority"`
 	SshComment       string   `short:"m" long:"ssh-comment" description:"[SSH] Comment appended to public key to help identify in environment"`
 	OutputJson       bool     `long:"output-json"`
 }
@@ -63,6 +64,7 @@ func (cmd GenerateCommand) Execute([]string) error {
 		Duration:         cmd.Duration,
 		Ca:               cmd.Ca,
 		SelfSign:         cmd.SelfSign,
+		IsCA:             cmd.IsCA,
 		SshComment:       cmd.SshComment,
 	}
 
