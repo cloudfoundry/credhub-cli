@@ -1,5 +1,14 @@
 **Pivotal Cloud Foundry CredHub CLI helps you configure and interact with CredHub APIs.**
 
+### Building the CLI:
+
+`make` (first time only to get dependencies, will also run specs)
+
+`make build`
+
+
+### Usage:
+
 ```
 Usage: credhub [<options>] <command> [<args>]
 		--version									Show version of CLI and API
