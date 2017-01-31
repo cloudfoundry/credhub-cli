@@ -12,7 +12,7 @@ type GenerateCommand struct {
 	SecretIdentifier string   `short:"n" required:"yes" long:"name" description:"Name of the credential to generate"`
 	SecretType       string   `short:"t" long:"type" description:"Sets the credential type to generate (Default: 'password')"`
 	NoOverwrite      bool     `short:"O" long:"no-overwrite" description:"Credential is not modified if stored value already exists"`
-	Length           int      `short:"l" long:"length" description:"[Password] Length of the generated value (Default: 20)"`
+	Length           int      `short:"l" long:"length" description:"[Password] Length of the generated value (Default: 30)"`
 	ExcludeSpecial   bool     `short:"S" long:"exclude-special" description:"[Password] Exclude special characters from the generated value"`
 	ExcludeNumber    bool     `short:"N" long:"exclude-number" description:"[Password] Exclude number characters from the generated value"`
 	ExcludeUpper     bool     `short:"U" long:"exclude-upper" description:"[Password] Exclude upper alpha characters from the generated value"`
