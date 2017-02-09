@@ -66,34 +66,6 @@ func NewPutRsaSshRequest(config config.Config, secretIdentifier, keyType, public
 	return newSecretRequest("PUT", config, secretIdentifier, secret)
 }
 
-func NewPutCaRequest(config config.Config, caIdentifier, caType, cert, priv string) *http.Request {
-	ca := models.CaParameters{
-		Certificate: cert,
-		PrivateKey:  priv,
-	}
-	caBody := models.CaBody{
-		Name:       caIdentifier,
-		SecretType: caType,
-		Value:      &ca,
-	}
-
-	return newCaRequest("PUT", config, caIdentifier, caBody)
-}
-
-func NewPostCaRequest(config config.Config, caIdentifier, caType string, params models.SecretParameters) *http.Request {
-	caGenerateRequestBody := models.GenerateCaRequest{
-		SecretType: caType,
-		Name:       caIdentifier,
-		Parameters: &params,
-	}
-
-	return newCaRequest("POST", config, caIdentifier, caGenerateRequestBody)
-}
-
-func NewGetCaRequest(config config.Config, caIdentifier string) *http.Request {
-	return newCaRequest("GET", config, caIdentifier, nil)
-}
-
 func NewGenerateSecretRequest(config config.Config, secretIdentifier string, parameters models.SecretParameters, secretType string, overwrite bool) *http.Request {
 	generateRequest := models.GenerateSecretRequest{
 		Name:       secretIdentifier,
@@ -209,17 +181,6 @@ func newSecretRequest(requestType string, config config.Config, secretIdentifier
 		urlString = config.ApiURL + "/api/v1/data?name=" + url.QueryEscape(secretIdentifier)
 	} else {
 		urlString = config.ApiURL + "/api/v1/data"
-	}
-
-	return newRequest(requestType, config, urlString, bodyModel)
-}
-
-func newCaRequest(requestType string, config config.Config, caIdentifier string, bodyModel interface{}) *http.Request {
-	var urlString string
-	if requestType == "GET" {
-		urlString = config.ApiURL + "/api/v1/ca?name=" + url.QueryEscape(caIdentifier) + "&current=true"
-	} else {
-		urlString = config.ApiURL + "/api/v1/ca"
 	}
 
 	return newRequest(requestType, config, urlString, bodyModel)

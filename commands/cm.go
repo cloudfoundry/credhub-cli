@@ -8,9 +8,6 @@ type CMCommand struct {
 	Generate   GenerateCommand   `command:"generate" alias:"n" description:"Set a credential with a generated value"`
 	Regenerate RegenerateCommand `command:"regenerate" alias:"r" description:"Set a credential with a generated value using the same attributes as the stored value"`
 	Delete     DeleteCommand     `command:"delete" alias:"d" description:"Delete a credential value"`
-	CaSet      CaSetCommand      `command:"ca-set" alias:"cs" description:"Set a certificate authority for generating signed certificates"`
-	CaGet      CaGetCommand      `command:"ca-get" alias:"cg" description:"Get a certificate authority"`
-	CaGenerate CaGenerateCommand `command:"ca-generate" alias:"cn" description:"Configures a certificate authority with a generated key pair"`
 	Login      LoginCommand      `command:"login" alias:"l" description:"Authenticate user with CredHub"`
 	Logout     LogoutCommand     `command:"logout" alias:"o" description:"Discard authenticated user session"`
 	Find       FindCommand       `command:"find" alias:"f" description:"Find stored credentials based on query parameters"`

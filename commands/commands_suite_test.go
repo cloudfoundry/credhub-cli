@@ -38,15 +38,9 @@ const CERTIFICATE_SECRET_RESPONSE_TABLE = "Type:          certificate\nName:    
 const SSH_SECRET_RESPONSE_TABLE = "Type:          ssh\nName:          %s\nPublic Key:    %s\nPrivate Key:   %s\nUpdated:       " + TIMESTAMP
 const RSA_SECRET_RESPONSE_TABLE = "Type:          rsa\nName:          %s\nPublic Key:    %s\nPrivate Key:   %s\nUpdated:       " + TIMESTAMP
 
-const CA_REQUEST_JSON = `{"name":"%s","type":"%s","value":{"certificate":"%s","private_key":"%s"}}`
-const CA_RESPONSE_JSON = `{"type":"%s","value":{"certificate":"%s","private_key":"%s"},"version_created_at":"` + TIMESTAMP + `"}`
-const CA_ARRAY_RESPONSE_JSON = `{"data":[{"type":"%s","value":{"certificate":"%s","private_key":"%s"},"version_created_at":"` + TIMESTAMP + `"}]}`
-const CA_RESPONSE_TABLE = "Type:          %s\nName:          %s\nCertificate:   %s\nPrivate Key:   %s\nUpdated:       " + TIMESTAMP
-
 var responseMyValuePotatoes = fmt.Sprintf(STRING_SECRET_RESPONSE_TABLE, "value", "my-value", "potatoes")
 var responseMyPasswordPotatoes = fmt.Sprintf(STRING_SECRET_RESPONSE_TABLE, "password", "my-password", "potatoes")
 var responseMyCertificate = fmt.Sprintf(CERTIFICATE_SECRET_RESPONSE_TABLE, "my-secret", "my-ca", "my-cert", "my-priv")
-var responseMyCertificateAuthority = fmt.Sprintf(CA_RESPONSE_TABLE, "root", "my-secret", "my-cert", "my-priv")
 var responseMySSHFoo = fmt.Sprintf(SSH_SECRET_RESPONSE_TABLE, "foo-ssh-key", "some-public-key", "some-private-key")
 var responseMyRSAFoo = fmt.Sprintf(RSA_SECRET_RESPONSE_TABLE, "foo-rsa-key", "some-public-key", "some-private-key")
 
