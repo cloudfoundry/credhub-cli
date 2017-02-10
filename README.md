@@ -1,4 +1,4 @@
-**Pivotal Cloud Foundry CredHub CLI helps you configure and interact with CredHub APIs.**
+**CredHub CLI helps you configure and interact with CredHub APIs.**
 
 ### Building the CLI:
 
@@ -84,6 +84,8 @@ CREDENTIAL MANAGEMENT:
 		-i, --locality 'LOCALITY'					[Certificate] Locality/city of the generated certificate
 		-s, --state	'ST'							[Certificate] State/province of the generated certificate
 		-y, --country 'CC'							[Certificate] Country of the generated certificate
+		    --self-sign						    	[Certificate] The generated certificate will be self-signed
+		    --is-ca 							    [Certificate] The generated certificate is a certificate authority
 		
 	regenerate --name <cred name>
 		Regenerates a credential using the same parameters that were previously used (short command: r)
