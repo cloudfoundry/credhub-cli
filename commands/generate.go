@@ -18,7 +18,7 @@ type GenerateCommand struct {
 	ExcludeUpper     bool     `short:"U" long:"exclude-upper" description:"[Password] Exclude upper alpha characters from the generated value"`
 	ExcludeLower     bool     `short:"L" long:"exclude-lower" description:"[Password] Exclude lower alpha characters from the generated value"`
 	OnlyHex          bool     `short:"H" long:"only-hex" description:"[Password] Use only hexadecimal characters"`
-	Ca               string   `long:"ca" description:"[Certificate] Name of CA used to sign the generated certificate (Default: 'default')"`
+	Ca               string   `long:"ca" description:"[Certificate] Name of CA used to sign the generated certificate"`
 	Duration         int      `short:"d" long:"duration" description:"[Certificate] Valid duration (in days) of the generated certificate (Default: 365)"`
 	KeyLength        int      `short:"k" long:"key-length" description:"[Certificate, SSH, RSA] Bit length of the generated key (Default: 2048)"`
 	CommonName       string   `short:"c" long:"common-name" description:"[Certificate] Common name of the generated certificate"`
