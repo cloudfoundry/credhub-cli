@@ -10,7 +10,7 @@ import (
 
 type GetCommand struct {
 	SecretIdentifier string `short:"n" required:"yes" long:"name" description:"Name of the credential to retrieve"`
-	OutputJson       bool   `long:"output-json"`
+	OutputJson       bool   `long:"output-json" description:"Return response in JSON format"`
 }
 
 func (cmd GetCommand) Execute([]string) error {

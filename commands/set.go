@@ -20,6 +20,7 @@ import (
 type SetCommand struct {
 	SecretIdentifier  string `short:"n" required:"yes" long:"name" description:"Name of the credential to set"`
 	Type              string `short:"t" long:"type" description:"Sets the credential type (Default: 'password')"`
+	NoOverwrite       bool   `short:"O" long:"no-overwrite" description:"Credential is not modified if stored value already exists"`
 	Value             string `short:"v" long:"value" description:"[Password, Value] Sets the value for the credential"`
 	Root              string `short:"r" long:"root" description:"[Certificate] Sets the root CA from file"`
 	Certificate       string `short:"c" long:"certificate" description:"[Certificate] Sets the certificate from file"`
@@ -29,7 +30,6 @@ type SetCommand struct {
 	CertificateString string `short:"C" long:"certificate-string" description:"[Certificate] Sets the certificate from string input"`
 	PrivateString     string `short:"P" long:"private-string" description:"[Certificate, SSH, RSA] Sets the private key from string input"`
 	PublicString      string `short:"U" long:"public-string" description:"[SSH, RSA] Sets the public key from  string input"`
-	NoOverwrite       bool   `short:"O" long:"no-overwrite" description:"Credential is not modified if stored value already exists"`
 }
 
 func (cmd SetCommand) Execute([]string) error {
