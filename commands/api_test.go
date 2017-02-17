@@ -28,7 +28,7 @@ var _ = Describe("API", func() {
 			CombineHandlers(
 				VerifyRequest("GET", "/info"),
 				RespondWith(http.StatusOK, `{
-					"app":{"version":"0.1.0 build DEV","name":"Pivotal Credential Manager"},
+					"app":{"version":"0.1.0 build DEV","name":"CredHub"},
 					"auth-server":{"url":"`+newAuthServer.URL()+`"}
 					}`),
 			),
@@ -62,7 +62,7 @@ var _ = Describe("API", func() {
 			CombineHandlers(
 				VerifyRequest("GET", "/info"),
 				RespondWith(http.StatusOK, `{
-					"app":{"version":"my-version","name":"Pivotal Credential Manager"},
+					"app":{"version":"my-version","name":"CredHub"},
 					"auth-server":{"url":"`+authServer.URL()+`"}
 					}`),
 			),
@@ -298,7 +298,7 @@ var _ = Describe("API", func() {
 				CombineHandlers(
 					VerifyRequest("GET", "/info"),
 					RespondWith(http.StatusOK, `{
-					"app":{"version":"my-version","name":"Pivotal Credential Manager"},
+					"app":{"version":"my-version","name":"CredHub"},
 					"auth-server":{"url":"https://example.com"}
 					}`),
 				),
@@ -336,7 +336,7 @@ func setUpServer(aServer *Server) string {
 		CombineHandlers(
 			VerifyRequest("GET", "/info"),
 			RespondWith(http.StatusOK, `{
-					"app":{"version":"0.1.0 build DEV","name":"Pivotal Credential Manager"},
+					"app":{"version":"0.1.0 build DEV","name":"CredHub"},
 					"auth-server":{"url":"https://example.com"}
 					}`),
 		),

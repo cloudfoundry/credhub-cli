@@ -12,7 +12,7 @@ import (
 var _ = Describe("Version", func() {
 	Context("when the request succeeds", func() {
 		BeforeEach(func() {
-			responseJson := `{"app":{"name":"Pivotal Credential Manager","version":"0.2.0"}}`
+			responseJson := `{"app":{"name":"CredHub","version":"0.2.0"}}`
 
 			server.AppendHandlers(
 				CombineHandlers(

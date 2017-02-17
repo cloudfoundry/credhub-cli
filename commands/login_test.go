@@ -332,7 +332,7 @@ func setupServer(theServer *Server, uaaUrl string) {
 		CombineHandlers(
 			VerifyRequest("GET", "/info"),
 			RespondWith(http.StatusOK, fmt.Sprintf(`{
-					"app":{"version":"0.1.0 build DEV","name":"Pivotal Credential Manager"},
+					"app":{"version":"0.1.0 build DEV","name":"CredHub"},
 					"auth-server":{"url":"%s"}
 					}`, uaaUrl)),
 		),

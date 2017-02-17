@@ -33,7 +33,7 @@ var _ = Describe("Info", func() {
 			responseObj := http.Response{
 				StatusCode: 200,
 				Body: ioutil.NopCloser(bytes.NewBufferString(`{
-					"app":{"version":"my-version","name":"Pivotal Credential Manager"},
+					"app":{"version":"my-version","name":"CredHub"},
 					"auth-server":{"url":"https://example.com"}
 					}`)),
 			}

@@ -75,7 +75,7 @@ var _ = BeforeEach(func() {
 		CombineHandlers(
 			VerifyRequest("GET", "/info"),
 			RespondWith(http.StatusOK, `{
-					"app":{"version":"my-version","name":"Pivotal Credential Manager"},
+					"app":{"version":"my-version","name":"CredHub"},
 					"auth-server":{"url":"`+authServer.URL()+`"}
 					}`),
 		),
