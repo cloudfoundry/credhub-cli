@@ -6,7 +6,7 @@ import (
 )
 
 func NewNetworkError(e error) error {
-	return errors.New(fmt.Sprintf("No response received for the command. Please validate that you are targeting an active credential manager with `credhub api` and retry your request: %#v\n", e.Error()))
+	return errors.New(fmt.Sprintf("Error connecting to the targeted API: %#v. Please validate your target and retry your request.", e.Error()))
 }
 
 func NewResponseError() error {
@@ -22,7 +22,7 @@ func NewInvalidTargetError() error {
 }
 
 func NewNoTargetUrlError() error {
-	return errors.New("Credential Manager API location is not set. Please target the location of your credential manager with `credhub api` to continue.")
+	return errors.New("An API target is not set. Please target the location of your server with `credhub api` to continue.")
 }
 
 func NewFileLoadError() error {

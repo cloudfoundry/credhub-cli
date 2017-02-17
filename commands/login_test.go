@@ -187,7 +187,7 @@ var _ = Describe("Login", func() {
 				session := runCommand("login", "-s", apiServer.URL(), "-u", "user", "-p", "pass")
 
 				Eventually(session).Should(Exit(1))
-				Eventually(session.Err).Should(Say("No response received for the command. Please validate that you are targeting an active credential manager with `credhub api` and retry your request."))
+				Eventually(session.Err).Should(Say("Error connecting to the targeted API"))
 			})
 
 			It("using a TLS server with the skip-tls flag set will succeed", func() {

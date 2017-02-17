@@ -44,7 +44,7 @@ var _ = Describe("Delete", func() {
 			session := runCommand("delete", "-n", "my-secret")
 
 			Eventually(session).Should(Exit(1))
-			Eventually(session.Err).Should(Say("No response received for the command"))
+			Eventually(session.Err).Should(Say("Error connecting to the targeted API"))
 		})
 
 		It("displays missing required parameter", func() {
