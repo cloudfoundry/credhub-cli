@@ -69,7 +69,7 @@ CREDENTIAL MANAGEMENT:
     -U, --exclude-upper                    [Password] Exclude upper alpha characters from generated value
     -L, --exclude-lower                    [Password] Exclude lower alpha characters from generated value
     -N, --exclude-number                   [Password] Exclude number characters from generated value
-    -S, --exclude-special                  [Password] Exclude special characters from generated value
+    -S, --include-special                  [Password] Include special characters in the generated value
     -H, --only-hex                         [Password] Use only hexadecimal characters in generated value   
     -k, --key-length [2048, 3072, 4096]    [Certificate, SSH, RSA] Bit length of the generated key (Default: 2048)
     -m, --ssh-comment 'COMMENT'            [SSH] A comment appended to the SSH public key for identification 

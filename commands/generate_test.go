@@ -99,9 +99,9 @@ var _ = Describe("Generate", func() {
 			Eventually(session).Should(Exit(0))
 		})
 
-		It("excluding special characters", func() {
-			setupPasswordPostServer("my-password", "potatoes", generateRequestJson("password", "my-password", `{"exclude_special":true}`, true))
-			session := runCommand("generate", "-n", "my-password", "-t", "password", "--exclude-special")
+		It("including special characters", func() {
+			setupPasswordPostServer("my-password", "potatoes", generateRequestJson("password", "my-password", `{"include_special":true}`, true))
+			session := runCommand("generate", "-n", "my-password", "-t", "password", "--include-special")
 			Eventually(session).Should(Exit(0))
 		})
 
@@ -345,7 +345,7 @@ var _ = Describe("Generate", func() {
 				commands.HaveFlag("type", "t"),
 				commands.HaveFlag("no-overwrite", "O"),
 				commands.HaveFlag("length", "l"),
-				commands.HaveFlag("exclude-special", "S"),
+				commands.HaveFlag("include-special", "S"),
 				commands.HaveFlag("exclude-number", "N"),
 				commands.HaveFlag("exclude-upper", "U"),
 				commands.HaveFlag("exclude-lower", "L"),

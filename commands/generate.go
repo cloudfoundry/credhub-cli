@@ -14,7 +14,7 @@ type GenerateCommand struct {
 	NoOverwrite      bool     `short:"O" long:"no-overwrite" description:"Credential is not modified if stored value already exists"`
 	OutputJson       bool     `long:"output-json" description:"Return response in JSON format"`
 	Length           int      `short:"l" long:"length" description:"[Password] Length of the generated value (Default: 30)"`
-	ExcludeSpecial   bool     `short:"S" long:"exclude-special" description:"[Password] Exclude special characters from the generated value"`
+	IncludeSpecial   bool     `short:"S" long:"include-special" description:"[Password] Include special characters in the generated value"`
 	ExcludeNumber    bool     `short:"N" long:"exclude-number" description:"[Password] Exclude number characters from the generated value"`
 	ExcludeUpper     bool     `short:"U" long:"exclude-upper" description:"[Password] Exclude upper alpha characters from the generated value"`
 	ExcludeLower     bool     `short:"L" long:"exclude-lower" description:"[Password] Exclude lower alpha characters from the generated value"`
@@ -45,7 +45,7 @@ func (cmd GenerateCommand) Execute([]string) error {
 	repository := repositories.NewSecretRepository(client.NewHttpClient(cfg))
 
 	parameters := models.SecretParameters{
-		ExcludeSpecial:   cmd.ExcludeSpecial,
+		IncludeSpecial:   cmd.IncludeSpecial,
 		ExcludeNumber:    cmd.ExcludeNumber,
 		ExcludeUpper:     cmd.ExcludeUpper,
 		ExcludeLower:     cmd.ExcludeLower,

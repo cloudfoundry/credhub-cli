@@ -200,7 +200,7 @@ var _ = Describe("API", func() {
 
 			It("returns a request with parameters", func() {
 				parameters := models.SecretParameters{
-					ExcludeSpecial: true,
+					IncludeSpecial: true,
 					ExcludeNumber:  true,
 					ExcludeUpper:   true,
 					ExcludeLower:   true,
@@ -211,7 +211,7 @@ var _ = Describe("API", func() {
 					"type":"password",
 					"overwrite":false,
 					"parameters": {
-						"exclude_special": true,
+						"include_special": true,
 						"exclude_number": true,
 						"exclude_upper": true,
 						"exclude_lower": true,
