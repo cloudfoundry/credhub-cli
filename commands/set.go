@@ -14,6 +14,8 @@ import (
 	"os"
 	"strings"
 
+	"errors"
+
 	cmcli_errors "github.com/pivotal-cf/credhub-cli/errors"
 )
 
@@ -59,8 +61,21 @@ func (cmd SetCommand) Execute([]string) error {
 	return nil
 }
 
+func contains(searchSpace []string, searchTerm string) bool {
+	for _, a := range searchSpace {
+		if a == searchTerm {
+			return true
+		}
+	}
+	return false
+}
+
 func getRequest(cmd SetCommand, config config.Config) (*http.Request, error) {
 	var request *http.Request
+	validTypes := []string{"value", "password", "ssh", "rsa", "certificate"}
+	if !contains(validTypes, cmd.Type) {
+		return nil, errors.New("The request does not include a valid type. Valid values include 'value', 'password', 'certificate', 'ssh' and 'rsa'.")
+	}
 	if cmd.Type == "value" {
 		request = client.NewPutValueRequest(config, cmd.SecretIdentifier, cmd.Value, !cmd.NoOverwrite)
 	} else if cmd.Type == "password" {

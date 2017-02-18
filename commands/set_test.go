@@ -20,6 +20,20 @@ import (
 )
 
 var _ = Describe("Set", func() {
+	Describe("error handling", func() {
+		It("displays an error when an invalid type is specified", func() {
+			server.AppendHandlers(
+				RespondWith(http.StatusBadRequest, `{"error": "we should not reach this point"}`),
+			)
+
+			session := runCommand("set", "-t", "potato", "-n", "foo")
+
+			Eventually(session).Should(Exit(1))
+
+			Expect(session.Err).To(Say("The request does not include a valid type. Valid values include 'value', 'password', 'certificate', 'ssh' and 'rsa'."))
+		})
+	})
+
 	Describe("setting string secrets", func() {
 		It("puts a secret using explicit value type", func() {
 			setupPutValueServer("my-value", "value", "potatoes")
