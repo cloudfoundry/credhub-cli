@@ -6,12 +6,12 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/cloudfoundry-incubator/credhub-cli/actions"
+	"github.com/cloudfoundry-incubator/credhub-cli/client"
+	"github.com/cloudfoundry-incubator/credhub-cli/client/clientfakes"
+	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/pivotal-cf/credhub-cli/actions"
-	"github.com/pivotal-cf/credhub-cli/client"
-	"github.com/pivotal-cf/credhub-cli/client/clientfakes"
-	"github.com/pivotal-cf/credhub-cli/config"
 )
 
 var _ = Describe("Info", func() {

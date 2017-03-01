@@ -3,14 +3,14 @@ package repositories
 import (
 	"net/http"
 
-	"github.com/pivotal-cf/credhub-cli/errors"
+	"github.com/cloudfoundry-incubator/credhub-cli/errors"
 
 	"encoding/json"
 
-	"github.com/pivotal-cf/credhub-cli/client"
-	"github.com/pivotal-cf/credhub-cli/models"
+	"github.com/cloudfoundry-incubator/credhub-cli/client"
+	"github.com/cloudfoundry-incubator/credhub-cli/models"
 
-	cm_errors "github.com/pivotal-cf/credhub-cli/errors"
+	cm_errors "github.com/cloudfoundry-incubator/credhub-cli/errors"
 )
 
 type allPathRepository struct {

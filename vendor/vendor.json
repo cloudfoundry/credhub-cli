@@ -237,5 +237,5 @@
 			"revisionTime": "2016-03-01T20:40:22Z"
 		}
 	],
-	"rootPath": "github.com/pivotal-cf/credhub-cli"
+	"rootPath": "github.com/cloudfoundry-incubator/credhub-cli"
 }

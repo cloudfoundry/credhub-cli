@@ -1,19 +1,19 @@
 package repositories_test
 
 import (
+	. "github.com/cloudfoundry-incubator/credhub-cli/repositories"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	. "github.com/pivotal-cf/credhub-cli/repositories"
 
 	"bytes"
 	"io/ioutil"
 	"net/http"
 
-	"github.com/pivotal-cf/credhub-cli/client/clientfakes"
-	"github.com/pivotal-cf/credhub-cli/config"
-	"github.com/pivotal-cf/credhub-cli/models"
+	"github.com/cloudfoundry-incubator/credhub-cli/client/clientfakes"
+	"github.com/cloudfoundry-incubator/credhub-cli/config"
+	"github.com/cloudfoundry-incubator/credhub-cli/models"
 
-	cmcli_errors "github.com/pivotal-cf/credhub-cli/errors"
+	cmcli_errors "github.com/cloudfoundry-incubator/credhub-cli/errors"
 )
 
 var _ = Describe("FindRepository", func() {

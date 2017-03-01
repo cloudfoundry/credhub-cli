@@ -3,12 +3,12 @@ package commands_test
 import (
 	"os"
 
-	"github.com/pivotal-cf/credhub-cli/commands"
+	"github.com/cloudfoundry-incubator/credhub-cli/commands"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	cmcli_errors "github.com/pivotal-cf/credhub-cli/errors"
+	cmcli_errors "github.com/cloudfoundry-incubator/credhub-cli/errors"
 )
 
 var _ = Describe("Util", func() {

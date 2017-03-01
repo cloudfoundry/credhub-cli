@@ -1,8 +1,8 @@
 package actions
 
 import (
-	"github.com/pivotal-cf/credhub-cli/client"
-	"github.com/pivotal-cf/credhub-cli/config"
+	"github.com/cloudfoundry-incubator/credhub-cli/client"
+	"github.com/cloudfoundry-incubator/credhub-cli/config"
 )
 
 type ServerInfo struct {

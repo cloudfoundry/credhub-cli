@@ -6,9 +6,9 @@ import (
 	"encoding/json"
 	"errors"
 
-	"github.com/pivotal-cf/credhub-cli/client"
-	cm_errors "github.com/pivotal-cf/credhub-cli/errors"
-	"github.com/pivotal-cf/credhub-cli/models"
+	"github.com/cloudfoundry-incubator/credhub-cli/client"
+	cm_errors "github.com/cloudfoundry-incubator/credhub-cli/errors"
+	"github.com/cloudfoundry-incubator/credhub-cli/models"
 )
 
 type Repository interface {

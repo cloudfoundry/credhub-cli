@@ -12,7 +12,7 @@ ifndef VERSION
 VERSION = dev
 endif
 
-GOFLAGS := -o $(DEST) -ldflags "-X github.com/pivotal-cf/credhub-cli/version.Version=${VERSION}"
+GOFLAGS := -o $(DEST) -ldflags "-X github.com/cloudfoundry-incubator/credhub-cli/version.Version=${VERSION}"
 
 dependencies :
 		go get github.com/onsi/ginkgo/ginkgo

@@ -3,7 +3,7 @@ package models
 import (
 	"strings"
 
-	"github.com/pivotal-cf/credhub-cli/util"
+	"github.com/cloudfoundry-incubator/credhub-cli/util"
 )
 
 type SecretQueryResponseBody struct {

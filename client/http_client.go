@@ -6,7 +6,7 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/pivotal-cf/credhub-cli/config"
+	"github.com/cloudfoundry-incubator/credhub-cli/config"
 )
 
 const TIMEOUT_SECS = 45

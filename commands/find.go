@@ -3,11 +3,11 @@ package commands
 import (
 	"fmt"
 
-	"github.com/pivotal-cf/credhub-cli/actions"
-	"github.com/pivotal-cf/credhub-cli/client"
-	"github.com/pivotal-cf/credhub-cli/config"
-	"github.com/pivotal-cf/credhub-cli/models"
-	"github.com/pivotal-cf/credhub-cli/repositories"
+	"github.com/cloudfoundry-incubator/credhub-cli/actions"
+	"github.com/cloudfoundry-incubator/credhub-cli/client"
+	"github.com/cloudfoundry-incubator/credhub-cli/config"
+	"github.com/cloudfoundry-incubator/credhub-cli/models"
+	"github.com/cloudfoundry-incubator/credhub-cli/repositories"
 )
 
 type FindCommand struct {

@@ -1,9 +1,9 @@
 package actions_test
 
 import (
+	. "github.com/cloudfoundry-incubator/credhub-cli/actions"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	. "github.com/pivotal-cf/credhub-cli/actions"
 
 	"net/http"
 
@@ -11,10 +11,10 @@ import (
 
 	"bytes"
 
-	"github.com/pivotal-cf/credhub-cli/config"
-	cm_errors "github.com/pivotal-cf/credhub-cli/errors"
-	"github.com/pivotal-cf/credhub-cli/models"
-	"github.com/pivotal-cf/credhub-cli/repositories/repositoriesfakes"
+	"github.com/cloudfoundry-incubator/credhub-cli/config"
+	cm_errors "github.com/cloudfoundry-incubator/credhub-cli/errors"
+	"github.com/cloudfoundry-incubator/credhub-cli/models"
+	"github.com/cloudfoundry-incubator/credhub-cli/repositories/repositoriesfakes"
 )
 
 var _ = Describe("Action", func() {

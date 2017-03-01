@@ -5,8 +5,8 @@ import (
 	"os"
 	"runtime/debug"
 
+	"github.com/cloudfoundry-incubator/credhub-cli/commands"
 	"github.com/jessevdk/go-flags"
-	"github.com/pivotal-cf/credhub-cli/commands"
 )
 
 func main() {

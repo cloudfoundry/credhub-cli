@@ -3,7 +3,7 @@ package client_test
 import (
 	"net/http"
 
-	. "github.com/pivotal-cf/credhub-cli/client"
+	. "github.com/cloudfoundry-incubator/credhub-cli/client"
 
 	"bytes"
 
@@ -11,10 +11,10 @@ import (
 
 	"net/url"
 
+	"github.com/cloudfoundry-incubator/credhub-cli/config"
+	"github.com/cloudfoundry-incubator/credhub-cli/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/pivotal-cf/credhub-cli/config"
-	"github.com/pivotal-cf/credhub-cli/models"
 )
 
 var _ = Describe("API", func() {

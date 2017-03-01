@@ -3,9 +3,9 @@
 package config_test
 
 import (
+	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/pivotal-cf/credhub-cli/config"
 )
 
 var _ = Describe("Config", func() {

@@ -1,6 +1,6 @@
 package config
 
-import "github.com/pivotal-cf/credhub-cli/errors"
+import "github.com/cloudfoundry-incubator/credhub-cli/errors"
 
 func ValidateConfig(c Config) error {
 	if c.ApiURL == "" {

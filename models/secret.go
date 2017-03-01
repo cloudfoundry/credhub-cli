@@ -3,7 +3,7 @@ package models
 import (
 	"encoding/json"
 
-	"github.com/pivotal-cf/credhub-cli/util"
+	"github.com/cloudfoundry-incubator/credhub-cli/util"
 )
 
 type Secret struct {

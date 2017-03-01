@@ -5,10 +5,10 @@ import (
 
 	"os"
 
-	"github.com/pivotal-cf/credhub-cli/actions"
-	"github.com/pivotal-cf/credhub-cli/client"
-	"github.com/pivotal-cf/credhub-cli/config"
-	"github.com/pivotal-cf/credhub-cli/version"
+	"github.com/cloudfoundry-incubator/credhub-cli/actions"
+	"github.com/cloudfoundry-incubator/credhub-cli/client"
+	"github.com/cloudfoundry-incubator/credhub-cli/config"
+	"github.com/cloudfoundry-incubator/credhub-cli/version"
 )
 
 func PrintVersion() error {

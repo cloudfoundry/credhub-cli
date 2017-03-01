@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/pivotal-cf/credhub-cli/models"
-	"github.com/pivotal-cf/credhub-cli/repositories"
+	"github.com/cloudfoundry-incubator/credhub-cli/models"
+	"github.com/cloudfoundry-incubator/credhub-cli/repositories"
 )
 
 type FakeRepository struct {

@@ -3,10 +3,10 @@ package client_test
 import (
 	"net/http"
 
+	"github.com/cloudfoundry-incubator/credhub-cli/client"
+	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/pivotal-cf/credhub-cli/client"
-	"github.com/pivotal-cf/credhub-cli/config"
 )
 
 var _ = Describe("#NewHttpClient", func() {

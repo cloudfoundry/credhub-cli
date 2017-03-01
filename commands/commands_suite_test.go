@@ -92,7 +92,7 @@ var _ = AfterEach(func() {
 })
 
 var _ = SynchronizedBeforeSuite(func() []byte {
-	executable_path, err := Build("github.com/pivotal-cf/credhub-cli", "-ldflags", "-X github.com/pivotal-cf/credhub-cli/version.Version=test-version")
+	executable_path, err := Build("github.com/cloudfoundry-incubator/credhub-cli", "-ldflags", "-X github.com/cloudfoundry-incubator/credhub-cli/version.Version=test-version")
 	Expect(err).NotTo(HaveOccurred())
 	return []byte(executable_path)
 }, func(data []byte) {
