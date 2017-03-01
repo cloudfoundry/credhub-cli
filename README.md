@@ -1,4 +1,14 @@
-**CredHub CLI helps you configure and interact with CredHub APIs.**
+# CredHub CLI 
+
+CredHub manages credentials like passwords, certificates, ssh keys, rsa keys, strings (arbitrary values) and CAs. CredHub provides a CLI and API to get, set, generate and securely store such credentials.
+
+* [CredHub Tracker](https://www.pivotaltracker.com/n/projects/1977341)
+
+See additional repos for more info:
+
+* [credhub](https://github.com/cloudfoundry-incubator/credhub) :     CredHub server code 
+* [credhub-acceptance-tests](https://github.com/cloudfoundry-incubator/credhub-acceptance-tests) : Integration tests
+* [credhub-release](https://github.com/pivotal-cf/credhub-release) : BOSH release of CredHub server **[Currently private - Coming Soon]**
 
 ### Building the CLI:
 
