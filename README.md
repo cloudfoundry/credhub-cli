@@ -2,7 +2,8 @@
 
 CredHub manages credentials like passwords, certificates, ssh keys, rsa keys, strings (arbitrary values) and CAs. CredHub provides a CLI and API to get, set, generate and securely store such credentials.
 
-* [CredHub Tracker](https://www.pivotaltracker.com/n/projects/1977341)
+ * [CredHub Tracker][1]
+[1]:https://www.pivotaltracker.com/n/projects/1977341
 
 See additional repos for more info:
 
