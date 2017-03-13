@@ -19,7 +19,7 @@ func NewPutValueRequest(config config.Config, secretIdentifier string, secretCon
 		SecretType: "value",
 		Name:       secretIdentifier,
 		Value:      secretContent,
-		Overwrite:  overwrite,
+		Overwrite:  &overwrite,
 	}
 
 	return newSecretRequest("PUT", config, secretIdentifier, secret)
@@ -30,7 +30,7 @@ func NewPutPasswordRequest(config config.Config, secretIdentifier string, secret
 		SecretType: "password",
 		Name:       secretIdentifier,
 		Value:      secretContent,
-		Overwrite:  overwrite,
+		Overwrite:  &overwrite,
 	}
 
 	return newSecretRequest("PUT", config, secretIdentifier, secret)
@@ -46,7 +46,7 @@ func NewPutCertificateRequest(config config.Config, secretIdentifier string, roo
 		SecretType: "certificate",
 		Name:       secretIdentifier,
 		Value:      &certificate,
-		Overwrite:  overwrite,
+		Overwrite:  &overwrite,
 	}
 	return newSecretRequest("PUT", config, secretIdentifier, secretBody)
 }
@@ -61,7 +61,7 @@ func NewPutRsaSshRequest(config config.Config, secretIdentifier, keyType, public
 		SecretType: keyType,
 		Name:       secretIdentifier,
 		Value:      &key,
-		Overwrite:  overwrite,
+		Overwrite:  &overwrite,
 	}
 	return newSecretRequest("PUT", config, secretIdentifier, secret)
 }
@@ -70,7 +70,7 @@ func NewGenerateSecretRequest(config config.Config, secretIdentifier string, par
 	generateRequest := models.GenerateSecretRequest{
 		Name:       secretIdentifier,
 		SecretType: secretType,
-		Overwrite:  overwrite,
+		Overwrite:  &overwrite,
 		Parameters: &parameters,
 	}
 
