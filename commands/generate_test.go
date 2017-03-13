@@ -41,6 +41,7 @@ var _ = Describe("Generate", func() {
 			Eventually(session).Should(Exit(0))
 			Expect(session.Out.Contents()).To(MatchJSON(`{
 				"type": "password",
+				"name": "my-password",
 				"version_created_at": "` + TIMESTAMP + `",
 				"value": "potatoes"
 			}`))
@@ -70,6 +71,7 @@ var _ = Describe("Generate", func() {
 			Eventually(session).Should(Exit(0))
 			Expect(string(session.Out.Contents())).To(MatchJSON(`{
 				"type": "password",
+				"name": "my-password",
 				"version_created_at": "` + TIMESTAMP + `",
 				"value": "potatoes"
 			}`))
@@ -136,9 +138,12 @@ var _ = Describe("Generate", func() {
 			Eventually(session).Should(Exit(0))
 			Expect(string(session.Out.Contents())).To(MatchJSON(`{
 				"type": "ssh",
+				"name": "foo-ssh-key",
 				"version_created_at": "` + TIMESTAMP + `",
-				"public_key": "some-public-key",
-				"private_key": "fake-private-key"
+				"value": {
+					"public_key": "some-public-key",
+					"private_key": "fake-private-key"
+				}
 			}`))
 		})
 
@@ -180,9 +185,12 @@ var _ = Describe("Generate", func() {
 			Eventually(session).Should(Exit(0))
 			Expect(string(session.Out.Contents())).To(MatchJSON(`{
 				"type": "rsa",
+				"name": "foo-rsa-key",
 				"version_created_at": "` + TIMESTAMP + `",
-				"public_key": "some-public-key",
-				"private_key": "fake-private-key"
+				"value": {
+					"public_key": "some-public-key",
+					"private_key": "fake-private-key"
+				}
 			}`))
 		})
 
@@ -219,10 +227,13 @@ var _ = Describe("Generate", func() {
 			Eventually(session).Should(Exit(0))
 			Expect(string(session.Out.Contents())).To(MatchJSON(`{
 				"type": "certificate",
+				"name": "my-secret",
 				"version_created_at": "` + TIMESTAMP + `",
-				"ca": "my-ca",
-				"certificate": "my-cert",
-				"private_key": "my-priv"
+				"value": {
+					"ca": "my-ca",
+					"certificate": "my-cert",
+					"private_key": "my-priv"
+				}
 			}`))
 		})
 

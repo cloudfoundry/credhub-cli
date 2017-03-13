@@ -133,6 +133,7 @@ var _ = Describe("Secret", func() {
 
 			Expect(stringSecret.Json()).To(MatchJSON(`{
 				"type": "value",
+				"name": "stringSecret",
 				"value": "my-value",
 				"version_created_at": "2016-01-01T12:00:00Z"
 			}`))
@@ -151,9 +152,12 @@ var _ = Describe("Secret", func() {
 
 			Expect(sshSecret.Json()).To(MatchJSON(`{
 				"type": "ssh",
+				"name": "sshSecret",
 				"version_created_at": "2016-01-01T12:00:00Z",
-				"public_key": "my-pub",
-				"private_key": "my-priv"
+				"value": {
+					"public_key": "my-pub",
+					"private_key": "my-priv"
+				}
 			}`))
 		})
 
@@ -170,9 +174,12 @@ var _ = Describe("Secret", func() {
 
 			Expect(sshSecret.Json()).To(MatchJSON(`{
 				"type": "rsa",
+				"name": "rsaSecret",
 				"version_created_at": "2016-01-01T12:00:00Z",
-				"public_key": "my-pub",
-				"private_key": "my-priv"
+				"value": {
+					"public_key": "my-pub",
+					"private_key": "my-priv"
+				}
 			}`))
 		})
 
@@ -190,10 +197,13 @@ var _ = Describe("Secret", func() {
 
 				Expect(certificateSecret.Json()).To(MatchJSON(`{
 					"type": "certificate",
+					"name": "nonNulledSecret",
 					"version_created_at": "2016-01-01T12:00:00Z",
-					"ca": "my-ca",
-					"certificate": "my-cert",
-					"private_key": "my-priv"
+					"value": {
+						"ca": "my-ca",
+						"certificate": "my-cert",
+						"private_key": "my-priv"
+					}
 				}`))
 			})
 
@@ -210,9 +220,12 @@ var _ = Describe("Secret", func() {
 
 				Expect(certificateSecret.Json()).To(MatchJSON(`{
 					"type": "certificate",
+					"name": "nonNulledSecret",
 					"version_created_at": "2016-01-01T12:00:00Z",
-					"ca": "my-ca",
-					"private_key": "my-priv"
+					"value": {
+						"ca": "my-ca",
+						"private_key": "my-priv"
+					}
 				}`))
 			})
 
@@ -228,6 +241,8 @@ var _ = Describe("Secret", func() {
 
 				Expect(certificateSecret.Json()).To(MatchJSON(`{
 					"type": "certificate",
+					"name": "nulledSecret",
+					"value": {},
 					"version_created_at": "2016-01-01T12:00:00Z"
 				}`))
 			})

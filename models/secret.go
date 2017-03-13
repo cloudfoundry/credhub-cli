@@ -38,38 +38,6 @@ func (s Secret) Terminal() string {
 }
 
 func (secret Secret) Json() string {
-	secretBody := secret.SecretBody
-
-	body := struct {
-		Value            string `json:"value,omitempty"`
-		Ca               string `json:"ca,omitempty"`
-		Certificate      string `json:"certificate,omitempty"`
-		PrivateKey       string `json:"private_key,omitempty"`
-		PublicKey        string `json:"public_key,omitempty"`
-		Type             string `json:"type"`
-		VersionCreatedAt string `json:"version_created_at"`
-	}{
-		Type:             secretBody.SecretType,
-		VersionCreatedAt: secretBody.VersionCreatedAt,
-	}
-
-	switch secretBody.SecretType {
-	case "value", "password":
-		body.Value = secretBody.Value.(string)
-		break
-	case "certificate":
-		certificate := secretBody.Value.(Certificate)
-		body.Ca = certificate.Ca
-		body.Certificate = certificate.Certificate
-		body.PrivateKey = certificate.PrivateKey
-		break
-	case "ssh", "rsa":
-		rsaSsh := secretBody.Value.(RsaSsh)
-		body.PublicKey = rsaSsh.PublicKey
-		body.PrivateKey = rsaSsh.PrivateKey
-		break
-	}
-
-	s, _ := json.MarshalIndent(body, "", JSON_PRETTY_PRINT_INDENT_STRING)
+	s, _ := json.MarshalIndent(secret.SecretBody, "", JSON_PRETTY_PRINT_INDENT_STRING)
 	return string(s)
 }
