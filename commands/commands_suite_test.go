@@ -33,16 +33,16 @@ const STRING_SECRET_ARRAY_RESPONSE_JSON = `{"data":[` + STRING_SECRET_RESPONSE_J
 const CERTIFICATE_SECRET_ARRAY_RESPONSE_JSON = `{"data":[` + CERTIFICATE_SECRET_RESPONSE_JSON + `]}`
 const RSA_SSH_SECRET_ARRAY_RESPONSE_JSON = `{"data":[` + RSA_SSH_SECRET_RESPONSE_JSON + `]}`
 
-const STRING_SECRET_RESPONSE_TABLE = "type: %s\nname: %s\nvalue: %s\nupdated: " + TIMESTAMP
-const CERTIFICATE_SECRET_RESPONSE_TABLE = "type: certificate\nname: %s\nvalue:\n  ca: %s\n  certificate: %s\n  private_key: %s\nupdated: " + TIMESTAMP
-const SSH_SECRET_RESPONSE_TABLE = "type: ssh\nname: %s\nvalue:\n  public_key: %s\n  private_key: %s\nupdated: " + TIMESTAMP
-const RSA_SECRET_RESPONSE_TABLE = "type: rsa\nname: %s\nvalue:\n  public_key: %s\n  private_key: %s\nupdated: " + TIMESTAMP
+const STRING_SECRET_RESPONSE_YAML = "type: %s\nname: %s\nvalue: %s\nupdated: " + TIMESTAMP
+const CERTIFICATE_SECRET_RESPONSE_YAML = "type: certificate\nname: %s\nvalue:\n  ca: %s\n  certificate: %s\n  private_key: %s\nupdated: " + TIMESTAMP
+const SSH_SECRET_RESPONSE_YAML = "type: ssh\nname: %s\nvalue:\n  public_key: %s\n  private_key: %s\nupdated: " + TIMESTAMP
+const RSA_SECRET_RESPONSE_YAML = "type: rsa\nname: %s\nvalue:\n  public_key: %s\n  private_key: %s\nupdated: " + TIMESTAMP
 
-var responseMyValuePotatoes = fmt.Sprintf(STRING_SECRET_RESPONSE_TABLE, "value", "my-value", "potatoes")
-var responseMyPasswordPotatoes = fmt.Sprintf(STRING_SECRET_RESPONSE_TABLE, "password", "my-password", "potatoes")
-var responseMyCertificate = fmt.Sprintf(CERTIFICATE_SECRET_RESPONSE_TABLE, "my-secret", "my-ca", "my-cert", "my-priv")
-var responseMySSHFoo = fmt.Sprintf(SSH_SECRET_RESPONSE_TABLE, "foo-ssh-key", "some-public-key", "some-private-key")
-var responseMyRSAFoo = fmt.Sprintf(RSA_SECRET_RESPONSE_TABLE, "foo-rsa-key", "some-public-key", "some-private-key")
+var responseMyValuePotatoes = fmt.Sprintf(STRING_SECRET_RESPONSE_YAML, "value", "my-value", "potatoes")
+var responseMyPasswordPotatoes = fmt.Sprintf(STRING_SECRET_RESPONSE_YAML, "password", "my-password", "potatoes")
+var responseMyCertificate = fmt.Sprintf(CERTIFICATE_SECRET_RESPONSE_YAML, "my-secret", "my-ca", "my-cert", "my-priv")
+var responseMySSHFoo = fmt.Sprintf(SSH_SECRET_RESPONSE_YAML, "foo-ssh-key", "some-public-key", "some-private-key")
+var responseMyRSAFoo = fmt.Sprintf(RSA_SECRET_RESPONSE_YAML, "foo-rsa-key", "some-public-key", "some-private-key")
 
 func TestCommands(t *testing.T) {
 	RegisterFailHandler(Fail)
