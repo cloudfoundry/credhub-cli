@@ -18,10 +18,10 @@ var _ = Describe("Secret", func() {
 			}
 
 			Expect(stringSecret.Terminal()).To(Equal("" +
-				"Type:          value\n" +
-				"Name:          stringSecret\n" +
-				"Value:         my-value\n" +
-				"Updated:       2016-01-01T12:00:00Z"))
+				"type: value\n" +
+				"name: stringSecret\n" +
+				"value: my-value\n" +
+				"updated: 2016-01-01T12:00:00Z\n"))
 		})
 
 		It("renders ssh secrets", func() {
@@ -36,11 +36,12 @@ var _ = Describe("Secret", func() {
 			}
 
 			Expect(sshSecret.Terminal()).To(Equal("" +
-				"Type:          ssh\n" +
-				"Name:          sshSecret\n" +
-				"Public Key:    my-pub\n" +
-				"Private Key:   my-priv\n" +
-				"Updated:       2016-01-01T12:00:00Z"))
+				"type: ssh\n" +
+				"name: sshSecret\n" +
+				"value:\n" +
+				"  public_key: my-pub\n" +
+				"  private_key: my-priv\n" +
+				"updated: 2016-01-01T12:00:00Z\n"))
 		})
 
 		It("renders rsa secrets", func() {
@@ -55,11 +56,12 @@ var _ = Describe("Secret", func() {
 			}
 
 			Expect(sshSecret.Terminal()).To(Equal("" +
-				"Type:          rsa\n" +
-				"Name:          rsaSecret\n" +
-				"Public Key:    my-pub\n" +
-				"Private Key:   my-priv\n" +
-				"Updated:       2016-01-01T12:00:00Z"))
+				"type: rsa\n" +
+				"name: rsaSecret\n" +
+				"value:\n" +
+				"  public_key: my-pub\n" +
+				"  private_key: my-priv\n" +
+				"updated: 2016-01-01T12:00:00Z\n"))
 		})
 
 		Describe("renders certificate secrets", func() {
@@ -75,12 +77,13 @@ var _ = Describe("Secret", func() {
 				}
 
 				Expect(certificateSecret.Terminal()).To(Equal("" +
-					"Type:          certificate\n" +
-					"Name:          nonNulledSecret\n" +
-					"Ca:            my-ca\n" +
-					"Certificate:   my-cert\n" +
-					"Private Key:   my-priv\n" +
-					"Updated:       2016-01-01T12:00:00Z"))
+					"type: certificate\n" +
+					"name: nonNulledSecret\n" +
+					"value:\n" +
+					"  ca: my-ca\n" +
+					"  certificate: my-cert\n" +
+					"  private_key: my-priv\n" +
+					"updated: 2016-01-01T12:00:00Z\n"))
 			})
 
 			It("when some fields have nil values", func() {
@@ -95,11 +98,12 @@ var _ = Describe("Secret", func() {
 				}
 
 				Expect(certificateSecret.Terminal()).To(Equal("" +
-					"Type:          certificate\n" +
-					"Name:          nonNulledSecret\n" +
-					"Ca:            my-ca\n" +
-					"Private Key:   my-priv\n" +
-					"Updated:       2016-01-01T12:00:00Z"))
+					"type: certificate\n" +
+					"name: nonNulledSecret\n" +
+					"value:\n" +
+					"  ca: my-ca\n" +
+					"  private_key: my-priv\n" +
+					"updated: 2016-01-01T12:00:00Z\n"))
 			})
 
 			It("when fields all have nil values", func() {
@@ -113,9 +117,10 @@ var _ = Describe("Secret", func() {
 				}
 
 				Expect(certificateSecret.Terminal()).To(Equal("" +
-					"Type:          certificate\n" +
-					"Name:          nulledSecret\n" +
-					"Updated:       2016-01-01T12:00:00Z"))
+					"type: certificate\n" +
+					"name: nulledSecret\n" +
+					"value: {}\n" +
+					"updated: 2016-01-01T12:00:00Z\n"))
 			})
 		})
 	})

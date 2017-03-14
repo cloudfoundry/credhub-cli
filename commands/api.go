@@ -8,8 +8,10 @@ import (
 	"github.com/cloudfoundry-incubator/credhub-cli/actions"
 	"github.com/cloudfoundry-incubator/credhub-cli/client"
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
-	. "github.com/cloudfoundry-incubator/credhub-cli/util"
+	"github.com/fatih/color"
 )
+
+var warning = color.New(color.Bold, color.FgYellow).PrintlnFunc()
 
 type ApiCommand struct {
 	Server            ApiPositionalArgs `positional-args:"yes"`
@@ -63,11 +65,11 @@ func GetApiInfo(cfg *config.Config, serverUrl string, skipTlsValidation bool) er
 	cfg.AuthURL = cmInfo.AuthServer.Url
 
 	if parsedUrl.Scheme != "https" {
-		Warning("Warning: Insecure HTTP API detected. Data sent to this API could be intercepted" +
+		warning("Warning: Insecure HTTP API detected. Data sent to this API could be intercepted" +
 			" in transit by third parties. Secure HTTPS API endpoints are recommended.")
 	} else {
 		if skipTlsValidation {
-			Warning("Warning: The targeted TLS certificate has not been verified for this connection.")
+			warning("Warning: The targeted TLS certificate has not been verified for this connection.")
 		}
 	}
 

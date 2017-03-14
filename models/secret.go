@@ -3,7 +3,7 @@ package models
 import (
 	"encoding/json"
 
-	"github.com/cloudfoundry-incubator/credhub-cli/util"
+	"gopkg.in/yaml.v2"
 )
 
 type Secret struct {
@@ -18,26 +18,12 @@ func NewSecret(secretBodyMap map[string]interface{}) Secret {
 	}
 }
 
-func (s Secret) Terminal() string {
-	result := ""
-	secretBody := s.SecretBody
-
-	switch secretBody.SecretType {
-	case "value", "password":
-		result = util.BuildLineOfFixedLength("Value:", secretBody.Value.(string)) + "\n"
-		break
-	case "certificate":
-		result = secretBody.Value.(Certificate).Terminal()
-		break
-	case "ssh", "rsa":
-		result = secretBody.Value.(RsaSsh).Terminal()
-		break
-	}
-
-	return util.Header(secretBody.SecretType, secretBody.Name) + result + util.Footer(secretBody.VersionCreatedAt)
+func (secret Secret) Terminal() string {
+	s, _ := yaml.Marshal(secret.SecretBody)
+	return string(s)
 }
 
 func (secret Secret) Json() string {
-	s, _ := json.MarshalIndent(secret.SecretBody, "", JSON_PRETTY_PRINT_INDENT_STRING)
+	s, _ := json.MarshalIndent(secret.SecretBody, "", "\t")
 	return string(s)
 }
