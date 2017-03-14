@@ -30,7 +30,7 @@ var _ = Describe("Set", func() {
 
 			Eventually(session).Should(Exit(1))
 
-			Expect(session.Err).To(Say("The request does not include a valid type. Valid values include 'value', 'password', 'certificate', 'ssh' and 'rsa'."))
+			Expect(session.Err).To(Say("The request does not include a valid type. Valid values include 'value', 'password', 'certificate', 'ssh', 'rsa', and 'json'."))
 		})
 	})
 
@@ -42,6 +42,18 @@ var _ = Describe("Set", func() {
 
 			Eventually(session).Should(Exit(0))
 			Eventually(session.Out).Should(Say(responseMyValuePotatoes))
+		})
+	})
+
+	Describe("setting json secrets", func() {
+		It("puts a secret using explicit json type", func() {
+			jsonValue := `{"foo":"bar","nested":{"a":1},"an":["array"]}`
+			setupPutJsonServer("json-secret", jsonValue)
+
+			session := runCommand("set", "-n", "json-secret", "-v", jsonValue, "-t", "json")
+
+			Eventually(session).Should(Exit(0))
+			Eventually(session.Out).Should(Say(responseMyJson))
 		})
 	})
 
@@ -289,6 +301,22 @@ func setupOverwritePutValueServer(name, secretType, value string, overwrite bool
 			VerifyRequest("PUT", "/api/v1/data"),
 			VerifyJSON(jsonRequest),
 			RespondWith(http.StatusOK, fmt.Sprintf(STRING_SECRET_RESPONSE_JSON, secretType, name, value)),
+		),
+	)
+}
+
+func setupPutJsonServer(name, value string) {
+	setupOverwritePutJsonServer(name, value, true)
+}
+
+func setupOverwritePutJsonServer(name, value string, overwrite bool) {
+	var jsonRequest string
+	jsonRequest = fmt.Sprintf(JSON_SECRET_OVERWRITE_REQUEST_JSON, name, value, overwrite)
+	server.AppendHandlers(
+		CombineHandlers(
+			VerifyRequest("PUT", "/api/v1/data"),
+			VerifyJSON(jsonRequest),
+			RespondWith(http.StatusOK, fmt.Sprintf(JSON_SECRET_RESPONSE_JSON, name, value)),
 		),
 	)
 }

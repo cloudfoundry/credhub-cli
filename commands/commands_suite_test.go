@@ -20,26 +20,31 @@ const TIMESTAMP = `2016-01-01T12:00:00Z`
 const UUID = `5a2edd4f-1686-4c8d-80eb-5daa866f9f86`
 
 const STRING_SECRET_OVERWRITE_REQUEST_JSON = `{"type":"%s","name":"%s","value":"%s","overwrite":%t}`
+const JSON_SECRET_OVERWRITE_REQUEST_JSON = `{"type":"json","name":"%s","value":%s,"overwrite":%t}`
 const CERTIFICATE_SECRET_REQUEST_JSON = `{"type":"certificate","name":"%s","value":{"ca":"%s","certificate":"%s","private_key":"%s"},"overwrite":%t}`
 const GENERATE_SECRET_REQUEST_JSON = `{"name":"%s","type":"%s","overwrite":%t,"parameters":%s}`
 const RSA_SSH_SECRET_REQUEST_JSON = `{"type":"%s","name":"%s","value":{"public_key":"%s","private_key":"%s"},"overwrite":%t}`
 const GENERATE_DEFAULT_TYPE_REQUEST_JSON = `{"name":"%s","type":"password","overwrite":%t,"parameters":%s}`
 
 const STRING_SECRET_RESPONSE_JSON = `{"type":"%s","id":"` + UUID + `","name":"%s","version_created_at":"` + TIMESTAMP + `","value":"%s"}`
+const JSON_SECRET_RESPONSE_JSON = `{"type":"json","id":"` + UUID + `","name":"%s","version_created_at":"` + TIMESTAMP + `","value":%s}`
 const CERTIFICATE_SECRET_RESPONSE_JSON = `{"type":"certificate","id":"` + UUID + `","name":"%s","version_created_at":"` + TIMESTAMP + `","value":{"ca":"%s","certificate":"%s","private_key":"%s"}}`
 const RSA_SSH_SECRET_RESPONSE_JSON = `{"type":"%s","id":"` + UUID + `","name":"%s","version_created_at":"` + TIMESTAMP + `","value":{"public_key":"%s","private_key":"%s"},"version_created_at":"` + TIMESTAMP + `"}`
 
 const STRING_SECRET_ARRAY_RESPONSE_JSON = `{"data":[` + STRING_SECRET_RESPONSE_JSON + `]}`
+const JSON_SECRET_ARRAY_RESPONSE_JSON = `{"data":[` + JSON_SECRET_RESPONSE_JSON + `]}`
 const CERTIFICATE_SECRET_ARRAY_RESPONSE_JSON = `{"data":[` + CERTIFICATE_SECRET_RESPONSE_JSON + `]}`
 const RSA_SSH_SECRET_ARRAY_RESPONSE_JSON = `{"data":[` + RSA_SSH_SECRET_RESPONSE_JSON + `]}`
 
 const STRING_SECRET_RESPONSE_YAML = "type: %s\nname: %s\nvalue: %s\nupdated: " + TIMESTAMP
+const JSON_SECRET_RESPONSE_YAML = "type: json\nname: %s\nvalue:\n%s\nupdated: " + TIMESTAMP
 const CERTIFICATE_SECRET_RESPONSE_YAML = "type: certificate\nname: %s\nvalue:\n  ca: %s\n  certificate: %s\n  private_key: %s\nupdated: " + TIMESTAMP
 const SSH_SECRET_RESPONSE_YAML = "type: ssh\nname: %s\nvalue:\n  public_key: %s\n  private_key: %s\nupdated: " + TIMESTAMP
 const RSA_SECRET_RESPONSE_YAML = "type: rsa\nname: %s\nvalue:\n  public_key: %s\n  private_key: %s\nupdated: " + TIMESTAMP
 
 var responseMyValuePotatoes = fmt.Sprintf(STRING_SECRET_RESPONSE_YAML, "value", "my-value", "potatoes")
 var responseMyPasswordPotatoes = fmt.Sprintf(STRING_SECRET_RESPONSE_YAML, "password", "my-password", "potatoes")
+var responseMyJson = fmt.Sprintf(JSON_SECRET_RESPONSE_YAML, "json-secret", "  an:\n  - array\n  foo: bar\n  nested:\n    a: 1")
 var responseMyCertificate = fmt.Sprintf(CERTIFICATE_SECRET_RESPONSE_YAML, "my-secret", "my-ca", "my-cert", "my-priv")
 var responseMySSHFoo = fmt.Sprintf(SSH_SECRET_RESPONSE_YAML, "foo-ssh-key", "some-public-key", "some-private-key")
 var responseMyRSAFoo = fmt.Sprintf(RSA_SECRET_RESPONSE_YAML, "foo-rsa-key", "some-public-key", "some-private-key")

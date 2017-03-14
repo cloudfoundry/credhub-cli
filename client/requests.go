@@ -36,6 +36,27 @@ func NewPutPasswordRequest(config config.Config, secretIdentifier string, secret
 	return newSecretRequest("PUT", config, secretIdentifier, secret)
 }
 
+func NewPutJsonRequest(config config.Config, secretIdentifier string, secretContent string, overwrite bool) *http.Request {
+	var value interface{}
+	valueObject := make(map[string]interface{})
+	err := json.Unmarshal([]byte(secretContent), &valueObject)
+
+	if err != nil {
+		value = secretContent
+	} else {
+		value = valueObject
+	}
+
+	secret := models.SecretBody{
+		SecretType: "json",
+		Name:       secretIdentifier,
+		Value:      value,
+		Overwrite:  &overwrite,
+	}
+
+	return newSecretRequest("PUT", config, secretIdentifier, secret)
+}
+
 func NewPutCertificateRequest(config config.Config, secretIdentifier string, root string, cert string, priv string, overwrite bool) *http.Request {
 	certificate := models.Certificate{
 		Ca:          root,

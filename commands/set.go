@@ -23,7 +23,7 @@ type SetCommand struct {
 	SecretIdentifier  string `short:"n" required:"yes" long:"name" description:"Name of the credential to set"`
 	Type              string `short:"t" long:"type" description:"Sets the credential type (Default: 'password')"`
 	NoOverwrite       bool   `short:"O" long:"no-overwrite" description:"Credential is not modified if stored value already exists"`
-	Value             string `short:"v" long:"value" description:"[Password, Value] Sets the value for the credential"`
+	Value             string `short:"v" long:"value" description:"[Password, Value, JSON] Sets the value for the credential"`
 	Root              string `short:"r" long:"root" description:"[Certificate] Sets the root CA from file"`
 	Certificate       string `short:"c" long:"certificate" description:"[Certificate] Sets the certificate from file"`
 	Private           string `short:"p" long:"private" description:"[Certificate, SSH, RSA] Sets the private key from file"`
@@ -39,7 +39,7 @@ func (cmd SetCommand) Execute([]string) error {
 		cmd.Type = "password"
 	}
 
-	if cmd.Value == "" && (cmd.Type == "password" || cmd.Type == "value") {
+	if cmd.Value == "" && (cmd.Type == "password" || cmd.Type == "value" || cmd.Type == "json") {
 		promptForInput("value: ", &cmd.Value)
 	}
 
@@ -47,7 +47,7 @@ func (cmd SetCommand) Execute([]string) error {
 	repository := repositories.NewSecretRepository(client.NewHttpClient(cfg))
 
 	action := actions.NewAction(repository, cfg)
-	request, err := getRequest(cmd, cfg)
+	request, err := makeRequest(cmd, cfg)
 	if err != nil {
 		return err
 	}
@@ -70,16 +70,18 @@ func contains(searchSpace []string, searchTerm string) bool {
 	return false
 }
 
-func getRequest(cmd SetCommand, config config.Config) (*http.Request, error) {
+func makeRequest(cmd SetCommand, config config.Config) (*http.Request, error) {
 	var request *http.Request
-	validTypes := []string{"value", "password", "ssh", "rsa", "certificate"}
+	validTypes := []string{"value", "password", "ssh", "rsa", "certificate", "json"}
 	if !contains(validTypes, cmd.Type) {
-		return nil, errors.New("The request does not include a valid type. Valid values include 'value', 'password', 'certificate', 'ssh' and 'rsa'.")
+		return nil, errors.New("The request does not include a valid type. Valid values include 'value', 'password', 'certificate', 'ssh', 'rsa', and 'json'.")
 	}
 	if cmd.Type == "value" {
 		request = client.NewPutValueRequest(config, cmd.SecretIdentifier, cmd.Value, !cmd.NoOverwrite)
 	} else if cmd.Type == "password" {
 		request = client.NewPutPasswordRequest(config, cmd.SecretIdentifier, cmd.Value, !cmd.NoOverwrite)
+	} else if cmd.Type == "json" {
+		request = client.NewPutJsonRequest(config, cmd.SecretIdentifier, cmd.Value, !cmd.NoOverwrite)
 	} else if cmd.Type == "ssh" || cmd.Type == "rsa" {
 		var err error
 

@@ -69,6 +69,22 @@ var _ = Describe("Get", func() {
 		Eventually(session.Out).Should(Say(responseMyPasswordPotatoes))
 	})
 
+	It("gets a json secret", func() {
+		serverResponse := fmt.Sprintf(JSON_SECRET_ARRAY_RESPONSE_JSON, "json-secret", `{"foo":"bar","nested":{"a":1},"an":["array"]}`)
+
+		server.AppendHandlers(
+			CombineHandlers(
+				VerifyRequest("GET", "/api/v1/data", "name=json-secret&current=true"),
+				RespondWith(http.StatusOK, serverResponse),
+			),
+		)
+
+		session := runCommand("get", "-n", "json-secret")
+
+		Eventually(session).Should(Exit(0))
+		Eventually(session.Out).Should(Say(responseMyJson))
+	})
+
 	It("gets a certificate secret", func() {
 		responseJson := fmt.Sprintf(CERTIFICATE_SECRET_ARRAY_RESPONSE_JSON, "my-secret", "my-ca", "my-cert", "my-priv")
 

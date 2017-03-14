@@ -27,6 +27,10 @@ func NewSecretBody(bodyAsJsonObject map[string]interface{}) SecretBody {
 	case "value", "password":
 		secretBody.Value = secret["value"].(string)
 		break
+	case "json":
+		valueMap := secret["value"].(map[string]interface{})
+		secretBody.Value = valueMap
+		break
 	case "ssh", "rsa":
 		value := secret["value"].(map[string]interface{})
 		rsaSsh := RsaSsh{}
