@@ -12,6 +12,7 @@ type CMCommand struct {
 	Logout     LogoutCommand     `command:"logout" alias:"o" description:"Discard authenticated user session"`
 	Find       FindCommand       `command:"find" alias:"f" description:"Find stored credentials based on query parameters"`
 	Version    func()            `long:"version" description:"Version of CLI and targeted CredHub API"`
+	Token      func()            `long:"token" description:"Return your current CredHub authorization token"`
 }
 
 var CM CMCommand
