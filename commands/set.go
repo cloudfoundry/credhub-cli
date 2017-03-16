@@ -17,6 +17,7 @@ import (
 	"errors"
 
 	cmcli_errors "github.com/cloudfoundry-incubator/credhub-cli/errors"
+	"github.com/cloudfoundry-incubator/credhub-cli/models"
 )
 
 type SetCommand struct {
@@ -56,7 +57,7 @@ func (cmd SetCommand) Execute([]string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(secret.Terminal())
+	models.Println(secret, false)
 
 	return nil
 }
