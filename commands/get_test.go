@@ -137,4 +137,20 @@ var _ = Describe("Get", func() {
 			"value": "potatoes"
 		}`))
 	})
+
+	It("does not use Printf on user-supplied data", func() {
+		responseJson := fmt.Sprintf(STRING_SECRET_RESPONSE_JSON, "password", "injected", "et''%/7(V&`|?m|Ckih$")
+
+		server.AppendHandlers(
+			CombineHandlers(
+				VerifyRequest("GET", "/api/v1/data", "name=injected&current=true"),
+				RespondWith(http.StatusOK, responseJson),
+			),
+		)
+
+		session := runCommand("get", "-n", "injected")
+
+		Eventually(session).Should(Exit(0))
+		Eventually(session.Out).Should(Say("et''%/7\\(V&`|\\?m\\|Ckih\\$" + TIMESTAMP))
+	})
 })

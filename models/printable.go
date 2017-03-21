@@ -11,8 +11,8 @@ type Printable interface {
 
 func Println(p Printable, asJson bool) {
 	if asJson {
-		fmt.Printf(p.Json())
+		fmt.Println(p.Json())
 	} else {
-		fmt.Printf(p.Terminal())
+		fmt.Println(p.Terminal())
 	}
 }
