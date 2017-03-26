@@ -1,6 +1,6 @@
-# CredHub CLI 
+# CredHub CLI [![slack.cloudfoundry.org](https://slack.cloudfoundry.org/badge.svg)](https://slack.cloudfoundry.org)
 
-CredHub manages credentials like passwords, certificates, ssh keys, rsa keys, strings (arbitrary values) and CAs. CredHub provides a CLI and API to get, set, generate and securely store such credentials.
+CredHub manages credentials like passwords, certificates, certificate authorities, ssh keys, rsa keys and arbitrary values (strings and JSON blobs). CredHub provides a CLI and API to get, set, generate and securely store such credentials.
 
 * [CredHub Tracker](https://www.pivotaltracker.com/n/projects/1977341)
 
@@ -59,7 +59,7 @@ CREDENTIAL MANAGEMENT:
     -O, --no-overwrite                    Credential is not modified if stored value already exists
 
     Set parameters by [Type]
-    -v, --value 'VALUE'                   [Password, Value] Sets the value for the credential
+    -v, --value 'VALUE'                   [Password, Value, JSON] Sets the value for the credential
     -r, --root  <FILE>                    [Certificate] Sets the root CA from file
     -c, --certificate <FILE>              [Certificate] Sets the certificate from file
     -p, --private <FILE>                  [Certificate, SSH] Sets the private key from file
