@@ -14,8 +14,6 @@ import (
 	"os"
 	"strings"
 
-	"errors"
-
 	cmcli_errors "github.com/cloudfoundry-incubator/credhub-cli/errors"
 	"github.com/cloudfoundry-incubator/credhub-cli/models"
 )
@@ -62,28 +60,9 @@ func (cmd SetCommand) Execute([]string) error {
 	return nil
 }
 
-func contains(searchSpace []string, searchTerm string) bool {
-	for _, a := range searchSpace {
-		if a == searchTerm {
-			return true
-		}
-	}
-	return false
-}
-
 func makeRequest(cmd SetCommand, config config.Config) (*http.Request, error) {
 	var request *http.Request
-	validTypes := []string{"value", "password", "ssh", "rsa", "certificate", "json"}
-	if !contains(validTypes, cmd.Type) {
-		return nil, errors.New("The request does not include a valid type. Valid values include 'value', 'password', 'certificate', 'ssh', 'rsa', and 'json'.")
-	}
-	if cmd.Type == "value" {
-		request = client.NewPutValueRequest(config, cmd.SecretIdentifier, cmd.Value, !cmd.NoOverwrite)
-	} else if cmd.Type == "password" {
-		request = client.NewPutPasswordRequest(config, cmd.SecretIdentifier, cmd.Value, !cmd.NoOverwrite)
-	} else if cmd.Type == "json" {
-		request = client.NewPutJsonRequest(config, cmd.SecretIdentifier, cmd.Value, !cmd.NoOverwrite)
-	} else if cmd.Type == "ssh" || cmd.Type == "rsa" {
+	if cmd.Type == "ssh" || cmd.Type == "rsa" {
 		var err error
 
 		err = setStringFieldFromFile(&cmd.Public, &cmd.PublicString)
@@ -96,8 +75,8 @@ func makeRequest(cmd SetCommand, config config.Config) (*http.Request, error) {
 			return nil, err
 		}
 
-		request = client.NewPutRsaSshRequest(config, cmd.SecretIdentifier, cmd.Type, cmd.PublicString, cmd.PrivateString, !cmd.NoOverwrite)
-	} else {
+		request = client.NewSetRsaSshRequest(config, cmd.SecretIdentifier, cmd.Type, cmd.PublicString, cmd.PrivateString, !cmd.NoOverwrite)
+	} else if cmd.Type == "certificate" {
 		var err error
 
 		err = setStringFieldFromFile(&cmd.Root, &cmd.RootString)
@@ -115,7 +94,9 @@ func makeRequest(cmd SetCommand, config config.Config) (*http.Request, error) {
 			return nil, err
 		}
 
-		request = client.NewPutCertificateRequest(config, cmd.SecretIdentifier, cmd.RootString, cmd.CertificateString, cmd.PrivateString, !cmd.NoOverwrite)
+		request = client.NewSetCertificateRequest(config, cmd.SecretIdentifier, cmd.RootString, cmd.CertificateString, cmd.PrivateString, !cmd.NoOverwrite)
+	} else {
+		request = client.NewSetSecretRequest(config, cmd.Type, cmd.SecretIdentifier, cmd.Value, !cmd.NoOverwrite)
 	}
 
 	return request, nil

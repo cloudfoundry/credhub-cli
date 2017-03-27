@@ -100,14 +100,14 @@ var _ = Describe("API", func() {
 			cfg.AccessToken = "access-token"
 		})
 
-		Describe("NewPutValueRequest", func() {
+		Describe("NewSetSecretRequest with value", func() {
 			It("Returns a request for the put-value endpoint", func() {
 				requestBody := bytes.NewReader([]byte(`{"type":"value","name":"my-name","value":"my-value","overwrite":true}`))
 				expectedRequest, _ := http.NewRequest("PUT", "http://example.com/api/v1/data", requestBody)
 				expectedRequest.Header.Set("Content-Type", "application/json")
 				expectedRequest.Header.Set("Authorization", "Bearer access-token")
 
-				request := NewPutValueRequest(cfg, "my-name", "my-value", true)
+				request := NewSetSecretRequest(cfg, "value", "my-name", "my-value", true)
 
 				Expect(request).To(Equal(expectedRequest))
 			})
@@ -118,21 +118,21 @@ var _ = Describe("API", func() {
 				expectedRequest.Header.Set("Content-Type", "application/json")
 				expectedRequest.Header.Set("Authorization", "Bearer access-token")
 
-				request := NewPutValueRequest(cfg, "my-name", "my-value", false)
+				request := NewSetSecretRequest(cfg, "value", "my-name", "my-value", false)
 
 				Expect(request).To(Equal(expectedRequest))
 
 			})
 		})
 
-		Describe("NewPutPasswordRequest", func() {
+		Describe("NewSetSecretRequest with password", func() {
 			It("Returns a request for the put-password endpoint", func() {
 				requestBody := bytes.NewReader([]byte(`{"type":"password","name":"my-name","value":"my-password","overwrite":true}`))
 				expectedRequest, _ := http.NewRequest("PUT", "http://example.com/api/v1/data", requestBody)
 				expectedRequest.Header.Set("Content-Type", "application/json")
 				expectedRequest.Header.Set("Authorization", "Bearer access-token")
 
-				request := NewPutPasswordRequest(cfg, "my-name", "my-password", true)
+				request := NewSetSecretRequest(cfg, "password", "my-name", "my-password", true)
 
 				Expect(request).To(Equal(expectedRequest))
 			})
@@ -147,7 +147,7 @@ var _ = Describe("API", func() {
 				expectedRequest.Header.Set("Content-Type", "application/json")
 				expectedRequest.Header.Set("Authorization", "Bearer access-token")
 
-				request := NewPutCertificateRequest(cfg, "my-name", "my-ca", "my-cert", "my-priv", true)
+				request := NewSetCertificateRequest(cfg, "my-name", "my-ca", "my-cert", "my-priv", true)
 
 				Expect(request).To(Equal(expectedRequest))
 			})
@@ -163,7 +163,7 @@ var _ = Describe("API", func() {
 					expectedRequest.Header.Set("Content-Type", "application/json")
 					expectedRequest.Header.Set("Authorization", "Bearer access-token")
 
-					request := NewPutRsaSshRequest(cfg, "my-name", "ssh", "my-pub", "my-priv", true)
+					request := NewSetRsaSshRequest(cfg, "my-name", "ssh", "my-pub", "my-priv", true)
 
 					Expect(request).To(Equal(expectedRequest))
 				})
@@ -178,7 +178,7 @@ var _ = Describe("API", func() {
 					expectedRequest.Header.Set("Content-Type", "application/json")
 					expectedRequest.Header.Set("Authorization", "Bearer access-token")
 
-					request := NewPutRsaSshRequest(cfg, "my-name", "rsa", "my-pub", "my-priv", true)
+					request := NewSetRsaSshRequest(cfg, "my-name", "rsa", "my-pub", "my-priv", true)
 
 					Expect(request).To(Equal(expectedRequest))
 				})

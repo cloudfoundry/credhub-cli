@@ -1,8 +1,6 @@
 package commands
 
 import (
-	"errors"
-
 	"github.com/cloudfoundry-incubator/credhub-cli/actions"
 	"github.com/cloudfoundry-incubator/credhub-cli/client"
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
@@ -39,13 +37,8 @@ type GenerateCommand struct {
 }
 
 func (cmd GenerateCommand) Execute([]string) error {
-	validTypes := []string{"value", "password", "ssh", "rsa", "certificate"}
-
 	if cmd.SecretType == "" {
 		cmd.SecretType = "password"
-	}
-	if !contains(validTypes, cmd.SecretType) {
-		return errors.New("The request does not include a valid type. Valid values include 'value', 'password', 'certificate', 'ssh' and 'rsa'.")
 	}
 
 	cfg := config.ReadConfig()

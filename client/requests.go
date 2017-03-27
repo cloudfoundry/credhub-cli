@@ -14,76 +14,48 @@ import (
 	"github.com/cloudfoundry-incubator/credhub-cli/models"
 )
 
-func NewPutValueRequest(config config.Config, secretIdentifier string, secretContent string, overwrite bool) *http.Request {
-	secret := models.SecretBody{
-		SecretType: "value",
-		Name:       secretIdentifier,
-		Value:      secretContent,
-		Overwrite:  &overwrite,
-	}
-
-	return newSecretRequest("PUT", config, secretIdentifier, secret)
-}
-
-func NewPutPasswordRequest(config config.Config, secretIdentifier string, secretContent string, overwrite bool) *http.Request {
-	secret := models.SecretBody{
-		SecretType: "password",
-		Name:       secretIdentifier,
-		Value:      secretContent,
-		Overwrite:  &overwrite,
-	}
-
-	return newSecretRequest("PUT", config, secretIdentifier, secret)
-}
-
-func NewPutJsonRequest(config config.Config, secretIdentifier string, secretContent string, overwrite bool) *http.Request {
-	var value interface{}
-	valueObject := make(map[string]interface{})
-	err := json.Unmarshal([]byte(secretContent), &valueObject)
-
-	if err != nil {
-		value = secretContent
-	} else {
-		value = valueObject
-	}
-
-	secret := models.SecretBody{
-		SecretType: "json",
-		Name:       secretIdentifier,
-		Value:      value,
-		Overwrite:  &overwrite,
-	}
-
-	return newSecretRequest("PUT", config, secretIdentifier, secret)
-}
-
-func NewPutCertificateRequest(config config.Config, secretIdentifier string, root string, cert string, priv string, overwrite bool) *http.Request {
+func NewSetCertificateRequest(config config.Config, secretIdentifier string, root string, cert string, priv string, overwrite bool) *http.Request {
 	certificate := models.Certificate{
 		Ca:          root,
 		Certificate: cert,
 		PrivateKey:  priv,
 	}
-	secretBody := models.SecretBody{
-		SecretType: "certificate",
-		Name:       secretIdentifier,
-		Value:      &certificate,
-		Overwrite:  &overwrite,
-	}
-	return newSecretRequest("PUT", config, secretIdentifier, secretBody)
+
+	return NewSetSecretRequest(config, "certificate", secretIdentifier, certificate, overwrite)
 }
 
-func NewPutRsaSshRequest(config config.Config, secretIdentifier, keyType, publicKey, privateKey string, overwrite bool) *http.Request {
+func NewSetRsaSshRequest(config config.Config, secretIdentifier, keyType, publicKey, privateKey string, overwrite bool) *http.Request {
 	key := models.RsaSsh{
 		PublicKey:  publicKey,
 		PrivateKey: privateKey,
 	}
 
+	return NewSetSecretRequest(config, keyType, secretIdentifier, key, overwrite)
+}
+
+func NewSetSecretRequest(config config.Config, secretType string, secretIdentifier string, secretContent interface{}, overwrite bool) *http.Request {
+	var value interface{}
+	switch secretContent := secretContent.(type) {
+	default:
+		value = secretContent
+	case string:
+		valueObject := make(map[string]interface{})
+		err := json.Unmarshal([]byte(secretContent), &valueObject)
+
+		if err != nil {
+			value = secretContent
+		} else {
+			value = valueObject
+		}
+	}
+
 	secret := models.SecretBody{
-		SecretType: keyType,
+		SecretType: secretType,
 		Name:       secretIdentifier,
-		Value:      &key,
+		Value:      value,
 		Overwrite:  &overwrite,
 	}
+
 	return newSecretRequest("PUT", config, secretIdentifier, secret)
 }
 

@@ -385,18 +385,6 @@ var _ = Describe("Generate", func() {
 			}
 		})
 
-		It("displays an error when invalid type is specified", func() {
-			server.AppendHandlers(
-				RespondWith(http.StatusBadRequest, `{"error": "you fail."}`),
-			)
-
-			session := runCommand("generate", "-t", "potato", "-n", "my-value")
-
-			Eventually(session).Should(Exit(1))
-
-			Expect(session.Err).To(Say("The request does not include a valid type. Valid values include 'value', 'password', 'certificate', 'ssh' and 'rsa'."))
-		})
-
 		It("displays the server provided error when an error is received", func() {
 			server.AppendHandlers(
 				RespondWith(http.StatusBadRequest, `{"error": "you fail."}`),
