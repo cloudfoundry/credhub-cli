@@ -82,7 +82,6 @@ CREDENTIAL MANAGEMENT:
     -L, --exclude-lower                    [Password] Exclude lower alpha characters from generated value
     -N, --exclude-number                   [Password] Exclude number characters from generated value
     -S, --include-special                  [Password] Include special characters in the generated value
-    -H, --only-hex                         [Password] Use only hexadecimal characters in generated value   
     -k, --key-length [2048, 3072, 4096]    [Certificate, SSH, RSA] Bit length of the generated key (Default: 2048)
     -m, --ssh-comment 'COMMENT'            [SSH] A comment appended to the SSH public key for identification 
     -d, --duration [1-3650]                [Certificate] Valid duration (in days) of the generated certificate (Default: 365)

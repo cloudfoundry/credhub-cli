@@ -112,12 +112,6 @@ var _ = Describe("Generate", func() {
 			session := runCommand("generate", "-n", "my-password", "-t", "password", "--exclude-number")
 			Eventually(session).Should(Exit(0))
 		})
-
-		It("including only hex", func() {
-			setupPasswordPostServer("my-password", "potatoes", generateRequestJson("password", "my-password", `{"only_hex":true}`, true))
-			session := runCommand("generate", "-n", "my-password", "-t", "password", "--only-hex")
-			Eventually(session).Should(Exit(0))
-		})
 	})
 
 	Describe("with a variety of SSH parameters", func() {
@@ -360,7 +354,6 @@ var _ = Describe("Generate", func() {
 				commands.HaveFlag("exclude-number", "N"),
 				commands.HaveFlag("exclude-upper", "U"),
 				commands.HaveFlag("exclude-lower", "L"),
-				commands.HaveFlag("only-hex", "H"),
 				commands.HaveFlag("common-name", "c"),
 				commands.HaveFlag("organization", "o"),
 				commands.HaveFlag("organization-unit", "u"),

@@ -18,7 +18,6 @@ type GenerateCommand struct {
 	ExcludeNumber    bool     `short:"N" long:"exclude-number" description:"[Password] Exclude number characters from the generated value"`
 	ExcludeUpper     bool     `short:"U" long:"exclude-upper" description:"[Password] Exclude upper alpha characters from the generated value"`
 	ExcludeLower     bool     `short:"L" long:"exclude-lower" description:"[Password] Exclude lower alpha characters from the generated value"`
-	OnlyHex          bool     `short:"H" long:"only-hex" description:"[Password] Use only hexadecimal characters"`
 	SshComment       string   `short:"m" long:"ssh-comment" description:"[SSH] Comment appended to public key to help identify in environment"`
 	KeyLength        int      `short:"k" long:"key-length" description:"[Certificate, SSH, RSA] Bit length of the generated key (Default: 2048)"`
 	Duration         int      `short:"d" long:"duration" description:"[Certificate] Valid duration (in days) of the generated certificate (Default: 365)"`
@@ -49,7 +48,6 @@ func (cmd GenerateCommand) Execute([]string) error {
 		ExcludeNumber:    cmd.ExcludeNumber,
 		ExcludeUpper:     cmd.ExcludeUpper,
 		ExcludeLower:     cmd.ExcludeLower,
-		OnlyHex:          cmd.OnlyHex,
 		Length:           cmd.Length,
 		CommonName:       cmd.CommonName,
 		Organization:     cmd.Organization,
