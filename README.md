@@ -10,6 +10,16 @@ See additional repos for more info:
 * [credhub-acceptance-tests](https://github.com/cloudfoundry-incubator/credhub-acceptance-tests) : Integration tests
 * [credhub-release](https://github.com/pivotal-cf/credhub-release) : BOSH release of CredHub server
 
+### Installing the CLI
+
+#### MacOS X with Homebrew
+```bash
+  brew install cloudfoundry/tap/credhub-cli
+```
+
+#### Linux and Windows
+Download and install the desired release from the [release page](https://github.com/cloudfoundry-incubator/credhub-cli/releases).
+
 ### Building the CLI:
 
 _NOTICE: Golang version 1.8 is not currently supported._
