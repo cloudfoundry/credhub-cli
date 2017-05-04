@@ -7,10 +7,10 @@ type Token struct {
 	ExpiresIn    int    `json:"expires_in"`
 }
 
-func (t Token) Terminal() string {
+func (t Token) ToYaml() string {
 	return ""
 }
 
-func (t Token) Json() string {
+func (t Token) ToJson() string {
 	return ""
 }

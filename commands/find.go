@@ -42,7 +42,7 @@ func (cmd FindCommand) Execute([]string) error {
 		return err
 	}
 
-	fmt.Println(credentials.Terminal())
+	fmt.Println(credentials.ToYaml())
 
 	return nil
 }

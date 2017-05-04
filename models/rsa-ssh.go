@@ -11,7 +11,7 @@ type RsaSsh struct {
 	PrivateKey string `json:"private_key,omitempty" yaml:"private_key,omitempty"`
 }
 
-func (rsaSsh RsaSsh) Terminal() string {
+func (rsaSsh RsaSsh) ToYaml() string {
 	lines := []string{}
 	if rsaSsh.PublicKey != "" {
 		lines = append(lines, util.BuildLineOfFixedLength("Public Key:", rsaSsh.PublicKey))

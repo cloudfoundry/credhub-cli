@@ -18,12 +18,12 @@ func NewSecret(secretBodyMap map[string]interface{}) Secret {
 	}
 }
 
-func (secret Secret) Terminal() string {
+func (secret Secret) ToYaml() string {
 	s, _ := yaml.Marshal(secret.SecretBody)
 	return string(s)
 }
 
-func (secret Secret) Json() string {
+func (secret Secret) ToJson() string {
 	s, _ := json.MarshalIndent(secret.SecretBody, "", "\t")
 	return string(s)
 }

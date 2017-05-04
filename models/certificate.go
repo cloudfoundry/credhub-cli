@@ -12,7 +12,7 @@ type Certificate struct {
 	PrivateKey  string `json:"private_key,omitempty" yaml:"private_key,omitempty"`
 }
 
-func (cert Certificate) Terminal() string {
+func (cert Certificate) ToYaml() string {
 	lines := []string{}
 	if cert.Ca != "" {
 		lines = append(lines, util.BuildLineOfFixedLength("Ca:", cert.Ca))

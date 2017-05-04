@@ -5,14 +5,14 @@ import (
 )
 
 type Printable interface {
-	Terminal() string
-	Json() string
+	ToYaml() string
+	ToJson() string
 }
 
 func Println(p Printable, asJson bool) {
 	if asJson {
-		fmt.Println(p.Json())
+		fmt.Println(p.ToJson())
 	} else {
-		fmt.Println(p.Terminal())
+		fmt.Println(p.ToYaml())
 	}
 }

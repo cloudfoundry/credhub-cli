@@ -12,7 +12,7 @@ type Path struct {
 	Path string `json:"path,omitempty"`
 }
 
-func (allPathResponseBody AllPathResponseBody) Terminal() string {
+func (allPathResponseBody AllPathResponseBody) ToYaml() string {
 	lines := []string{}
 	lines = append(lines, "Path")
 	for _, path := range allPathResponseBody.Paths {
@@ -21,6 +21,6 @@ func (allPathResponseBody AllPathResponseBody) Terminal() string {
 	return strings.Join(lines, "\n")
 }
 
-func (allPathsResponseBody AllPathResponseBody) Json() string {
+func (allPathsResponseBody AllPathResponseBody) ToJson() string {
 	return ""
 }

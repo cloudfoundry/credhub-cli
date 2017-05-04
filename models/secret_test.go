@@ -17,7 +17,7 @@ var _ = Describe("Secret", func() {
 				},
 			}
 
-			Expect(stringSecret.Terminal()).To(Equal("" +
+			Expect(stringSecret.ToYaml()).To(Equal("" +
 				"type: value\n" +
 				"name: stringSecret\n" +
 				"value: my-value\n" +
@@ -35,7 +35,7 @@ var _ = Describe("Secret", func() {
 				},
 			}
 
-			Expect(sshSecret.Terminal()).To(Equal("" +
+			Expect(sshSecret.ToYaml()).To(Equal("" +
 				"type: ssh\n" +
 				"name: sshSecret\n" +
 				"value:\n" +
@@ -55,7 +55,7 @@ var _ = Describe("Secret", func() {
 				},
 			}
 
-			Expect(sshSecret.Terminal()).To(Equal("" +
+			Expect(sshSecret.ToYaml()).To(Equal("" +
 				"type: rsa\n" +
 				"name: rsaSecret\n" +
 				"value:\n" +
@@ -76,7 +76,7 @@ var _ = Describe("Secret", func() {
 					},
 				}
 
-				Expect(certificateSecret.Terminal()).To(Equal("" +
+				Expect(certificateSecret.ToYaml()).To(Equal("" +
 					"type: certificate\n" +
 					"name: nonNulledSecret\n" +
 					"value:\n" +
@@ -97,7 +97,7 @@ var _ = Describe("Secret", func() {
 					},
 				}
 
-				Expect(certificateSecret.Terminal()).To(Equal("" +
+				Expect(certificateSecret.ToYaml()).To(Equal("" +
 					"type: certificate\n" +
 					"name: nonNulledSecret\n" +
 					"value:\n" +
@@ -116,7 +116,7 @@ var _ = Describe("Secret", func() {
 					},
 				}
 
-				Expect(certificateSecret.Terminal()).To(Equal("" +
+				Expect(certificateSecret.ToYaml()).To(Equal("" +
 					"type: certificate\n" +
 					"name: nulledSecret\n" +
 					"value: {}\n" +
@@ -136,7 +136,7 @@ var _ = Describe("Secret", func() {
 				},
 			}
 
-			Expect(stringSecret.Json()).To(MatchJSON(`{
+			Expect(stringSecret.ToJson()).To(MatchJSON(`{
 				"type": "value",
 				"name": "stringSecret",
 				"value": "my-value",
@@ -155,7 +155,7 @@ var _ = Describe("Secret", func() {
 				},
 			}
 
-			Expect(sshSecret.Json()).To(MatchJSON(`{
+			Expect(sshSecret.ToJson()).To(MatchJSON(`{
 				"type": "ssh",
 				"name": "sshSecret",
 				"version_created_at": "2016-01-01T12:00:00Z",
@@ -177,7 +177,7 @@ var _ = Describe("Secret", func() {
 				},
 			}
 
-			Expect(sshSecret.Json()).To(MatchJSON(`{
+			Expect(sshSecret.ToJson()).To(MatchJSON(`{
 				"type": "rsa",
 				"name": "rsaSecret",
 				"version_created_at": "2016-01-01T12:00:00Z",
@@ -200,7 +200,7 @@ var _ = Describe("Secret", func() {
 					},
 				}
 
-				Expect(certificateSecret.Json()).To(MatchJSON(`{
+				Expect(certificateSecret.ToJson()).To(MatchJSON(`{
 					"type": "certificate",
 					"name": "nonNulledSecret",
 					"version_created_at": "2016-01-01T12:00:00Z",
@@ -223,7 +223,7 @@ var _ = Describe("Secret", func() {
 					},
 				}
 
-				Expect(certificateSecret.Json()).To(MatchJSON(`{
+				Expect(certificateSecret.ToJson()).To(MatchJSON(`{
 					"type": "certificate",
 					"name": "nonNulledSecret",
 					"version_created_at": "2016-01-01T12:00:00Z",
@@ -244,7 +244,7 @@ var _ = Describe("Secret", func() {
 					},
 				}
 
-				Expect(certificateSecret.Json()).To(MatchJSON(`{
+				Expect(certificateSecret.ToJson()).To(MatchJSON(`{
 					"type": "certificate",
 					"name": "nulledSecret",
 					"value": {},

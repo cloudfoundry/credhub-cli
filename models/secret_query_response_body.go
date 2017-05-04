@@ -15,7 +15,7 @@ type SecretQueryCredential struct {
 	VersionCreatedAt string `json:"version_created_at,omitempty"`
 }
 
-func (secretQueryResponseBody SecretQueryResponseBody) Terminal() string {
+func (secretQueryResponseBody SecretQueryResponseBody) ToYaml() string {
 	lines := []string{}
 	longestNameLength := 0
 	for _, credential := range secretQueryResponseBody.Credentials {
@@ -31,6 +31,6 @@ func (secretQueryResponseBody SecretQueryResponseBody) Terminal() string {
 	return strings.Join(lines, "\n")
 }
 
-func (secretQueryResponseBody SecretQueryResponseBody) Json() string {
+func (secretQueryResponseBody SecretQueryResponseBody) ToJson() string {
 	return ""
 }
