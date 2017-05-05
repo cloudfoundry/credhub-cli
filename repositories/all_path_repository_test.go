@@ -11,7 +11,6 @@ import (
 
 	"github.com/cloudfoundry-incubator/credhub-cli/client/clientfakes"
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
-	"github.com/cloudfoundry-incubator/credhub-cli/models"
 
 	cmcli_errors "github.com/cloudfoundry-incubator/credhub-cli/errors"
 )
@@ -38,30 +37,20 @@ var _ = Describe("FindRepository", func() {
 		It("sends a request to the server", func() {
 			request, _ := http.NewRequest("GET", "http://example.com/data?paths=true", nil)
 
+			// language=JSON
+			expectedJson := `{
+                "paths": [
+                    {"path": "deploy123/"},
+                    {"path": "deploy123/dan/"},
+                    {"path": "deploy123/dan/consul/"},
+                    {"path": "deploy12/"},
+                    {"path": "consul/"},
+                    {"path": "consul/deploy123/"}
+                ]}`
+
 			responseObj := http.Response{
 				StatusCode: 200,
-				Body: ioutil.NopCloser(bytes.NewReader([]byte(`{
-				"paths": [
-						{
-							"path": "deploy123/"
-						},
-						{
-							"path": "deploy123/dan/"
-						},
-						{
-							"path": "deploy123/dan/consul/"
-						},
-						{
-							"path": "deploy12/"
-						},
-						{
-							"path": "consul/"
-						},
-						{
-							"path": "consul/deploy123/"
-						}
-				]
-			}`))),
+				Body:       ioutil.NopCloser(bytes.NewReader([]byte(expectedJson))),
 			}
 
 			httpClient.DoStub = func(req *http.Request) (resp *http.Response, err error) {
@@ -70,33 +59,10 @@ var _ = Describe("FindRepository", func() {
 				return &responseObj, nil
 			}
 
-			expectedFindResponseBody := models.AllPathResponseBody{
-				Paths: []models.Path{
-					{
-						Path: "deploy123/",
-					},
-					{
-						Path: "deploy123/dan/",
-					},
-					{
-						Path: "deploy123/dan/consul/",
-					},
-					{
-						Path: "deploy12/",
-					},
-					{
-						Path: "consul/",
-					},
-					{
-						Path: "consul/deploy123/",
-					},
-				},
-			}
-
 			findResponseBody, err := repository.SendRequest(request, "")
-
 			Expect(err).ToNot(HaveOccurred())
-			Expect(findResponseBody).To(Equal(expectedFindResponseBody))
+
+			Expect(findResponseBody.ToJson()).To(MatchJSON(expectedJson))
 		})
 
 		Describe("Errors", func() {
@@ -110,6 +76,21 @@ var _ = Describe("FindRepository", func() {
 
 				_, error := repository.SendRequest(request, "foo")
 				Expect(error).To(MatchError(cmcli_errors.NewResponseError()))
+			})
+
+			It("returns a NewNoMatchingCredentialsFoundError when there are no credentials returned", func() {
+				emptyPaths := `{"paths":[]}`
+
+				responseObj := http.Response{
+					StatusCode: 200,
+					Body:       ioutil.NopCloser(bytes.NewReader([]byte(emptyPaths))),
+				}
+				httpClient.DoReturns(&responseObj, nil)
+				request, _ := http.NewRequest("GET", "http://example.com/foo", nil)
+
+				secret, err := repository.SendRequest(request, "foo")
+				Expect(err).To(MatchError(cmcli_errors.NewNoMatchingCredentialsFoundError()))
+				Expect(secret.ToJson()).To(MatchJSON(emptyPaths))
 			})
 		})
 	})

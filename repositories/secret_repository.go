@@ -18,23 +18,26 @@ func NewSecretRepository(httpClient client.HttpClient) Repository {
 }
 
 func (r secretRepository) SendRequest(request *http.Request, identifier string) (models.Printable, error) {
+	secret := models.Secret{}
 	response, err := DoSendRequest(r.httpClient, request)
 	if err != nil {
-		return models.Secret{}, err
+		return secret, err
 	}
 
 	if request.Method == "DELETE" {
-		return models.Secret{}, nil
+		return secret, nil
 	}
 
 	decoder := json.NewDecoder(response.Body)
-	decoded := map[string]interface{}{}
-
-	err = decoder.Decode(&decoded)
+	err = decoder.Decode(&secret.SecretBody)
 
 	if err != nil {
-		return models.Secret{}, cm_errors.NewResponseError()
+		return secret, cm_errors.NewResponseError()
 	}
 
-	return models.NewSecret(decoded), nil
+	if data, ok := secret.SecretBody["data"].([]interface{}); ok {
+		secret.SecretBody = data[0].(map[string]interface{})
+	}
+
+	return secret, nil
 }

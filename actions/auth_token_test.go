@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/cloudfoundry-incubator/credhub-cli/actions"
-	"github.com/cloudfoundry-incubator/credhub-cli/client"
 	"github.com/cloudfoundry-incubator/credhub-cli/client/clientfakes"
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	. "github.com/onsi/ginkgo"
@@ -27,8 +26,6 @@ var _ = Describe("Token", func() {
 
 	Describe("Authorization", func() {
 		It("returns the token from the authorization server", func() {
-			request := client.NewAuthTokenRequest(testConfig, "userName", "password")
-
 			responseObj := http.Response{
 				StatusCode: 200,
 				Body: ioutil.NopCloser(bytes.NewBufferString(`{
@@ -38,8 +35,6 @@ var _ = Describe("Token", func() {
 			}
 
 			httpClient.DoStub = func(req *http.Request) (resp *http.Response, err error) {
-				Expect(*req).To(Equal(*request))
-
 				return &responseObj, nil
 			}
 

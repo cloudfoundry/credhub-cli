@@ -11,6 +11,8 @@ import (
 
 	"net/url"
 
+	b64 "encoding/base64"
+
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	"github.com/cloudfoundry-incubator/credhub-cli/models"
 	. "github.com/onsi/ginkgo"
@@ -41,41 +43,43 @@ var _ = Describe("API", func() {
 		It("Returns a request for the uaa oauth token endpoint", func() {
 			user := "my-user"
 			pass := "my-pass"
-			data := url.Values{}
-			data.Set("grant_type", "password")
-			data.Add("response_type", "token")
-			data.Add("username", user)
-			data.Add("password", pass)
-			expectedRequest, _ := http.NewRequest(
-				"POST",
-				cfg.AuthURL+"/oauth/token/",
-				bytes.NewBufferString(data.Encode()))
-			expectedRequest.SetBasicAuth("credhub_cli", "")
-			expectedRequest.Header.Add("Accept", "application/json")
-			expectedRequest.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+
+			basicEncoded := b64.StdEncoding.EncodeToString([]byte(config.AuthClient + ":"))
 
 			request := NewAuthTokenRequest(cfg, user, pass)
+			Expect(request.Header).To(HaveKeyWithValue("Accept", []string{"application/json"}))
+			Expect(request.Header).To(HaveKeyWithValue("Content-Type", []string{"application/x-www-form-urlencoded"}))
+			Expect(request.Header).To(HaveKeyWithValue("Authorization", []string{"Basic " + basicEncoded}))
+			Expect(request.URL.Path).To(Equal("/uaa/oauth/token/"))
+			Expect(request.Method).To(Equal("POST"))
 
-			Expect(request).To(Equal(expectedRequest))
+			byteBuff := new(bytes.Buffer)
+			byteBuff.ReadFrom(request.Body)
+
+			Expect(byteBuff.String()).To(ContainSubstring("grant_type=password"))
+			Expect(byteBuff.String()).To(ContainSubstring("password=my-pass"))
+			Expect(byteBuff.String()).To(ContainSubstring("response_type=token"))
+			Expect(byteBuff.String()).To(ContainSubstring("username=my-user"))
 		})
 	})
 
 	Describe("NewRefreshTokenRequest", func() {
 		It("Returns a request for the uaa oauth token endpoint to get refresh token", func() {
-			data := url.Values{}
-			data.Set("grant_type", "refresh_token")
-			data.Set("refresh_token", cfg.RefreshToken)
-			expectedRequest, _ := http.NewRequest(
-				"POST",
-				cfg.AuthURL+"/oauth/token/",
-				bytes.NewBufferString(data.Encode()))
-			expectedRequest.SetBasicAuth("credhub_cli", "")
-			expectedRequest.Header.Add("Accept", "application/json")
-			expectedRequest.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-
 			request := NewRefreshTokenRequest(cfg)
 
-			Expect(request).To(Equal(expectedRequest))
+			basicEncoded := b64.StdEncoding.EncodeToString([]byte(config.AuthClient + ":"))
+
+			Expect(request.Header).To(HaveKeyWithValue("Accept", []string{"application/json"}))
+			Expect(request.Header).To(HaveKeyWithValue("Content-Type", []string{"application/x-www-form-urlencoded"}))
+			Expect(request.Header).To(HaveKeyWithValue("Authorization", []string{"Basic " + basicEncoded}))
+			Expect(request.URL.Path).To(Equal("/uaa/oauth/token/"))
+			Expect(request.Method).To(Equal("POST"))
+
+			byteBuff := new(bytes.Buffer)
+			byteBuff.ReadFrom(request.Body)
+
+			Expect(byteBuff.String()).To(ContainSubstring("grant_type=refresh_token"))
+			Expect(byteBuff.String()).To(ContainSubstring("refresh_token=" + cfg.RefreshToken))
 		})
 	})
 
@@ -102,39 +106,43 @@ var _ = Describe("API", func() {
 
 		Describe("NewSetSecretRequest with value", func() {
 			It("Returns a request for the put-value endpoint", func() {
-				requestBody := bytes.NewReader([]byte(`{"type":"value","name":"my-name","value":"my-value","overwrite":true}`))
-				expectedRequest, _ := http.NewRequest("PUT", "http://example.com/api/v1/data", requestBody)
-				expectedRequest.Header.Set("Content-Type", "application/json")
-				expectedRequest.Header.Set("Authorization", "Bearer access-token")
-
 				request := NewSetSecretRequest(cfg, "value", "my-name", "my-value", true)
 
-				Expect(request).To(Equal(expectedRequest))
+				Expect(request.Header).To(HaveKeyWithValue("Content-Type", []string{"application/json"}))
+				Expect(request.Header).To(HaveKeyWithValue("Authorization", []string{"Bearer access-token"}))
+				Expect(request.Method).To(Equal("PUT"))
+
+				byteBuff := new(bytes.Buffer)
+				byteBuff.ReadFrom(request.Body)
+
+				Expect(byteBuff.String()).To(MatchJSON(`{"type":"value","name":"my-name","value":"my-value","overwrite":true}`))
 			})
 
 			It("Returns a request that will not overwrite", func() {
-				requestBody := bytes.NewReader([]byte(`{"type":"value","name":"my-name","value":"my-value","overwrite":false}`))
-				expectedRequest, _ := http.NewRequest("PUT", "http://example.com/api/v1/data", requestBody)
-				expectedRequest.Header.Set("Content-Type", "application/json")
-				expectedRequest.Header.Set("Authorization", "Bearer access-token")
-
 				request := NewSetSecretRequest(cfg, "value", "my-name", "my-value", false)
 
-				Expect(request).To(Equal(expectedRequest))
+				Expect(request.Header).To(HaveKeyWithValue("Content-Type", []string{"application/json"}))
+				Expect(request.Header).To(HaveKeyWithValue("Authorization", []string{"Bearer access-token"}))
+				Expect(request.Method).To(Equal("PUT"))
 
+				byteBuff := new(bytes.Buffer)
+				byteBuff.ReadFrom(request.Body)
+
+				Expect(byteBuff.String()).To(MatchJSON(`{"type":"value","name":"my-name","value":"my-value","overwrite":false}`))
 			})
 		})
 
 		Describe("NewSetSecretRequest with password", func() {
 			It("Returns a request for the put-password endpoint", func() {
-				requestBody := bytes.NewReader([]byte(`{"type":"password","name":"my-name","value":"my-password","overwrite":true}`))
-				expectedRequest, _ := http.NewRequest("PUT", "http://example.com/api/v1/data", requestBody)
-				expectedRequest.Header.Set("Content-Type", "application/json")
-				expectedRequest.Header.Set("Authorization", "Bearer access-token")
-
 				request := NewSetSecretRequest(cfg, "password", "my-name", "my-password", true)
+				Expect(request.Header).To(HaveKeyWithValue("Content-Type", []string{"application/json"}))
+				Expect(request.Header).To(HaveKeyWithValue("Authorization", []string{"Bearer access-token"}))
+				Expect(request.Method).To(Equal("PUT"))
 
-				Expect(request).To(Equal(expectedRequest))
+				byteBuff := new(bytes.Buffer)
+				byteBuff.ReadFrom(request.Body)
+
+				Expect(byteBuff.String()).To(MatchJSON(`{"type":"password","name":"my-name","value":"my-password","overwrite":true}`))
 			})
 		})
 
@@ -142,14 +150,16 @@ var _ = Describe("API", func() {
 			It("Returns a request for the put-certificate endpoint", func() {
 				json := fmt.Sprintf(`{"type":"certificate","name":"my-name","value":{"ca":"%s","certificate":"%s","private_key":"%s"},"overwrite":true}`,
 					"my-ca", "my-cert", "my-priv")
-				requestBody := bytes.NewReader([]byte(json))
-				expectedRequest, _ := http.NewRequest("PUT", "http://example.com/api/v1/data", requestBody)
-				expectedRequest.Header.Set("Content-Type", "application/json")
-				expectedRequest.Header.Set("Authorization", "Bearer access-token")
 
 				request := NewSetCertificateRequest(cfg, "my-name", "my-ca", "my-cert", "my-priv", true)
+				Expect(request.Header).To(HaveKeyWithValue("Content-Type", []string{"application/json"}))
+				Expect(request.Header).To(HaveKeyWithValue("Authorization", []string{"Bearer access-token"}))
+				Expect(request.Method).To(Equal("PUT"))
 
-				Expect(request).To(Equal(expectedRequest))
+				byteBuff := new(bytes.Buffer)
+				byteBuff.ReadFrom(request.Body)
+
+				Expect(byteBuff.String()).To(MatchJSON(json))
 			})
 		})
 
@@ -158,14 +168,17 @@ var _ = Describe("API", func() {
 				It("Returns a request for the put-rsa-ssh endpoint", func() {
 					json := fmt.Sprintf(`{"type":"%s","name":"my-name","value":{"public_key":"%s","private_key":"%s"},"overwrite":true}`,
 						"ssh", "my-pub", "my-priv")
-					requestBody := bytes.NewReader([]byte(json))
-					expectedRequest, _ := http.NewRequest("PUT", "http://example.com/api/v1/data", requestBody)
-					expectedRequest.Header.Set("Content-Type", "application/json")
-					expectedRequest.Header.Set("Authorization", "Bearer access-token")
 
 					request := NewSetRsaSshRequest(cfg, "my-name", "ssh", "my-pub", "my-priv", true)
 
-					Expect(request).To(Equal(expectedRequest))
+					Expect(request.Header).To(HaveKeyWithValue("Content-Type", []string{"application/json"}))
+					Expect(request.Header).To(HaveKeyWithValue("Authorization", []string{"Bearer access-token"}))
+					Expect(request.Method).To(Equal("PUT"))
+
+					byteBuff := new(bytes.Buffer)
+					byteBuff.ReadFrom(request.Body)
+
+					Expect(byteBuff.String()).To(MatchJSON(json))
 				})
 			})
 
@@ -173,29 +186,35 @@ var _ = Describe("API", func() {
 				It("Returns a request for the put-rsa-ssh endpoint", func() {
 					json := fmt.Sprintf(`{"type":"%s","name":"my-name","value":{"public_key":"%s","private_key":"%s"},"overwrite":true}`,
 						"rsa", "my-pub", "my-priv")
-					requestBody := bytes.NewReader([]byte(json))
-					expectedRequest, _ := http.NewRequest("PUT", "http://example.com/api/v1/data", requestBody)
-					expectedRequest.Header.Set("Content-Type", "application/json")
-					expectedRequest.Header.Set("Authorization", "Bearer access-token")
 
 					request := NewSetRsaSshRequest(cfg, "my-name", "rsa", "my-pub", "my-priv", true)
 
-					Expect(request).To(Equal(expectedRequest))
+					Expect(request.Header).To(HaveKeyWithValue("Content-Type", []string{"application/json"}))
+					Expect(request.Header).To(HaveKeyWithValue("Authorization", []string{"Bearer access-token"}))
+					Expect(request.Method).To(Equal("PUT"))
+
+					byteBuff := new(bytes.Buffer)
+					byteBuff.ReadFrom(request.Body)
+
+					Expect(byteBuff.String()).To(MatchJSON(json))
 				})
 			})
 		})
 
 		Describe("NewGenerateSecretRequest", func() {
 			It("returns a request with only overwrite", func() {
-				requestBody := bytes.NewReader([]byte(`{"name":"my-name","type":"my-type","overwrite":true,"parameters":{}}`))
-				expectedRequest, _ := http.NewRequest("POST", "http://example.com/api/v1/data", requestBody)
-				expectedRequest.Header.Set("Content-Type", "application/json")
-				expectedRequest.Header.Set("Authorization", "Bearer access-token")
+				requestBody := `{"name":"my-name","type":"my-type","overwrite":true,"parameters":{}}`
 
 				params := models.SecretParameters{}
 				request := NewGenerateSecretRequest(cfg, "my-name", params, "my-type", true)
+				Expect(request.Header).To(HaveKeyWithValue("Content-Type", []string{"application/json"}))
+				Expect(request.Header).To(HaveKeyWithValue("Authorization", []string{"Bearer access-token"}))
+				Expect(request.Method).To(Equal("POST"))
 
-				Expect(request).To(Equal(expectedRequest))
+				byteBuff := new(bytes.Buffer)
+				byteBuff.ReadFrom(request.Body)
+
+				Expect(byteBuff.String()).To(MatchJSON(requestBody))
 			})
 
 			It("returns a request with parameters", func() {
@@ -232,14 +251,17 @@ var _ = Describe("API", func() {
 
 		Describe("NewRegenerateSecretRequest", func() {
 			It("returns a request with only regenerate", func() {
-				requestBody := bytes.NewReader([]byte(`{"name":"my-name","regenerate":true}`))
-				expectedRequest, _ := http.NewRequest("POST", "http://example.com/api/v1/data", requestBody)
-				expectedRequest.Header.Set("Content-Type", "application/json")
-				expectedRequest.Header.Set("Authorization", "Bearer access-token")
+				requestBody := `{"name":"my-name","regenerate":true}`
 
 				request := NewRegenerateSecretRequest(cfg, "my-name")
+				Expect(request.Header).To(HaveKeyWithValue("Content-Type", []string{"application/json"}))
+				Expect(request.Header).To(HaveKeyWithValue("Authorization", []string{"Bearer access-token"}))
+				Expect(request.Method).To(Equal("POST"))
 
-				Expect(request).To(Equal(expectedRequest))
+				byteBuff := new(bytes.Buffer)
+				byteBuff.ReadFrom(request.Body)
+
+				Expect(byteBuff.String()).To(MatchJSON(requestBody))
 			})
 		})
 

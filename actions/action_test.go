@@ -11,6 +11,9 @@ import (
 
 	"bytes"
 
+	"encoding/json"
+	"fmt"
+
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	cm_errors "github.com/cloudfoundry-incubator/credhub-cli/errors"
 	"github.com/cloudfoundry-incubator/credhub-cli/models"
@@ -23,8 +26,8 @@ var _ = Describe("Action", func() {
 		subject      Action
 		repository   repositoriesfakes.FakeRepository
 		cfg          config.Config
-		expectedBody models.SecretBody
-		expectedItem models.Printable
+		expectedJSON string
+		expectedItem models.Secret
 	)
 
 	BeforeEach(func() {
@@ -33,14 +36,14 @@ var _ = Describe("Action", func() {
 			AuthURL: "example.com",
 		}
 		subject = NewAction(&repository, cfg)
-		expectedBody = models.SecretBody{
-			Name:       "my-item",
-			SecretType: "value",
-			Value:      "potatoes",
-		}
-		expectedItem = models.Secret{
-			SecretBody: expectedBody,
-		}
+
+		expectedJSON =
+			`{ "name":"my-item",
+ 		   "secretType": "value",
+  		 "value": "potatoes"
+		}`
+
+		expectedItem = models.Secret{}
 	})
 
 	AfterEach(func() {
@@ -52,13 +55,20 @@ var _ = Describe("Action", func() {
 			request, _ := http.NewRequest("POST", "my-url", nil)
 			repository.SendRequestStub = func(req *http.Request, identifier string) (models.Printable, error) {
 				Expect(req).To(Equal(request))
+
+				err := json.Unmarshal([]byte(expectedJSON), &expectedItem.SecretBody)
+				Expect(err).ToNot(HaveOccurred())
+				if err != nil {
+					fmt.Println(err)
+				}
+
 				return expectedItem, nil
 			}
 
 			secret, err := subject.DoAction(request, "my-item")
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(secret).To(Equal(expectedItem))
+			Expect(secret.ToJson()).To(MatchJSON(expectedJSON))
 		})
 
 		Describe("Errors", func() {

@@ -157,7 +157,7 @@ var _ = Describe("Set", func() {
 
 			session := runCommandWithStdin(strings.NewReader("potatoes potatoes\n"), "set", "-n", "my-password", "-t", "password")
 
-			response := fmt.Sprintf(STRING_SECRET_RESPONSE_YAML, "password", "my-password", "potatoes potatoes")
+			response := fmt.Sprintf(STRING_SECRET_RESPONSE_YAML, "my-password", "password", "potatoes potatoes")
 
 			Eventually(session.Out).Should(Say("value:"))
 			Eventually(session.Wait("10s").Out).Should(Say(response))

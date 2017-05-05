@@ -40,6 +40,7 @@ var _ = Describe("Generate", func() {
 
 			Eventually(session).Should(Exit(0))
 			Expect(session.Out.Contents()).To(MatchJSON(`{
+				"id" :"` + UUID + `",
 				"type": "password",
 				"name": "my-password",
 				"version_created_at": "` + TIMESTAMP + `",
@@ -70,6 +71,7 @@ var _ = Describe("Generate", func() {
 
 			Eventually(session).Should(Exit(0))
 			Expect(string(session.Out.Contents())).To(MatchJSON(`{
+				"id" :"` + UUID + `",
 				"type": "password",
 				"name": "my-password",
 				"version_created_at": "` + TIMESTAMP + `",
@@ -131,6 +133,7 @@ var _ = Describe("Generate", func() {
 
 			Eventually(session).Should(Exit(0))
 			Expect(string(session.Out.Contents())).To(MatchJSON(`{
+				"id" :"` + UUID + `",
 				"type": "ssh",
 				"name": "foo-ssh-key",
 				"version_created_at": "` + TIMESTAMP + `",
@@ -178,6 +181,7 @@ var _ = Describe("Generate", func() {
 
 			Eventually(session).Should(Exit(0))
 			Expect(string(session.Out.Contents())).To(MatchJSON(`{
+				"id" :"` + UUID + `",
 				"type": "rsa",
 				"name": "foo-rsa-key",
 				"version_created_at": "` + TIMESTAMP + `",
@@ -220,6 +224,7 @@ var _ = Describe("Generate", func() {
 
 			Eventually(session).Should(Exit(0))
 			Expect(string(session.Out.Contents())).To(MatchJSON(`{
+				"id" :"` + UUID + `",
 				"type": "certificate",
 				"name": "my-secret",
 				"version_created_at": "` + TIMESTAMP + `",

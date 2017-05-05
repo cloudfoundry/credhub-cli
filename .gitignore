@@ -4,6 +4,7 @@ cm-cli
 *.pem
 *.crt
 *.key
+.idea
 vendor/*
 !vendor/vendor.json
 tmp

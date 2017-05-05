@@ -38,40 +38,29 @@ var _ = Describe("SecretRepository", func() {
 			It("sends a request to the server which responds with a single credential", func() {
 				request, _ := http.NewRequest("GET", "http://example.com/foo", nil)
 
+				expectedSecretJson := `{"name":"foo","id":"some-id","type":"value","value":"my-value","version_created_at":"2016-12-07T22:57:04Z"}`
 				responseObj := http.Response{
 					StatusCode: 200,
-					Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"name":"foo","id":"some-id","type":"value","value":"my-value","version_created_at":"2016-12-07T22:57:04Z"}`))),
+					Body:       ioutil.NopCloser(bytes.NewReader([]byte(expectedSecretJson))),
 				}
 
 				httpClient.DoStub = func(req *http.Request) (resp *http.Response, err error) {
 					Expect(req).To(Equal(request))
-
 					return &responseObj, nil
 				}
 
-				expectedSecretBody := models.SecretBody{
-					Name:             "foo",
-					SecretType:       "value",
-					Value:            "my-value",
-					VersionCreatedAt: "2016-12-07T22:57:04Z",
-				}
-
-				expectedSecret := models.Secret{
-					SecretBody: expectedSecretBody,
-				}
-
 				secret, err := repository.SendRequest(request, "foo")
-
 				Expect(err).ToNot(HaveOccurred())
-				Expect(secret).To(Equal(expectedSecret))
+				Expect(secret.ToJson()).To(MatchJSON(expectedSecretJson))
 			})
 
 			It("sends a request to the server for an array of credentials", func() {
 				request, _ := http.NewRequest("GET", "http://example.com/bar", nil)
 
+				expectedSecretJson := `{"name":"bar","id":"some-id","type":"password","value":"my-password","version_created_at":"2016-12-07T22:57:04Z"}`
 				responseObj := http.Response{
 					StatusCode: 200,
-					Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"data":[{"name":"bar","id":"some-id","type":"password","value":"my-password","version_created_at":"2016-12-07T22:57:04Z"}]}`))),
+					Body:       ioutil.NopCloser(bytes.NewReader([]byte(expectedSecretJson))),
 				}
 
 				httpClient.DoStub = func(req *http.Request) (resp *http.Response, err error) {
@@ -80,21 +69,9 @@ var _ = Describe("SecretRepository", func() {
 					return &responseObj, nil
 				}
 
-				expectedSecretBody := models.SecretBody{
-					Name:             "bar",
-					SecretType:       "password",
-					Value:            "my-password",
-					VersionCreatedAt: "2016-12-07T22:57:04Z",
-				}
-
-				expectedSecret := models.Secret{
-					SecretBody: expectedSecretBody,
-				}
-
 				secret, err := repository.SendRequest(request, "foo")
-
 				Expect(err).ToNot(HaveOccurred())
-				Expect(secret).To(Equal(expectedSecret))
+				Expect(secret.ToJson()).To(MatchJSON(expectedSecretJson))
 			})
 		})
 

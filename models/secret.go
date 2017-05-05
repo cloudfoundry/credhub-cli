@@ -7,14 +7,12 @@ import (
 )
 
 type Secret struct {
-	SecretBody SecretBody
+	SecretBody map[string]interface{}
 }
 
 func NewSecret(secretBodyMap map[string]interface{}) Secret {
-	secretBody := NewSecretBody(secretBodyMap)
-
 	return Secret{
-		SecretBody: secretBody,
+		SecretBody: secretBodyMap,
 	}
 }
 

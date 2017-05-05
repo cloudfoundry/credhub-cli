@@ -131,6 +131,7 @@ var _ = Describe("Get", func() {
 
 		Eventually(session).Should(Exit(0))
 		Eventually(string(session.Out.Contents())).Should(MatchJSON(`{
+			"id": "` + UUID + `",
 			"type": "password",
 			"name": "my-password",
 			"version_created_at": "` + TIMESTAMP + `",

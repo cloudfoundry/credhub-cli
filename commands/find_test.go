@@ -58,13 +58,9 @@ var _ = Describe("Find", func() {
 				]
 			}`
 
-			responseTable := "Path\n" +
-				"consul/\n" +
-				"consul/deploy123/\n" +
-				"deploy12/\n" +
-				"deploy123/\n" +
-				"deploy123/dan/\n" +
-				"deploy123/dan/consul/\n"
+			// language=YAML
+			responseTable :=
+				"paths:\n- path: consul/\n- path: consul/deploy123/\n- path: deploy12/\n- path: deploy123/\n- path: deploy123/dan/\n- path: deploy123/dan/consul/"
 
 			server.AppendHandlers(
 				CombineHandlers(

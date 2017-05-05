@@ -29,7 +29,7 @@ var _ = Describe("Regenerate", func() {
 			session := runCommand("regenerate", "--name", "my-password-stuffs")
 
 			Eventually(session).Should(Exit(0))
-			Expect(session.Out).To(Say(fmt.Sprintf(STRING_SECRET_RESPONSE_YAML, "password", "my-password-stuffs", "nu-potatoes")))
+			Expect(session.Out).To(Say(fmt.Sprintf(STRING_SECRET_RESPONSE_YAML, "my-password-stuffs", "password", "nu-potatoes")))
 		})
 	})
 
