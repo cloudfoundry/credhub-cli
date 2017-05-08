@@ -14,7 +14,7 @@ type RegenerateCommand struct {
 
 func (cmd RegenerateCommand) Execute([]string) error {
 	cfg := config.ReadConfig()
-	repository := repositories.NewSecretRepository(client.NewHttpClient(cfg))
+	repository := repositories.NewCredentialRepository(client.NewHttpClient(cfg))
 	action := actions.NewAction(repository, cfg)
 
 	secret, err := action.DoAction(client.NewRegenerateSecretRequest(cfg, cmd.SecretIdentifier), cmd.SecretIdentifier)

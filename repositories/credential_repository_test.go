@@ -15,7 +15,7 @@ import (
 	"github.com/cloudfoundry-incubator/credhub-cli/models"
 )
 
-var _ = Describe("SecretRepository", func() {
+var _ = Describe("CredentialRepository", func() {
 	var (
 		repository Repository
 		httpClient clientfakes.FakeHttpClient
@@ -31,17 +31,17 @@ var _ = Describe("SecretRepository", func() {
 
 	Describe("SendRequest", func() {
 		BeforeEach(func() {
-			repository = NewSecretRepository(&httpClient)
+			repository = NewCredentialRepository(&httpClient)
 		})
 
 		Context("when there is a response body", func() {
 			It("sends a request to the server which responds with a single credential", func() {
 				request, _ := http.NewRequest("GET", "http://example.com/foo", nil)
 
-				expectedSecretJson := `{"name":"foo","id":"some-id","type":"value","value":"my-value","version_created_at":"2016-12-07T22:57:04Z"}`
+				expectedCredentialJson := `{"name":"foo","id":"some-id","type":"value","value":"my-value","version_created_at":"2016-12-07T22:57:04Z"}`
 				responseObj := http.Response{
 					StatusCode: 200,
-					Body:       ioutil.NopCloser(bytes.NewReader([]byte(expectedSecretJson))),
+					Body:       ioutil.NopCloser(bytes.NewReader([]byte(expectedCredentialJson))),
 				}
 
 				httpClient.DoStub = func(req *http.Request) (resp *http.Response, err error) {
@@ -49,18 +49,18 @@ var _ = Describe("SecretRepository", func() {
 					return &responseObj, nil
 				}
 
-				secret, err := repository.SendRequest(request, "foo")
+				credential, err := repository.SendRequest(request, "foo")
 				Expect(err).ToNot(HaveOccurred())
-				Expect(secret.ToJson()).To(MatchJSON(expectedSecretJson))
+				Expect(credential.ToJson()).To(MatchJSON(expectedCredentialJson))
 			})
 
 			It("sends a request to the server for an array of credentials", func() {
 				request, _ := http.NewRequest("GET", "http://example.com/bar", nil)
 
-				expectedSecretJson := `{"name":"bar","id":"some-id","type":"password","value":"my-password","version_created_at":"2016-12-07T22:57:04Z"}`
+				expectedCredentialJson := `{"name":"bar","id":"some-id","type":"password","value":"my-password","version_created_at":"2016-12-07T22:57:04Z"}`
 				responseObj := http.Response{
 					StatusCode: 200,
-					Body:       ioutil.NopCloser(bytes.NewReader([]byte(expectedSecretJson))),
+					Body:       ioutil.NopCloser(bytes.NewReader([]byte(expectedCredentialJson))),
 				}
 
 				httpClient.DoStub = func(req *http.Request) (resp *http.Response, err error) {
@@ -69,9 +69,9 @@ var _ = Describe("SecretRepository", func() {
 					return &responseObj, nil
 				}
 
-				secret, err := repository.SendRequest(request, "foo")
+				credential, err := repository.SendRequest(request, "foo")
 				Expect(err).ToNot(HaveOccurred())
-				Expect(secret.ToJson()).To(MatchJSON(expectedSecretJson))
+				Expect(credential.ToJson()).To(MatchJSON(expectedCredentialJson))
 			})
 		})
 
@@ -90,10 +90,10 @@ var _ = Describe("SecretRepository", func() {
 					return &responseObj, nil
 				}
 
-				secret, err := repository.SendRequest(request, "foo")
+				credential, err := repository.SendRequest(request, "foo")
 
 				Expect(err).ToNot(HaveOccurred())
-				Expect(secret).To(Equal(models.CredentialResponse{}))
+				Expect(credential).To(Equal(models.CredentialResponse{}))
 			})
 		})
 
