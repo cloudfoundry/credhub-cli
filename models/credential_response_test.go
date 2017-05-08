@@ -7,19 +7,19 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Secret", func() {
+var _ = Describe("CredentialResponse", func() {
 	expectedJSON := `{"name": "stringSecret",
 					"type":       "value",
 					"value":            "my-value",
 					"version_created_at": "2016-01-01T12:00:00Z"}`
 
-	secret := Secret{
+	secret := CredentialResponse{
 		make(map[string]interface{}),
 	}
 
 	Describe("ToYaml()", func() {
 		It("renders string secrets", func() {
-			err := json.Unmarshal([]byte(expectedJSON), &secret.SecretBody)
+			err := json.Unmarshal([]byte(expectedJSON), &secret.ResponseBody)
 			Expect(err).To(BeNil())
 
 			Expect(secret.ToYaml()).To(MatchYAML("" +
@@ -32,7 +32,7 @@ var _ = Describe("Secret", func() {
 
 	Describe("ToJson()", func() {
 		It("renders string secrets", func() {
-			err := json.Unmarshal([]byte(expectedJSON), &secret.SecretBody)
+			err := json.Unmarshal([]byte(expectedJSON), &secret.ResponseBody)
 			Expect(err).To(BeNil())
 			Expect(secret.ToJson()).To(MatchJSON(expectedJSON))
 		})

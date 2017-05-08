@@ -1,6 +1,6 @@
 package models
 
-type SecretParameters struct {
+type GenerationParameters struct {
 	IncludeSpecial   bool     `json:"include_special,omitempty"`
 	ExcludeNumber    bool     `json:"exclude_number,omitempty"`
 	ExcludeUpper     bool     `json:"exclude_upper,omitempty"`

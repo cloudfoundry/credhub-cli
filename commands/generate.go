@@ -43,7 +43,7 @@ func (cmd GenerateCommand) Execute([]string) error {
 	cfg := config.ReadConfig()
 	repository := repositories.NewSecretRepository(client.NewHttpClient(cfg))
 
-	parameters := models.SecretParameters{
+	parameters := models.GenerationParameters{
 		IncludeSpecial:   cmd.IncludeSpecial,
 		ExcludeNumber:    cmd.ExcludeNumber,
 		ExcludeUpper:     cmd.ExcludeUpper,

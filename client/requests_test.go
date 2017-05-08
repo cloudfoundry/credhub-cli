@@ -205,7 +205,7 @@ var _ = Describe("API", func() {
 			It("returns a request with only overwrite", func() {
 				requestBody := `{"name":"my-name","type":"my-type","overwrite":true,"parameters":{}}`
 
-				params := models.SecretParameters{}
+				params := models.GenerationParameters{}
 				request := NewGenerateSecretRequest(cfg, "my-name", params, "my-type", true)
 				Expect(request.Header).To(HaveKeyWithValue("Content-Type", []string{"application/json"}))
 				Expect(request.Header).To(HaveKeyWithValue("Authorization", []string{"Bearer access-token"}))
@@ -218,7 +218,7 @@ var _ = Describe("API", func() {
 			})
 
 			It("returns a request with parameters", func() {
-				parameters := models.SecretParameters{
+				parameters := models.GenerationParameters{
 					IncludeSpecial: true,
 					ExcludeNumber:  true,
 					ExcludeUpper:   true,

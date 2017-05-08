@@ -26,7 +26,7 @@ var _ = Describe("Action", func() {
 		repository   repositoriesfakes.FakeRepository
 		cfg          config.Config
 		expectedJSON string
-		expectedItem models.Secret
+		expectedItem models.CredentialResponse
 	)
 
 	BeforeEach(func() {
@@ -39,7 +39,7 @@ var _ = Describe("Action", func() {
 		// language=JSON
 		expectedJSON = `{"name": "my-item", "secretType": "value", "value": "potatoes"}`
 
-		expectedItem = models.Secret{}
+		expectedItem = models.CredentialResponse{}
 	})
 
 	AfterEach(func() {
@@ -52,7 +52,7 @@ var _ = Describe("Action", func() {
 			repository.SendRequestStub = func(req *http.Request, identifier string) (models.Printable, error) {
 				Expect(req).To(Equal(request))
 
-				err := json.Unmarshal([]byte(expectedJSON), &expectedItem.SecretBody)
+				err := json.Unmarshal([]byte(expectedJSON), &expectedItem.ResponseBody)
 				Expect(err).ToNot(HaveOccurred())
 
 				return expectedItem, nil

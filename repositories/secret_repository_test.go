@@ -93,7 +93,7 @@ var _ = Describe("SecretRepository", func() {
 				secret, err := repository.SendRequest(request, "foo")
 
 				Expect(err).ToNot(HaveOccurred())
-				Expect(secret).To(Equal(models.Secret{}))
+				Expect(secret).To(Equal(models.CredentialResponse{}))
 			})
 		})
 

@@ -49,7 +49,7 @@ func NewSetSecretRequest(config config.Config, secretType string, secretIdentifi
 		}
 	}
 
-	secret := models.SecretBody{
+	secret := models.RequestBody{
 		SecretType: secretType,
 		Name:       secretIdentifier,
 		Value:      value,
@@ -59,7 +59,7 @@ func NewSetSecretRequest(config config.Config, secretType string, secretIdentifi
 	return newSecretRequest("PUT", config, secretIdentifier, secret)
 }
 
-func NewGenerateSecretRequest(config config.Config, secretIdentifier string, parameters models.SecretParameters, secretType string, overwrite bool) *http.Request {
+func NewGenerateSecretRequest(config config.Config, secretIdentifier string, parameters models.GenerationParameters, secretType string, overwrite bool) *http.Request {
 	generateRequest := models.GenerateSecretRequest{
 		Name:       secretIdentifier,
 		SecretType: secretType,

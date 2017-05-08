@@ -22,7 +22,7 @@ func NewAllPathRepository(httpClient client.HttpClient) Repository {
 }
 
 func (r allPathRepository) SendRequest(request *http.Request, ignoredIdentifier string) (models.Printable, error) {
-	secret := models.Secret{}
+	secret := models.CredentialResponse{}
 
 	response, err := DoSendRequest(r.httpClient, request)
 	if err != nil {
@@ -30,13 +30,13 @@ func (r allPathRepository) SendRequest(request *http.Request, ignoredIdentifier 
 	}
 
 	decoder := json.NewDecoder(response.Body)
-	err = decoder.Decode(&secret.SecretBody)
+	err = decoder.Decode(&secret.ResponseBody)
 
 	if err != nil {
 		return secret, cm_errors.NewResponseError()
 	}
 
-	if len(secret.SecretBody["paths"].([]interface{})) == 0 {
+	if len(secret.ResponseBody["paths"].([]interface{})) == 0 {
 		return secret, errors.NewNoMatchingCredentialsFoundError()
 	}
 	return secret, nil

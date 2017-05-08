@@ -52,7 +52,7 @@ var _ = Describe("FindRepository", func() {
 
 			responseObj := http.Response{
 				StatusCode: 200,
-				Body: ioutil.NopCloser(bytes.NewReader([]byte(expctedJson))),
+				Body:       ioutil.NopCloser(bytes.NewReader([]byte(expctedJson))),
 			}
 
 			httpClient.DoStub = func(req *http.Request) (resp *http.Response, err error) {
