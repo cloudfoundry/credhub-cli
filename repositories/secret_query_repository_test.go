@@ -11,7 +11,6 @@ import (
 
 	"github.com/cloudfoundry-incubator/credhub-cli/client/clientfakes"
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
-	"github.com/cloudfoundry-incubator/credhub-cli/models"
 
 	cmcli_errors "github.com/cloudfoundry-incubator/credhub-cli/errors"
 )
@@ -38,9 +37,7 @@ var _ = Describe("FindRepository", func() {
 		It("sends a request to the server", func() {
 			request, _ := http.NewRequest("GET", "http://example.com/api/v1/data?name-like=find-me", nil)
 
-			responseObj := http.Response{
-				StatusCode: 200,
-				Body: ioutil.NopCloser(bytes.NewReader([]byte(`{
+			expctedJson := `{
 					"credentials": [
 							{
 								"name": "dan.password",
@@ -51,7 +48,11 @@ var _ = Describe("FindRepository", func() {
 								"version_created_at": "2016-09-06T23:26:58Z"
 							}
 					]
-				}`))),
+				}`
+
+			responseObj := http.Response{
+				StatusCode: 200,
+				Body: ioutil.NopCloser(bytes.NewReader([]byte(expctedJson))),
 			}
 
 			httpClient.DoStub = func(req *http.Request) (resp *http.Response, err error) {
@@ -60,23 +61,10 @@ var _ = Describe("FindRepository", func() {
 				return &responseObj, nil
 			}
 
-			expectedFindResponseBody := models.SecretQueryResponseBody{
-				Credentials: []models.SecretQueryCredential{
-					{
-						Name:             "dan.password",
-						VersionCreatedAt: "2016-09-06T23:26:58Z",
-					},
-					{
-						Name:             "deploy1/dan/id.key",
-						VersionCreatedAt: "2016-09-06T23:26:58Z",
-					},
-				},
-			}
-
 			findResponseBody, err := repository.SendRequest(request, "")
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(findResponseBody).To(Equal(expectedFindResponseBody))
+			Expect(findResponseBody.ToJson()).To(MatchJSON(expctedJson))
 		})
 
 		Describe("Errors", func() {

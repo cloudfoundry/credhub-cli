@@ -36,6 +36,5 @@ var _ = Describe("Secret", func() {
 			Expect(err).To(BeNil())
 			Expect(secret.ToJson()).To(MatchJSON(expectedJSON))
 		})
-
 	})
 })

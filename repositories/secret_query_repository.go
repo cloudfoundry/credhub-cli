@@ -22,18 +22,21 @@ func NewSecretQueryRepository(httpClient client.HttpClient) Repository {
 }
 
 func (r secretQueryRepository) SendRequest(request *http.Request, identifier string) (models.Printable, error) {
+	secret := models.Secret{}
 	response, err := DoSendRequest(r.httpClient, request)
 	if err != nil {
-		return models.SecretQueryResponseBody{}, err
+		return secret, err
 	}
 
 	decoder := json.NewDecoder(response.Body)
-	findResponseBody := models.SecretQueryResponseBody{}
-	err = decoder.Decode(&findResponseBody)
+	err = decoder.Decode(&secret.SecretBody)
+
 	if err != nil {
-		return models.SecretQueryResponseBody{}, cm_errors.NewResponseError()
-	} else if len(findResponseBody.Credentials) < 1 {
-		return models.SecretQueryResponseBody{}, errors.NewNoMatchingCredentialsFoundError()
+		return secret, cm_errors.NewResponseError()
 	}
-	return findResponseBody, nil
+	if len(secret.SecretBody["credentials"].([]interface{})) == 0 {
+		return secret, errors.NewNoMatchingCredentialsFoundError()
+	}
+
+	return secret, nil
 }

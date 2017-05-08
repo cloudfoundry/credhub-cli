@@ -2,18 +2,11 @@ package models
 
 import (
 	"encoding/json"
-
 	"gopkg.in/yaml.v2"
 )
 
 type Secret struct {
 	SecretBody map[string]interface{}
-}
-
-func NewSecret(secretBodyMap map[string]interface{}) Secret {
-	return Secret{
-		SecretBody: secretBodyMap,
-	}
 }
 
 func (secret Secret) ToYaml() string {

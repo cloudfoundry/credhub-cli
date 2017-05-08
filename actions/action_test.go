@@ -12,7 +12,6 @@ import (
 	"bytes"
 
 	"encoding/json"
-	"fmt"
 
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	cm_errors "github.com/cloudfoundry-incubator/credhub-cli/errors"
@@ -37,11 +36,8 @@ var _ = Describe("Action", func() {
 		}
 		subject = NewAction(&repository, cfg)
 
-		expectedJSON =
-			`{ "name":"my-item",
- 		   "secretType": "value",
-  		 "value": "potatoes"
-		}`
+		// language=JSON
+		expectedJSON = `{"name": "my-item", "secretType": "value", "value": "potatoes"}`
 
 		expectedItem = models.Secret{}
 	})
@@ -58,9 +54,6 @@ var _ = Describe("Action", func() {
 
 				err := json.Unmarshal([]byte(expectedJSON), &expectedItem.SecretBody)
 				Expect(err).ToNot(HaveOccurred())
-				if err != nil {
-					fmt.Println(err)
-				}
 
 				return expectedItem, nil
 			}
