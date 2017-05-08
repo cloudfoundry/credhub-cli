@@ -31,7 +31,7 @@ var _ = Describe("FindRepository", func() {
 
 	Describe("SendRequest", func() {
 		BeforeEach(func() {
-			repository = NewSecretQueryRepository(&httpClient)
+			repository = NewCredentialQueryRepository(&httpClient)
 		})
 
 		It("sends a request to the server", func() {

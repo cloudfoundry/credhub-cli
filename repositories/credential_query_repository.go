@@ -13,15 +13,15 @@ import (
 	cm_errors "github.com/cloudfoundry-incubator/credhub-cli/errors"
 )
 
-type secretQueryRepository struct {
+type credentialQueryRepository struct {
 	httpClient client.HttpClient
 }
 
-func NewSecretQueryRepository(httpClient client.HttpClient) Repository {
-	return secretQueryRepository{httpClient: httpClient}
+func NewCredentialQueryRepository(httpClient client.HttpClient) Repository {
+	return credentialQueryRepository{httpClient: httpClient}
 }
 
-func (r secretQueryRepository) SendRequest(request *http.Request, identifier string) (models.Printable, error) {
+func (r credentialQueryRepository) SendRequest(request *http.Request, identifier string) (models.Printable, error) {
 	credentialResponse := models.CredentialResponse{}
 	response, err := DoSendRequest(r.httpClient, request)
 	if err != nil {

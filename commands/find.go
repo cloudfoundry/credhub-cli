@@ -26,7 +26,7 @@ func (cmd FindCommand) Execute([]string) error {
 	if cmd.AllPaths {
 		repository = repositories.NewAllPathRepository(client.NewHttpClient(cfg))
 	} else {
-		repository = repositories.NewSecretQueryRepository(client.NewHttpClient(cfg))
+		repository = repositories.NewCredentialQueryRepository(client.NewHttpClient(cfg))
 	}
 
 	action := actions.NewAction(repository, cfg)
