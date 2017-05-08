@@ -13,16 +13,16 @@ var _ = Describe("CredentialResponse", func() {
 					"value":            "my-value",
 					"version_created_at": "2016-01-01T12:00:00Z"}`
 
-	secret := CredentialResponse{
+	credential := CredentialResponse{
 		make(map[string]interface{}),
 	}
 
 	Describe("ToYaml()", func() {
 		It("renders string secrets", func() {
-			err := json.Unmarshal([]byte(expectedJSON), &secret.ResponseBody)
+			err := json.Unmarshal([]byte(expectedJSON), &credential.ResponseBody)
 			Expect(err).To(BeNil())
 
-			Expect(secret.ToYaml()).To(MatchYAML("" +
+			Expect(credential.ToYaml()).To(MatchYAML("" +
 				"type: value\n" +
 				"name: stringSecret\n" +
 				"value: my-value\n" +
@@ -32,9 +32,9 @@ var _ = Describe("CredentialResponse", func() {
 
 	Describe("ToJson()", func() {
 		It("renders string secrets", func() {
-			err := json.Unmarshal([]byte(expectedJSON), &secret.ResponseBody)
+			err := json.Unmarshal([]byte(expectedJSON), &credential.ResponseBody)
 			Expect(err).To(BeNil())
-			Expect(secret.ToJson()).To(MatchJSON(expectedJSON))
+			Expect(credential.ToJson()).To(MatchJSON(expectedJSON))
 		})
 	})
 })

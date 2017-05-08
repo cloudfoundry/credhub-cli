@@ -1,7 +1,7 @@
 package models
 
 type RequestBody struct {
-	SecretType       string                `json:"type" binding:"required"`
+	CredentialType   string                `json:"type" binding:"required"`
 	Name             string                `json:"name,omitempty"`
 	Value            interface{}           `json:"value,omitempty"`
 	Overwrite        *bool                 `json:"overwrite,omitempty"`

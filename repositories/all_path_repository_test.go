@@ -88,9 +88,9 @@ var _ = Describe("FindRepository", func() {
 				httpClient.DoReturns(&responseObj, nil)
 				request, _ := http.NewRequest("GET", "http://example.com/foo", nil)
 
-				secret, err := repository.SendRequest(request, "foo")
+				paths, err := repository.SendRequest(request, "foo")
 				Expect(err).To(MatchError(cmcli_errors.NewNoMatchingCredentialsFoundError()))
-				Expect(secret.ToJson()).To(MatchJSON(emptyPaths))
+				Expect(paths.ToJson()).To(MatchJSON(emptyPaths))
 			})
 		})
 	})

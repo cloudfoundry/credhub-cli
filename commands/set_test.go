@@ -57,8 +57,8 @@ var _ = Describe("Set", func() {
 			setupPutRsaSshServer("foo-ssh-key", "ssh", "some-public-key", "some-private-key", true)
 
 			tempDir := createTempDir("sshFilesForTesting")
-			publicFileName := createSecretFile(tempDir, "rsa.pub", "some-public-key")
-			privateFilename := createSecretFile(tempDir, "rsa.key", "some-private-key")
+			publicFileName := createCredentialFile(tempDir, "rsa.pub", "some-public-key")
+			privateFilename := createCredentialFile(tempDir, "rsa.key", "some-private-key")
 
 			session := runCommand("set", "-n", "foo-ssh-key",
 				"-t", "ssh",
@@ -93,8 +93,8 @@ var _ = Describe("Set", func() {
 			setupPutRsaSshServer("foo-rsa-key", "rsa", "some-public-key", "some-private-key", true)
 
 			tempDir := createTempDir("rsaFilesForTesting")
-			publicFileName := createSecretFile(tempDir, "rsa.pub", "some-public-key")
-			privateFilename := createSecretFile(tempDir, "rsa.key", "some-private-key")
+			publicFileName := createCredentialFile(tempDir, "rsa.pub", "some-public-key")
+			privateFilename := createCredentialFile(tempDir, "rsa.key", "some-private-key")
 
 			session := runCommand("set", "-n", "foo-rsa-key",
 				"-t", "rsa",
@@ -157,7 +157,7 @@ var _ = Describe("Set", func() {
 
 			session := runCommandWithStdin(strings.NewReader("potatoes potatoes\n"), "set", "-n", "my-password", "-t", "password")
 
-			response := fmt.Sprintf(STRING_SECRET_RESPONSE_YAML, "my-password", "password", "potatoes potatoes")
+			response := fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_YAML, "my-password", "password", "potatoes potatoes")
 
 			Eventually(session.Out).Should(Say("value:"))
 			Eventually(session.Wait("10s").Out).Should(Say(response))
@@ -190,9 +190,9 @@ var _ = Describe("Set", func() {
 		It("puts a secret using explicit certificate type and values read from files", func() {
 			setupPutCertificateServer("my-secret", "my-ca", "my-cert", "my-priv")
 			tempDir := createTempDir("certFilesForTesting")
-			caFilename := createSecretFile(tempDir, "ca.txt", "my-ca")
-			certificateFilename := createSecretFile(tempDir, "certificate.txt", "my-cert")
-			privateFilename := createSecretFile(tempDir, "private.txt", "my-priv")
+			caFilename := createCredentialFile(tempDir, "ca.txt", "my-ca")
+			certificateFilename := createCredentialFile(tempDir, "certificate.txt", "my-cert")
+			privateFilename := createCredentialFile(tempDir, "private.txt", "my-priv")
 
 			session := runCommand("set", "-n", "my-secret",
 				"-t", "certificate", "--root", caFilename,
@@ -265,28 +265,28 @@ var _ = Describe("Set", func() {
 
 func setupPutRsaSshServer(name, keyType, publicKey, privateKey string, overwrite bool) {
 	var jsonRequest string
-	jsonRequest = fmt.Sprintf(RSA_SSH_SECRET_REQUEST_JSON, keyType, name, publicKey, privateKey, overwrite)
+	jsonRequest = fmt.Sprintf(RSA_SSH_CREDENTIAL_REQUEST_JSON, keyType, name, publicKey, privateKey, overwrite)
 	server.AppendHandlers(
 		CombineHandlers(
 			VerifyRequest("PUT", "/api/v1/data"),
 			VerifyJSON(jsonRequest),
-			RespondWith(http.StatusOK, fmt.Sprintf(RSA_SSH_SECRET_RESPONSE_JSON, keyType, name, publicKey, privateKey)),
+			RespondWith(http.StatusOK, fmt.Sprintf(RSA_SSH_CREDENTIAL_RESPONSE_JSON, keyType, name, publicKey, privateKey)),
 		),
 	)
 }
 
-func setupPutValueServer(name, secretType, value string) {
-	setupOverwritePutValueServer(name, secretType, value, true)
+func setupPutValueServer(name, credentialType, value string) {
+	setupOverwritePutValueServer(name, credentialType, value, true)
 }
 
-func setupOverwritePutValueServer(name, secretType, value string, overwrite bool) {
+func setupOverwritePutValueServer(name, credentialType, value string, overwrite bool) {
 	var jsonRequest string
-	jsonRequest = fmt.Sprintf(STRING_SECRET_OVERWRITE_REQUEST_JSON, secretType, name, value, overwrite)
+	jsonRequest = fmt.Sprintf(STRING_CREDENTIAL_OVERWRITE_REQUEST_JSON, credentialType, name, value, overwrite)
 	server.AppendHandlers(
 		CombineHandlers(
 			VerifyRequest("PUT", "/api/v1/data"),
 			VerifyJSON(jsonRequest),
-			RespondWith(http.StatusOK, fmt.Sprintf(STRING_SECRET_RESPONSE_JSON, secretType, name, value)),
+			RespondWith(http.StatusOK, fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_JSON, credentialType, name, value)),
 		),
 	)
 }
@@ -297,12 +297,12 @@ func setupPutJsonServer(name, value string) {
 
 func setupOverwritePutJsonServer(name, value string, overwrite bool) {
 	var jsonRequest string
-	jsonRequest = fmt.Sprintf(JSON_SECRET_OVERWRITE_REQUEST_JSON, name, value, overwrite)
+	jsonRequest = fmt.Sprintf(JSON_CREDENTIAL_OVERWRITE_REQUEST_JSON, name, value, overwrite)
 	server.AppendHandlers(
 		CombineHandlers(
 			VerifyRequest("PUT", "/api/v1/data"),
 			VerifyJSON(jsonRequest),
-			RespondWith(http.StatusOK, fmt.Sprintf(JSON_SECRET_RESPONSE_JSON, name, value)),
+			RespondWith(http.StatusOK, fmt.Sprintf(JSON_CREDENTIAL_RESPONSE_JSON, name, value)),
 		),
 	)
 }
@@ -313,12 +313,12 @@ func setupPutCertificateServer(name, ca, cert, priv string) {
 
 func setupOverwritePutCertificateServer(name, ca, cert, priv string, overwrite bool) {
 	var jsonRequest string
-	jsonRequest = fmt.Sprintf(CERTIFICATE_SECRET_REQUEST_JSON, name, ca, cert, priv, overwrite)
+	jsonRequest = fmt.Sprintf(CERTIFICATE_CREDENTIAL_REQUEST_JSON, name, ca, cert, priv, overwrite)
 	server.AppendHandlers(
 		CombineHandlers(
 			VerifyRequest("PUT", "/api/v1/data"),
 			VerifyJSON(jsonRequest),
-			RespondWith(http.StatusOK, fmt.Sprintf(CERTIFICATE_SECRET_RESPONSE_JSON, name, ca, cert, priv)),
+			RespondWith(http.StatusOK, fmt.Sprintf(CERTIFICATE_CREDENTIAL_RESPONSE_JSON, name, ca, cert, priv)),
 		),
 	)
 }
@@ -326,17 +326,17 @@ func setupOverwritePutCertificateServer(name, ca, cert, priv string, overwrite b
 func testSetFileFailure(caFilename, certificateFilename, privateFilename string) {
 	tempDir := createTempDir("certFilesForTesting")
 	if caFilename != "" {
-		caFilename = createSecretFile(tempDir, caFilename, "my-ca")
+		caFilename = createCredentialFile(tempDir, caFilename, "my-ca")
 	} else {
 		caFilename = "dud"
 	}
 	if certificateFilename != "" {
-		certificateFilename = createSecretFile(tempDir, certificateFilename, "my-cert")
+		certificateFilename = createCredentialFile(tempDir, certificateFilename, "my-cert")
 	} else {
 		certificateFilename = "dud"
 	}
 	if privateFilename != "" {
-		privateFilename = createSecretFile(tempDir, privateFilename, "my-priv")
+		privateFilename = createCredentialFile(tempDir, privateFilename, "my-priv")
 	} else {
 		privateFilename = "dud"
 	}
@@ -353,9 +353,9 @@ func testSetFileFailure(caFilename, certificateFilename, privateFilename string)
 func testSetCertFileDuplicationFailure(option, optionValue string) {
 	setupPutCertificateServer("my-secret", "my-ca", "my-cert", "my-priv")
 	tempDir := createTempDir("certFilesForTesting")
-	caFilename := createSecretFile(tempDir, "ca.txt", "my-ca")
-	certificateFilename := createSecretFile(tempDir, "certificate.txt", "my-cert")
-	privateFilename := createSecretFile(tempDir, "private.txt", "my-priv")
+	caFilename := createCredentialFile(tempDir, "ca.txt", "my-ca")
+	certificateFilename := createCredentialFile(tempDir, "certificate.txt", "my-cert")
+	privateFilename := createCredentialFile(tempDir, "private.txt", "my-priv")
 
 	session := runCommand("set", "-n", "my-secret", "-t", "certificate", "--root", caFilename,
 		"--certificate", certificateFilename, "--private", privateFilename, option, optionValue)

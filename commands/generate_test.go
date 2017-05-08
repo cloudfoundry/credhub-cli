@@ -402,17 +402,17 @@ func setupPasswordPostServer(name string, value string, requestJson string) {
 		CombineHandlers(
 			VerifyRequest("POST", "/api/v1/data"),
 			VerifyJSON(requestJson),
-			RespondWith(http.StatusOK, fmt.Sprintf(STRING_SECRET_RESPONSE_JSON, "password", name, value)),
+			RespondWith(http.StatusOK, fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_JSON, "password", name, value)),
 		),
 	)
 }
 
-func setupRsaSshPostServer(name string, secretType string, publicKey string, privateKey string, requestJson string) {
+func setupRsaSshPostServer(name string, credentialType string, publicKey string, privateKey string, requestJson string) {
 	server.AppendHandlers(
 		CombineHandlers(
 			VerifyRequest("POST", "/api/v1/data"),
 			VerifyJSON(requestJson),
-			RespondWith(http.StatusOK, fmt.Sprintf(RSA_SSH_SECRET_RESPONSE_JSON, secretType, name, publicKey, privateKey)),
+			RespondWith(http.StatusOK, fmt.Sprintf(RSA_SSH_CREDENTIAL_RESPONSE_JSON, credentialType, name, publicKey, privateKey)),
 		),
 	)
 }
@@ -422,13 +422,13 @@ func setupCertificatePostServer(name string, ca string, certificate string, priv
 		CombineHandlers(
 			VerifyRequest("POST", "/api/v1/data"),
 			VerifyJSON(requestJson),
-			RespondWith(http.StatusOK, fmt.Sprintf(CERTIFICATE_SECRET_RESPONSE_JSON, name, ca, certificate, privateKey)),
+			RespondWith(http.StatusOK, fmt.Sprintf(CERTIFICATE_CREDENTIAL_RESPONSE_JSON, name, ca, certificate, privateKey)),
 		),
 	)
 }
 
-func generateRequestJson(secretName string, secretType string, params string, overwrite bool) string {
-	return fmt.Sprintf(GENERATE_SECRET_REQUEST_JSON, secretType, secretName, overwrite, params)
+func generateRequestJson(name string, credentialType string, params string, overwrite bool) string {
+	return fmt.Sprintf(GENERATE_CREDENTIAL_REQUEST_JSON, credentialType, name, overwrite, params)
 }
 
 func generateDefaultTypeRequestJson(name string, params string, overwrite bool) string {

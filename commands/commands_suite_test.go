@@ -19,35 +19,35 @@ import (
 const TIMESTAMP = `2016-01-01T12:00:00Z`
 const UUID = `5a2edd4f-1686-4c8d-80eb-5daa866f9f86`
 
-const STRING_SECRET_OVERWRITE_REQUEST_JSON = `{"type":"%s","name":"%s","value":"%s","overwrite":%t}`
-const JSON_SECRET_OVERWRITE_REQUEST_JSON = `{"type":"json","name":"%s","value":%s,"overwrite":%t}`
-const CERTIFICATE_SECRET_REQUEST_JSON = `{"type":"certificate","name":"%s","value":{"ca":"%s","certificate":"%s","private_key":"%s"},"overwrite":%t}`
-const GENERATE_SECRET_REQUEST_JSON = `{"name":"%s","type":"%s","overwrite":%t,"parameters":%s}`
-const RSA_SSH_SECRET_REQUEST_JSON = `{"type":"%s","name":"%s","value":{"public_key":"%s","private_key":"%s"},"overwrite":%t}`
+const STRING_CREDENTIAL_OVERWRITE_REQUEST_JSON = `{"type":"%s","name":"%s","value":"%s","overwrite":%t}`
+const JSON_CREDENTIAL_OVERWRITE_REQUEST_JSON = `{"type":"json","name":"%s","value":%s,"overwrite":%t}`
+const CERTIFICATE_CREDENTIAL_REQUEST_JSON = `{"type":"certificate","name":"%s","value":{"ca":"%s","certificate":"%s","private_key":"%s"},"overwrite":%t}`
+const GENERATE_CREDENTIAL_REQUEST_JSON = `{"name":"%s","type":"%s","overwrite":%t,"parameters":%s}`
+const RSA_SSH_CREDENTIAL_REQUEST_JSON = `{"type":"%s","name":"%s","value":{"public_key":"%s","private_key":"%s"},"overwrite":%t}`
 const GENERATE_DEFAULT_TYPE_REQUEST_JSON = `{"name":"%s","type":"password","overwrite":%t,"parameters":%s}`
 
-const STRING_SECRET_RESPONSE_JSON = `{"type":"%s","id":"` + UUID + `","name":"%s","version_created_at":"` + TIMESTAMP + `","value":"%s"}`
-const JSON_SECRET_RESPONSE_JSON = `{"type":"json","id":"` + UUID + `","name":"%s","version_created_at":"` + TIMESTAMP + `","value":%s}`
-const CERTIFICATE_SECRET_RESPONSE_JSON = `{"type":"certificate","id":"` + UUID + `","name":"%s","version_created_at":"` + TIMESTAMP + `","value":{"ca":"%s","certificate":"%s","private_key":"%s"}}`
-const RSA_SSH_SECRET_RESPONSE_JSON = `{"type":"%s","id":"` + UUID + `","name":"%s","version_created_at":"` + TIMESTAMP + `","value":{"public_key":"%s","private_key":"%s"},"version_created_at":"` + TIMESTAMP + `"}`
+const JSON_CREDENTIAL_RESPONSE_JSON = `{"type":"json","id":"` + UUID + `","name":"%s","version_created_at":"` + TIMESTAMP + `","value":%s}`
+const STRING_CREDENTIAL_RESPONSE_JSON = `{"type":"%s","id":"` + UUID + `","name":"%s","version_created_at":"` + TIMESTAMP + `","value":"%s"}`
+const CERTIFICATE_CREDENTIAL_RESPONSE_JSON = `{"type":"certificate","id":"` + UUID + `","name":"%s","version_created_at":"` + TIMESTAMP + `","value":{"ca":"%s","certificate":"%s","private_key":"%s"}}`
+const RSA_SSH_CREDENTIAL_RESPONSE_JSON = `{"type":"%s","id":"` + UUID + `","name":"%s","version_created_at":"` + TIMESTAMP + `","value":{"public_key":"%s","private_key":"%s"},"version_created_at":"` + TIMESTAMP + `"}`
 
-const STRING_SECRET_ARRAY_RESPONSE_JSON = `{"data":[` + STRING_SECRET_RESPONSE_JSON + `]}`
-const JSON_SECRET_ARRAY_RESPONSE_JSON = `{"data":[` + JSON_SECRET_RESPONSE_JSON + `]}`
-const CERTIFICATE_SECRET_ARRAY_RESPONSE_JSON = `{"data":[` + CERTIFICATE_SECRET_RESPONSE_JSON + `]}`
-const RSA_SSH_SECRET_ARRAY_RESPONSE_JSON = `{"data":[` + RSA_SSH_SECRET_RESPONSE_JSON + `]}`
+const STRING_CREDENTIAL_ARRAY_RESPONSE_JSON = `{"data":[` + STRING_CREDENTIAL_RESPONSE_JSON + `]}`
+const JSON_CREDENTIAL_ARRAY_RESPONSE_JSON = `{"data":[` + JSON_CREDENTIAL_RESPONSE_JSON + `]}`
+const CERTIFICATE_CREDENTIAL_ARRAY_RESPONSE_JSON = `{"data":[` + CERTIFICATE_CREDENTIAL_RESPONSE_JSON + `]}`
+const RSA_SSH_CREDENTIAL_ARRAY_RESPONSE_JSON = `{"data":[` + RSA_SSH_CREDENTIAL_RESPONSE_JSON + `]}`
 
-const STRING_SECRET_RESPONSE_YAML = "id: " + UUID + "\nname: %s\ntype: %s\nvalue: %s\nversion_created_at: " + TIMESTAMP
-const JSON_SECRET_RESPONSE_YAML = "id: " + UUID + "\nname: %s\ntype: json\nvalue:\n%s\nversion_created_at: " + TIMESTAMP
-const CERTIFICATE_SECRET_RESPONSE_YAML = "id: " + UUID + "\nname: %s\ntype: certificate\nvalue:\n  ca: %s\n  certificate: %s\n  private_key: %s\nversion_created_at: " + TIMESTAMP
-const SSH_SECRET_RESPONSE_YAML = "id: " + UUID + "\nname: %s\ntype: ssh\nvalue:\n  private_key: %s\n  public_key: %s\nversion_created_at: " + TIMESTAMP
-const RSA_SECRET_RESPONSE_YAML = "id: " + UUID + "\nname: %s\ntype: rsa\nvalue:\n  private_key: %s\n  public_key: %s\nversion_created_at: " + TIMESTAMP
+const STRING_CREDENTIAL_RESPONSE_YAML = "id: " + UUID + "\nname: %s\ntype: %s\nvalue: %s\nversion_created_at: " + TIMESTAMP
+const JSON_CREDENTIAL_RESPONSE_YAML = "id: " + UUID + "\nname: %s\ntype: json\nvalue:\n%s\nversion_created_at: " + TIMESTAMP
+const CERTIFICATE_CREDENTIAL_RESPONSE_YAML = "id: " + UUID + "\nname: %s\ntype: certificate\nvalue:\n  ca: %s\n  certificate: %s\n  private_key: %s\nversion_created_at: " + TIMESTAMP
+const SSH_CREDENTIAL_RESPONSE_YAML = "id: " + UUID + "\nname: %s\ntype: ssh\nvalue:\n  private_key: %s\n  public_key: %s\nversion_created_at: " + TIMESTAMP
+const RSA_CREDENTIAL_RESPONSE_YAML = "id: " + UUID + "\nname: %s\ntype: rsa\nvalue:\n  private_key: %s\n  public_key: %s\nversion_created_at: " + TIMESTAMP
 
-var responseMyValuePotatoes = fmt.Sprintf(STRING_SECRET_RESPONSE_YAML, "my-value", "value", "potatoes")
-var responseMyPasswordPotatoes = fmt.Sprintf(STRING_SECRET_RESPONSE_YAML, "my-password", "password", "potatoes")
-var responseMyJson = fmt.Sprintf(JSON_SECRET_RESPONSE_YAML, "json-secret", "  an:\n  - array\n  foo: bar\n  nested:\n    a: 1")
-var responseMyCertificate = fmt.Sprintf(CERTIFICATE_SECRET_RESPONSE_YAML, "my-secret", "my-ca", "my-cert", "my-priv")
-var responseMySSHFoo = fmt.Sprintf(SSH_SECRET_RESPONSE_YAML, "foo-ssh-key", "some-private-key", "some-public-key")
-var responseMyRSAFoo = fmt.Sprintf(RSA_SECRET_RESPONSE_YAML, "foo-rsa-key", "some-private-key", "some-public-key")
+var responseMyValuePotatoes = fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_YAML, "my-value", "value", "potatoes")
+var responseMyPasswordPotatoes = fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_YAML, "my-password", "password", "potatoes")
+var responseMyJson = fmt.Sprintf(JSON_CREDENTIAL_RESPONSE_YAML, "json-secret", "  an:\n  - array\n  foo: bar\n  nested:\n    a: 1")
+var responseMyCertificate = fmt.Sprintf(CERTIFICATE_CREDENTIAL_RESPONSE_YAML, "my-secret", "my-ca", "my-cert", "my-priv")
+var responseMySSHFoo = fmt.Sprintf(SSH_CREDENTIAL_RESPONSE_YAML, "foo-ssh-key", "some-private-key", "some-public-key")
+var responseMyRSAFoo = fmt.Sprintf(RSA_CREDENTIAL_RESPONSE_YAML, "foo-rsa-key", "some-private-key", "some-public-key")
 
 func TestCommands(t *testing.T) {
 	RegisterFailHandler(Fail)
@@ -135,7 +135,7 @@ func createTempDir(prefix string) string {
 	return name
 }
 
-func createSecretFile(dir, filename string, contents string) string {
+func createCredentialFile(dir, filename string, contents string) string {
 	path := dir + "/" + filename
 	err := ioutil.WriteFile(path, []byte(contents), 0644)
 	if err != nil {

@@ -11,9 +11,9 @@ import (
 )
 
 type FindCommand struct {
-	PartialSecretIdentifier string `short:"n" long:"name-like" description:"Find credentials whose name contains the query string"`
-	PathIdentifier          string `short:"p" long:"path" description:"Find credentials that exist under the provided path"`
-	AllPaths                bool   `short:"a" long:"all-paths" description:"List all existing credential paths"`
+	PartialCredentialIdentifier string `short:"n" long:"name-like" description:"Find credentials whose name contains the query string"`
+	PathIdentifier              string `short:"p" long:"path" description:"Find credentials that exist under the provided path"`
+	AllPaths                    bool   `short:"a" long:"all-paths" description:"List all existing credential paths"`
 }
 
 func (cmd FindCommand) Execute([]string) error {
@@ -33,10 +33,10 @@ func (cmd FindCommand) Execute([]string) error {
 
 	if cmd.AllPaths {
 		credentials, err = action.DoAction(client.NewFindAllCredentialPathsRequest(cfg), "")
-	} else if cmd.PartialSecretIdentifier != "" {
-		credentials, err = action.DoAction(client.NewFindCredentialsBySubstringRequest(cfg, cmd.PartialSecretIdentifier), cmd.PartialSecretIdentifier)
+	} else if cmd.PartialCredentialIdentifier != "" {
+		credentials, err = action.DoAction(client.NewFindCredentialsBySubstringRequest(cfg, cmd.PartialCredentialIdentifier), cmd.PartialCredentialIdentifier)
 	} else {
-		credentials, err = action.DoAction(client.NewFindCredentialsByPathRequest(cfg, cmd.PathIdentifier), cmd.PartialSecretIdentifier)
+		credentials, err = action.DoAction(client.NewFindCredentialsByPathRequest(cfg, cmd.PathIdentifier), cmd.PartialCredentialIdentifier)
 	}
 	if err != nil {
 		return err

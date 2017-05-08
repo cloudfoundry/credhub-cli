@@ -10,7 +10,7 @@ import (
 )
 
 type DeleteCommand struct {
-	SecretIdentifier string `short:"n" long:"name" required:"yes" description:"Name of the credential to delete"`
+	CredentialIdentifier string `short:"n" long:"name" required:"yes" description:"Name of the credential to delete"`
 }
 
 func (cmd DeleteCommand) Execute([]string) error {
@@ -18,7 +18,7 @@ func (cmd DeleteCommand) Execute([]string) error {
 	repository := repositories.NewCredentialRepository(client.NewHttpClient(cfg))
 	action := actions.NewAction(repository, cfg)
 
-	_, err := action.DoAction(client.NewDeleteSecretRequest(cfg, cmd.SecretIdentifier), cmd.SecretIdentifier)
+	_, err := action.DoAction(client.NewDeleteCredentialRequest(cfg, cmd.CredentialIdentifier), cmd.CredentialIdentifier)
 
 	if err == nil {
 		fmt.Println("Secret successfully deleted")

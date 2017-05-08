@@ -9,35 +9,35 @@ import (
 )
 
 type GenerateCommand struct {
-	SecretIdentifier string   `short:"n" required:"yes" long:"name" description:"Name of the credential to generate"`
-	SecretType       string   `short:"t" long:"type" description:"Sets the credential type to generate (Default: 'password')"`
-	NoOverwrite      bool     `short:"O" long:"no-overwrite" description:"Credential is not modified if stored value already exists"`
-	OutputJson       bool     `long:"output-json" description:"Return response in JSON format"`
-	Length           int      `short:"l" long:"length" description:"[Password] Length of the generated value (Default: 30)"`
-	IncludeSpecial   bool     `short:"S" long:"include-special" description:"[Password] Include special characters in the generated value"`
-	ExcludeNumber    bool     `short:"N" long:"exclude-number" description:"[Password] Exclude number characters from the generated value"`
-	ExcludeUpper     bool     `short:"U" long:"exclude-upper" description:"[Password] Exclude upper alpha characters from the generated value"`
-	ExcludeLower     bool     `short:"L" long:"exclude-lower" description:"[Password] Exclude lower alpha characters from the generated value"`
-	SshComment       string   `short:"m" long:"ssh-comment" description:"[SSH] Comment appended to public key to help identify in environment"`
-	KeyLength        int      `short:"k" long:"key-length" description:"[Certificate, SSH, RSA] Bit length of the generated key (Default: 2048)"`
-	Duration         int      `short:"d" long:"duration" description:"[Certificate] Valid duration (in days) of the generated certificate (Default: 365)"`
-	CommonName       string   `short:"c" long:"common-name" description:"[Certificate] Common name of the generated certificate"`
-	Organization     string   `short:"o" long:"organization" description:"[Certificate] Organization of the generated certificate"`
-	OrganizationUnit string   `short:"u" long:"organization-unit" description:"[Certificate] Organization unit of the generated certificate"`
-	Locality         string   `short:"i" long:"locality" description:"[Certificate] Locality/city of the generated certificate"`
-	State            string   `short:"s" long:"state" description:"[Certificate] State/province of the generated certificate"`
-	Country          string   `short:"y" long:"country" description:"[Certificate] Country of the generated certificate"`
-	AlternativeName  []string `short:"a" long:"alternative-name" description:"[Certificate] A subject alternative name of the generated certificate (may be specified multiple times)"`
-	KeyUsage         []string `short:"g" long:"key-usage" description:"[Certificate] Key Usage extensions for the generated certificate (may be specified multiple times)"`
-	ExtendedKeyUsage []string `short:"e" long:"ext-key-usage" description:"[Certificate] Extended Key Usage extensions for the generated certificate (may be specified multiple times)"`
-	Ca               string   `long:"ca" description:"[Certificate] Name of CA used to sign the generated certificate"`
-	IsCA             bool     `long:"is-ca" description:"[Certificate] The generated certificate is a certificate authority"`
-	SelfSign         bool     `long:"self-sign" description:"[Certificate] The generated certificate will be self-signed"`
+	CredentialIdentifier string   `short:"n" required:"yes" long:"name" description:"Name of the credential to generate"`
+	CredentialType       string   `short:"t" long:"type" description:"Sets the credential type to generate (Default: 'password')"`
+	NoOverwrite          bool     `short:"O" long:"no-overwrite" description:"Credential is not modified if stored value already exists"`
+	OutputJson           bool     `long:"output-json" description:"Return response in JSON format"`
+	Length               int      `short:"l" long:"length" description:"[Password] Length of the generated value (Default: 30)"`
+	IncludeSpecial       bool     `short:"S" long:"include-special" description:"[Password] Include special characters in the generated value"`
+	ExcludeNumber        bool     `short:"N" long:"exclude-number" description:"[Password] Exclude number characters from the generated value"`
+	ExcludeUpper         bool     `short:"U" long:"exclude-upper" description:"[Password] Exclude upper alpha characters from the generated value"`
+	ExcludeLower         bool     `short:"L" long:"exclude-lower" description:"[Password] Exclude lower alpha characters from the generated value"`
+	SshComment           string   `short:"m" long:"ssh-comment" description:"[SSH] Comment appended to public key to help identify in environment"`
+	KeyLength            int      `short:"k" long:"key-length" description:"[Certificate, SSH, RSA] Bit length of the generated key (Default: 2048)"`
+	Duration             int      `short:"d" long:"duration" description:"[Certificate] Valid duration (in days) of the generated certificate (Default: 365)"`
+	CommonName           string   `short:"c" long:"common-name" description:"[Certificate] Common name of the generated certificate"`
+	Organization         string   `short:"o" long:"organization" description:"[Certificate] Organization of the generated certificate"`
+	OrganizationUnit     string   `short:"u" long:"organization-unit" description:"[Certificate] Organization unit of the generated certificate"`
+	Locality             string   `short:"i" long:"locality" description:"[Certificate] Locality/city of the generated certificate"`
+	State                string   `short:"s" long:"state" description:"[Certificate] State/province of the generated certificate"`
+	Country              string   `short:"y" long:"country" description:"[Certificate] Country of the generated certificate"`
+	AlternativeName      []string `short:"a" long:"alternative-name" description:"[Certificate] A subject alternative name of the generated certificate (may be specified multiple times)"`
+	KeyUsage             []string `short:"g" long:"key-usage" description:"[Certificate] Key Usage extensions for the generated certificate (may be specified multiple times)"`
+	ExtendedKeyUsage     []string `short:"e" long:"ext-key-usage" description:"[Certificate] Extended Key Usage extensions for the generated certificate (may be specified multiple times)"`
+	Ca                   string   `long:"ca" description:"[Certificate] Name of CA used to sign the generated certificate"`
+	IsCA                 bool     `long:"is-ca" description:"[Certificate] The generated certificate is a certificate authority"`
+	SelfSign             bool     `long:"self-sign" description:"[Certificate] The generated certificate will be self-signed"`
 }
 
 func (cmd GenerateCommand) Execute([]string) error {
-	if cmd.SecretType == "" {
-		cmd.SecretType = "password"
+	if cmd.CredentialType == "" {
+		cmd.CredentialType = "password"
 	}
 
 	cfg := config.ReadConfig()
@@ -67,14 +67,14 @@ func (cmd GenerateCommand) Execute([]string) error {
 	}
 
 	action := actions.NewAction(repository, cfg)
-	request := client.NewGenerateSecretRequest(cfg, cmd.SecretIdentifier, parameters, cmd.SecretType, !cmd.NoOverwrite)
-	secret, err := action.DoAction(request, cmd.SecretIdentifier)
+	request := client.NewGenerateCredentialRequest(cfg, cmd.CredentialIdentifier, parameters, cmd.CredentialType, !cmd.NoOverwrite)
+	credential, err := action.DoAction(request, cmd.CredentialIdentifier)
 
 	if err != nil {
 		return err
 	}
 
-	models.Println(secret, cmd.OutputJson)
+	models.Println(credential, cmd.OutputJson)
 
 	return nil
 }

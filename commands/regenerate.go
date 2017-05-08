@@ -9,7 +9,7 @@ import (
 )
 
 type RegenerateCommand struct {
-	SecretIdentifier string `required:"yes" short:"n" long:"name" description:"Selects the credential to regenerate"`
+	CredentialIdentifier string `required:"yes" short:"n" long:"name" description:"Selects the credential to regenerate"`
 }
 
 func (cmd RegenerateCommand) Execute([]string) error {
@@ -17,12 +17,12 @@ func (cmd RegenerateCommand) Execute([]string) error {
 	repository := repositories.NewCredentialRepository(client.NewHttpClient(cfg))
 	action := actions.NewAction(repository, cfg)
 
-	secret, err := action.DoAction(client.NewRegenerateSecretRequest(cfg, cmd.SecretIdentifier), cmd.SecretIdentifier)
+	credential, err := action.DoAction(client.NewRegenerateCredentialRequest(cfg, cmd.CredentialIdentifier), cmd.CredentialIdentifier)
 	if err != nil {
 		return err
 	}
 
-	models.Println(secret, false)
+	models.Println(credential, false)
 
 	return nil
 }

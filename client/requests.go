@@ -14,77 +14,77 @@ import (
 	"github.com/cloudfoundry-incubator/credhub-cli/models"
 )
 
-func NewSetCertificateRequest(config config.Config, secretIdentifier string, root string, cert string, priv string, overwrite bool) *http.Request {
+func NewSetCertificateRequest(config config.Config, credentialIdentifier string, root string, cert string, priv string, overwrite bool) *http.Request {
 	certificate := models.Certificate{
 		Ca:          root,
 		Certificate: cert,
 		PrivateKey:  priv,
 	}
 
-	return NewSetSecretRequest(config, "certificate", secretIdentifier, certificate, overwrite)
+	return NewSetCredentialRequest(config, "certificate", credentialIdentifier, certificate, overwrite)
 }
 
-func NewSetRsaSshRequest(config config.Config, secretIdentifier, keyType, publicKey, privateKey string, overwrite bool) *http.Request {
+func NewSetRsaSshRequest(config config.Config, credentialIdentifier, keyType, publicKey, privateKey string, overwrite bool) *http.Request {
 	key := models.RsaSsh{
 		PublicKey:  publicKey,
 		PrivateKey: privateKey,
 	}
 
-	return NewSetSecretRequest(config, keyType, secretIdentifier, key, overwrite)
+	return NewSetCredentialRequest(config, keyType, credentialIdentifier, key, overwrite)
 }
 
-func NewSetSecretRequest(config config.Config, secretType string, secretIdentifier string, secretContent interface{}, overwrite bool) *http.Request {
+func NewSetCredentialRequest(config config.Config, credentialType string, credentialIdentifier string, content interface{}, overwrite bool) *http.Request {
 	var value interface{}
-	switch secretContent := secretContent.(type) {
+	switch credentialContent := content.(type) {
 	default:
-		value = secretContent
+		value = credentialContent
 	case string:
 		valueObject := make(map[string]interface{})
-		err := json.Unmarshal([]byte(secretContent), &valueObject)
+		err := json.Unmarshal([]byte(credentialContent), &valueObject)
 
 		if err != nil {
-			value = secretContent
+			value = credentialContent
 		} else {
 			value = valueObject
 		}
 	}
 
-	secret := models.RequestBody{
-		SecretType: secretType,
-		Name:       secretIdentifier,
-		Value:      value,
-		Overwrite:  &overwrite,
+	credential := models.RequestBody{
+		CredentialType: credentialType,
+		Name:           credentialIdentifier,
+		Value:          value,
+		Overwrite:      &overwrite,
 	}
 
-	return newSecretRequest("PUT", config, secretIdentifier, secret)
+	return newCredentialRequest("PUT", config, credentialIdentifier, credential)
 }
 
-func NewGenerateSecretRequest(config config.Config, secretIdentifier string, parameters models.GenerationParameters, secretType string, overwrite bool) *http.Request {
-	generateRequest := models.GenerateSecretRequest{
-		Name:       secretIdentifier,
-		SecretType: secretType,
-		Overwrite:  &overwrite,
-		Parameters: &parameters,
+func NewGenerateCredentialRequest(config config.Config, identifier string, parameters models.GenerationParameters, credentialType string, overwrite bool) *http.Request {
+	generateRequest := models.GenerateRequest{
+		Name:           identifier,
+		CredentialType: credentialType,
+		Overwrite:      &overwrite,
+		Parameters:     &parameters,
 	}
 
-	return newSecretRequest("POST", config, secretIdentifier, generateRequest)
+	return newCredentialRequest("POST", config, identifier, generateRequest)
 }
 
-func NewRegenerateSecretRequest(config config.Config, secretIdentifier string) *http.Request {
-	regenerateRequest := models.RegenerateSecretRequest{
-		Name:       secretIdentifier,
+func NewRegenerateCredentialRequest(config config.Config, identifier string) *http.Request {
+	regenerateRequest := models.RegenerateRequest{
+		Name:       identifier,
 		Regenerate: true,
 	}
 
-	return newSecretRequest("POST", config, secretIdentifier, regenerateRequest)
+	return newCredentialRequest("POST", config, identifier, regenerateRequest)
 }
 
-func NewGetSecretRequest(config config.Config, secretIdentifier string) *http.Request {
-	return newSecretRequest("GET", config, secretIdentifier, nil)
+func NewGetCredentialRequest(config config.Config, identifier string) *http.Request {
+	return newCredentialRequest("GET", config, identifier, nil)
 }
 
-func NewDeleteSecretRequest(config config.Config, secretIdentifier string) *http.Request {
-	return newSecretRequest("DELETE", config, secretIdentifier, nil)
+func NewDeleteCredentialRequest(config config.Config, identifier string) *http.Request {
+	return newCredentialRequest("DELETE", config, identifier, nil)
 }
 
 func NewInfoRequest(config config.Config) *http.Request {
@@ -154,8 +154,8 @@ func NewFindAllCredentialPathsRequest(config config.Config) *http.Request {
 	return newRequest("GET", config, url, nil)
 }
 
-func NewFindCredentialsBySubstringRequest(config config.Config, partialSecretIdentifier string) *http.Request {
-	urlString := config.ApiURL + "/api/v1/data?name-like=" + url.QueryEscape(partialSecretIdentifier)
+func NewFindCredentialsBySubstringRequest(config config.Config, partialIdentifier string) *http.Request {
+	urlString := config.ApiURL + "/api/v1/data?name-like=" + url.QueryEscape(partialIdentifier)
 
 	return newRequest("GET", config, urlString, nil)
 }
@@ -166,12 +166,12 @@ func NewFindCredentialsByPathRequest(config config.Config, path string) *http.Re
 	return newRequest("GET", config, urlString, nil)
 }
 
-func newSecretRequest(requestType string, config config.Config, secretIdentifier string, bodyModel interface{}) *http.Request {
+func newCredentialRequest(requestType string, config config.Config, identifier string, bodyModel interface{}) *http.Request {
 	var urlString string
 	if requestType == "GET" {
-		urlString = config.ApiURL + "/api/v1/data?name=" + url.QueryEscape(secretIdentifier) + "&current=true"
+		urlString = config.ApiURL + "/api/v1/data?name=" + url.QueryEscape(identifier) + "&current=true"
 	} else if requestType == "DELETE" {
-		urlString = config.ApiURL + "/api/v1/data?name=" + url.QueryEscape(secretIdentifier)
+		urlString = config.ApiURL + "/api/v1/data?name=" + url.QueryEscape(identifier)
 	} else {
 		urlString = config.ApiURL + "/api/v1/data"
 	}

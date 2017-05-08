@@ -22,22 +22,22 @@ func NewAllPathRepository(httpClient client.HttpClient) Repository {
 }
 
 func (r allPathRepository) SendRequest(request *http.Request, ignoredIdentifier string) (models.Printable, error) {
-	secret := models.CredentialResponse{}
+	credential_paths := models.CredentialResponse{}
 
 	response, err := DoSendRequest(r.httpClient, request)
 	if err != nil {
-		return secret, err
+		return credential_paths, err
 	}
 
 	decoder := json.NewDecoder(response.Body)
-	err = decoder.Decode(&secret.ResponseBody)
+	err = decoder.Decode(&credential_paths.ResponseBody)
 
 	if err != nil {
-		return secret, cm_errors.NewResponseError()
+		return credential_paths, cm_errors.NewResponseError()
 	}
 
-	if len(secret.ResponseBody["paths"].([]interface{})) == 0 {
-		return secret, errors.NewNoMatchingCredentialsFoundError()
+	if len(credential_paths.ResponseBody["paths"].([]interface{})) == 0 {
+		return credential_paths, errors.NewNoMatchingCredentialsFoundError()
 	}
-	return secret, nil
+	return credential_paths, nil
 }

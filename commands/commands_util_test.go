@@ -16,7 +16,7 @@ var _ = Describe("Util", func() {
 		It("reads a file into memory", func() {
 			tempDir := createTempDir("filesForTesting")
 			fileContents := "My Test String"
-			filename := createSecretFile(tempDir, "file.txt", fileContents)
+			filename := createCredentialFile(tempDir, "file.txt", fileContents)
 			readContents, err := commands.ReadFile(filename)
 			Expect(readContents).To(Equal(fileContents))
 			Expect(err).To(BeNil())

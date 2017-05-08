@@ -38,7 +38,7 @@ var _ = Describe("Get", func() {
 	})
 
 	It("gets a string secret", func() {
-		responseJson := fmt.Sprintf(STRING_SECRET_ARRAY_RESPONSE_JSON, "value", "my-value", "potatoes")
+		responseJson := fmt.Sprintf(STRING_CREDENTIAL_ARRAY_RESPONSE_JSON, "value", "my-value", "potatoes")
 
 		server.AppendHandlers(
 			CombineHandlers(
@@ -54,7 +54,7 @@ var _ = Describe("Get", func() {
 	})
 
 	It("gets a password secret", func() {
-		responseJson := fmt.Sprintf(STRING_SECRET_ARRAY_RESPONSE_JSON, "password", "my-password", "potatoes")
+		responseJson := fmt.Sprintf(STRING_CREDENTIAL_ARRAY_RESPONSE_JSON, "password", "my-password", "potatoes")
 
 		server.AppendHandlers(
 			CombineHandlers(
@@ -70,7 +70,7 @@ var _ = Describe("Get", func() {
 	})
 
 	It("gets a json secret", func() {
-		serverResponse := fmt.Sprintf(JSON_SECRET_ARRAY_RESPONSE_JSON, "json-secret", `{"foo":"bar","nested":{"a":1},"an":["array"]}`)
+		serverResponse := fmt.Sprintf(JSON_CREDENTIAL_ARRAY_RESPONSE_JSON, "json-secret", `{"foo":"bar","nested":{"a":1},"an":["array"]}`)
 
 		server.AppendHandlers(
 			CombineHandlers(
@@ -86,7 +86,7 @@ var _ = Describe("Get", func() {
 	})
 
 	It("gets a certificate secret", func() {
-		responseJson := fmt.Sprintf(CERTIFICATE_SECRET_ARRAY_RESPONSE_JSON, "my-secret", "my-ca", "my-cert", "my-priv")
+		responseJson := fmt.Sprintf(CERTIFICATE_CREDENTIAL_ARRAY_RESPONSE_JSON, "my-secret", "my-ca", "my-cert", "my-priv")
 
 		server.AppendHandlers(
 			CombineHandlers(
@@ -102,7 +102,7 @@ var _ = Describe("Get", func() {
 	})
 
 	It("gets an rsa secret", func() {
-		responseJson := fmt.Sprintf(RSA_SSH_SECRET_ARRAY_RESPONSE_JSON, "rsa", "foo-rsa-key", "some-public-key", "some-private-key")
+		responseJson := fmt.Sprintf(RSA_SSH_CREDENTIAL_ARRAY_RESPONSE_JSON, "rsa", "foo-rsa-key", "some-public-key", "some-private-key")
 
 		server.AppendHandlers(
 			CombineHandlers(
@@ -118,7 +118,7 @@ var _ = Describe("Get", func() {
 	})
 
 	It("can output json", func() {
-		responseJson := fmt.Sprintf(STRING_SECRET_ARRAY_RESPONSE_JSON, "password", "my-password", "potatoes")
+		responseJson := fmt.Sprintf(STRING_CREDENTIAL_ARRAY_RESPONSE_JSON, "password", "my-password", "potatoes")
 
 		server.AppendHandlers(
 			CombineHandlers(
@@ -140,7 +140,7 @@ var _ = Describe("Get", func() {
 	})
 
 	It("does not use Printf on user-supplied data", func() {
-		responseJson := fmt.Sprintf(STRING_SECRET_RESPONSE_JSON, "password", "injected", "et''%/7(V&`|?m|Ckih$")
+		responseJson := fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_JSON, "password", "injected", "et''%/7(V&`|?m|Ckih$")
 
 		server.AppendHandlers(
 			CombineHandlers(

@@ -104,9 +104,9 @@ var _ = Describe("API", func() {
 			cfg.AccessToken = "access-token"
 		})
 
-		Describe("NewSetSecretRequest with value", func() {
+		Describe("NewSetCredentialRequest with value", func() {
 			It("Returns a request for the put-value endpoint", func() {
-				request := NewSetSecretRequest(cfg, "value", "my-name", "my-value", true)
+				request := NewSetCredentialRequest(cfg, "value", "my-name", "my-value", true)
 
 				Expect(request.Header).To(HaveKeyWithValue("Content-Type", []string{"application/json"}))
 				Expect(request.Header).To(HaveKeyWithValue("Authorization", []string{"Bearer access-token"}))
@@ -119,7 +119,7 @@ var _ = Describe("API", func() {
 			})
 
 			It("Returns a request that will not overwrite", func() {
-				request := NewSetSecretRequest(cfg, "value", "my-name", "my-value", false)
+				request := NewSetCredentialRequest(cfg, "value", "my-name", "my-value", false)
 
 				Expect(request.Header).To(HaveKeyWithValue("Content-Type", []string{"application/json"}))
 				Expect(request.Header).To(HaveKeyWithValue("Authorization", []string{"Bearer access-token"}))
@@ -132,9 +132,9 @@ var _ = Describe("API", func() {
 			})
 		})
 
-		Describe("NewSetSecretRequest with password", func() {
+		Describe("NewSetCredentialRequest with password", func() {
 			It("Returns a request for the put-password endpoint", func() {
-				request := NewSetSecretRequest(cfg, "password", "my-name", "my-password", true)
+				request := NewSetCredentialRequest(cfg, "password", "my-name", "my-password", true)
 				Expect(request.Header).To(HaveKeyWithValue("Content-Type", []string{"application/json"}))
 				Expect(request.Header).To(HaveKeyWithValue("Authorization", []string{"Bearer access-token"}))
 				Expect(request.Method).To(Equal("PUT"))
@@ -201,12 +201,12 @@ var _ = Describe("API", func() {
 			})
 		})
 
-		Describe("NewGenerateSecretRequest", func() {
+		Describe("NewGenerateCredentialRequest", func() {
 			It("returns a request with only overwrite", func() {
 				requestBody := `{"name":"my-name","type":"my-type","overwrite":true,"parameters":{}}`
 
 				params := models.GenerationParameters{}
-				request := NewGenerateSecretRequest(cfg, "my-name", params, "my-type", true)
+				request := NewGenerateCredentialRequest(cfg, "my-name", params, "my-type", true)
 				Expect(request.Header).To(HaveKeyWithValue("Content-Type", []string{"application/json"}))
 				Expect(request.Header).To(HaveKeyWithValue("Authorization", []string{"Bearer access-token"}))
 				Expect(request.Method).To(Equal("POST"))
@@ -238,7 +238,7 @@ var _ = Describe("API", func() {
 					}
 				}`
 
-				request := NewGenerateSecretRequest(cfg, "my-name", parameters, "password", false)
+				request := NewGenerateCredentialRequest(cfg, "my-name", parameters, "password", false)
 
 				bodyBuffer := new(bytes.Buffer)
 				bodyBuffer.ReadFrom(request.Body)
@@ -249,11 +249,11 @@ var _ = Describe("API", func() {
 			})
 		})
 
-		Describe("NewRegenerateSecretRequest", func() {
+		Describe("NewRegenerateCredentialRequest", func() {
 			It("returns a request with only regenerate", func() {
 				requestBody := `{"name":"my-name","regenerate":true}`
 
-				request := NewRegenerateSecretRequest(cfg, "my-name")
+				request := NewRegenerateCredentialRequest(cfg, "my-name")
 				Expect(request.Header).To(HaveKeyWithValue("Content-Type", []string{"application/json"}))
 				Expect(request.Header).To(HaveKeyWithValue("Authorization", []string{"Bearer access-token"}))
 				Expect(request.Method).To(Equal("POST"))
@@ -265,12 +265,12 @@ var _ = Describe("API", func() {
 			})
 		})
 
-		Describe("NewGetSecretRequest", func() {
+		Describe("NewGetCredentialRequest", func() {
 			It("Returns a request for getting secret", func() {
 				expectedRequest, _ := http.NewRequest("GET", "http://example.com/api/v1/data?name=my-name&current=true", nil)
 				expectedRequest.Header.Set("Authorization", "Bearer access-token")
 
-				request := NewGetSecretRequest(cfg, "my-name")
+				request := NewGetCredentialRequest(cfg, "my-name")
 
 				Expect(request).To(Equal(expectedRequest))
 			})
@@ -284,14 +284,14 @@ var _ = Describe("API", func() {
 				expectedRequest, _ := http.NewRequest("GET", "http://example.com/api/v1/data?name="+escapedName+"&current=true", nil)
 				expectedRequest.Header.Set("Authorization", "Bearer access-token")
 
-				request := NewGetSecretRequest(cfg, rawName)
+				request := NewGetCredentialRequest(cfg, rawName)
 
 				Expect(request).To(Equal(expectedRequest))
 			})
 		})
 
 		Describe("NewFindCredentialsBySubstringRequest", func() {
-			It("Returns a request for getting secret", func() {
+			It("Returns a request for getting a credential", func() {
 				expectedRequest, _ := http.NewRequest("GET", "http://example.com/api/v1/data?name-like=my-name", nil)
 				expectedRequest.Header.Set("Authorization", "Bearer access-token")
 
@@ -325,7 +325,7 @@ var _ = Describe("API", func() {
 		})
 
 		Describe("NewFindCredentialsByPathRequest", func() {
-			It("Returns a request for getting secret", func() {
+			It("Returns a request for getting a credential", func() {
 				expectedRequest, _ := http.NewRequest("GET", "http://example.com/api/v1/data?path=my-path", nil)
 				expectedRequest.Header.Set("Authorization", "Bearer access-token")
 
@@ -347,12 +347,12 @@ var _ = Describe("API", func() {
 			})
 		})
 
-		Describe("NewDeleteSecretRequest", func() {
+		Describe("NewDeleteCredentialRequest", func() {
 			It("Returns a request for deleting", func() {
 				expectedRequest, _ := http.NewRequest("DELETE", "http://example.com/api/v1/data?name=my-name", nil)
 				expectedRequest.Header.Set("Authorization", "Bearer access-token")
 
-				request := NewDeleteSecretRequest(cfg, "my-name")
+				request := NewDeleteCredentialRequest(cfg, "my-name")
 
 				Expect(request).To(Equal(expectedRequest))
 			})
@@ -364,7 +364,7 @@ var _ = Describe("API", func() {
 				expectedRequest, _ := http.NewRequest("DELETE", "http://example.com/api/v1/data?name="+escapedName, nil)
 				expectedRequest.Header.Set("Authorization", "Bearer access-token")
 
-				request := NewDeleteSecretRequest(cfg, rawName)
+				request := NewDeleteCredentialRequest(cfg, rawName)
 
 				Expect(request).To(Equal(expectedRequest))
 			})

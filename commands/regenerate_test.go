@@ -13,7 +13,7 @@ import (
 	. "github.com/onsi/gomega/ghttp"
 )
 
-const REGENERATE_SECRET_REQUEST_JSON = `{"regenerate":true,"name":"my-password-stuffs"}`
+const REGENERATE_CREDENTIAL_REQUEST_JSON = `{"regenerate":true,"name":"my-password-stuffs"}`
 
 var _ = Describe("Regenerate", func() {
 	Describe("Regenerating password", func() {
@@ -21,15 +21,15 @@ var _ = Describe("Regenerate", func() {
 			server.AppendHandlers(
 				CombineHandlers(
 					VerifyRequest("POST", "/api/v1/data"),
-					VerifyJSON(REGENERATE_SECRET_REQUEST_JSON),
-					RespondWith(http.StatusOK, fmt.Sprintf(STRING_SECRET_RESPONSE_JSON, "password", "my-password-stuffs", "nu-potatoes")),
+					VerifyJSON(REGENERATE_CREDENTIAL_REQUEST_JSON),
+					RespondWith(http.StatusOK, fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_JSON, "password", "my-password-stuffs", "nu-potatoes")),
 				),
 			)
 
 			session := runCommand("regenerate", "--name", "my-password-stuffs")
 
 			Eventually(session).Should(Exit(0))
-			Expect(session.Out).To(Say(fmt.Sprintf(STRING_SECRET_RESPONSE_YAML, "my-password-stuffs", "password", "nu-potatoes")))
+			Expect(session.Out).To(Say(fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_YAML, "my-password-stuffs", "password", "nu-potatoes")))
 		})
 	})
 

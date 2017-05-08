@@ -9,20 +9,20 @@ import (
 )
 
 type GetCommand struct {
-	SecretIdentifier string `short:"n" required:"yes" long:"name" description:"Name of the credential to retrieve"`
-	OutputJson       bool   `long:"output-json" description:"Return response in JSON format"`
+	CredentialIdentifier string `short:"n" required:"yes" long:"name" description:"Name of the credential to retrieve"`
+	OutputJson           bool   `long:"output-json" description:"Return response in JSON format"`
 }
 
 func (cmd GetCommand) Execute([]string) error {
 	cfg := config.ReadConfig()
 	repository := repositories.NewCredentialRepository(client.NewHttpClient(cfg))
 	action := actions.NewAction(repository, cfg)
-	secret, err := action.DoAction(client.NewGetSecretRequest(cfg, cmd.SecretIdentifier), cmd.SecretIdentifier)
+	credential, err := action.DoAction(client.NewGetCredentialRequest(cfg, cmd.CredentialIdentifier), cmd.CredentialIdentifier)
 	if err != nil {
 		return err
 	}
 
-	models.Println(secret, cmd.OutputJson)
+	models.Println(credential, cmd.OutputJson)
 
 	return nil
 }

@@ -37,7 +37,7 @@ var _ = Describe("Action", func() {
 		subject = NewAction(&repository, cfg)
 
 		// language=JSON
-		expectedJSON = `{"name": "my-item", "secretType": "value", "value": "potatoes"}`
+		expectedJSON = `{"name": "my-item", "type": "value", "value": "potatoes"}`
 
 		expectedItem = models.CredentialResponse{}
 	})
@@ -58,10 +58,10 @@ var _ = Describe("Action", func() {
 				return expectedItem, nil
 			}
 
-			secret, err := subject.DoAction(request, "my-item")
+			credential, err := subject.DoAction(request, "my-item")
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(secret.ToJson()).To(MatchJSON(expectedJSON))
+			Expect(credential.ToJson()).To(MatchJSON(expectedJSON))
 		})
 
 		Describe("Errors", func() {
@@ -99,10 +99,10 @@ var _ = Describe("Action", func() {
 
 					req, _ := http.NewRequest("POST", "my-url", bytes.NewBufferString("{}"))
 
-					secret, err := subject.DoAction(req, "my-item")
+					credential, err := subject.DoAction(req, "my-item")
 
 					Expect(err).ToNot(HaveOccurred())
-					Expect(secret).To(Equal(expectedItem))
+					Expect(credential).To(Equal(expectedItem))
 					cfg := config.ReadConfig()
 					Expect(cfg.AccessToken).To(Equal("access_token"))
 					Expect(cfg.RefreshToken).To(Equal("refresh_token"))

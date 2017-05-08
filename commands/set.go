@@ -19,18 +19,18 @@ import (
 )
 
 type SetCommand struct {
-	SecretIdentifier  string `short:"n" required:"yes" long:"name" description:"Name of the credential to set"`
-	Type              string `short:"t" long:"type" description:"Sets the credential type (Default: 'password')"`
-	NoOverwrite       bool   `short:"O" long:"no-overwrite" description:"Credential is not modified if stored value already exists"`
-	Value             string `short:"v" long:"value" description:"[Password, Value, JSON] Sets the value for the credential"`
-	Root              string `short:"r" long:"root" description:"[Certificate] Sets the root CA from file"`
-	Certificate       string `short:"c" long:"certificate" description:"[Certificate] Sets the certificate from file"`
-	Private           string `short:"p" long:"private" description:"[Certificate, SSH, RSA] Sets the private key from file"`
-	Public            string `short:"u" long:"public" description:"[SSH, RSA] Sets the public key from file"`
-	RootString        string `short:"R" long:"root-string" description:"[Certificate] Sets the root CA from string input"`
-	CertificateString string `short:"C" long:"certificate-string" description:"[Certificate] Sets the certificate from string input"`
-	PrivateString     string `short:"P" long:"private-string" description:"[Certificate, SSH, RSA] Sets the private key from string input"`
-	PublicString      string `short:"U" long:"public-string" description:"[SSH, RSA] Sets the public key from  string input"`
+	CredentialIdentifier string `short:"n" required:"yes" long:"name" description:"Name of the credential to set"`
+	Type                 string `short:"t" long:"type" description:"Sets the credential type (Default: 'password')"`
+	NoOverwrite          bool   `short:"O" long:"no-overwrite" description:"Credential is not modified if stored value already exists"`
+	Value                string `short:"v" long:"value" description:"[Password, Value, JSON] Sets the value for the credential"`
+	Root                 string `short:"r" long:"root" description:"[Certificate] Sets the root CA from file"`
+	Certificate          string `short:"c" long:"certificate" description:"[Certificate] Sets the certificate from file"`
+	Private              string `short:"p" long:"private" description:"[Certificate, SSH, RSA] Sets the private key from file"`
+	Public               string `short:"u" long:"public" description:"[SSH, RSA] Sets the public key from file"`
+	RootString           string `short:"R" long:"root-string" description:"[Certificate] Sets the root CA from string input"`
+	CertificateString    string `short:"C" long:"certificate-string" description:"[Certificate] Sets the certificate from string input"`
+	PrivateString        string `short:"P" long:"private-string" description:"[Certificate, SSH, RSA] Sets the private key from string input"`
+	PublicString         string `short:"U" long:"public-string" description:"[SSH, RSA] Sets the public key from  string input"`
 }
 
 func (cmd SetCommand) Execute([]string) error {
@@ -51,11 +51,11 @@ func (cmd SetCommand) Execute([]string) error {
 		return err
 	}
 
-	secret, err := action.DoAction(request, cmd.SecretIdentifier)
+	credential, err := action.DoAction(request, cmd.CredentialIdentifier)
 	if err != nil {
 		return err
 	}
-	models.Println(secret, false)
+	models.Println(credential, false)
 
 	return nil
 }
@@ -75,7 +75,7 @@ func makeRequest(cmd SetCommand, config config.Config) (*http.Request, error) {
 			return nil, err
 		}
 
-		request = client.NewSetRsaSshRequest(config, cmd.SecretIdentifier, cmd.Type, cmd.PublicString, cmd.PrivateString, !cmd.NoOverwrite)
+		request = client.NewSetRsaSshRequest(config, cmd.CredentialIdentifier, cmd.Type, cmd.PublicString, cmd.PrivateString, !cmd.NoOverwrite)
 	} else if cmd.Type == "certificate" {
 		var err error
 
@@ -94,9 +94,9 @@ func makeRequest(cmd SetCommand, config config.Config) (*http.Request, error) {
 			return nil, err
 		}
 
-		request = client.NewSetCertificateRequest(config, cmd.SecretIdentifier, cmd.RootString, cmd.CertificateString, cmd.PrivateString, !cmd.NoOverwrite)
+		request = client.NewSetCertificateRequest(config, cmd.CredentialIdentifier, cmd.RootString, cmd.CertificateString, cmd.PrivateString, !cmd.NoOverwrite)
 	} else {
-		request = client.NewSetSecretRequest(config, cmd.Type, cmd.SecretIdentifier, cmd.Value, !cmd.NoOverwrite)
+		request = client.NewSetCredentialRequest(config, cmd.Type, cmd.CredentialIdentifier, cmd.Value, !cmd.NoOverwrite)
 	}
 
 	return request, nil
