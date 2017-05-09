@@ -13,6 +13,7 @@ type GenerateCommand struct {
 	CredentialType       string   `short:"t" long:"type" description:"Sets the credential type to generate (Default: 'password')"`
 	NoOverwrite          bool     `short:"O" long:"no-overwrite" description:"Credential is not modified if stored value already exists"`
 	OutputJson           bool     `long:"output-json" description:"Return response in JSON format"`
+	Username             string   `short:"z" long:"username" description:"Sets the username value of the credential"`
 	Length               int      `short:"l" long:"length" description:"[Password, User] Length of the generated value (Default: 30)"`
 	IncludeSpecial       bool     `short:"S" long:"include-special" description:"[Password, User] Include special characters in the generated value"`
 	ExcludeNumber        bool     `short:"N" long:"exclude-number" description:"[Password, User] Exclude number characters from the generated value"`
@@ -66,8 +67,15 @@ func (cmd GenerateCommand) Execute([]string) error {
 		SshComment:       cmd.SshComment,
 	}
 
+	var value *models.ProvidedValue
+	if len(cmd.Username) > 0 {
+		value = &models.ProvidedValue{
+			Username: cmd.Username,
+		}
+	}
+
 	action := actions.NewAction(repository, cfg)
-	request := client.NewGenerateCredentialRequest(cfg, cmd.CredentialIdentifier, parameters, cmd.CredentialType, !cmd.NoOverwrite)
+	request := client.NewGenerateCredentialRequest(cfg, cmd.CredentialIdentifier, parameters, value, cmd.CredentialType, !cmd.NoOverwrite)
 	credential, err := action.DoAction(request, cmd.CredentialIdentifier)
 
 	if err != nil {

@@ -206,7 +206,7 @@ var _ = Describe("API", func() {
 				requestBody := `{"name":"my-name","type":"my-type","overwrite":true,"parameters":{}}`
 
 				params := models.GenerationParameters{}
-				request := NewGenerateCredentialRequest(cfg, "my-name", params, "my-type", true)
+				request := NewGenerateCredentialRequest(cfg, "my-name", params, nil, "my-type", true)
 				Expect(request.Header).To(HaveKeyWithValue("Content-Type", []string{"application/json"}))
 				Expect(request.Header).To(HaveKeyWithValue("Authorization", []string{"Bearer access-token"}))
 				Expect(request.Method).To(Equal("POST"))
@@ -225,6 +225,7 @@ var _ = Describe("API", func() {
 					ExcludeLower:   true,
 					Length:         42,
 				}
+				value := models.ProvidedValue{Username: "my-username"}
 				expectedRequestBody := `{
 					"name":"my-name",
 					"type":"password",
@@ -235,10 +236,13 @@ var _ = Describe("API", func() {
 						"exclude_upper": true,
 						"exclude_lower": true,
 						"length": 42
+					},
+					"value": {
+						"username": "my-username"
 					}
 				}`
 
-				request := NewGenerateCredentialRequest(cfg, "my-name", parameters, "password", false)
+				request := NewGenerateCredentialRequest(cfg, "my-name", parameters, &value, "password", false)
 
 				bodyBuffer := new(bytes.Buffer)
 				bodyBuffer.ReadFrom(request.Body)

@@ -359,6 +359,21 @@ var _ = Describe("Generate", func() {
 			Expect(session.Out.Contents()).To(ContainSubstring(responseMyUsername))
 		})
 
+		It("should accept a statically provided username", func() {
+			expectedRequestJson := generateUserRequestJson(name, `{}`, `{"username": "my-username"}`, true)
+			setupUserPostServer(
+				name,
+				"my-username",
+				"test-password",
+				"passw0rd-H4$h",
+				expectedRequestJson)
+
+			session := runCommand("generate", "-n", name, "-t", "user", "-z", "my-username")
+
+			Eventually(session).Should(Exit(0))
+			Expect(session.Out.Contents()).To(ContainSubstring(responseMyUsername))
+		})
+
 		It("with with no-overwrite", func() {
 			setupUserPostServer(
 				name,
@@ -523,6 +538,10 @@ func setupCertificatePostServer(name, ca, certificate, privateKey, requestJson s
 
 func generateRequestJson(credentialType, name, params string, overwrite bool) string {
 	return fmt.Sprintf(GENERATE_CREDENTIAL_REQUEST_JSON, name, credentialType, overwrite, params)
+}
+
+func generateUserRequestJson(name, params, value string, overwrite bool) string {
+	return fmt.Sprintf(USER_GENERATE_CREDENTIAL_REQUEST_JSON, name, overwrite, params, value)
 }
 
 func generateDefaultTypeRequestJson(name, params string, overwrite bool) string {

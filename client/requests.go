@@ -59,12 +59,13 @@ func NewSetCredentialRequest(config config.Config, credentialType string, creden
 	return newCredentialRequest("PUT", config, credentialIdentifier, credential)
 }
 
-func NewGenerateCredentialRequest(config config.Config, identifier string, parameters models.GenerationParameters, credentialType string, overwrite bool) *http.Request {
+func NewGenerateCredentialRequest(config config.Config, identifier string, parameters models.GenerationParameters, value *models.ProvidedValue, credentialType string, overwrite bool) *http.Request {
 	generateRequest := models.GenerateRequest{
 		Name:           identifier,
 		CredentialType: credentialType,
 		Overwrite:      &overwrite,
 		Parameters:     &parameters,
+		Value:          value,
 	}
 
 	return newCredentialRequest("POST", config, identifier, generateRequest)
