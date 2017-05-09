@@ -21,7 +21,7 @@ func (cmd DeleteCommand) Execute([]string) error {
 	_, err := action.DoAction(client.NewDeleteCredentialRequest(cfg, cmd.CredentialIdentifier), cmd.CredentialIdentifier)
 
 	if err == nil {
-		fmt.Println("Secret successfully deleted")
+		fmt.Println("Credential successfully deleted")
 	}
 
 	return err

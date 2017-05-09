@@ -32,7 +32,7 @@ var _ = Describe("Delete", func() {
 		session := runCommand("delete", "-n", "my-secret")
 
 		Eventually(session).Should(Exit(0))
-		Eventually(session.Out).Should(Say("Secret successfully deleted"))
+		Eventually(session.Out).Should(Say("Credential successfully deleted"))
 	})
 
 	Describe("Errors", func() {
