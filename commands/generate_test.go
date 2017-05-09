@@ -342,6 +342,90 @@ var _ = Describe("Generate", func() {
 		})
 	})
 
+	Describe("with a variety of user parameters", func() {
+		name := "my-username-credential"
+		It("prints the secret", func() {
+			expectedRequestJson := generateRequestJson("user", name, `{}`, true)
+			setupUserPostServer(
+				name,
+				"my-username",
+				"test-password",
+				"passw0rd-H4$h",
+				expectedRequestJson)
+
+			session := runCommand("generate", "-n", name, "-t", "user")
+
+			Eventually(session).Should(Exit(0))
+			Expect(session.Out.Contents()).To(ContainSubstring(responseMyUsername))
+		})
+
+		It("with with no-overwrite", func() {
+			setupUserPostServer(
+				name,
+				"my-username",
+				"test-password",
+				"passw0rd-H4$h",
+				generateRequestJson("user", name, `{}`, false))
+			session := runCommand("generate", "-n", name, "-t", "user", "--no-overwrite")
+			Eventually(session).Should(Exit(0))
+		})
+
+		It("including length", func() {
+			setupUserPostServer(
+				name,
+				"my-username",
+				"test-password",
+				"passw0rd-H4$h",
+				generateRequestJson("user", name, `{"length": 42}`, true))
+			session := runCommand("generate", "-n", name, "-t", "user", "-l", "42")
+			Eventually(session).Should(Exit(0))
+		})
+
+		It("excluding upper case", func() {
+			setupUserPostServer(
+				name,
+				"my-username",
+				"test-password",
+				"passw0rd-H4$h",
+				generateRequestJson("user", name, `{"exclude_upper": true}`, true))
+			session := runCommand("generate", "-n", name, "-t", "user", "--exclude-upper")
+			Eventually(session).Should(Exit(0))
+		})
+
+		It("excluding lower case", func() {
+			setupUserPostServer(
+				name,
+				"my-username",
+				"test-password",
+				"passw0rd-H4$h",
+				generateRequestJson("user", name, `{"exclude_lower": true}`, true))
+			session := runCommand("generate", "-n", name, "-t", "user", "--exclude-lower")
+			Eventually(session).Should(Exit(0))
+		})
+
+		It("including special characters", func() {
+			setupUserPostServer(
+				name,
+				"my-username",
+				"test-password",
+				"passw0rd-H4$h",
+				generateRequestJson("user", name, `{"include_special": true}`, true))
+			session := runCommand("generate", "-n", name, "-t", "user", "--include-special")
+			Eventually(session).Should(Exit(0))
+		})
+
+		It("excluding numbers", func() {
+			setupUserPostServer(
+				name,
+				"my-username",
+				"test-password",
+				"passw0rd-H4$h",
+				generateRequestJson("user", name, `{"exclude_number": true}`, true))
+			session := runCommand("generate", "-n", name, "-t", "user", "--exclude-number")
+			Eventually(session).Should(Exit(0))
+		})
+	})
+
 	Describe("Help", func() {
 		ItBehavesLikeHelp("generate", "n", func(session *Session) {
 			Expect(session.Err).To(Say("generate"))
@@ -397,7 +481,17 @@ var _ = Describe("Generate", func() {
 	})
 })
 
-func setupPasswordPostServer(name string, value string, requestJson string) {
+func setupUserPostServer(name, username, password, passwordHash, requestJson string) {
+	server.AppendHandlers(
+		CombineHandlers(
+			VerifyRequest("POST", "/api/v1/data"),
+			VerifyJSON(requestJson),
+			RespondWith(http.StatusOK, fmt.Sprintf(USER_CREDENTIAL_RESPONSE_JSON, name, username, password, passwordHash)),
+		),
+	)
+}
+
+func setupPasswordPostServer(name, value, requestJson string) {
 	server.AppendHandlers(
 		CombineHandlers(
 			VerifyRequest("POST", "/api/v1/data"),
@@ -407,7 +501,7 @@ func setupPasswordPostServer(name string, value string, requestJson string) {
 	)
 }
 
-func setupRsaSshPostServer(name string, credentialType string, publicKey string, privateKey string, requestJson string) {
+func setupRsaSshPostServer(name, credentialType, publicKey, privateKey, requestJson string) {
 	server.AppendHandlers(
 		CombineHandlers(
 			VerifyRequest("POST", "/api/v1/data"),
@@ -417,7 +511,7 @@ func setupRsaSshPostServer(name string, credentialType string, publicKey string,
 	)
 }
 
-func setupCertificatePostServer(name string, ca string, certificate string, privateKey string, requestJson string) {
+func setupCertificatePostServer(name, ca, certificate, privateKey, requestJson string) {
 	server.AppendHandlers(
 		CombineHandlers(
 			VerifyRequest("POST", "/api/v1/data"),
@@ -427,10 +521,10 @@ func setupCertificatePostServer(name string, ca string, certificate string, priv
 	)
 }
 
-func generateRequestJson(name string, credentialType string, params string, overwrite bool) string {
-	return fmt.Sprintf(GENERATE_CREDENTIAL_REQUEST_JSON, credentialType, name, overwrite, params)
+func generateRequestJson(credentialType, name, params string, overwrite bool) string {
+	return fmt.Sprintf(GENERATE_CREDENTIAL_REQUEST_JSON, name, credentialType, overwrite, params)
 }
 
-func generateDefaultTypeRequestJson(name string, params string, overwrite bool) string {
+func generateDefaultTypeRequestJson(name, params string, overwrite bool) string {
 	return fmt.Sprintf(GENERATE_DEFAULT_TYPE_REQUEST_JSON, name, overwrite, params)
 }
