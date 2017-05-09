@@ -22,8 +22,6 @@ Download and install the desired release from the [release page](https://github.
 
 ### Building the CLI:
 
-_NOTICE: Golang version 1.8 is not currently supported._
-
 `make` (first time only to get dependencies, will also run specs)
 
 `make build`
