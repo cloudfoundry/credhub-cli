@@ -139,6 +139,22 @@ var _ = Describe("Get", func() {
 		}`))
 	})
 
+	It("gets a user secret", func() {
+		responseJson := fmt.Sprintf(USER_CREDENTIAL_ARRAY_RESPONSE_JSON, "my-username-credential", "my-username", "test-password", "passw0rd-H4$h")
+
+		server.AppendHandlers(
+			CombineHandlers(
+				VerifyRequest("GET", "/api/v1/data", "name=my-username-credential&current=true"),
+				RespondWith(http.StatusOK, responseJson),
+			),
+		)
+
+		session := runCommand("get", "-n", "my-username-credential")
+
+		Eventually(session).Should(Exit(0))
+		Expect(session.Out.Contents()).To(ContainSubstring(responseMyUsername))
+	})
+
 	It("does not use Printf on user-supplied data", func() {
 		responseJson := fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_JSON, "password", "injected", "et''%/7(V&`|?m|Ckih$")
 
