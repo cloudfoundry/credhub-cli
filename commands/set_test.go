@@ -119,7 +119,7 @@ var _ = Describe("Set", func() {
 		It("puts a secret using default type", func() {
 			setupPutValueServer("my-password", "password", "potatoes")
 
-			session := runCommand("set", "-n", "my-password", "-v", "potatoes")
+			session := runCommand("set", "-n", "my-password", "-w", "potatoes")
 
 			Eventually(session).Should(Exit(0))
 			Eventually(session.Out).Should(Say(responseMyPasswordPotatoes))
@@ -128,7 +128,7 @@ var _ = Describe("Set", func() {
 		It("puts a secret specifying no-overwrite", func() {
 			setupOverwritePutValueServer("my-password", "password", "potatoes", false)
 
-			session := runCommand("set", "-n", "my-password", "-v", "potatoes", "--no-overwrite")
+			session := runCommand("set", "-n", "my-password", "-w", "potatoes", "--no-overwrite")
 
 			Eventually(session).Should(Exit(0))
 		})
@@ -136,7 +136,7 @@ var _ = Describe("Set", func() {
 		It("puts a secret using explicit password type", func() {
 			setupPutValueServer("my-password", "password", "potatoes")
 
-			session := runCommand("set", "-n", "my-password", "-v", "potatoes", "-t", "password")
+			session := runCommand("set", "-n", "my-password", "-w", "potatoes", "-t", "password")
 
 			Eventually(session).Should(Exit(0))
 			Eventually(session.Out).Should(Say(responseMyPasswordPotatoes))
@@ -147,7 +147,7 @@ var _ = Describe("Set", func() {
 
 			session := runCommandWithStdin(strings.NewReader("potatoes\n"), "set", "-n", "my-password", "-t", "password")
 
-			Eventually(session.Out).Should(Say("value:"))
+			Eventually(session.Out).Should(Say("password:"))
 			Eventually(session.Wait("10s").Out).Should(Say(responseMyPasswordPotatoes))
 			Eventually(session).Should(Exit(0))
 		})
@@ -159,7 +159,7 @@ var _ = Describe("Set", func() {
 
 			response := fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_YAML, "my-password", "password", "potatoes potatoes")
 
-			Eventually(session.Out).Should(Say("value:"))
+			Eventually(session.Out).Should(Say("password:"))
 			Eventually(session.Wait("10s").Out).Should(Say(response))
 			Eventually(session).Should(Exit(0))
 		})

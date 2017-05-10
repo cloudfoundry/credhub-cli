@@ -22,7 +22,7 @@ type SetCommand struct {
 	CredentialIdentifier string `short:"n" required:"yes" long:"name" description:"Name of the credential to set"`
 	Type                 string `short:"t" long:"type" description:"Sets the credential type (Default: 'password')"`
 	NoOverwrite          bool   `short:"O" long:"no-overwrite" description:"Credential is not modified if stored value already exists"`
-	Value                string `short:"v" long:"value" description:"[Password, Value, JSON] Sets the value for the credential"`
+	Value                string `short:"v" long:"value" description:"[Value, JSON] Sets the value for the credential"`
 	Root                 string `short:"r" long:"root" description:"[Certificate] Sets the root CA from file"`
 	Certificate          string `short:"c" long:"certificate" description:"[Certificate] Sets the certificate from file"`
 	Private              string `short:"p" long:"private" description:"[Certificate, SSH, RSA] Sets the private key from file"`
@@ -32,7 +32,7 @@ type SetCommand struct {
 	PrivateString        string `short:"P" long:"private-string" description:"[Certificate, SSH, RSA] Sets the private key from string input"`
 	PublicString         string `short:"U" long:"public-string" description:"[SSH, RSA] Sets the public key from  string input"`
 	Username             string `short:"z" long:"username" description:"[User] Sets the username value of the credential"`
-	Password             string `short:"w" long:"password" description:"[User] Sets the password value of the credential"`
+	Password             string `short:"w" long:"password" description:"[Password, User] Sets the password value of the credential"`
 }
 
 func (cmd SetCommand) Execute([]string) error {
@@ -40,11 +40,11 @@ func (cmd SetCommand) Execute([]string) error {
 		cmd.Type = "password"
 	}
 
-	if cmd.Value == "" && (cmd.Type == "password" || cmd.Type == "value" || cmd.Type == "json") {
+	if cmd.Value == "" && (cmd.Type == "value" || cmd.Type == "json") {
 		promptForInput("value: ", &cmd.Value)
 	}
 
-	if cmd.Password == "" && cmd.Type == "user" {
+	if cmd.Password == "" && (cmd.Type == "password" || cmd.Type == "user") {
 		promptForInput("password: ", &cmd.Password)
 	}
 
@@ -103,6 +103,8 @@ func makeRequest(cmd SetCommand, config config.Config) (*http.Request, error) {
 		request = client.NewSetCertificateRequest(config, cmd.CredentialIdentifier, cmd.RootString, cmd.CertificateString, cmd.PrivateString, !cmd.NoOverwrite)
 	} else if cmd.Type == "user" {
 		request = client.NewSetUserRequest(config, cmd.CredentialIdentifier, cmd.Username, cmd.Password, !cmd.NoOverwrite)
+	} else if cmd.Type == "password" {
+		request = client.NewSetCredentialRequest(config, cmd.Type, cmd.CredentialIdentifier, cmd.Password, !cmd.NoOverwrite)
 	} else {
 		request = client.NewSetCredentialRequest(config, cmd.Type, cmd.CredentialIdentifier, cmd.Value, !cmd.NoOverwrite)
 	}
