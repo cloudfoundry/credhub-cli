@@ -44,6 +44,10 @@ func (cmd SetCommand) Execute([]string) error {
 		promptForInput("value: ", &cmd.Value)
 	}
 
+	if cmd.Password == "" && cmd.Type == "user" {
+		promptForInput("password: ", &cmd.Password)
+	}
+
 	cfg := config.ReadConfig()
 	repository := repositories.NewCredentialRepository(client.NewHttpClient(cfg))
 

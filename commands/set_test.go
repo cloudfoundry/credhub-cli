@@ -233,6 +233,30 @@ var _ = Describe("Set", func() {
 
 			Eventually(session).Should(Exit(0))
 		})
+
+		It("should set password interactively for user", func() {
+			setupPutUserServer("my-username-credential", `{"username": "my-username", "password": "test-password"}`, "my-username", "test-password", "passw0rd-H4$h", true)
+
+			session := runCommandWithStdin(strings.NewReader("test-password\n"), "set", "-n", "my-username-credential", "-t", "user", "--username", "my-username")
+
+			response := fmt.Sprintf(USER_CREDENTIAL_RESPONSE_YAML, "my-username-credential", "test-password", "passw0rd-H4$h", "my-username")
+
+			Eventually(session.Out).Should(Say("password:"))
+			Eventually(session.Wait("10s").Out.Contents()).Should(ContainSubstring(response))
+			Eventually(session).Should(Exit(0))
+		})
+
+		It("should set null username when it isn't provided", func() {
+			setupPutUserWithoutUsernameServer("my-username-credential", `{"password": "test-password"}`, "test-password", "passw0rd-H4$h", true)
+
+			session := runCommandWithStdin(strings.NewReader("test-password\n"), "set", "-n", "my-username-credential", "-t", "user")
+
+			response := fmt.Sprintf(USER_WITHOUT_USERNAME_CREDENTIAL_RESPONSE_YAML, "my-username-credential", "test-password", "passw0rd-H4$h")
+
+			Eventually(session.Out).Should(Say("password:"))
+			Eventually(session.Wait("10s").Out.Contents()).Should(ContainSubstring(response))
+			Eventually(session).Should(Exit(0))
+		})
 	})
 
 	Describe("Help", func() {
@@ -350,6 +374,18 @@ func setupPutUserServer(name, value, username, password, passwordHash string, ov
 			VerifyRequest("PUT", "/api/v1/data"),
 			VerifyJSON(jsonRequest),
 			RespondWith(http.StatusOK, fmt.Sprintf(USER_CREDENTIAL_RESPONSE_JSON, name, username, password, passwordHash)),
+		),
+	)
+}
+
+func setupPutUserWithoutUsernameServer(name, value, password, passwordHash string, overwrite bool) {
+	var jsonRequest string
+	jsonRequest = fmt.Sprintf(USER_SET_CREDENTIAL_REQUEST_JSON, name, value, overwrite)
+	server.AppendHandlers(
+		CombineHandlers(
+			VerifyRequest("PUT", "/api/v1/data"),
+			VerifyJSON(jsonRequest),
+			RespondWith(http.StatusOK, fmt.Sprintf(USER_WITHOUT_USERNAME_CREDENTIAL_RESPONSE_JSON, name, password, passwordHash)),
 		),
 	)
 }
