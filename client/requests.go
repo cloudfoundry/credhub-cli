@@ -33,6 +33,15 @@ func NewSetRsaSshRequest(config config.Config, credentialIdentifier, keyType, pu
 	return NewSetCredentialRequest(config, keyType, credentialIdentifier, key, overwrite)
 }
 
+func NewSetUserRequest(config config.Config, credentialIdentifier, username, password string, overwrite bool) *http.Request {
+	user := models.User{
+		Username: username,
+		Password: password,
+	}
+
+	return NewSetCredentialRequest(config, "user", credentialIdentifier, user, overwrite)
+}
+
 func NewSetCredentialRequest(config config.Config, credentialType string, credentialIdentifier string, content interface{}, overwrite bool) *http.Request {
 	var value interface{}
 	switch credentialContent := content.(type) {

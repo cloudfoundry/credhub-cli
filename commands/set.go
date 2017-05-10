@@ -31,6 +31,8 @@ type SetCommand struct {
 	CertificateString    string `short:"C" long:"certificate-string" description:"[Certificate] Sets the certificate from string input"`
 	PrivateString        string `short:"P" long:"private-string" description:"[Certificate, SSH, RSA] Sets the private key from string input"`
 	PublicString         string `short:"U" long:"public-string" description:"[SSH, RSA] Sets the public key from  string input"`
+	Username             string `short:"z" long:"username" description:"[User] Sets the username value of the credential"`
+	Password             string `short:"w" long:"password" description:"[User] Sets the password value of the credential"`
 }
 
 func (cmd SetCommand) Execute([]string) error {
@@ -95,6 +97,8 @@ func makeRequest(cmd SetCommand, config config.Config) (*http.Request, error) {
 		}
 
 		request = client.NewSetCertificateRequest(config, cmd.CredentialIdentifier, cmd.RootString, cmd.CertificateString, cmd.PrivateString, !cmd.NoOverwrite)
+	} else if cmd.Type == "user" {
+		request = client.NewSetUserRequest(config, cmd.CredentialIdentifier, cmd.Username, cmd.Password, !cmd.NoOverwrite)
 	} else {
 		request = client.NewSetCredentialRequest(config, cmd.Type, cmd.CredentialIdentifier, cmd.Value, !cmd.NoOverwrite)
 	}

@@ -216,6 +216,25 @@ var _ = Describe("Set", func() {
 		})
 	})
 
+	Describe("setting User secrets", func() {
+		It("puts a secret using explicit user type", func() {
+			setupPutUserServer("my-username-credential", `{"username": "my-username", "password": "test-password"}`, "my-username", "test-password", "passw0rd-H4$h", true)
+
+			session := runCommand("set", "-n", "my-username-credential", "-z", "my-username", "-w", "test-password", "-t", "user")
+
+			Eventually(session).Should(Exit(0))
+			Expect(session.Out.Contents()).To(ContainSubstring(responseMyUsername))
+		})
+
+		It("puts a secret specifying no-overwrite", func() {
+			setupPutUserServer("my-username-credential", `{"username": "my-username", "password": "test-password"}`, "my-username", "test-password", "passw0rd-H4$h", false)
+
+			session := runCommand("set", "-n", "my-username-credential", "-t", "user", "-z", "my-username", "-w", "test-password", "--no-overwrite")
+
+			Eventually(session).Should(Exit(0))
+		})
+	})
+
 	Describe("Help", func() {
 		It("short flags", func() {
 			Expect(commands.SetCommand{}).To(SatisfyAll(
@@ -319,6 +338,18 @@ func setupOverwritePutCertificateServer(name, ca, cert, priv string, overwrite b
 			VerifyRequest("PUT", "/api/v1/data"),
 			VerifyJSON(jsonRequest),
 			RespondWith(http.StatusOK, fmt.Sprintf(CERTIFICATE_CREDENTIAL_RESPONSE_JSON, name, ca, cert, priv)),
+		),
+	)
+}
+
+func setupPutUserServer(name, value, username, password, passwordHash string, overwrite bool) {
+	var jsonRequest string
+	jsonRequest = fmt.Sprintf(USER_SET_CREDENTIAL_REQUEST_JSON, name, value, overwrite)
+	server.AppendHandlers(
+		CombineHandlers(
+			VerifyRequest("PUT", "/api/v1/data"),
+			VerifyJSON(jsonRequest),
+			RespondWith(http.StatusOK, fmt.Sprintf(USER_CREDENTIAL_RESPONSE_JSON, name, username, password, passwordHash)),
 		),
 	)
 }

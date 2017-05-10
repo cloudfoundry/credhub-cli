@@ -201,6 +201,23 @@ var _ = Describe("API", func() {
 			})
 		})
 
+		Describe("NewPutUserRequest", func() {
+			It("Returns a request for the put-user endpoint", func() {
+				json := fmt.Sprintf(`{"type":"user","name":"my-name","value":{"username":"%s","password":"%s"},"overwrite":true}`,
+					"my-user", "my-password")
+
+				request := NewSetUserRequest(cfg, "my-name", "my-user", "my-password", true)
+				Expect(request.Header).To(HaveKeyWithValue("Content-Type", []string{"application/json"}))
+				Expect(request.Header).To(HaveKeyWithValue("Authorization", []string{"Bearer access-token"}))
+				Expect(request.Method).To(Equal("PUT"))
+
+				byteBuff := new(bytes.Buffer)
+				byteBuff.ReadFrom(request.Body)
+
+				Expect(byteBuff.String()).To(MatchJSON(json))
+			})
+		})
+
 		Describe("NewGenerateCredentialRequest", func() {
 			It("returns a request with only overwrite", func() {
 				requestBody := `{"name":"my-name","type":"my-type","overwrite":true,"parameters":{}}`
