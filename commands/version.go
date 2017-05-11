@@ -15,9 +15,9 @@ func PrintVersion() error {
 	cfg := config.ReadConfig()
 
 	credHubServerVersion := "Not Found"
-	cmInfo, err := actions.NewInfo(client.NewHttpClient(cfg), cfg).GetServerInfo()
+	credhubInfo, err := actions.NewInfo(client.NewHttpClient(cfg), cfg).GetServerInfo()
 	if err == nil {
-		credHubServerVersion = cmInfo.App.Version
+		credHubServerVersion = credhubInfo.App.Version
 	}
 
 	fmt.Println("CLI Version:", version.Version)
@@ -27,7 +27,7 @@ func PrintVersion() error {
 }
 
 func init() {
-	CM.Version = func() {
+	CredHub.Version = func() {
 		PrintVersion()
 		os.Exit(0)
 	}

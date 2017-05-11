@@ -11,7 +11,7 @@ import (
 
 func main() {
 	debug.SetTraceback("all")
-	parser := flags.NewParser(&commands.CM, flags.HelpFlag)
+	parser := flags.NewParser(&commands.CredHub, flags.HelpFlag)
 
 	_, err := parser.Parse()
 	if err != nil {

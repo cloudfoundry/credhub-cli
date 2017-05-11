@@ -1,5 +1,5 @@
 build/
-cm-cli
+credhub-cli
 *.iml
 *.pem
 *.crt

@@ -14,7 +14,7 @@ import (
 	"os"
 	"strings"
 
-	cmcli_errors "github.com/cloudfoundry-incubator/credhub-cli/errors"
+	credhub_errors "github.com/cloudfoundry-incubator/credhub-cli/errors"
 	"github.com/cloudfoundry-incubator/credhub-cli/models"
 )
 
@@ -123,7 +123,7 @@ func setStringFieldFromFile(fileField, stringField *string) error {
 	var err error
 	if *fileField != "" {
 		if *stringField != "" {
-			return cmcli_errors.NewCombinationOfParametersError()
+			return credhub_errors.NewCombinationOfParametersError()
 		}
 		*stringField, err = ReadFile(*fileField)
 		if err != nil {

@@ -13,7 +13,7 @@ import (
 
 	"github.com/cloudfoundry-incubator/credhub-cli/client/clientfakes"
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
-	cmcli_errors "github.com/cloudfoundry-incubator/credhub-cli/errors"
+	credhub_errors "github.com/cloudfoundry-incubator/credhub-cli/errors"
 )
 
 var _ = Describe("Repository", func() {
@@ -56,7 +56,7 @@ var _ = Describe("Repository", func() {
 
 				request, _ := http.NewRequest("GET", "http://example.com/foo", nil)
 				_, error := DoSendRequest(&httpClient, request)
-				Expect(error).To(MatchError(cmcli_errors.NewNetworkError(serverError)))
+				Expect(error).To(MatchError(credhub_errors.NewNetworkError(serverError)))
 			})
 
 			It("returns a error when response is 400", func() {
@@ -94,7 +94,7 @@ var _ = Describe("Repository", func() {
 				request, _ := http.NewRequest("GET", "http://example.com/foo", nil)
 
 				_, error := DoSendRequest(&httpClient, request)
-				Expect(error).To(MatchError(cmcli_errors.NewForbiddenError()))
+				Expect(error).To(MatchError(credhub_errors.NewForbiddenError()))
 			})
 
 			It("returns an error when response is 500", func() {
@@ -135,7 +135,7 @@ var _ = Describe("Repository", func() {
 				request, _ := http.NewRequest("GET", "http://example.com/foo", nil)
 
 				_, error := DoSendRequest(&httpClient, request)
-				Expect(error).To(MatchError(cmcli_errors.NewAccessTokenExpiredError()))
+				Expect(error).To(MatchError(credhub_errors.NewAccessTokenExpiredError()))
 			})
 		})
 	})

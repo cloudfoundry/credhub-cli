@@ -7,7 +7,7 @@ import (
 	"errors"
 
 	"github.com/cloudfoundry-incubator/credhub-cli/client"
-	cm_errors "github.com/cloudfoundry-incubator/credhub-cli/errors"
+	credhub_errors "github.com/cloudfoundry-incubator/credhub-cli/errors"
 	"github.com/cloudfoundry-incubator/credhub-cli/models"
 )
 
@@ -19,7 +19,7 @@ func DoSendRequest(httpClient client.HttpClient, request *http.Request) (*http.R
 	response, err := httpClient.Do(request)
 
 	if err != nil {
-		return nil, cm_errors.NewNetworkError(err)
+		return nil, credhub_errors.NewNetworkError(err)
 	}
 
 	if response.StatusCode < 200 || response.StatusCode > 299 {
@@ -28,17 +28,17 @@ func DoSendRequest(httpClient client.HttpClient, request *http.Request) (*http.R
 		err = decoder.Decode(&serverError)
 		if err != nil {
 			if response.StatusCode == http.StatusInternalServerError {
-				return nil, cm_errors.NewCatchAllError()
+				return nil, credhub_errors.NewCatchAllError()
 			}
 			return nil, err
 		}
 
 		if serverError.Error == "access_token_expired" {
-			return nil, cm_errors.NewAccessTokenExpiredError()
+			return nil, credhub_errors.NewAccessTokenExpiredError()
 		} else if response.StatusCode == http.StatusUnauthorized {
 			return nil, errors.New(serverError.ErrorDescription)
 		} else if response.StatusCode == http.StatusForbidden {
-			return nil, cm_errors.NewForbiddenError()
+			return nil, credhub_errors.NewForbiddenError()
 		}
 
 		return nil, errors.New(serverError.Error)

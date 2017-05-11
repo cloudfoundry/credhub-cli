@@ -12,7 +12,7 @@ import (
 	"github.com/cloudfoundry-incubator/credhub-cli/client/clientfakes"
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
 
-	cmcli_errors "github.com/cloudfoundry-incubator/credhub-cli/errors"
+	credhub_errors "github.com/cloudfoundry-incubator/credhub-cli/errors"
 )
 
 var _ = Describe("FindRepository", func() {
@@ -75,7 +75,7 @@ var _ = Describe("FindRepository", func() {
 				request, _ := http.NewRequest("GET", "http://example.com/foo", nil)
 
 				_, error := repository.SendRequest(request, "foo")
-				Expect(error).To(MatchError(cmcli_errors.NewResponseError()))
+				Expect(error).To(MatchError(credhub_errors.NewResponseError()))
 			})
 
 			It("returns a NewNoMatchingCredentialsFoundError when there are no credentials returned", func() {
@@ -89,7 +89,7 @@ var _ = Describe("FindRepository", func() {
 				request, _ := http.NewRequest("GET", "http://example.com/foo", nil)
 
 				paths, err := repository.SendRequest(request, "foo")
-				Expect(err).To(MatchError(cmcli_errors.NewNoMatchingCredentialsFoundError()))
+				Expect(err).To(MatchError(credhub_errors.NewNoMatchingCredentialsFoundError()))
 				Expect(paths.ToJson()).To(MatchJSON(emptyPaths))
 			})
 		})

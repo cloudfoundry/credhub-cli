@@ -5,13 +5,13 @@ import (
 
 	"strings"
 
-	cmcli_errors "github.com/cloudfoundry-incubator/credhub-cli/errors"
+	credhub_errors "github.com/cloudfoundry-incubator/credhub-cli/errors"
 )
 
 func ReadFile(filename string) (string, error) {
 	dat, err := ioutil.ReadFile(filename)
 	if err != nil {
-		return "", cmcli_errors.NewFileLoadError()
+		return "", credhub_errors.NewFileLoadError()
 	}
 	return string(dat), nil
 }

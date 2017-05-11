@@ -8,7 +8,7 @@ import (
 )
 
 func init() {
-	CM.Token = func() {
+	CredHub.Token = func() {
 		cfg := config.ReadConfig()
 		if cfg.AccessToken != "" {
 			fmt.Println("Bearer " + cfg.AccessToken)

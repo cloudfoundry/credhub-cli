@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/cloudfoundry-incubator/credhub-cli/client"
-	cm_errors "github.com/cloudfoundry-incubator/credhub-cli/errors"
+	credhub_errors "github.com/cloudfoundry-incubator/credhub-cli/errors"
 	"github.com/cloudfoundry-incubator/credhub-cli/models"
 )
 
@@ -32,7 +32,7 @@ func (r credentialRepository) SendRequest(request *http.Request, identifier stri
 	err = decoder.Decode(&credentialResponse.ResponseBody)
 
 	if err != nil {
-		return credentialResponse, cm_errors.NewResponseError()
+		return credentialResponse, credhub_errors.NewResponseError()
 	}
 
 	if data, ok := credentialResponse.ResponseBody["data"].([]interface{}); ok {

@@ -14,7 +14,7 @@ import (
 	"encoding/json"
 
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
-	cm_errors "github.com/cloudfoundry-incubator/credhub-cli/errors"
+	credhub_errors "github.com/cloudfoundry-incubator/credhub-cli/errors"
 	"github.com/cloudfoundry-incubator/credhub-cli/models"
 	"github.com/cloudfoundry-incubator/credhub-cli/repositories/repositoriesfakes"
 )
@@ -70,7 +70,7 @@ var _ = Describe("Action", func() {
 				req, _ := http.NewRequest("POST", "my-url", bytes.NewBufferString("{}"))
 				_, error := subject.DoAction(req, "my-item")
 
-				Expect(error).To(MatchError(cm_errors.NewNoTargetUrlError()))
+				Expect(error).To(MatchError(credhub_errors.NewNoTargetUrlError()))
 			})
 
 			Context("when repository returns unauthorized", func() {
@@ -84,7 +84,7 @@ var _ = Describe("Action", func() {
 							buf := new(bytes.Buffer)
 							buf.ReadFrom(req.Body)
 							Expect(buf.String()).To(Equal("{}"))
-							return nil, cm_errors.NewAccessTokenExpiredError()
+							return nil, credhub_errors.NewAccessTokenExpiredError()
 						},
 						func(req *http.Request, identifier string) (models.Printable, error) {
 							Expect(req.Header.Get("Authorization")).To(Equal("Bearer access_token"))
@@ -117,7 +117,7 @@ var _ = Describe("Action", func() {
 
 						repository.SendRequestStub = SequentialStub(
 							func(req *http.Request, identifier string) (models.Printable, error) {
-								return nil, cm_errors.NewAccessTokenExpiredError()
+								return nil, credhub_errors.NewAccessTokenExpiredError()
 							},
 							func(req *http.Request, identifier string) (models.Printable, error) {
 								Expect(req.Header.Get("Authorization")).To(Equal("Bearer access_token"))

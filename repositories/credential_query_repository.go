@@ -10,7 +10,7 @@ import (
 	"github.com/cloudfoundry-incubator/credhub-cli/client"
 	"github.com/cloudfoundry-incubator/credhub-cli/models"
 
-	cm_errors "github.com/cloudfoundry-incubator/credhub-cli/errors"
+	credhub_errors "github.com/cloudfoundry-incubator/credhub-cli/errors"
 )
 
 type credentialQueryRepository struct {
@@ -32,7 +32,7 @@ func (r credentialQueryRepository) SendRequest(request *http.Request, identifier
 	err = decoder.Decode(&credentialResponse.ResponseBody)
 
 	if err != nil {
-		return credentialResponse, cm_errors.NewResponseError()
+		return credentialResponse, credhub_errors.NewResponseError()
 	}
 	if len(credentialResponse.ResponseBody["credentials"].([]interface{})) == 0 {
 		return credentialResponse, errors.NewNoMatchingCredentialsFoundError()

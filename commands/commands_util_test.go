@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	cmcli_errors "github.com/cloudfoundry-incubator/credhub-cli/errors"
+	credhub_errors "github.com/cloudfoundry-incubator/credhub-cli/errors"
 )
 
 var _ = Describe("Util", func() {
@@ -26,7 +26,7 @@ var _ = Describe("Util", func() {
 		It("returns an error message if a file cannot be read", func() {
 			readContents, err := commands.ReadFile("Foo")
 			Expect(readContents).To(Equal(""))
-			Expect(err).To(MatchError(cmcli_errors.NewFileLoadError()))
+			Expect(err).To(MatchError(credhub_errors.NewFileLoadError()))
 		})
 	})
 

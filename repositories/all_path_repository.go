@@ -10,7 +10,7 @@ import (
 	"github.com/cloudfoundry-incubator/credhub-cli/client"
 	"github.com/cloudfoundry-incubator/credhub-cli/models"
 
-	cm_errors "github.com/cloudfoundry-incubator/credhub-cli/errors"
+	credhub_errors "github.com/cloudfoundry-incubator/credhub-cli/errors"
 )
 
 type allPathRepository struct {
@@ -33,7 +33,7 @@ func (r allPathRepository) SendRequest(request *http.Request, ignoredIdentifier 
 	err = decoder.Decode(&credential_paths.ResponseBody)
 
 	if err != nil {
-		return credential_paths, cm_errors.NewResponseError()
+		return credential_paths, credhub_errors.NewResponseError()
 	}
 
 	if len(credential_paths.ResponseBody["paths"].([]interface{})) == 0 {

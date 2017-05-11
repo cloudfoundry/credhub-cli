@@ -1,6 +1,6 @@
 package commands
 
-type CMCommand struct {
+type CredhubCommand struct {
 	Api ApiCommand `command:"api" alias:"a" description:"Set the CredHub API target to be used for subsequent commands"`
 
 	Get        GetCommand        `command:"get" alias:"g" description:"Get a credential value"`
@@ -15,4 +15,4 @@ type CMCommand struct {
 	Token      func()            `long:"token" description:"Return your current CredHub authorization token"`
 }
 
-var CM CMCommand
+var CredHub CredhubCommand

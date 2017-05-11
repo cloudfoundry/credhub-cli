@@ -12,7 +12,7 @@ import (
 	"github.com/cloudfoundry-incubator/credhub-cli/client/clientfakes"
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
 
-	cmcli_errors "github.com/cloudfoundry-incubator/credhub-cli/errors"
+	credhub_errors "github.com/cloudfoundry-incubator/credhub-cli/errors"
 )
 
 var _ = Describe("FindRepository", func() {
@@ -77,7 +77,7 @@ var _ = Describe("FindRepository", func() {
 				request, _ := http.NewRequest("GET", "http://example.com/foo", nil)
 
 				_, error := repository.SendRequest(request, "foo")
-				Expect(error).To(MatchError(cmcli_errors.NewResponseError()))
+				Expect(error).To(MatchError(credhub_errors.NewResponseError()))
 			})
 		})
 	})

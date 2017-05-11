@@ -58,11 +58,11 @@ func GetApiInfo(cfg *config.Config, serverUrl string, skipTlsValidation bool) er
 	cfg.ApiURL = parsedUrl.String()
 
 	cfg.InsecureSkipVerify = skipTlsValidation
-	cmInfo, err := actions.NewInfo(client.NewHttpClient(*cfg), *cfg).GetServerInfo()
+	credhubInfo, err := actions.NewInfo(client.NewHttpClient(*cfg), *cfg).GetServerInfo()
 	if err != nil {
 		return err
 	}
-	cfg.AuthURL = cmInfo.AuthServer.Url
+	cfg.AuthURL = credhubInfo.AuthServer.Url
 
 	if parsedUrl.Scheme != "https" {
 		warning("Warning: Insecure HTTP API detected. Data sent to this API could be intercepted" +
