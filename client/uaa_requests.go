@@ -9,7 +9,7 @@ import (
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
 )
 
-func NewPasswordGrantTokenRequest(cfg config.Config, user string, pass string) *http.Request {
+func NewPasswordGrantTokenRequest(cfg config.Config, user, pass string) *http.Request {
 	authUrl := cfg.AuthURL + "/oauth/token/"
 	data := url.Values{}
 	data.Set("grant_type", "password")
@@ -18,6 +18,19 @@ func NewPasswordGrantTokenRequest(cfg config.Config, user string, pass string) *
 	data.Add("password", pass)
 	request, _ := http.NewRequest("POST", authUrl, bytes.NewBufferString(data.Encode()))
 	request.SetBasicAuth(config.AuthClient, config.AuthPassword)
+	request.Header.Add("Accept", "application/json")
+	request.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	return request
+}
+
+func NewClientCredentialsGrantTokenRequest(cfg config.Config, clientId, clientSecret string) *http.Request {
+	authUrl := cfg.AuthURL + "/oauth/token/"
+	data := url.Values{}
+	data.Set("grant_type", "client_credentials")
+	data.Add("response_type", "token")
+	data.Add("client_id", clientId)
+	data.Add("client_secret", clientSecret)
+	request, _ := http.NewRequest("POST", authUrl, bytes.NewBufferString(data.Encode()))
 	request.Header.Add("Accept", "application/json")
 	request.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	return request
