@@ -17,7 +17,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("API", func() {
+var _ = Describe("Credhub API", func() {
 	var cfg config.Config
 
 	BeforeEach(func() {

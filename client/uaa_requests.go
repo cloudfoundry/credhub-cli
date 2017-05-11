@@ -9,7 +9,7 @@ import (
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
 )
 
-func NewAuthTokenRequest(cfg config.Config, user string, pass string) *http.Request {
+func NewPasswordGrantTokenRequest(cfg config.Config, user string, pass string) *http.Request {
 	authUrl := cfg.AuthURL + "/oauth/token/"
 	data := url.Values{}
 	data.Set("grant_type", "password")

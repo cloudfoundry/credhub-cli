@@ -23,14 +23,14 @@ var _ = Describe("UAA Requests", func() {
 		}
 	})
 
-	Describe("NewAuthTokenRequest", func() {
+	Describe("NewPasswordGrantTokenRequest", func() {
 		It("Returns a request for the uaa oauth token endpoint", func() {
 			user := "my-user"
 			pass := "my-pass"
 
 			basicEncoded := b64.StdEncoding.EncodeToString([]byte(config.AuthClient + ":"))
 
-			request := NewAuthTokenRequest(cfg, user, pass)
+			request := NewPasswordGrantTokenRequest(cfg, user, pass)
 			Expect(request.Header).To(HaveKeyWithValue("Accept", []string{"application/json"}))
 			Expect(request.Header).To(HaveKeyWithValue("Content-Type", []string{"application/x-www-form-urlencoded"}))
 			Expect(request.Header).To(HaveKeyWithValue("Authorization", []string{"Basic " + basicEncoded}))

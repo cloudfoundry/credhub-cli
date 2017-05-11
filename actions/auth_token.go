@@ -15,7 +15,7 @@ func NewAuthToken(httpClient client.HttpClient, config config.Config) ServerInfo
 }
 
 func (serverInfo ServerInfo) GetAuthToken(user string, pass string) (models.Token, error) {
-	request := client.NewAuthTokenRequest(serverInfo.config, user, pass)
+	request := client.NewPasswordGrantTokenRequest(serverInfo.config, user, pass)
 	response, err := serverInfo.httpClient.Do(request)
 	if err != nil {
 		return models.Token{}, errors.NewNetworkError(err)
