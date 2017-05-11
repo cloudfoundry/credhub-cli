@@ -317,6 +317,8 @@ var _ = Describe("Login", func() {
 			Expect(session.Err).To(Say("login"))
 			Expect(session.Err).To(Say("username"))
 			Expect(session.Err).To(Say("password"))
+			Expect(session.Err).To(Say("client-name"))
+			Expect(session.Err).To(Say("client-secret"))
 		})
 	})
 })

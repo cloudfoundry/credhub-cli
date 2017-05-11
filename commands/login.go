@@ -13,6 +13,8 @@ import (
 type LoginCommand struct {
 	Username          string `short:"u" long:"username" description:"Authentication username"`
 	Password          string `short:"p" long:"password" description:"Authentication password"`
+	ClientName        string `long:"client-name" description:"Client name for UAA client grant [$CREDHUB_CLIENT]"`
+	ClientSecret      string `long:"client-secret" description:"Client secret for UAA client grant [$CREDHUB_SECRET]"`
 	ServerUrl         string `short:"s" long:"server" description:"URI of API server to target"`
 	SkipTlsValidation bool   `long:"skip-tls-validation" description:"Skip certificate validation of the API endpoint. Not recommended!"`
 }
