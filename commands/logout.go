@@ -14,7 +14,7 @@ type LogoutCommand struct {
 func (cmd LogoutCommand) Execute([]string) error {
 	cfg := config.ReadConfig()
 	RevokeTokenIfNecessary(cfg)
-	cfg = MarkTokensAsRevokedInConfig(cfg)
+	MarkTokensAsRevokedInConfig(&cfg)
 	config.WriteConfig(cfg)
 	fmt.Println("Logout Successful")
 	return nil
@@ -30,8 +30,7 @@ func RevokeTokenIfNecessary(cfg config.Config) {
 	}
 }
 
-func MarkTokensAsRevokedInConfig(cfg config.Config) config.Config {
+func MarkTokensAsRevokedInConfig(cfg *config.Config) {
 	cfg.AccessToken = "revoked"
 	cfg.RefreshToken = "revoked"
-	return cfg
 }

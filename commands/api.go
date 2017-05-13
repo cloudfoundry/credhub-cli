@@ -40,7 +40,7 @@ func (cmd ApiCommand) Execute([]string) error {
 
 		if existingCfg.AuthURL != cfg.AuthURL {
 			RevokeTokenIfNecessary(existingCfg)
-			cfg = MarkTokensAsRevokedInConfig(cfg)
+			MarkTokensAsRevokedInConfig(&cfg)
 		}
 		config.WriteConfig(cfg)
 	}

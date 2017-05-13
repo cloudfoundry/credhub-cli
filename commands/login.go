@@ -37,7 +37,7 @@ func (cmd LoginCommand) Execute([]string) error {
 	token, err := actions.NewAuthToken(client.NewHttpClient(cfg), cfg).GetAuthToken(cmd.Username, cmd.Password)
 	if err != nil {
 		RevokeTokenIfNecessary(cfg)
-		cfg = MarkTokensAsRevokedInConfig(cfg)
+		MarkTokensAsRevokedInConfig(&cfg)
 		config.WriteConfig(cfg)
 		return err
 	}
