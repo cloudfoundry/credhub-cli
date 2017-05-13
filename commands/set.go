@@ -20,7 +20,7 @@ import (
 
 type SetCommand struct {
 	CredentialIdentifier string `short:"n" required:"yes" long:"name" description:"Name of the credential to set"`
-	Type                 string `short:"t" long:"type" description:"Sets the credential type (Default: 'password')"`
+	Type                 string `short:"t" long:"type" description:"Sets the credential type. Valid types include 'value', 'json', 'password', 'user', 'certificate', 'ssh' and 'rsa'. Type-specific values are set with the following flags (supported types prefixed)."`
 	NoOverwrite          bool   `short:"O" long:"no-overwrite" description:"Credential is not modified if stored value already exists"`
 	Value                string `short:"v" long:"value" description:"[Value, JSON] Sets the value for the credential"`
 	Root                 string `short:"r" long:"root" description:"[Certificate] Sets the root CA from file"`
