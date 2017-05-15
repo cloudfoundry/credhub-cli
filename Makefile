@@ -1,6 +1,4 @@
-.DEFAULT_GOAL := test
-
-.PHONY : build
+.PHONY: all build ci clean dependencies format ginkgo test
 
 ifeq ($(GOOS),windows)
 DEST = build/credhub.exe
@@ -14,24 +12,29 @@ endif
 
 GOFLAGS := -o $(DEST) -ldflags "-X github.com/cloudfoundry-incubator/credhub-cli/version.Version=${VERSION}"
 
-dependencies :
-		go get github.com/onsi/ginkgo/ginkgo
-		go get golang.org/x/tools/cmd/goimports
-		go get github.com/maxbrunsfeld/counterfeiter
-		go get -u github.com/kardianos/govendor
-		govendor sync
+all: dependencies test clean build
 
-format : dependencies
-		goimports -w .
-		go fmt .
+clean:
+	rm -rf build
 
-ginkgo : dependencies
-		ginkgo -r -randomizeSuites -randomizeAllSpecs -race 2>&1
+dependencies:
+	go get github.com/onsi/ginkgo/ginkgo
+	go get golang.org/x/tools/cmd/goimports
+	go get github.com/maxbrunsfeld/counterfeiter
+	go get -u github.com/kardianos/govendor
+	govendor sync
 
-test : format ginkgo
+format:
+	goimports -w .
+	go fmt .
 
-ci : ginkgo
+ginkgo:
+	ginkgo -r -randomizeSuites -randomizeAllSpecs -race 2>&1
 
-build :
-		mkdir -p build
-		go build $(GOFLAGS)
+test: format ginkgo
+
+ci: dependencies ginkgo
+
+build:
+	mkdir -p build
+	go build $(GOFLAGS)
