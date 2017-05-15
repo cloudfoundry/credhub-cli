@@ -16,33 +16,33 @@ import (
 )
 
 var _ = Describe("Login", func() {
-	AfterEach(func() {
-		config.RemoveConfig()
-	})
+	var (
+		uaaServer *Server
+	)
 
-	Context("provided a username", func() {
-		var (
-			uaaServer *Server
-		)
-
-		BeforeEach(func() {
-			uaaServer = NewServer()
-			uaaServer.AppendHandlers(
-				CombineHandlers(
-					VerifyRequest("POST", "/oauth/token/"),
-					VerifyBody([]byte(`grant_type=password&password=pass&response_type=token&username=user`)),
-					RespondWith(http.StatusOK, `{
+	BeforeEach(func() {
+		uaaServer = NewServer()
+		uaaServer.AppendHandlers(
+			CombineHandlers(
+				VerifyRequest("POST", "/oauth/token/"),
+				VerifyBody([]byte(`grant_type=password&password=pass&response_type=token&username=user`)),
+				RespondWith(http.StatusOK, `{
 						"access_token":"2YotnFZFEjr1zCsicMWpAA",
 						"refresh_token":"erousflkajqwer",
 						"token_type":"bearer",
 						"expires_in":3600}`),
-				),
-			)
+			),
+		)
 
-			setConfigAuthUrl(uaaServer.URL())
-		})
+		setConfigAuthUrl(uaaServer.URL())
+	})
 
-		Context("provided a password", func() {
+	AfterEach(func() {
+		config.RemoveConfig()
+	})
+
+	Describe("password flow", func() {
+		Context("with a username and a password", func() {
 			It("authenticates with the UAA server and saves a token", func() {
 				session := runCommand("login", "-u", "user", "-p", "pass")
 
@@ -55,7 +55,7 @@ var _ = Describe("Login", func() {
 			})
 		})
 
-		Context("provided no password", func() {
+		Context("with a username and no password", func() {
 			It("prompts for a password", func() {
 				session := runCommandWithStdin(strings.NewReader("pass\n"), "login", "-u", "user")
 				Eventually(session.Out).Should(Say("password:"))
@@ -65,10 +65,8 @@ var _ = Describe("Login", func() {
 				Expect(cfg.AccessToken).To(Equal("2YotnFZFEjr1zCsicMWpAA"))
 			})
 		})
-	})
 
-	Context("provided no username", func() {
-		Context("provided a password", func() {
+		Context("with a password and no username", func() {
 			It("fails authentication with an error message", func() {
 				session := runCommand("login", "-p", "pass")
 
@@ -77,20 +75,8 @@ var _ = Describe("Login", func() {
 			})
 		})
 
-		Context("provided no password", func() {
+		Context("with neither a username nor a password", func() {
 			It("prompts for a username and password", func() {
-				uaaServer := NewServer()
-				uaaServer.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest("POST", "/oauth/token/"),
-						VerifyBody([]byte(`grant_type=password&password=pass&response_type=token&username=user`)),
-						RespondWith(http.StatusOK, `{
-						"access_token":"2YotnFZFEjr1zCsicMWpAA",
-						"token_type":"bearer",
-						"expires_in":3600}`),
-					),
-				)
-
 				// TODO:  devise an input which echoes the input characters for the user name, much as gopass.GetPasswdMasked()
 				// echoes '*', for that we may regression-test the echoing of the username
 				setConfigAuthUrl(uaaServer.URL())
