@@ -19,62 +19,40 @@ type LoginCommand struct {
 	SkipTlsValidation bool   `long:"skip-tls-validation" description:"Skip certificate validation of the API endpoint. Not recommended!"`
 }
 
-type loginStrategy interface {
-	Login() error
-}
-
-type passwordLogin struct {
-	cmd    *LoginCommand
-	config *config.Config
-}
-
 func (cmd LoginCommand) Execute([]string) error {
 	cfg := config.ReadConfig()
 
-	strategy := getLoginStrategy(&cmd, &cfg)
-
-	return strategy.Login()
-}
-
-func (login passwordLogin) Login() error {
-	if login.cmd.ServerUrl != "" {
-		err := GetApiInfo(login.config, login.cmd.ServerUrl, login.cmd.SkipTlsValidation)
+	if cmd.ServerUrl != "" {
+		err := GetApiInfo(&cfg, cmd.ServerUrl, cmd.SkipTlsValidation)
 		if err != nil {
 			return err
 		}
 	}
 
-	err := getUsernameAndPassword(login.cmd)
+	err := getUsernameAndPassword(&cmd)
 	if err != nil {
 		return err
 	}
 
-	token, err := actions.NewAuthToken(client.NewHttpClient(*login.config), *login.config).GetAuthToken(login.cmd.Username, login.cmd.Password)
+	token, err := actions.NewAuthToken(client.NewHttpClient(cfg), cfg).GetAuthToken(cmd.Username, cmd.Password)
 	if err != nil {
-		RevokeTokenIfNecessary(*login.config)
-		MarkTokensAsRevokedInConfig(login.config)
-		config.WriteConfig(*login.config)
+		RevokeTokenIfNecessary(cfg)
+		MarkTokensAsRevokedInConfig(&cfg)
+		config.WriteConfig(cfg)
 		return err
 	}
 
-	login.config.AccessToken = token.AccessToken
-	login.config.RefreshToken = token.RefreshToken
-	config.WriteConfig(*login.config)
+	cfg.AccessToken = token.AccessToken
+	cfg.RefreshToken = token.RefreshToken
+	config.WriteConfig(cfg)
 
-	if login.cmd.ServerUrl != "" {
-		fmt.Println("Setting the target url:", login.config.ApiURL)
+	if cmd.ServerUrl != "" {
+		fmt.Println("Setting the target url:", cfg.ApiURL)
 	}
 
 	fmt.Println("Login Successful")
 
 	return nil
-}
-
-func getLoginStrategy(cmd *LoginCommand, config *config.Config) loginStrategy {
-	return passwordLogin{
-		cmd:    cmd,
-		config: config,
-	}
 }
 
 func getUsernameAndPassword(cmd *LoginCommand) error {
