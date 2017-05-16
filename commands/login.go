@@ -1,6 +1,8 @@
 package commands
 
 import (
+	"fmt"
+
 	"github.com/cloudfoundry-incubator/credhub-cli/actions"
 	"github.com/cloudfoundry-incubator/credhub-cli/client"
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
