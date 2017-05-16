@@ -24,8 +24,8 @@ var _ = Describe("Token", func() {
 		subject = actions.NewAuthToken(&httpClient, testConfig)
 	})
 
-	Describe("Authorization", func() {
-		It("returns the token from the authorization server", func() {
+	Describe("GetAuthTokenByPasswordGrant", func() {
+		It("returns the token from the authorization server using password grant", func() {
 			responseObj := http.Response{
 				StatusCode: 200,
 				Body: ioutil.NopCloser(bytes.NewBufferString(`{
@@ -38,8 +38,27 @@ var _ = Describe("Token", func() {
 				return &responseObj, nil
 			}
 
-			token, _ := subject.GetAuthToken("userName", "password")
+			token, _ := subject.GetAuthTokenByPasswordGrant("userName", "password")
 			Expect(token.AccessToken).To(Equal("2YotnFZFEjr1zCsicMWpAA"))
+		})
+	})
+
+	Describe("GetAuthTokenByClientCredential", func() {
+		It("returns the token from the authorization server using client credential", func() {
+			responseObj := http.Response{
+				StatusCode: 200,
+				Body: ioutil.NopCloser(bytes.NewBufferString(`{
+					"access_token":"3YotnFZFEjr1zCsicMWpAA",
+					"token_type":"bearer",
+					"expires_in":3600}`)),
+			}
+
+			httpClient.DoStub = func(req *http.Request) (resp *http.Response, err error) {
+				return &responseObj, nil
+			}
+
+			token, _ := subject.GetAuthTokenByClientCredential("test_client", "test_secret")
+			Expect(token.AccessToken).To(Equal("3YotnFZFEjr1zCsicMWpAA"))
 		})
 	})
 })

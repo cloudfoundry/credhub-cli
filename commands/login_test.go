@@ -20,28 +20,28 @@ var _ = Describe("Login", func() {
 		uaaServer *Server
 	)
 
-	BeforeEach(func() {
-		uaaServer = NewServer()
-		uaaServer.AppendHandlers(
-			CombineHandlers(
-				VerifyRequest("POST", "/oauth/token/"),
-				VerifyBody([]byte(`grant_type=password&password=pass&response_type=token&username=user`)),
-				RespondWith(http.StatusOK, `{
-						"access_token":"2YotnFZFEjr1zCsicMWpAA",
-						"refresh_token":"erousflkajqwer",
-						"token_type":"bearer",
-						"expires_in":3600}`),
-			),
-		)
-
-		setConfigAuthUrl(uaaServer.URL())
-	})
-
 	AfterEach(func() {
 		config.RemoveConfig()
 	})
 
 	Describe("password flow", func() {
+		BeforeEach(func() {
+			uaaServer = NewServer()
+			uaaServer.AppendHandlers(
+				CombineHandlers(
+					VerifyRequest("POST", "/oauth/token/"),
+					VerifyBody([]byte(`grant_type=password&password=pass&response_type=token&username=user`)),
+					RespondWith(http.StatusOK, `{
+						"access_token":"2YotnFZFEjr1zCsicMWpAA",
+						"refresh_token":"erousflkajqwer",
+						"token_type":"bearer",
+						"expires_in":3600}`),
+				),
+			)
+
+			setConfigAuthUrl(uaaServer.URL())
+		})
+
 		Context("with a username and a password", func() {
 			It("authenticates with the UAA server and saves a token", func() {
 				session := runCommand("login", "-u", "user", "-p", "pass")
@@ -85,6 +85,77 @@ var _ = Describe("Login", func() {
 				Eventually(session.Out).Should(Say("password:"))
 				Eventually(session.Wait("10s").Out).Should(Say("Login Successful"))
 				Eventually(session).Should(Exit(0))
+			})
+		})
+	})
+
+	Describe("client flow", func() {
+		BeforeEach(func() {
+			uaaServer = NewServer()
+			uaaServer.AppendHandlers(
+				CombineHandlers(
+					VerifyRequest("POST", "/oauth/token/"),
+					VerifyBody([]byte(`client_id=test_client&client_secret=test_secret&grant_type=client_credentials&response_type=token`)),
+					RespondWith(http.StatusOK, `{
+						"access_token":"2YotnFZFEjr1zCsicMWpAA",
+						"refresh_token":"erousflkajqwer",
+						"token_type":"bearer",
+						"expires_in":3600}`),
+				),
+			)
+
+			setConfigAuthUrl(uaaServer.URL())
+		})
+
+		Context("with the client name and secret from the CLI", func() {
+			It("authenticates with the UAA server and saves a token", func() {
+				session := runCommand("login", "--client-name", "test_client", "--client-secret", "test_secret")
+
+				Expect(uaaServer.ReceivedRequests()).Should(HaveLen(1))
+				Eventually(session).Should(Exit(0))
+				Eventually(session.Out).Should(Say("Login Successful"))
+				Eventually(session.Out.Contents()).ShouldNot(ContainSubstring("Setting the target url:"))
+				cfg := config.ReadConfig()
+				Expect(cfg.AccessToken).To(Equal("2YotnFZFEjr1zCsicMWpAA"))
+			})
+		})
+
+		Context("with the client name and secret from the env", func() {
+			It("authenticates with the UAA server and saves a token", func() {
+				session := runCommandWithEnv([]string{"CREDHUB_CLIENT=test_client", "CREDHUB_SECRET=test_secret"}, "login")
+
+				Expect(uaaServer.ReceivedRequests()).Should(HaveLen(1))
+				Eventually(session).Should(Exit(0))
+				Eventually(session.Out).Should(Say("Login Successful"))
+				Eventually(session.Out.Contents()).ShouldNot(ContainSubstring("Setting the target url:"))
+				cfg := config.ReadConfig()
+				Expect(cfg.AccessToken).To(Equal("2YotnFZFEjr1zCsicMWpAA"))
+			})
+		})
+
+		Context("with the client name from the env and client secret from the CLI", func() {
+			It("authenticates with the UAA server and saves a token", func() {
+				session := runCommandWithEnv([]string{"CREDHUB_CLIENT=test_client"}, "login", "--client-secret", "test_secret")
+
+				Expect(uaaServer.ReceivedRequests()).Should(HaveLen(1))
+				Eventually(session).Should(Exit(0))
+				Eventually(session.Out).Should(Say("Login Successful"))
+				Eventually(session.Out.Contents()).ShouldNot(ContainSubstring("Setting the target url:"))
+				cfg := config.ReadConfig()
+				Expect(cfg.AccessToken).To(Equal("2YotnFZFEjr1zCsicMWpAA"))
+			})
+		})
+
+		Context("with the client name from the CLI and secret from the env", func() {
+			It("authenticates with the UAA server and saves a token", func() {
+				session := runCommandWithEnv([]string{"CREDHUB_SECRET=test_secret"}, "login", "--client-name", "test_client")
+
+				Expect(uaaServer.ReceivedRequests()).Should(HaveLen(1))
+				Eventually(session).Should(Exit(0))
+				Eventually(session.Out).Should(Say("Login Successful"))
+				Eventually(session.Out.Contents()).ShouldNot(ContainSubstring("Setting the target url:"))
+				cfg := config.ReadConfig()
+				Expect(cfg.AccessToken).To(Equal("2YotnFZFEjr1zCsicMWpAA"))
 			})
 		})
 	})

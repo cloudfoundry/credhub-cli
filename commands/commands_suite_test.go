@@ -125,6 +125,20 @@ func runCommand(args ...string) *Session {
 	return session
 }
 
+func runCommandWithEnv(env []string, args ...string) *Session {
+	cmd := exec.Command(commandPath, args...)
+	existing := os.Environ()
+	for _, env_var := range env {
+		existing = append(existing, env_var)
+	}
+	cmd.Env = existing
+	session, err := Start(cmd, GinkgoWriter, GinkgoWriter)
+	Expect(err).NotTo(HaveOccurred())
+	<-session.Exited
+
+	return session
+}
+
 func runCommandWithStdin(stdin io.Reader, args ...string) *Session {
 	cmd := exec.Command(commandPath, args...)
 	cmd.Stdin = stdin
