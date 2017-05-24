@@ -33,17 +33,17 @@ func (cmd LoginCommand) Execute([]string) error {
 			return err
 		}
 	}
-	if cmd.ClientName != "" || cmd.ClientSecret != "" {
-		if cmd.ClientName == "" || cmd.ClientSecret == "" {
-			return errors.NewClientAuthorizationParametersError()
-		}
 
+	err = validateParameters(&cmd)
+
+	if err != nil {
+		return err
+	}
+
+	if cmd.ClientName != "" || cmd.ClientSecret != "" {
 		token, err = actions.NewAuthToken(client.NewHttpClient(cfg), cfg).GetAuthTokenByClientCredential(cmd.ClientName, cmd.ClientSecret)
 	} else {
-		err = promptForMissingCredentials(&cmd)
-		if err != nil {
-			return err
-		}
+		promptForMissingCredentials(&cmd)
 
 		token, err = actions.NewAuthToken(client.NewHttpClient(cfg), cfg).GetAuthTokenByPasswordGrant(cmd.Username, cmd.Password)
 	}
@@ -54,6 +54,7 @@ func (cmd LoginCommand) Execute([]string) error {
 		config.WriteConfig(cfg)
 		return err
 	}
+
 	cfg.AccessToken = token.AccessToken
 	cfg.RefreshToken = token.RefreshToken
 	config.WriteConfig(cfg)
@@ -67,10 +68,25 @@ func (cmd LoginCommand) Execute([]string) error {
 	return nil
 }
 
-func promptForMissingCredentials(cmd *LoginCommand) error {
+func validateParameters(cmd *LoginCommand) error {
+	if cmd.ClientName != "" || cmd.ClientSecret != "" {
+		if cmd.Username != "" || cmd.Password != "" {
+			return errors.NewMixedAuthorizationParametersError()
+		}
+
+		if cmd.ClientName == "" || cmd.ClientSecret == "" {
+			return errors.NewClientAuthorizationParametersError()
+		}
+	}
+
 	if cmd.Username == "" && cmd.Password != "" {
 		return errors.NewPasswordAuthorizationParametersError()
 	}
+
+	return nil
+}
+
+func promptForMissingCredentials(cmd *LoginCommand) {
 	if cmd.Username == "" {
 		fmt.Printf("username: ")
 		fmt.Scanln(&cmd.Username)
@@ -80,5 +96,4 @@ func promptForMissingCredentials(cmd *LoginCommand) error {
 		pass, _ := gopass.GetPasswdMasked()
 		cmd.Password = string(pass)
 	}
-	return nil
 }

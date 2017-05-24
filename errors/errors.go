@@ -41,6 +41,10 @@ func NewAuthorizationError() error {
 	return errors.New("The provided username and password combination are incorrect. Please validate your input and retry your request.")
 }
 
+func NewMixedAuthorizationParametersError() error {
+	return errors.New("Client and password credentials may not be combined. Please update and retry your request with a single login method.")
+}
+
 func NewPasswordAuthorizationParametersError() error {
 	return errors.New("The combination of parameters in the request is not allowed. Please validate your input and retry your request.")
 }
