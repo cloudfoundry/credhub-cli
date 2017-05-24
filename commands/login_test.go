@@ -158,6 +158,46 @@ var _ = Describe("Login", func() {
 				Expect(cfg.AccessToken).To(Equal("2YotnFZFEjr1zCsicMWpAA"))
 			})
 		})
+
+		Context("with the client name from the CLI and no client secret", func() {
+			It("fails with an error message", func() {
+				session := runCommand("login", "--client-name", "test_client")
+
+				Expect(uaaServer.ReceivedRequests()).Should(HaveLen(0))
+				Eventually(session).Should(Exit(1))
+				Eventually(session.Err).Should(Say("Both client name and client secret must be provided to authenticate. Please update and retry your request."))
+			})
+		})
+
+		Context("with the client name from the environment and no client secret", func() {
+			It("fails with an error message", func() {
+				session := runCommandWithEnv([]string{"CREDHUB_CLIENT=test_client"}, "login")
+
+				Expect(uaaServer.ReceivedRequests()).Should(HaveLen(0))
+				Eventually(session).Should(Exit(1))
+				Eventually(session.Err).Should(Say("Both client name and client secret must be provided to authenticate. Please update and retry your request."))
+			})
+		})
+
+		Context("with the client secret from the CLI and no client name", func() {
+			It("fails with an error message", func() {
+				session := runCommand("login", "--client-secret", "test_secret")
+
+				Expect(uaaServer.ReceivedRequests()).Should(HaveLen(0))
+				Eventually(session).Should(Exit(1))
+				Eventually(session.Err).Should(Say("Both client name and client secret must be provided to authenticate. Please update and retry your request."))
+			})
+		})
+
+		Context("with the client secret from the environment and no client name", func() {
+			It("fails with an error message", func() {
+				session := runCommandWithEnv([]string{"CREDHUB_SECRET=test_secret"}, "login")
+
+				Expect(uaaServer.ReceivedRequests()).Should(HaveLen(0))
+				Eventually(session).Should(Exit(1))
+				Eventually(session.Err).Should(Say("Both client name and client secret must be provided to authenticate. Please update and retry your request."))
+			})
+		})
 	})
 
 	Context("when logging in with server api target", func() {

@@ -33,7 +33,11 @@ func (cmd LoginCommand) Execute([]string) error {
 			return err
 		}
 	}
-	if cmd.ClientName != "" && cmd.ClientSecret != "" {
+	if cmd.ClientName != "" || cmd.ClientSecret != "" {
+		if cmd.ClientName == "" || cmd.ClientSecret == "" {
+			return errors.NewClientAuthorizationParametersError()
+		}
+
 		token, err = actions.NewAuthToken(client.NewHttpClient(cfg), cfg).GetAuthTokenByClientCredential(cmd.ClientName, cmd.ClientSecret)
 	} else {
 		err = promptForMissingCredentials(&cmd)
@@ -65,7 +69,7 @@ func (cmd LoginCommand) Execute([]string) error {
 
 func promptForMissingCredentials(cmd *LoginCommand) error {
 	if cmd.Username == "" && cmd.Password != "" {
-		return errors.NewAuthorizationParametersError()
+		return errors.NewPasswordAuthorizationParametersError()
 	}
 	if cmd.Username == "" {
 		fmt.Printf("username: ")
