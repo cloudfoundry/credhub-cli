@@ -14,6 +14,12 @@ import (
 )
 
 var _ = Describe("Find", func() {
+	BeforeEach(func() {
+		login()
+	})
+
+	ItRequiresAuthentication("get", "-n", "test-credential")
+
 	Describe("Help", func() {
 		ItBehavesLikeHelp("find", "f", func(session *Session) {
 			Expect(session.Err).To(Say("Usage"))

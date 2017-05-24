@@ -3,6 +3,7 @@ package commands_test
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
 	. "github.com/onsi/gomega/ghttp"
 
@@ -84,7 +85,6 @@ var _ = BeforeEach(func() {
 	}
 
 	server = NewServer()
-
 	authServer = NewServer()
 
 	server.AppendHandlers(
@@ -98,6 +98,8 @@ var _ = BeforeEach(func() {
 	)
 
 	session := runCommand("api", server.URL())
+	server.Reset()
+
 	Eventually(session).Should(Exit(0))
 })
 
@@ -118,6 +120,24 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 var _ = SynchronizedAfterSuite(func() {}, func() {
 	CleanupBuildArtifacts()
 })
+
+func login() {
+	authServer.AppendHandlers(
+		CombineHandlers(
+			VerifyRequest("POST", "/oauth/token/"),
+			RespondWith(http.StatusOK, `{
+			"access_token":"test-access-token",
+			"refresh_token":"test-refresh-token",
+			"token_type":"password",
+			"expires_in":123456789
+			}`),
+		),
+	)
+
+	runCommand("login", "-u", "test-username", "-p", "test-password")
+
+	authServer.Reset()
+}
 
 func runCommand(args ...string) *Session {
 	cmd := exec.Command(commandPath, args...)
@@ -180,5 +200,23 @@ func ItBehavesLikeHelp(command string, alias string, validate func(*Session)) {
 		session := runCommand(alias, "-h")
 		Eventually(session).Should(Exit(1))
 		validate(session)
+	})
+}
+
+func ItRequiresAuthentication(args ...string) {
+	It("requires authentication", func() {
+		authServer.AppendHandlers(
+			CombineHandlers(
+				VerifyRequest("DELETE", "/oauth/token/revoke/test-refresh-token"),
+				RespondWith(http.StatusOK, nil),
+			),
+		)
+
+		runCommand("logout")
+
+		session := runCommand(args...)
+
+		Eventually(session).Should(Exit(1))
+		Expect(session.Err).To(Say("You are not currently authenticated. Please log in to continue."))
 	})
 }

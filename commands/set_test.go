@@ -20,6 +20,12 @@ import (
 )
 
 var _ = Describe("Set", func() {
+	BeforeEach(func() {
+		login()
+	})
+
+	ItRequiresAuthentication("get", "-n", "test-credential")
+
 	Describe("not specifying type", func() {
 		It("returns an error", func() {
 			session := runCommand("set", "-n", "my-password", "-w", "potatoes")

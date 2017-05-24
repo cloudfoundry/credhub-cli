@@ -15,6 +15,11 @@ import (
 )
 
 var _ = Describe("Get", func() {
+	BeforeEach(func() {
+		login()
+	})
+
+	ItRequiresAuthentication("get", "-n", "test-credential")
 
 	ItBehavesLikeHelp("get", "g", func(session *Session) {
 		Expect(session.Err).To(Say("Usage"))

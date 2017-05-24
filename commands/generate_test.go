@@ -16,6 +16,12 @@ import (
 )
 
 var _ = Describe("Generate", func() {
+	BeforeEach(func() {
+		login()
+	})
+
+	ItRequiresAuthentication("get", "-n", "test-credential")
+
 	It("requires a type", func() {
 		session := runCommand("generate", "-n", "my-credential")
 		Eventually(session).Should(Exit(1))

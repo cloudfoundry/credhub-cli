@@ -14,6 +14,12 @@ import (
 )
 
 var _ = Describe("Delete", func() {
+	BeforeEach(func() {
+		login()
+	})
+
+	ItRequiresAuthentication("get", "-n", "test-credential")
+
 	Describe("Help", func() {
 		ItBehavesLikeHelp("delete", "d", func(session *Session) {
 			Expect(session.Err).To(Say("delete"))

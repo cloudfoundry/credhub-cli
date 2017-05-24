@@ -16,6 +16,12 @@ import (
 const REGENERATE_CREDENTIAL_REQUEST_JSON = `{"regenerate":true,"name":"my-password-stuffs"}`
 
 var _ = Describe("Regenerate", func() {
+	BeforeEach(func() {
+		login()
+	})
+
+	ItRequiresAuthentication("get", "-n", "test-credential")
+
 	Describe("Regenerating password", func() {
 		It("prints the regenerated password secret", func() {
 			server.AppendHandlers(
