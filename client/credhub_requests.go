@@ -43,19 +43,26 @@ func NewSetUserRequest(config config.Config, credentialIdentifier, username, pas
 }
 
 func NewSetCredentialRequest(config config.Config, credentialType string, credentialIdentifier string, content interface{}, overwrite bool) *http.Request {
-	var value interface{}
-	switch credentialContent := content.(type) {
-	default:
-		value = credentialContent
-	case string:
-		valueObject := make(map[string]interface{})
-		err := json.Unmarshal([]byte(credentialContent), &valueObject)
+	credential := models.RequestBody{
+		CredentialType: credentialType,
+		Name:           credentialIdentifier,
+		Value:          content,
+		Overwrite:      &overwrite,
+	}
 
-		if err != nil {
-			value = credentialContent
-		} else {
-			value = valueObject
-		}
+	return newCredentialRequest("PUT", config, credentialIdentifier, credential)
+}
+
+func NewSetJsonCredentialRequest(config config.Config, credentialType string, credentialIdentifier string, content interface{}, overwrite bool) *http.Request {
+	var value interface{}
+	valueObject := make(map[string]interface{})
+	contentCredential := content.(string)
+	err := json.Unmarshal([]byte(contentCredential), &valueObject)
+
+	if err != nil {
+		value = content
+	} else {
+		value = valueObject
 	}
 
 	credential := models.RequestBody{

@@ -20,7 +20,7 @@ import (
 )
 
 var _ = Describe("Set", func() {
-	Describe("setting string secrets", func() {
+	Describe("setting value secrets", func() {
 		It("puts a secret using explicit value type", func() {
 			setupPutValueServer("my-value", "value", "potatoes")
 
@@ -28,6 +28,15 @@ var _ = Describe("Set", func() {
 
 			Eventually(session).Should(Exit(0))
 			Eventually(session.Out).Should(Say(responseMyValuePotatoes))
+		})
+
+		It("escapes special characters in the value", func() {
+			setupPutValueServer("my-character-test", "value", `{\"password\":\"some-still-bad-password\"}`)
+
+			session := runCommand("set", "-t", "value", "-n", "my-character-test", "-v", `{"password":"some-still-bad-password"}`)
+
+			Eventually(session).Should(Exit(0))
+			Eventually(session.Out).Should(Say(responseMySpecialCharacterValue))
 		})
 	})
 
@@ -40,6 +49,15 @@ var _ = Describe("Set", func() {
 
 			Eventually(session).Should(Exit(0))
 			Eventually(session.Out).Should(Say(responseMyJson))
+		})
+
+		It("escapes special characters in the json", func() {
+			setupPutJsonServer("my-character-test", `{"foo":"b\"ar"}`)
+
+			session := runCommand("set", "-t", "json", "-n", "my-character-test", "-v", `{"foo":"b\"ar"}`)
+
+			Eventually(session).Should(Exit(0))
+			Eventually(session.Out).Should(Say(responseMySpecialCharacterJson))
 		})
 	})
 
@@ -162,6 +180,15 @@ var _ = Describe("Set", func() {
 			Eventually(session.Out).Should(Say("password:"))
 			Eventually(session.Wait("10s").Out).Should(Say(response))
 			Eventually(session).Should(Exit(0))
+		})
+
+		It("escapes special characters in the password", func() {
+			setupPutValueServer("my-character-test", "password", `{\"password\":\"some-still-bad-password\"}`)
+
+			session := runCommand("set", "-t", "password", "-n", "my-character-test", "-w", `{"password":"some-still-bad-password"}`)
+
+			Eventually(session).Should(Exit(0))
+			Eventually(session.Out).Should(Say(responseMySpecialCharacterPassword))
 		})
 	})
 

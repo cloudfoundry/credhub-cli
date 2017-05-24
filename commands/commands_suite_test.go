@@ -56,6 +56,9 @@ var responseMyCertificate = fmt.Sprintf(CERTIFICATE_CREDENTIAL_RESPONSE_YAML, "m
 var responseMySSHFoo = fmt.Sprintf(SSH_CREDENTIAL_RESPONSE_YAML, "foo-ssh-key", "some-private-key", "some-public-key")
 var responseMyRSAFoo = fmt.Sprintf(RSA_CREDENTIAL_RESPONSE_YAML, "foo-rsa-key", "some-private-key", "some-public-key")
 var responseMyUsername = fmt.Sprintf(USER_CREDENTIAL_RESPONSE_YAML, "my-username-credential", "test-password", "passw0rd-H4$h", "my-username")
+var responseMySpecialCharacterValue = fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_YAML, "my-character-test", "value", `'{"password":"some-still-bad-password"}'`)
+var responseMySpecialCharacterPassword = fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_YAML, "my-character-test", "password", `'{"password":"some-still-bad-password"}'`)
+var responseMySpecialCharacterJson = fmt.Sprintf(JSON_CREDENTIAL_RESPONSE_YAML, "my-character-test", "  foo: b\"ar")
 
 func TestCommands(t *testing.T) {
 	RegisterFailHandler(Fail)

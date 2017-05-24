@@ -105,6 +105,8 @@ func makeRequest(cmd SetCommand, config config.Config) (*http.Request, error) {
 		request = client.NewSetUserRequest(config, cmd.CredentialIdentifier, cmd.Username, cmd.Password, !cmd.NoOverwrite)
 	} else if cmd.Type == "password" {
 		request = client.NewSetCredentialRequest(config, cmd.Type, cmd.CredentialIdentifier, cmd.Password, !cmd.NoOverwrite)
+	} else if cmd.Type == "json" {
+		request = client.NewSetJsonCredentialRequest(config, cmd.Type, cmd.CredentialIdentifier, cmd.Value, !cmd.NoOverwrite)
 	} else {
 		request = client.NewSetCredentialRequest(config, cmd.Type, cmd.CredentialIdentifier, cmd.Value, !cmd.NoOverwrite)
 	}
