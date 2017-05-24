@@ -21,7 +21,7 @@ var _ = Describe("Login", func() {
 	)
 
 	BeforeEach(func() {
-	    uaaServer = NewServer()
+		uaaServer = NewServer()
 	})
 
 	AfterEach(func() {
@@ -29,55 +29,55 @@ var _ = Describe("Login", func() {
 	})
 
 	Describe("with mixed password and client parameters", func() {
-	    Context("with a client name and username", func() {
-	        It("fails with an error message", func() {
+		Context("with a client name and username", func() {
+			It("fails with an error message", func() {
 				session := runCommand("login", "--client-name", "test_client", "--username", "test-username")
 
 				Expect(uaaServer.ReceivedRequests()).Should(HaveLen(0))
 				Eventually(session).Should(Exit(1))
 				Eventually(session.Err).Should(Say("Client and password credentials may not be combined. Please update and retry your request with a single login method."))
-	        })
-	    })
+			})
+		})
 
-	    Context("with a client secret and username", func() {
-	        It("fails with an error message", func() {
+		Context("with a client secret and username", func() {
+			It("fails with an error message", func() {
 				session := runCommand("login", "--client-secret", "test_secret", "--username", "test-username")
 
 				Expect(uaaServer.ReceivedRequests()).Should(HaveLen(0))
 				Eventually(session).Should(Exit(1))
 				Eventually(session.Err).Should(Say("Client and password credentials may not be combined. Please update and retry your request with a single login method."))
-	        })
-	    })
+			})
+		})
 
-	    Context("with a client name and password", func() {
-	        It("fails with an error message", func() {
+		Context("with a client name and password", func() {
+			It("fails with an error message", func() {
 				session := runCommand("login", "--client-name", "test_client", "--password", "test-password")
 
 				Expect(uaaServer.ReceivedRequests()).Should(HaveLen(0))
 				Eventually(session).Should(Exit(1))
 				Eventually(session.Err).Should(Say("Client and password credentials may not be combined. Please update and retry your request with a single login method."))
-	        })
-	    })
+			})
+		})
 
-	    Context("with a client secret and password", func() {
-	        It("fails with an error message", func() {
+		Context("with a client secret and password", func() {
+			It("fails with an error message", func() {
 				session := runCommand("login", "--client-secret", "test_secret", "--password", "test-password")
 
 				Expect(uaaServer.ReceivedRequests()).Should(HaveLen(0))
 				Eventually(session).Should(Exit(1))
 				Eventually(session.Err).Should(Say("Client and password credentials may not be combined. Please update and retry your request with a single login method."))
-	        })
-	    })
+			})
+		})
 
-	    Context("with all parameters from both", func() {
-	        It("fails with an error message", func() {
+		Context("with all parameters from both", func() {
+			It("fails with an error message", func() {
 				session := runCommand("login", "--client-name", "test_client", "--client-secret", "test_secret", "--username", "test-username", "--password", "test-password")
 
 				Expect(uaaServer.ReceivedRequests()).Should(HaveLen(0))
 				Eventually(session).Should(Exit(1))
 				Eventually(session.Err).Should(Say("Client and password credentials may not be combined. Please update and retry your request with a single login method."))
-	        })
-	    })
+			})
+		})
 	})
 
 	Describe("password flow", func() {
