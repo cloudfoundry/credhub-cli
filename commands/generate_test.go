@@ -16,18 +16,24 @@ import (
 )
 
 var _ = Describe("Generate", func() {
-	Describe("Without parameters", func() {
+	It("requires a type", func() {
+		session := runCommand("generate", "-n", "my-credential")
+		Eventually(session).Should(Exit(1))
+		Eventually(session.Err).Should(Say("A type must be specified when generating a credential. Valid types include 'password', 'user', 'certificate', 'ssh' and 'rsa'."))
+	})
+
+	Describe("Without password parameters", func() {
 		It("uses default parameters", func() {
 			setupPasswordPostServer("my-password", "potatoes", generateDefaultTypeRequestJson("my-password", `{}`, true))
 
-			session := runCommand("generate", "-n", "my-password")
+			session := runCommand("generate", "-n", "my-password", "-t", "password")
 			Eventually(session).Should(Exit(0))
 		})
 
 		It("prints the generated password secret", func() {
 			setupPasswordPostServer("my-password", "potatoes", generateDefaultTypeRequestJson("my-password", `{}`, true))
 
-			session := runCommand("generate", "-n", "my-password")
+			session := runCommand("generate", "-n", "my-password", "-t", "password")
 
 			Eventually(session).Should(Exit(0))
 			Expect(session.Out).To(Say(responseMyPasswordPotatoes))
@@ -36,7 +42,7 @@ var _ = Describe("Generate", func() {
 		It("can print the generated password secret as JSON", func() {
 			setupPasswordPostServer("my-password", "potatoes", generateDefaultTypeRequestJson("my-password", `{}`, true))
 
-			session := runCommand("generate", "-n", "my-password", "--output-json")
+			session := runCommand("generate", "-n", "my-password", "-t", "password", "--output-json")
 
 			Eventually(session).Should(Exit(0))
 			Expect(session.Out.Contents()).To(MatchJSON(`{
@@ -484,14 +490,14 @@ var _ = Describe("Generate", func() {
 
 		It("displays the server provided error when an error is received", func() {
 			server.AppendHandlers(
-				RespondWith(http.StatusBadRequest, `{"error": "you fail."}`),
+				RespondWith(http.StatusBadRequest, `{"error": "test error"}`),
 			)
 
-			session := runCommand("generate", "-n", "my-value")
+			session := runCommand("generate", "-n", "my-value", "-t", "value")
 
 			Eventually(session).Should(Exit(1))
 
-			Expect(session.Err).To(Say("you fail."))
+			Expect(session.Err).To(Say("test error"))
 		})
 	})
 })

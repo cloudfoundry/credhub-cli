@@ -14,7 +14,7 @@ import (
 	"os"
 	"strings"
 
-	credhub_errors "github.com/cloudfoundry-incubator/credhub-cli/errors"
+	"github.com/cloudfoundry-incubator/credhub-cli/errors"
 	"github.com/cloudfoundry-incubator/credhub-cli/models"
 )
 
@@ -36,8 +36,9 @@ type SetCommand struct {
 }
 
 func (cmd SetCommand) Execute([]string) error {
+
 	if cmd.Type == "" {
-		cmd.Type = "password"
+		return errors.NewSetEmptyTypeError()
 	}
 
 	if cmd.Value == "" && (cmd.Type == "value" || cmd.Type == "json") {
@@ -125,7 +126,7 @@ func setStringFieldFromFile(fileField, stringField *string) error {
 	var err error
 	if *fileField != "" {
 		if *stringField != "" {
-			return credhub_errors.NewCombinationOfParametersError()
+			return errors.NewCombinationOfParametersError()
 		}
 		*stringField, err = ReadFile(*fileField)
 		if err != nil {

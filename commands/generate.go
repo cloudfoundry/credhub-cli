@@ -4,6 +4,7 @@ import (
 	"github.com/cloudfoundry-incubator/credhub-cli/actions"
 	"github.com/cloudfoundry-incubator/credhub-cli/client"
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
+	"github.com/cloudfoundry-incubator/credhub-cli/errors"
 	"github.com/cloudfoundry-incubator/credhub-cli/models"
 	"github.com/cloudfoundry-incubator/credhub-cli/repositories"
 )
@@ -38,7 +39,7 @@ type GenerateCommand struct {
 
 func (cmd GenerateCommand) Execute([]string) error {
 	if cmd.CredentialType == "" {
-		cmd.CredentialType = "password"
+		return errors.NewGenerateEmptyTypeError()
 	}
 
 	cfg := config.ReadConfig()

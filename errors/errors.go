@@ -56,3 +56,11 @@ func NewNoMatchingCredentialsFoundError() error {
 func NewAccessTokenExpiredError() error {
 	return errors.New("JWT access token expired")
 }
+
+func NewSetEmptyTypeError() error {
+	return errors.New("A type must be specified when setting a credential. Valid types include 'value', 'json', 'password', 'user', 'certificate', 'ssh' and 'rsa'.")
+}
+
+func NewGenerateEmptyTypeError() error {
+	return errors.New("A type must be specified when generating a credential. Valid types include 'password', 'user', 'certificate', 'ssh' and 'rsa'.")
+}

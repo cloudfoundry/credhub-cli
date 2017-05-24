@@ -20,6 +20,15 @@ import (
 )
 
 var _ = Describe("Set", func() {
+	Describe("not specifying type", func() {
+		It("returns an error", func() {
+			session := runCommand("set", "-n", "my-password", "-w", "potatoes")
+
+			Eventually(session).Should(Exit(1))
+			Eventually(session.Err).Should(Say("A type must be specified when setting a credential. Valid types include 'value', 'json', 'password', 'user', 'certificate', 'ssh' and 'rsa'."))
+		})
+	})
+
 	Describe("setting value secrets", func() {
 		It("puts a secret using explicit value type", func() {
 			setupPutValueServer("my-value", "value", "potatoes")
@@ -134,19 +143,10 @@ var _ = Describe("Set", func() {
 	})
 
 	Describe("setting password secrets", func() {
-		It("puts a secret using default type", func() {
-			setupPutValueServer("my-password", "password", "potatoes")
-
-			session := runCommand("set", "-n", "my-password", "-w", "potatoes")
-
-			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say(responseMyPasswordPotatoes))
-		})
-
 		It("puts a secret specifying no-overwrite", func() {
 			setupOverwritePutValueServer("my-password", "password", "potatoes", false)
 
-			session := runCommand("set", "-n", "my-password", "-w", "potatoes", "--no-overwrite")
+			session := runCommand("set", "-n", "my-password", "-t", "password", "-w", "potatoes", "--no-overwrite")
 
 			Eventually(session).Should(Exit(0))
 		})
@@ -321,14 +321,14 @@ var _ = Describe("Set", func() {
 
 		It("displays the server provided error when an error is received", func() {
 			server.AppendHandlers(
-				RespondWith(http.StatusBadRequest, `{"error": "you fail."}`),
+				RespondWith(http.StatusBadRequest, `{"error": "test error"}`),
 			)
 
-			session := runCommand("set", "-n", "my-value", "-v", "tomatoes")
+			session := runCommand("set", "-n", "my-value", "-t", "value", "-v", "tomatoes")
 
 			Eventually(session).Should(Exit(1))
 
-			Expect(session.Err).To(Say("you fail."))
+			Expect(session.Err).To(Say("test error"))
 		})
 	})
 })
