@@ -96,12 +96,20 @@ func NewRegenerateCredentialRequest(config config.Config, identifier string) *ht
 	return newCredentialRequest("POST", config, identifier, regenerateRequest)
 }
 
-func NewGetCredentialRequest(config config.Config, identifier string) *http.Request {
-	return newCredentialRequest("GET", config, identifier, nil)
+func NewGetCredentialByNameRequest(config config.Config, name string) *http.Request {
+	url := config.ApiURL + "/api/v1/data?name=" + url.QueryEscape(name) + "&current=true"
+	return newRequestWithoutBody("GET", config, url)
+}
+
+func NewGetCredentialByIdRequest(config config.Config, id string) *http.Request {
+	url := config.ApiURL + "/api/v1/data/" + url.QueryEscape(id)
+
+	return newRequestWithoutBody("GET", config, url)
 }
 
 func NewDeleteCredentialRequest(config config.Config, identifier string) *http.Request {
-	return newCredentialRequest("DELETE", config, identifier, nil)
+	url := config.ApiURL + "/api/v1/data?name=" + url.QueryEscape(identifier)
+	return newRequestWithoutBody("DELETE", config, url)
 }
 
 func NewInfoRequest(config config.Config) *http.Request {
@@ -131,44 +139,36 @@ func NewBodyClone(req *http.Request) io.ReadCloser {
 
 func NewFindAllCredentialPathsRequest(config config.Config) *http.Request {
 	url := config.ApiURL + "/api/v1/data?paths=true"
-
-	return newRequest("GET", config, url, nil)
+	return newRequestWithoutBody("GET", config, url)
 }
 
 func NewFindCredentialsBySubstringRequest(config config.Config, partialIdentifier string) *http.Request {
 	urlString := config.ApiURL + "/api/v1/data?name-like=" + url.QueryEscape(partialIdentifier)
-
-	return newRequest("GET", config, urlString, nil)
+	return newRequestWithoutBody("GET", config, urlString)
 }
 
 func NewFindCredentialsByPathRequest(config config.Config, path string) *http.Request {
 	urlString := config.ApiURL + "/api/v1/data?path=" + url.QueryEscape(path)
-
-	return newRequest("GET", config, urlString, nil)
+	return newRequestWithoutBody("GET", config, urlString)
 }
 
 func newCredentialRequest(requestType string, config config.Config, identifier string, bodyModel interface{}) *http.Request {
-	var urlString string
-	if requestType == "GET" {
-		urlString = config.ApiURL + "/api/v1/data?name=" + url.QueryEscape(identifier) + "&current=true"
-	} else if requestType == "DELETE" {
-		urlString = config.ApiURL + "/api/v1/data?name=" + url.QueryEscape(identifier)
-	} else {
-		urlString = config.ApiURL + "/api/v1/data"
-	}
-
+	urlString := config.ApiURL + "/api/v1/data"
 	return newRequest(requestType, config, urlString, bodyModel)
 }
 
 func newRequest(requestType string, config config.Config, url string, bodyModel interface{}) *http.Request {
 	var request *http.Request
-	if bodyModel == nil {
-		request, _ = http.NewRequest(requestType, url, nil)
-	} else {
-		body, _ := json.Marshal(bodyModel)
-		request, _ = http.NewRequest(requestType, url, bytes.NewReader(body))
-		request.Header.Set("Content-Type", "application/json")
-	}
+	body, _ := json.Marshal(bodyModel)
+	request, _ = http.NewRequest(requestType, url, bytes.NewReader(body))
+	request.Header.Set("Content-Type", "application/json")
+	request.Header.Set("Authorization", "Bearer "+config.AccessToken)
+	return request
+}
+
+func newRequestWithoutBody(requestType string, config config.Config, url string) *http.Request {
+	var request *http.Request
+	request, _ = http.NewRequest(requestType, url, nil)
 	request.Header.Set("Authorization", "Bearer "+config.AccessToken)
 	return request
 }

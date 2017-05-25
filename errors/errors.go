@@ -33,6 +33,10 @@ func NewFileLoadError() error {
 	return errors.New("A referenced file could not be opened. Please validate the provided filenames and permissions, then retry your request.")
 }
 
+func NewMissingGetParametersError() error {
+	return errors.New("A name or ID must be provided. Please update and retry your request.")
+}
+
 func NewCombinationOfParametersError() error {
 	return errors.New("The combination of parameters in the request is not allowed. Please validate your input and retry your request.")
 }

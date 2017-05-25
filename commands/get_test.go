@@ -36,13 +36,13 @@ var _ = Describe("Get", func() {
 		Eventually(session).Should(Exit(1))
 
 		if runtime.GOOS == "windows" {
-			Expect(session.Err).To(Say("the required flag `/n, /name' was not specified"))
+			Expect(session.Err).To(Say("A name or ID must be provided. Please update and retry your request."))
 		} else {
-			Expect(session.Err).To(Say("the required flag `-n, --name' was not specified"))
+			Expect(session.Err).To(Say("A name or ID must be provided. Please update and retry your request."))
 		}
 	})
 
-	It("gets a string secret", func() {
+	It("gets a value secret", func() {
 		responseJson := fmt.Sprintf(STRING_CREDENTIAL_ARRAY_RESPONSE_JSON, "value", "my-value", "potatoes")
 
 		server.AppendHandlers(
@@ -158,6 +158,22 @@ var _ = Describe("Get", func() {
 
 		Eventually(session).Should(Exit(0))
 		Expect(session.Out.Contents()).To(ContainSubstring(responseMyUsername))
+	})
+
+	It("gets a secret by ID", func() {
+		responseJson := fmt.Sprintf(STRING_CREDENTIAL_ARRAY_RESPONSE_JSON, "password", "my-password", "potatoes")
+
+		server.AppendHandlers(
+			CombineHandlers(
+				VerifyRequest("GET", "/api/v1/data/"+UUID),
+				RespondWith(http.StatusOK, responseJson),
+			),
+		)
+
+		session := runCommand("get", "--id", UUID)
+
+		Eventually(session).Should(Exit(0))
+		Eventually(session.Out).Should(Say(responseMyPasswordPotatoes))
 	})
 
 	It("does not use Printf on user-supplied data", func() {

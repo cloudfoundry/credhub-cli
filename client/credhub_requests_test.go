@@ -220,12 +220,12 @@ var _ = Describe("Credhub API", func() {
 		})
 	})
 
-	Describe("NewGetCredentialRequest", func() {
-		It("Returns a request for getting secret", func() {
+	Describe("NewGetCredentialByNameRequest", func() {
+		It("Returns a request for getting a secret by name", func() {
 			expectedRequest, _ := http.NewRequest("GET", "http://example.com/api/v1/data?name=my-name&current=true", nil)
 			expectedRequest.Header.Set("Authorization", "Bearer access-token")
 
-			request := NewGetCredentialRequest(cfg, "my-name")
+			request := NewGetCredentialByNameRequest(cfg, "my-name")
 
 			Expect(request).To(Equal(expectedRequest))
 		})
@@ -239,7 +239,32 @@ var _ = Describe("Credhub API", func() {
 			expectedRequest, _ := http.NewRequest("GET", "http://example.com/api/v1/data?name="+escapedName+"&current=true", nil)
 			expectedRequest.Header.Set("Authorization", "Bearer access-token")
 
-			request := NewGetCredentialRequest(cfg, rawName)
+			request := NewGetCredentialByNameRequest(cfg, rawName)
+
+			Expect(request).To(Equal(expectedRequest))
+		})
+	})
+
+	Describe("NewGetCredentialByIdRequest", func() {
+		It("Returns a request for getting a secret by ID", func() {
+			expectedRequest, _ := http.NewRequest("GET", "http://example.com/api/v1/data/fake-test-id-123", nil)
+			expectedRequest.Header.Set("Authorization", "Bearer access-token")
+
+			request := NewGetCredentialByIdRequest(cfg, "fake-test-id-123")
+
+			Expect(request).To(Equal(expectedRequest))
+		})
+
+		It("handles special characters in the query string", func() {
+			rawId := "!wayt1cket/t0/cr@zy[town]?=AC/DC"
+			escapedId := url.QueryEscape(rawId)
+
+			Expect(escapedId).To(Equal("%21wayt1cket%2Ft0%2Fcr%40zy%5Btown%5D%3F%3DAC%2FDC"))
+
+			expectedRequest, _ := http.NewRequest("GET", "http://example.com/api/v1/data/"+escapedId, nil)
+			expectedRequest.Header.Set("Authorization", "Bearer access-token")
+
+			request := NewGetCredentialByIdRequest(cfg, rawId)
 
 			Expect(request).To(Equal(expectedRequest))
 		})
