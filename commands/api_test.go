@@ -13,7 +13,7 @@ import (
 	. "github.com/onsi/gomega/ghttp"
 )
 
-var _ = FDescribe("API", func() {
+var _ = Describe("API", func() {
 
 	ItBehavesLikeHelp("api", "a", func(session *Session) {
 		Expect(session.Err).To(Say("api"))
@@ -21,12 +21,25 @@ var _ = FDescribe("API", func() {
 	})
 
 	Describe("when no new API is provided", func() {
-	    It("shows the currently set API", func() {
-	        session := runCommand("api")
+		It("shows the currently set API", func() {
+			session := runCommand("api")
 
 			Eventually(session).Should(Exit(0))
 			Eventually(session.Out).Should(Say(server.URL()))
-	    })
+		})
+
+		Context("with no set API", func() {
+			BeforeEach(func() {
+				config.WriteConfig(config.Config{})
+			})
+
+			It("errors with a helpful message", func() {
+				session := runCommand("api")
+
+				Eventually(session).Should(Exit(1))
+				Expect(session.Err).To(Say("An API target is not set. Please target the location of your server with `credhub api --server api.example.com` to continue."))
+			})
+		})
 	})
 
 	Describe("when a new API is provided", func() {

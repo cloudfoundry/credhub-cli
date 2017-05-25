@@ -8,6 +8,7 @@ import (
 	"github.com/cloudfoundry-incubator/credhub-cli/actions"
 	"github.com/cloudfoundry-incubator/credhub-cli/client"
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
+	"github.com/cloudfoundry-incubator/credhub-cli/errors"
 	"github.com/fatih/color"
 )
 
@@ -28,7 +29,11 @@ func (cmd ApiCommand) Execute([]string) error {
 	serverUrl := targetUrl(cmd)
 
 	if serverUrl == "" {
-		fmt.Println(cfg.ApiURL)
+		if cfg.ApiURL != "" {
+			fmt.Println(cfg.ApiURL)
+		} else {
+			return errors.NewNoTargetUrlError()
+		}
 	} else {
 		existingCfg := cfg
 		err := GetApiInfo(&cfg, serverUrl, cmd.SkipTlsValidation)
