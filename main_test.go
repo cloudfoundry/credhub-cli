@@ -22,9 +22,9 @@ var _ = Describe("main", func() {
 			Eventually(session).Should(Exit(1))
 
 			if runtime.GOOS == "windows" {
-				Expect(session.Err).To(Say("Usage:\n  credhub-cli.exe \\[OPTIONS\\] \\[command\\]"))
+				Expect(session.Err).To(Say("credhub-cli.exe \\[OPTIONS\\] \\[command\\]"))
 			} else {
-				Expect(session.Err).To(Say("Usage:\n  credhub-cli \\[OPTIONS\\] \\[command\\]"))
+				Expect(session.Err).To(Say("credhub-cli \\[OPTIONS\\] \\[command\\]"))
 			}
 		})
 	})
