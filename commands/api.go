@@ -18,6 +18,7 @@ type ApiCommand struct {
 	Server            ApiPositionalArgs `positional-args:"yes"`
 	ServerFlagUrl     string            `short:"s" long:"server" description:"URI of API server to target"`
 	SkipTlsValidation bool              `long:"skip-tls-validation" description:"Skip certificate validation of the API endpoint. Not recommended!"`
+	CaCert            string            `long:"ca-cert"`
 }
 
 type ApiPositionalArgs struct {
@@ -27,6 +28,8 @@ type ApiPositionalArgs struct {
 func (cmd ApiCommand) Execute([]string) error {
 	cfg := config.ReadConfig()
 	serverUrl := targetUrl(cmd)
+
+	cfg.CaCert = cmd.CaCert
 
 	if serverUrl == "" {
 		if cfg.ApiURL != "" {

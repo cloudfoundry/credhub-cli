@@ -144,7 +144,7 @@ var _ = Describe("API", func() {
 				theServer.Close()
 			})
 
-			It("sets the target URL", func() {
+			It("sets the target URL and resets ca-cert value", func() {
 				session := runCommand("api", theServerUrl)
 
 				Eventually(session).Should(Exit(0))
@@ -157,6 +157,7 @@ var _ = Describe("API", func() {
 				cfg := config.ReadConfig()
 
 				Expect(cfg.AuthURL).To(Equal("https://example.com"))
+				Expect(cfg.CaCert).To(Equal(""))
 			})
 
 			It("sets the target URL using a flag", func() {
@@ -244,6 +245,11 @@ var _ = Describe("API", func() {
 				})
 
 				Context("when the user skips TLS validation", func() {
+					BeforeEach(func() {
+						cfg := config.ReadConfig()
+						cfg.CaCert = ""
+						config.WriteConfig(cfg)
+					})
 
 					It("prints warning when --skip-tls-validation flag is present", func() {
 						theServer.Close()
@@ -305,6 +311,16 @@ var _ = Describe("API", func() {
 						Eventually(session).Should(Exit(0))
 						Expect(cfg.InsecureSkipVerify).To(Equal(true))
 					})
+				})
+			})
+
+			Context("and ca-cert is provided", func() {
+				It("saves the caCert in the config", func() {
+					session := runCommand("api", "-s", theServer.URL(), "--ca-cert", "../test/test-ca.pem")
+					Eventually(session).Should(Exit(0))
+
+					cfg := config.ReadConfig()
+					Expect(cfg.CaCert).To(Equal("../test/test-ca.pem"))
 				})
 			})
 		})

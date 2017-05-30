@@ -295,6 +295,15 @@ var _ = Describe("Login", func() {
 			Expect(cfg.AuthURL).To(Equal(uaaServer.URL()))
 		})
 
+		It("saves caCert to config when it is provided", func() {
+			session := runCommand("login", "-u", "user", "-p", "pass", "-s", apiServer.URL(), "--ca-cert", "../test/test-ca.pem")
+
+			Expect(session).Should(Exit(0))
+			cfg := config.ReadConfig()
+
+			Expect(cfg.CaCert).Should(Equal("../test/test-ca.pem"))
+		})
+
 		Context("when the user skips TLS validation", func() {
 
 			It("prints warning when --skip-tls-validation flag is present", func() {

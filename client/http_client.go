@@ -6,6 +6,12 @@ import (
 	"net/url"
 	"time"
 
+	"crypto/x509"
+	"fmt"
+	"io/ioutil"
+	"log"
+	"os"
+
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
 )
 
@@ -31,10 +37,29 @@ func newHttpClient() *http.Client {
 }
 
 func newHttpsClient(cfg config.Config) *http.Client {
+	serverCaPath := cfg.CaCert
+	trustedCAs := x509.NewCertPool()
+
 	tlsConfig := &tls.Config{
 		InsecureSkipVerify:       cfg.InsecureSkipVerify,
 		PreferServerCipherSuites: true,
 	}
+
+	if serverCaPath != "" && !cfg.InsecureSkipVerify {
+		_, err := os.Stat(serverCaPath)
+		handleError(err)
+
+		serverCA, err := ioutil.ReadFile(serverCaPath)
+		handleError(err)
+
+		ok := trustedCAs.AppendCertsFromPEM([]byte(serverCA))
+		if !ok {
+			log.Fatal("failed to parse root certificate")
+		}
+
+		tlsConfig.RootCAs = trustedCAs
+	}
+
 	tr := &http.Transport{
 		TLSClientConfig: tlsConfig,
 	}
@@ -44,4 +69,11 @@ func newHttpsClient(cfg config.Config) *http.Client {
 		Timeout:   time.Second * TIMEOUT_SECS,
 	}
 	return client
+}
+
+func handleError(err error) {
+	if err != nil {
+		fmt.Println(err)
+		log.Fatal("Fatal", err)
+	}
 }

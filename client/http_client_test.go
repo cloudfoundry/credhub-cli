@@ -57,4 +57,14 @@ var _ = Describe("#NewHttpClient", func() {
 		Expect(httpsClient.Transport.(*http.Transport).TLSClientConfig.PreferServerCipherSuites).To(BeTrue())
 	})
 
+	It("uses server ca cert in tls connection if provided", func() {
+		cfg := config.Config{
+			CaCert: "../test/test-ca.pem",
+			ApiURL: "https://test.com",
+		}
+		httpsClient := client.NewHttpClient(cfg)
+		Expect(httpsClient.Transport.(*http.Transport).TLSClientConfig.RootCAs).To(Not(BeNil()))
+
+	})
+
 })
