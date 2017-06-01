@@ -472,6 +472,43 @@ var _ = Describe("Login", func() {
 		})
 	})
 
+	Describe("when logging in without server api target", func() {
+		var (
+			apiUrl string
+		)
+
+		BeforeEach(func() {
+			cfg := config.ReadConfig()
+			apiUrl = cfg.ApiURL
+			cfg.ApiURL = ""
+			config.WriteConfig(cfg)
+		})
+
+		AfterEach(func() {
+			cfg := config.ReadConfig()
+			cfg.ApiURL = apiUrl
+			config.WriteConfig(cfg)
+		})
+
+		Context("with no user or password flags", func() {
+			It("returns an error message", func() {
+				session := runCommand("login")
+
+				Eventually(session).Should(Exit(1))
+				Eventually(session.Err).Should(Say("An API target is not set. Please target the location of your server with `credhub api --server api.example.com` to continue."))
+			})
+		})
+
+		Context("with user and password flags", func() {
+			It("returns an error message", func() {
+				session := runCommand("login", "-u", "user", "-p", "pass")
+
+				Eventually(session).Should(Exit(1))
+				Eventually(session.Err).Should(Say("An API target is not set. Please target the location of your server with `credhub api --server api.example.com` to continue."))
+			})
+		})
+	})
+
 	Describe("Help", func() {
 		ItBehavesLikeHelp("login", "l", func(session *Session) {
 			Expect(session.Err).To(Say("login"))

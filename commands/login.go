@@ -28,6 +28,10 @@ func (cmd LoginCommand) Execute([]string) error {
 	)
 	cfg := config.ReadConfig()
 
+	if cfg.ApiURL == "" && cmd.ServerUrl == "" {
+		return errors.NewNoApiUrlSetError()
+	}
+
 	if cmd.CaCert != "" {
 		cfg.CaCert = cmd.CaCert
 	}

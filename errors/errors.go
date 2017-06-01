@@ -80,3 +80,7 @@ func NewSetEmptyTypeError() error {
 func NewGenerateEmptyTypeError() error {
 	return errors.New("A type must be specified when generating a credential. Valid types include 'password', 'user', 'certificate', 'ssh' and 'rsa'.")
 }
+
+func NewNoApiUrlSetError() error {
+	return errors.New("An API target is not set. Please target the location of your server with `credhub api --server api.example.com` to continue.")
+}
