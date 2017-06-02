@@ -306,7 +306,7 @@ var _ = Describe("Login", func() {
 
 		Context("when the user skips TLS validation", func() {
 
-			It("prints warning when --skip-tls-validation flag is present", func() {
+			It("prints warning and deprecation notice when --skip-tls-validation flag is present", func() {
 				apiServer.Close()
 				apiServer = NewTLSServer()
 				setupServer(apiServer, uaaServer.URL())
@@ -314,6 +314,7 @@ var _ = Describe("Login", func() {
 
 				Eventually(session).Should(Exit(0))
 				Eventually(session.Out).Should(Say("Warning: The targeted TLS certificate has not been verified for this connection."))
+				Eventually(session.Out).Should(Say("Warning: The --skip-tls-validation flag is deprecated. Please use --ca-cert instead."))
 			})
 
 			It("sets skip-tls flag in the config file", func() {

@@ -251,7 +251,7 @@ var _ = Describe("API", func() {
 						config.WriteConfig(cfg)
 					})
 
-					It("prints warning when --skip-tls-validation flag is present", func() {
+					It("prints warning and deprecation notice when --skip-tls-validation flag is present", func() {
 						theServer.Close()
 						theServer = NewTLSServer()
 						theServerUrl = setUpServer(NewTLSServer())
@@ -259,6 +259,7 @@ var _ = Describe("API", func() {
 
 						Eventually(session).Should(Exit(0))
 						Eventually(session.Out).Should(Say("Warning: The targeted TLS certificate has not been verified for this connection."))
+						Eventually(session.Out).Should(Say("Warning: The --skip-tls-validation flag is deprecated. Please use --ca-cert instead."))
 					})
 
 					It("sets skip-tls flag in the config file", func() {

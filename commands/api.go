@@ -13,6 +13,7 @@ import (
 )
 
 var warning = color.New(color.Bold, color.FgYellow).PrintlnFunc()
+var deprecation = color.New(color.Bold, color.FgRed).PrintlnFunc()
 
 type ApiCommand struct {
 	Server            ApiPositionalArgs `positional-args:"yes"`
@@ -78,6 +79,7 @@ func GetApiInfo(cfg *config.Config, serverUrl string, skipTlsValidation bool) er
 	} else {
 		if skipTlsValidation {
 			warning("Warning: The targeted TLS certificate has not been verified for this connection.")
+			deprecation("Warning: The --skip-tls-validation flag is deprecated. Please use --ca-cert instead.")
 		}
 	}
 
