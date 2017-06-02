@@ -59,7 +59,7 @@ var _ = Describe("#NewHttpClient", func() {
 
 	It("uses server ca cert in tls connection if provided", func() {
 		cfg := config.Config{
-			CaCert: "../test/test-ca.pem",
+			CaCert: []string{"../test/test-ca.pem"},
 			ApiURL: "https://test.com",
 		}
 		httpsClient := client.NewHttpClient(cfg)

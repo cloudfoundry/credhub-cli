@@ -157,7 +157,7 @@ var _ = Describe("API", func() {
 				cfg := config.ReadConfig()
 
 				Expect(cfg.AuthURL).To(Equal("https://example.com"))
-				Expect(cfg.CaCert).To(Equal(""))
+				Expect(len(cfg.CaCert)).To(Equal(0))
 			})
 
 			It("sets the target URL using a flag", func() {
@@ -247,7 +247,7 @@ var _ = Describe("API", func() {
 				Context("when the user skips TLS validation", func() {
 					BeforeEach(func() {
 						cfg := config.ReadConfig()
-						cfg.CaCert = ""
+						cfg.CaCert = []string{}
 						config.WriteConfig(cfg)
 					})
 
@@ -320,7 +320,7 @@ var _ = Describe("API", func() {
 					Eventually(session).Should(Exit(0))
 
 					cfg := config.ReadConfig()
-					Expect(cfg.CaCert).To(Equal("../test/test-ca.pem"))
+					Expect(cfg.CaCert).To(Equal([]string{"../test/test-ca.pem"}))
 				})
 			})
 		})

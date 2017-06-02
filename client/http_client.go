@@ -45,16 +45,17 @@ func newHttpsClient(cfg config.Config) *http.Client {
 		PreferServerCipherSuites: true,
 	}
 
-	if serverCaPath != "" && !cfg.InsecureSkipVerify {
-		_, err := os.Stat(serverCaPath)
-		handleError(err)
+	if len(serverCaPath) > 0 && !cfg.InsecureSkipVerify {
+		for _, certPath := range serverCaPath {
+			_, err := os.Stat(certPath)
+			handleError(err)
+			serverCA, err := ioutil.ReadFile(certPath)
+			handleError(err)
+			ok := trustedCAs.AppendCertsFromPEM([]byte(serverCA))
 
-		serverCA, err := ioutil.ReadFile(serverCaPath)
-		handleError(err)
-
-		ok := trustedCAs.AppendCertsFromPEM([]byte(serverCA))
-		if !ok {
-			log.Fatal("failed to parse root certificate")
+			if !ok {
+				log.Fatal("failed to parse root certificate")
+			}
 		}
 
 		tlsConfig.RootCAs = trustedCAs

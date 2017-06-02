@@ -301,7 +301,7 @@ var _ = Describe("Login", func() {
 			Expect(session).Should(Exit(0))
 			cfg := config.ReadConfig()
 
-			Expect(cfg.CaCert).Should(Equal("../test/test-ca.pem"))
+			Expect(cfg.CaCert).Should(Equal([]string{"../test/test-ca.pem"}))
 		})
 
 		Context("when the user skips TLS validation", func() {
