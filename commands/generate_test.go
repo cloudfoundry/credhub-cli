@@ -42,7 +42,7 @@ var _ = Describe("Generate", func() {
 			session := runCommand("generate", "-n", "my-password", "-t", "password")
 
 			Eventually(session).Should(Exit(0))
-			Expect(session.Out).To(Say(responseMyPasswordPotatoes))
+			Expect(session.Out).To(Say(responseMyPasswordPotatoesYaml))
 		})
 
 		It("can print the generated password secret as JSON", func() {
@@ -68,7 +68,7 @@ var _ = Describe("Generate", func() {
 			session := runCommand("generate", "-n", "my-password", "-t", "password")
 
 			Eventually(session).Should(Exit(0))
-			Expect(session.Out).To(Say(responseMyPasswordPotatoes))
+			Expect(session.Out).To(Say(responseMyPasswordPotatoesYaml))
 		})
 
 		It("can print the secret as JSON", func() {
@@ -135,7 +135,7 @@ var _ = Describe("Generate", func() {
 			session := runCommand("generate", "-n", "foo-ssh-key", "-t", "ssh")
 
 			Eventually(session).Should(Exit(0))
-			Expect(session.Out).To(Say(responseMySSHFoo))
+			Expect(session.Out).To(Say(responseMySSHFooYaml))
 		})
 
 		It("can print the SSH key as JSON", func() {
@@ -183,7 +183,7 @@ var _ = Describe("Generate", func() {
 			session := runCommand("generate", "-n", "foo-rsa-key", "-t", "rsa")
 
 			Eventually(session).Should(Exit(0))
-			Expect(session.Out).To(Say(responseMyRSAFoo))
+			Expect(session.Out).To(Say(responseMyRSAFooYaml))
 		})
 
 		It("can print the RSA key as JSON", func() {
@@ -225,7 +225,7 @@ var _ = Describe("Generate", func() {
 			session := runCommand("generate", "-n", "my-secret", "-t", "certificate", "--common-name", "common.name.io")
 
 			Eventually(session).Should(Exit(0))
-			Expect(session.Out).To(Say(responseMyCertificate))
+			Expect(session.Out).To(Say(responseMyCertificateYaml))
 		})
 
 		It("can print the certificate as JSON", func() {
@@ -368,7 +368,7 @@ var _ = Describe("Generate", func() {
 			session := runCommand("generate", "-n", name, "-t", "user")
 
 			Eventually(session).Should(Exit(0))
-			Expect(session.Out.Contents()).To(ContainSubstring(responseMyUsername))
+			Expect(session.Out.Contents()).To(ContainSubstring(responseMyUsernameYaml))
 		})
 
 		It("should accept a statically provided username", func() {
@@ -383,7 +383,7 @@ var _ = Describe("Generate", func() {
 			session := runCommand("generate", "-n", name, "-t", "user", "-z", "my-username")
 
 			Eventually(session).Should(Exit(0))
-			Expect(session.Out.Contents()).To(ContainSubstring(responseMyUsername))
+			Expect(session.Out.Contents()).To(ContainSubstring(responseMyUsernameYaml))
 		})
 
 		It("with with no-overwrite", func() {

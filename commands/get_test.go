@@ -55,7 +55,7 @@ var _ = Describe("Get", func() {
 		session := runCommand("get", "-n", "my-value")
 
 		Eventually(session).Should(Exit(0))
-		Eventually(session.Out).Should(Say(responseMyValuePotatoes))
+		Eventually(session.Out).Should(Say(responseMyValuePotatoesYaml))
 	})
 
 	It("gets a password secret", func() {
@@ -71,7 +71,7 @@ var _ = Describe("Get", func() {
 		session := runCommand("get", "-n", "my-password")
 
 		Eventually(session).Should(Exit(0))
-		Eventually(session.Out).Should(Say(responseMyPasswordPotatoes))
+		Eventually(session.Out).Should(Say(responseMyPasswordPotatoesYaml))
 	})
 
 	It("gets a json secret", func() {
@@ -87,7 +87,7 @@ var _ = Describe("Get", func() {
 		session := runCommand("get", "-n", "json-secret")
 
 		Eventually(session).Should(Exit(0))
-		Eventually(session.Out).Should(Say(responseMyJson))
+		Eventually(session.Out).Should(Say(responseMyJsonFormatYaml))
 	})
 
 	It("gets a certificate secret", func() {
@@ -103,7 +103,7 @@ var _ = Describe("Get", func() {
 		session := runCommand("get", "-n", "my-secret")
 
 		Eventually(session).Should(Exit(0))
-		Eventually(session.Out).Should(Say(responseMyCertificate))
+		Eventually(session.Out).Should(Say(responseMyCertificateYaml))
 	})
 
 	It("gets an rsa secret", func() {
@@ -119,7 +119,7 @@ var _ = Describe("Get", func() {
 		session := runCommand("get", "-n", "foo-rsa-key")
 
 		Eventually(session).Should(Exit(0))
-		Eventually(session.Out).Should(Say(responseMyRSAFoo))
+		Eventually(session.Out).Should(Say(responseMyRSAFooYaml))
 	})
 
 	It("can output json", func() {
@@ -157,7 +157,7 @@ var _ = Describe("Get", func() {
 		session := runCommand("get", "-n", "my-username-credential")
 
 		Eventually(session).Should(Exit(0))
-		Expect(session.Out.Contents()).To(ContainSubstring(responseMyUsername))
+		Expect(session.Out.Contents()).To(ContainSubstring(responseMyUsernameYaml))
 	})
 
 	It("gets a secret by ID", func() {
@@ -173,7 +173,7 @@ var _ = Describe("Get", func() {
 		session := runCommand("get", "--id", UUID)
 
 		Eventually(session).Should(Exit(0))
-		Eventually(session.Out).Should(Say(responseMyPasswordPotatoes))
+		Eventually(session.Out).Should(Say(responseMyPasswordPotatoesYaml))
 	})
 
 	It("does not use Printf on user-supplied data", func() {

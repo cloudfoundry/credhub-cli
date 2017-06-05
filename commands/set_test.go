@@ -42,7 +42,7 @@ var _ = Describe("Set", func() {
 			session := runCommand("set", "-n", "my-value", "-v", "potatoes", "-t", "value")
 
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say(responseMyValuePotatoes))
+			Eventually(session.Out).Should(Say(responseMyValuePotatoesYaml))
 		})
 
 		It("escapes special characters in the value", func() {
@@ -52,6 +52,15 @@ var _ = Describe("Set", func() {
 
 			Eventually(session).Should(Exit(0))
 			Eventually(session.Out).Should(Say(responseMySpecialCharacterValue))
+		})
+
+		It("puts a secret using explicit value type and returns in json format", func() {
+			setupPutValueServer("my-value", "value", "potatoes")
+
+			session := runCommand("set", "-n", "my-value", "-v", "potatoes", "-t", "value", "--output-json")
+
+			Eventually(session).Should(Exit(0))
+			Eventually(string(session.Out.Contents())).Should(MatchJSON(responseMyValuePotatoesJson))
 		})
 	})
 
@@ -63,7 +72,7 @@ var _ = Describe("Set", func() {
 			session := runCommand("set", "-n", "json-secret", "-v", jsonValue, "-t", "json")
 
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say(responseMyJson))
+			Eventually(session.Out).Should(Say(responseMyJsonFormatYaml))
 		})
 
 		It("escapes special characters in the json", func() {
@@ -74,6 +83,17 @@ var _ = Describe("Set", func() {
 			Eventually(session).Should(Exit(0))
 			Eventually(session.Out).Should(Say(responseMySpecialCharacterJson))
 		})
+
+		It("puts a secret using explicit json type and returns in json format", func() {
+			jsonValue := `{"foo":"bar","nested":{"a":1},"an":["array"]}`
+			setupPutJsonServer("json-secret", jsonValue)
+
+			session := runCommand("set", "-n", "json-secret", "-v", jsonValue, "-t", "json", "--output-json")
+
+			Eventually(session).Should(Exit(0))
+			Eventually(string(session.Out.Contents())).Should(MatchJSON(responseMyJsonFormatJson))
+		})
+
 	})
 
 	Describe("setting SSH secrets", func() {
@@ -83,7 +103,7 @@ var _ = Describe("Set", func() {
 			session := runCommand("set", "-n", "foo-ssh-key", "-U", "some-public-key", "-P", "some-private-key", "-t", "ssh")
 
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say(responseMySSHFoo))
+			Eventually(session.Out).Should(Say(responseMySSHFooYaml))
 		})
 
 		It("puts a secret using values read from files", func() {
@@ -100,7 +120,7 @@ var _ = Describe("Set", func() {
 
 			os.RemoveAll(tempDir)
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say(responseMySSHFoo))
+			Eventually(session.Out).Should(Say(responseMySSHFooYaml))
 		})
 
 		It("puts a secret specifying no-overwrite", func() {
@@ -109,6 +129,15 @@ var _ = Describe("Set", func() {
 			session := runCommand("set", "-n", "foo-ssh-key", "-t", "ssh", "-U", "some-public-key", "-P", "some-private-key", "--no-overwrite")
 
 			Eventually(session).Should(Exit(0))
+		})
+
+		It("puts a secret using explicit ssh type and returns in json format", func() {
+			setupPutRsaSshServer("foo-ssh-key", "ssh", "some-public-key", "some-private-key", true)
+
+			session := runCommand("set", "-n", "foo-ssh-key", "-U", "some-public-key", "-P", "some-private-key", "-t", "ssh", "--output-json")
+
+			Eventually(session).Should(Exit(0))
+			Eventually(string(session.Out.Contents())).Should(MatchJSON(responseMySSHFooJson))
 		})
 	})
 
@@ -119,7 +148,7 @@ var _ = Describe("Set", func() {
 			session := runCommand("set", "-n", "foo-rsa-key", "-U", "some-public-key", "-P", "some-private-key", "-t", "rsa")
 
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say(responseMyRSAFoo))
+			Eventually(session.Out).Should(Say(responseMyRSAFooYaml))
 		})
 
 		It("puts a secret using values read from files", func() {
@@ -136,7 +165,7 @@ var _ = Describe("Set", func() {
 
 			os.RemoveAll(tempDir)
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say(responseMyRSAFoo))
+			Eventually(session.Out).Should(Say(responseMyRSAFooYaml))
 		})
 
 		It("puts a secret specifying no-overwrite", func() {
@@ -145,6 +174,15 @@ var _ = Describe("Set", func() {
 			session := runCommand("set", "-n", "foo-rsa-key", "-t", "rsa", "-U", "some-public-key", "-P", "some-private-key", "--no-overwrite")
 
 			Eventually(session).Should(Exit(0))
+		})
+
+		It("puts a secret using explicit rsa type and returns in json format", func() {
+			setupPutRsaSshServer("foo-rsa-key", "rsa", "some-public-key", "some-private-key", true)
+
+			session := runCommand("set", "-n", "foo-rsa-key", "-U", "some-public-key", "-P", "some-private-key", "-t", "rsa", "--output-json")
+
+			Eventually(session).Should(Exit(0))
+			Eventually(string(session.Out.Contents())).Should(MatchJSON(responseMyRSAFooJson))
 		})
 	})
 
@@ -157,13 +195,13 @@ var _ = Describe("Set", func() {
 			Eventually(session).Should(Exit(0))
 		})
 
-		It("puts a secret using explicit password type", func() {
+		It("puts a secret using explicit password type  and returns in yaml format", func() {
 			setupPutValueServer("my-password", "password", "potatoes")
 
 			session := runCommand("set", "-n", "my-password", "-w", "potatoes", "-t", "password")
 
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say(responseMyPasswordPotatoes))
+			Eventually(session.Out).Should(Say(responseMyPasswordPotatoesYaml))
 		})
 
 		It("prompts for value if value is not provided", func() {
@@ -172,7 +210,7 @@ var _ = Describe("Set", func() {
 			session := runCommandWithStdin(strings.NewReader("potatoes\n"), "set", "-n", "my-password", "-t", "password")
 
 			Eventually(session.Out).Should(Say("password:"))
-			Eventually(session.Wait("10s").Out).Should(Say(responseMyPasswordPotatoes))
+			Eventually(session.Wait("10s").Out).Should(Say(responseMyPasswordPotatoesYaml))
 			Eventually(session).Should(Exit(0))
 		})
 
@@ -196,6 +234,15 @@ var _ = Describe("Set", func() {
 			Eventually(session).Should(Exit(0))
 			Eventually(session.Out).Should(Say(responseMySpecialCharacterPassword))
 		})
+
+		It("puts a secret using explicit password type and returns in json format", func() {
+			setupPutValueServer("my-password", "password", "potatoes")
+
+			session := runCommand("set", "-n", "my-password", "-w", "potatoes", "-t", "password", "--output-json")
+
+			Eventually(session).Should(Exit(0))
+			Eventually(string(session.Out.Contents())).Should(MatchJSON(responseMyPasswordPotatoesJson))
+		})
 	})
 
 	Describe("setting certificate secrets", func() {
@@ -207,7 +254,7 @@ var _ = Describe("Set", func() {
 				"--certificate-string", "my-cert", "--private-string", "my-priv")
 
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say(responseMyCertificate))
+			Eventually(session.Out).Should(Say(responseMyCertificateYaml))
 		})
 
 		It("puts a secret using explicit certificate type and string values with no-overwrite", func() {
@@ -233,7 +280,7 @@ var _ = Describe("Set", func() {
 
 			os.RemoveAll(tempDir)
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say(responseMyCertificate))
+			Eventually(session.Out).Should(Say(responseMyCertificateYaml))
 		})
 
 		It("fails to put a secret when failing to read from a file", func() {
@@ -247,6 +294,17 @@ var _ = Describe("Set", func() {
 			testSetCertFileDuplicationFailure("--certificate-string", "my-cert")
 			testSetCertFileDuplicationFailure("--private-string", "my-priv")
 		})
+
+		It("puts a secret using explicit certificate type and string values in json format", func() {
+			setupPutCertificateServer("my-secret", "my-ca", "my-cert", "my-priv")
+
+			session := runCommand("set", "-n", "my-secret",
+				"-t", "certificate", "--root-string", "my-ca",
+				"--certificate-string", "my-cert", "--private-string", "my-priv", "--output-json")
+
+			Eventually(session).Should(Exit(0))
+			Eventually(string(session.Out.Contents())).Should(MatchJSON(responseMyCertificateJson))
+		})
 	})
 
 	Describe("setting User secrets", func() {
@@ -256,7 +314,7 @@ var _ = Describe("Set", func() {
 			session := runCommand("set", "-n", "my-username-credential", "-z", "my-username", "-w", "test-password", "-t", "user")
 
 			Eventually(session).Should(Exit(0))
-			Expect(session.Out.Contents()).To(ContainSubstring(responseMyUsername))
+			Expect(session.Out.Contents()).To(ContainSubstring(responseMyUsernameYaml))
 		})
 
 		It("puts a secret specifying no-overwrite", func() {
@@ -289,6 +347,16 @@ var _ = Describe("Set", func() {
 			Eventually(session.Out).Should(Say("password:"))
 			Eventually(session.Wait("10s").Out.Contents()).Should(ContainSubstring(response))
 			Eventually(session).Should(Exit(0))
+		})
+
+		It("puts a secret using explicit user type in json format", func() {
+			setupPutUserServer("my-username-credential", `{"username": "my-username", "password": "test-password"}`, "my-username", "test-password", "passw0rd-H4$h", true)
+
+			session := runCommand("set", "-n", "my-username-credential", "-z", "my-username", "-w", "test-password", "-t", "user",
+				"--output-json")
+
+			Eventually(session).Should(Exit(0))
+			Expect(string(session.Out.Contents())).Should(MatchJSON(responseMyUsernameJson))
 		})
 	})
 

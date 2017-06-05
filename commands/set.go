@@ -33,6 +33,7 @@ type SetCommand struct {
 	PublicString         string `short:"U" long:"public-string" description:"[SSH, RSA] Sets the public key from  string input"`
 	Username             string `short:"z" long:"username" description:"[User] Sets the username value of the credential"`
 	Password             string `short:"w" long:"password" description:"[Password, User] Sets the password value of the credential"`
+	OutputJson           bool   `long:"output-json" description:"Return response in JSON format"`
 }
 
 func (cmd SetCommand) Execute([]string) error {
@@ -62,7 +63,7 @@ func (cmd SetCommand) Execute([]string) error {
 	if err != nil {
 		return err
 	}
-	models.Println(credential, false)
+	models.Println(credential, cmd.OutputJson)
 
 	return nil
 }
