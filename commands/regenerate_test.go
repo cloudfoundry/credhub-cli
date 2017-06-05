@@ -23,7 +23,7 @@ var _ = Describe("Regenerate", func() {
 	ItRequiresAuthentication("get", "-n", "test-credential")
 
 	Describe("Regenerating password", func() {
-		It("prints the regenerated password secret", func() {
+		It("prints the regenerated password secret in yaml format", func() {
 			server.AppendHandlers(
 				CombineHandlers(
 					VerifyRequest("POST", "/api/v1/data"),
@@ -36,6 +36,21 @@ var _ = Describe("Regenerate", func() {
 
 			Eventually(session).Should(Exit(0))
 			Expect(session.Out).To(Say(fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_YAML, "my-password-stuffs", "password", "nu-potatoes")))
+		})
+
+		It("prints the regenerated password secret in json format", func() {
+			server.AppendHandlers(
+				CombineHandlers(
+					VerifyRequest("POST", "/api/v1/data"),
+					VerifyJSON(REGENERATE_CREDENTIAL_REQUEST_JSON),
+					RespondWith(http.StatusOK, fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_JSON, "password", "my-password-stuffs", "nu-potatoes")),
+				),
+			)
+
+			session := runCommand("regenerate", "--name", "my-password-stuffs", "--output-json")
+
+			Eventually(session).Should(Exit(0))
+			Expect(string(session.Out.Contents())).To(MatchJSON(fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_JSON, "password", "my-password-stuffs", "nu-potatoes")))
 		})
 	})
 
