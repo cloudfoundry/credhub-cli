@@ -40,7 +40,7 @@ var _ = Describe("Find", func() {
 	})
 
 	Describe("finding all paths in the system", func() {
-		It("lists all existing credential paths", func() {
+		It("lists all existing credential paths in yaml format", func() {
 			responseJson := `{
 				"paths": [
 						{
@@ -79,6 +79,63 @@ var _ = Describe("Find", func() {
 
 			Eventually(session.Out).Should(Say(responseTable))
 			Eventually(session).Should(Exit(0))
+		})
+
+		It("lists all existing credential paths in json format", func() {
+			//language=JSOn
+			responseJson := `{
+   "paths": [
+              {
+                  "path": "consul/"
+              },
+              {
+                  "path": "consul/deploy123/"
+              },
+              {
+                  "path": "deploy12/"
+              },
+              {
+                  "path": "deploy123/"
+              },
+              {
+                  "path": "deploy123/dan/"
+              },
+              {
+                  "path": "deploy123/dan/consul/"
+              }
+   ]
+}`
+
+			server.AppendHandlers(
+				CombineHandlers(
+					VerifyRequest("GET", "/api/v1/data", "paths=true"),
+					RespondWith(http.StatusOK, responseJson),
+				),
+			)
+
+			session := runCommand("find", "-a", "--output-json")
+
+			Eventually(string(session.Out.Contents())).Should(MatchJSON(responseJson))
+			Eventually(session).Should(Exit(0))
+		})
+
+		It("displays error message when no credentials are found", func() {
+			//language=JSOn
+			responseJson := `{
+				"paths": []
+			}`
+
+			server.AppendHandlers(
+				CombineHandlers(
+					VerifyRequest("GET", "/api/v1/data", "paths=true"),
+					RespondWith(http.StatusOK, responseJson),
+				),
+			)
+
+			session := runCommand("find", "-a", "--output-json")
+
+			Eventually(session.Err).Should(Say("No credentials exist which match the provided parameters."))
+			Eventually(session).Should(Exit(1))
 		})
 	})
 
