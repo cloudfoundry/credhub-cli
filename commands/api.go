@@ -18,8 +18,8 @@ var deprecation = color.New(color.Bold, color.FgRed).PrintlnFunc()
 type ApiCommand struct {
 	Server            ApiPositionalArgs `positional-args:"yes"`
 	ServerFlagUrl     string            `short:"s" long:"server" description:"URI of API server to target"`
+	CaCert            []string          `long:"ca-cert" description:"Trusted CA for API and UAA TLS connections"`
 	SkipTlsValidation bool              `long:"skip-tls-validation" description:"Skip certificate validation of the API endpoint. Not recommended!"`
-	CaCert            []string          `long:"ca-cert" description:"Server CA for mTLS connection for the Credhub target"`
 }
 
 type ApiPositionalArgs struct {

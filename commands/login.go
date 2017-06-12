@@ -17,8 +17,8 @@ type LoginCommand struct {
 	ClientName        string   `long:"client-name" description:"Client name for UAA client grant" env:"CREDHUB_CLIENT"`
 	ClientSecret      string   `long:"client-secret" description:"Client secret for UAA client grant" env:"CREDHUB_SECRET"`
 	ServerUrl         string   `short:"s" long:"server" description:"URI of API server to target"`
+	CaCert            []string `long:"ca-cert" description:"Trusted CA for API and UAA TLS connections"`
 	SkipTlsValidation bool     `long:"skip-tls-validation" description:"Skip certificate validation of the API endpoint. Not recommended!"`
-	CaCert            []string `long:"ca-cert" description:"Server CA for mTLS connection for the Credhub target"`
 }
 
 func (cmd LoginCommand) Execute([]string) error {
