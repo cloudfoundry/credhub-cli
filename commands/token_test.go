@@ -24,7 +24,12 @@ var _ = Describe("Token", func() {
 	})
 
 	Context("when the config file has a token", func() {
+
 		BeforeEach(func() {
+			cfg := config.ReadConfig()
+			cfg.AccessToken = "2YotnFZFEjr1zCsicMWpAA"
+			config.WriteConfig(cfg)
+
 			uaaServer.AppendHandlers(
 				CombineHandlers(
 					VerifyRequest("POST", "/oauth/token/"),

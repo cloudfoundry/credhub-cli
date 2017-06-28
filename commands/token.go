@@ -13,7 +13,7 @@ import (
 func init() {
 	CredHub.Token = func() {
 		cfg := config.ReadConfig()
-		if cfg.AccessToken != "" {
+		if cfg.AccessToken != "" && cfg.AccessToken != "revoked" {
 
 			refresh_request := client.NewRefreshTokenRequest(cfg)
 			repository := repositories.NewAuthRepository(client.NewHttpClient(cfg), true)
@@ -30,7 +30,7 @@ func init() {
 
 			fmt.Println("Bearer " + cfg.AccessToken)
 		} else {
-			fmt.Fprint(os.Stderr, "You are not logged in to a CredHub server")
+			fmt.Fprint(os.Stderr, "You are not currently authenticated. Please log in to continue.")
 		}
 		os.Exit(0)
 	}
