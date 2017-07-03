@@ -257,6 +257,17 @@ var _ = Describe("Set", func() {
 			Eventually(session.Out).Should(Say(responseMyCertificateYaml))
 		})
 
+		It("puts a secret using explicit certificate type, string values, and certificate authority name", func() {
+			setupPutCertificateWithCaNameServer("my-secret", "my-ca", "my-cert", "my-priv")
+
+			session := runCommand("set", "-n", "my-secret",
+				"-t", "certificate", "--ca-name", "my-ca",
+				"--certificate-string", "my-cert", "--private-string", "my-priv")
+
+			Eventually(session).Should(Exit(0))
+			Eventually(session.Out).Should(Say(responseMyCertificateWithNamedCAYaml))
+		})
+
 		It("puts a secret using explicit certificate type and string values with no-overwrite", func() {
 			setupOverwritePutCertificateServer("my-secret", "my-ca", "my-cert", "my-priv", false)
 
@@ -455,6 +466,10 @@ func setupPutCertificateServer(name, ca, cert, priv string) {
 	setupOverwritePutCertificateServer(name, ca, cert, priv, true)
 }
 
+func setupPutCertificateWithCaNameServer(name, caName, cert, priv string) {
+	setupOverwritePutCertificateWithCaNameServer(name, caName, cert, priv, true)
+}
+
 func setupOverwritePutCertificateServer(name, ca, cert, priv string, overwrite bool) {
 	var jsonRequest string
 	jsonRequest = fmt.Sprintf(CERTIFICATE_CREDENTIAL_REQUEST_JSON, name, ca, cert, priv, overwrite)
@@ -463,6 +478,18 @@ func setupOverwritePutCertificateServer(name, ca, cert, priv string, overwrite b
 			VerifyRequest("PUT", "/api/v1/data"),
 			VerifyJSON(jsonRequest),
 			RespondWith(http.StatusOK, fmt.Sprintf(CERTIFICATE_CREDENTIAL_RESPONSE_JSON, name, ca, cert, priv)),
+		),
+	)
+}
+
+func setupOverwritePutCertificateWithCaNameServer(name, caName, cert, priv string, overwrite bool) {
+	var jsonRequest string
+	jsonRequest = fmt.Sprintf(CERTIFICATE_CREDENTIAL_WITH_NAMED_CA_REQUEST_JSON, name, caName, cert, priv, overwrite)
+	server.AppendHandlers(
+		CombineHandlers(
+			VerifyRequest("PUT", "/api/v1/data"),
+			VerifyJSON(jsonRequest),
+			RespondWith(http.StatusOK, fmt.Sprintf(CERTIFICATE_CREDENTIAL_RESPONSE_JSON, name, "known-ca-value", cert, priv)),
 		),
 	)
 }

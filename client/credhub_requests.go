@@ -14,11 +14,12 @@ import (
 	"github.com/cloudfoundry-incubator/credhub-cli/models"
 )
 
-func NewSetCertificateRequest(config config.Config, credentialIdentifier string, root string, cert string, priv string, overwrite bool) *http.Request {
+func NewSetCertificateRequest(config config.Config, credentialIdentifier string, root string, caName string, cert string, priv string, overwrite bool) *http.Request {
 	certificate := models.Certificate{
 		Ca:          root,
 		Certificate: cert,
 		PrivateKey:  priv,
+		CaName:      caName,
 	}
 
 	return NewSetCredentialRequest(config, "certificate", credentialIdentifier, certificate, overwrite)

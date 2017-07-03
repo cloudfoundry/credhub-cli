@@ -85,7 +85,7 @@ var _ = Describe("Credhub API", func() {
 			json := fmt.Sprintf(`{"type":"certificate","name":"my-name","value":{"ca":"%s","certificate":"%s","private_key":"%s"},"overwrite":true}`,
 				"my-ca", "my-cert", "my-priv")
 
-			request := NewSetCertificateRequest(cfg, "my-name", "my-ca", "my-cert", "my-priv", true)
+			request := NewSetCertificateRequest(cfg, "my-name", "my-ca", "", "my-cert", "my-priv", true)
 			Expect(request.Header).To(HaveKeyWithValue("Content-Type", []string{"application/json"}))
 			Expect(request.Header).To(HaveKeyWithValue("Authorization", []string{"Bearer access-token"}))
 			Expect(request.Method).To(Equal("PUT"))

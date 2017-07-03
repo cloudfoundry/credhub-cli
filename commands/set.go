@@ -33,7 +33,8 @@ type SetCommand struct {
 	PublicString         string `short:"U" long:"public-string" description:"[SSH, RSA] Sets the public key from  string input"`
 	Username             string `short:"z" long:"username" description:"[User] Sets the username value of the credential"`
 	Password             string `short:"w" long:"password" description:"[Password, User] Sets the password value of the credential"`
-	OutputJson           bool   `long:"output-json" description:"Return response in JSON format"`
+	OutputJson           bool   `          long:"output-json" description:"Return response in JSON format"`
+	CaName               string `          long:"ca-name" description:"[Certificate] Sets the root CA to a stored CA credential"`
 }
 
 func (cmd SetCommand) Execute([]string) error {
@@ -102,7 +103,7 @@ func makeRequest(cmd SetCommand, config config.Config) (*http.Request, error) {
 			return nil, err
 		}
 
-		request = client.NewSetCertificateRequest(config, cmd.CredentialIdentifier, cmd.RootString, cmd.CertificateString, cmd.PrivateString, !cmd.NoOverwrite)
+		request = client.NewSetCertificateRequest(config, cmd.CredentialIdentifier, cmd.RootString, cmd.CaName, cmd.CertificateString, cmd.PrivateString, !cmd.NoOverwrite)
 	} else if cmd.Type == "user" {
 		request = client.NewSetUserRequest(config, cmd.CredentialIdentifier, cmd.Username, cmd.Password, !cmd.NoOverwrite)
 	} else if cmd.Type == "password" {
