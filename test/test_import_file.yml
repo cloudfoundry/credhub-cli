@@ -1,0 +1,7 @@
+credentials:
+- name: /director/deployment/blobstore - agent
+  type: password
+  value: gx4ll8193j5rw0wljgqo
+- name: /director/deployment/blobstore - director
+  type: value
+  value: y14ck84ef51dnchgk4kp
