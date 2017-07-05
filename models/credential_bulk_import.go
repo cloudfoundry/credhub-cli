@@ -12,19 +12,18 @@ type Credential struct {
 	Value string `yaml:"value"`
 }
 
-type ImportFile struct {
+type CredentialBulkImport struct {
 	Credentials []Credential `yaml:"credentials"`
 }
 
-func (importFile *ImportFile) ReadFile(filepath string) error {
+func (credentialBulkImport *CredentialBulkImport) ReadFile(filepath string) error {
 	data, err := ioutil.ReadFile(filepath)
 	if err != nil {
 		return err
 	}
-
-	return importFile.ReadBytes(data)
+	return credentialBulkImport.ReadBytes(data)
 }
 
-func (importFile *ImportFile) ReadBytes(data []byte) error {
-	return yaml.Unmarshal(data, importFile)
+func (credentialBulkImport *CredentialBulkImport) ReadBytes(data []byte) error {
+	return yaml.Unmarshal(data, credentialBulkImport)
 }

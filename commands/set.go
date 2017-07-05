@@ -55,7 +55,7 @@ func (cmd SetCommand) Execute([]string) error {
 	repository := repositories.NewCredentialRepository(client.NewHttpClient(cfg))
 
 	action := actions.NewAction(repository, cfg)
-	request, err := makeRequest(cmd, cfg)
+	request, err := MakeRequest(cmd, cfg)
 	if err != nil {
 		return err
 	}
@@ -69,7 +69,7 @@ func (cmd SetCommand) Execute([]string) error {
 	return nil
 }
 
-func makeRequest(cmd SetCommand, config config.Config) (*http.Request, error) {
+func MakeRequest(cmd SetCommand, config config.Config) (*http.Request, error) {
 	var request *http.Request
 	if cmd.Type == "ssh" || cmd.Type == "rsa" {
 		var err error

@@ -11,6 +11,7 @@ type CredhubCommand struct {
 	Login      LoginCommand      `command:"login" alias:"l" description:"Authenticate user with CredHub"`
 	Logout     LogoutCommand     `command:"logout" alias:"o" description:"Discard authenticated user session"`
 	Find       FindCommand       `command:"find" alias:"f" description:"Find stored credentials based on query parameters"`
+	Import     ImportCommand     `command:"import" alias:"i" description:"Set multiple credential values"`
 	Version    func()            `long:"version" description:"Version of CLI and targeted CredHub API"`
 	Token      func()            `long:"token" description:"Return your current CredHub authorization token"`
 }

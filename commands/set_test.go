@@ -37,7 +37,7 @@ var _ = Describe("Set", func() {
 
 	Describe("setting value secrets", func() {
 		It("puts a secret using explicit value type", func() {
-			setupPutValueServer("my-value", "value", "potatoes")
+			SetupPutValueServer("my-value", "value", "potatoes")
 
 			session := runCommand("set", "-n", "my-value", "-v", "potatoes", "-t", "value")
 
@@ -46,7 +46,7 @@ var _ = Describe("Set", func() {
 		})
 
 		It("escapes special characters in the value", func() {
-			setupPutValueServer("my-character-test", "value", `{\"password\":\"some-still-bad-password\"}`)
+			SetupPutValueServer("my-character-test", "value", `{\"password\":\"some-still-bad-password\"}`)
 
 			session := runCommand("set", "-t", "value", "-n", "my-character-test", "-v", `{"password":"some-still-bad-password"}`)
 
@@ -55,7 +55,7 @@ var _ = Describe("Set", func() {
 		})
 
 		It("puts a secret using explicit value type and returns in json format", func() {
-			setupPutValueServer("my-value", "value", "potatoes")
+			SetupPutValueServer("my-value", "value", "potatoes")
 
 			session := runCommand("set", "-n", "my-value", "-v", "potatoes", "-t", "value", "--output-json")
 
@@ -188,7 +188,7 @@ var _ = Describe("Set", func() {
 
 	Describe("setting password secrets", func() {
 		It("puts a secret specifying no-overwrite", func() {
-			setupOverwritePutValueServer("my-password", "password", "potatoes", false)
+			SetupOverwritePutValueServer("my-password", "password", "potatoes", false)
 
 			session := runCommand("set", "-n", "my-password", "-t", "password", "-w", "potatoes", "--no-overwrite")
 
@@ -196,7 +196,7 @@ var _ = Describe("Set", func() {
 		})
 
 		It("puts a secret using explicit password type  and returns in yaml format", func() {
-			setupPutValueServer("my-password", "password", "potatoes")
+			SetupPutValueServer("my-password", "password", "potatoes")
 
 			session := runCommand("set", "-n", "my-password", "-w", "potatoes", "-t", "password")
 
@@ -205,7 +205,7 @@ var _ = Describe("Set", func() {
 		})
 
 		It("prompts for value if value is not provided", func() {
-			setupPutValueServer("my-password", "password", "potatoes")
+			SetupPutValueServer("my-password", "password", "potatoes")
 
 			session := runCommandWithStdin(strings.NewReader("potatoes\n"), "set", "-n", "my-password", "-t", "password")
 
@@ -215,7 +215,7 @@ var _ = Describe("Set", func() {
 		})
 
 		It("can set password that contains spaces interactively", func() {
-			setupPutValueServer("my-password", "password", "potatoes potatoes")
+			SetupPutValueServer("my-password", "password", "potatoes potatoes")
 
 			session := runCommandWithStdin(strings.NewReader("potatoes potatoes\n"), "set", "-n", "my-password", "-t", "password")
 
@@ -227,7 +227,7 @@ var _ = Describe("Set", func() {
 		})
 
 		It("escapes special characters in the password", func() {
-			setupPutValueServer("my-character-test", "password", `{\"password\":\"some-still-bad-password\"}`)
+			SetupPutValueServer("my-character-test", "password", `{\"password\":\"some-still-bad-password\"}`)
 
 			session := runCommand("set", "-t", "password", "-n", "my-character-test", "-w", `{"password":"some-still-bad-password"}`)
 
@@ -236,7 +236,7 @@ var _ = Describe("Set", func() {
 		})
 
 		It("puts a secret using explicit password type and returns in json format", func() {
-			setupPutValueServer("my-password", "password", "potatoes")
+			SetupPutValueServer("my-password", "password", "potatoes")
 
 			session := runCommand("set", "-n", "my-password", "-w", "potatoes", "-t", "password", "--output-json")
 
@@ -430,11 +430,11 @@ func setupPutRsaSshServer(name, keyType, publicKey, privateKey string, overwrite
 	)
 }
 
-func setupPutValueServer(name, credentialType, value string) {
-	setupOverwritePutValueServer(name, credentialType, value, true)
+func SetupPutValueServer(name, credentialType, value string) {
+	SetupOverwritePutValueServer(name, credentialType, value, true)
 }
 
-func setupOverwritePutValueServer(name, credentialType, value string, overwrite bool) {
+func SetupOverwritePutValueServer(name, credentialType, value string, overwrite bool) {
 	var jsonRequest string
 	jsonRequest = fmt.Sprintf(STRING_CREDENTIAL_OVERWRITE_REQUEST_JSON, credentialType, name, value, overwrite)
 	server.AppendHandlers(
