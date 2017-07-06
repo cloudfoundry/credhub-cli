@@ -3,6 +3,8 @@ package commands
 import (
 	"fmt"
 
+	"net/http"
+
 	"github.com/cloudfoundry-incubator/credhub-cli/actions"
 	"github.com/cloudfoundry-incubator/credhub-cli/client"
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
@@ -19,7 +21,7 @@ var (
 	err        error
 	repository repositories.Repository
 	bulkImport models.CredentialBulkImport
-	setCommand SetCommand
+	request    *http.Request
 )
 
 func (cmd ImportCommand) Execute([]string) error {
@@ -41,47 +43,35 @@ func setCredentials(bulkImport models.CredentialBulkImport) {
 	action := actions.NewAction(repository, cfg)
 
 	for _, credential := range bulkImport.Credentials {
-		setCommand = SetCommand{}
-		setCommand.CredentialIdentifier = credential.Name
-		setCommand.Type = credential.Type
-
 		switch credential.Type {
-		case "password":
-			setCommand.Password = credential.Value.(string)
-		case "value":
-			setCommand.Value = credential.Value.(string)
+		case "password", "value":
+			value, ok := credential.Value.(string)
+			if !ok {
+				fmt.Errorf("%v\n", "Interface conversion error")
+				continue
+			}
+			request = client.NewSetCredentialRequest(cfg, credential.Type, credential.Name, value, true)
 		case "certificate":
 			certificate := new(models.Certificate)
 			err = mapstructure.Decode(credential.Value, &certificate)
 
-			if certificate.CaName != "" {
-				setCommand.CaName = certificate.CaName
+			if err != nil {
+				fmt.Errorf("%v\n", err)
+				continue
 			}
-
-			if certificate.Ca != "" {
-				setCommand.RootString = certificate.Ca
-			}
-
-			setCommand.CertificateString = certificate.Certificate
-			setCommand.PrivateString = certificate.PrivateKey
+			request = client.NewSetCertificateRequest(cfg, credential.Name, certificate.Ca, certificate.CaName, certificate.Certificate, certificate.PrivateKey, true)
 		default:
 			fmt.Errorf("unrecognized type: %s", credential.Type)
 		}
 
-		setRequest, err := MakeRequest(setCommand, cfg)
+		result, err := action.DoAction(request, credential.Name)
 
 		if err != nil {
 			fmt.Errorf("%v\n", err)
 			continue
 		}
-
-		result, err := action.DoAction(setRequest, credential.Name)
 
 		models.Println(result, false)
 
-		if err != nil {
-			fmt.Errorf("%v\n", err)
-			continue
-		}
 	}
 }
