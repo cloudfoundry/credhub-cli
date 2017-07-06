@@ -11,3 +11,6 @@ credentials:
     ca_name: /dan-cert
     certificate: certificate
     private_key: private-key
+- name: /director/deployment/bosh-cert-secondary
+  type: certificate
+  value: a;lksdfja;dkslf

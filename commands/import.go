@@ -11,6 +11,7 @@ import (
 	"github.com/cloudfoundry-incubator/credhub-cli/models"
 	"github.com/cloudfoundry-incubator/credhub-cli/repositories"
 	"github.com/mitchellh/mapstructure"
+	"os"
 )
 
 type ImportCommand struct {
@@ -47,7 +48,7 @@ func setCredentials(bulkImport models.CredentialBulkImport) {
 		case "password", "value":
 			value, ok := credential.Value.(string)
 			if !ok {
-				fmt.Errorf("%v\n", "Interface conversion error")
+				fmt.Fprintf(os.Stderr,"%v\n", "Interface conversion error")
 				continue
 			}
 			request = client.NewSetCredentialRequest(cfg, credential.Type, credential.Name, value, true)
@@ -56,22 +57,21 @@ func setCredentials(bulkImport models.CredentialBulkImport) {
 			err = mapstructure.Decode(credential.Value, &certificate)
 
 			if err != nil {
-				fmt.Errorf("%v\n", err)
+				fmt.Fprintf(os.Stderr, "%v\n", err)
 				continue
 			}
 			request = client.NewSetCertificateRequest(cfg, credential.Name, certificate.Ca, certificate.CaName, certificate.Certificate, certificate.PrivateKey, true)
 		default:
-			fmt.Errorf("unrecognized type: %s", credential.Type)
+			fmt.Fprintf(os.Stderr, "unrecognized type: %s", credential.Type)
 		}
 
 		result, err := action.DoAction(request, credential.Name)
 
 		if err != nil {
-			fmt.Errorf("%v\n", err)
+			fmt.Fprintf(os.Stderr, "%v\n", err)
 			continue
 		}
 
 		models.Println(result, false)
-
 	}
 }

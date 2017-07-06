@@ -5,3 +5,7 @@ credentials:
 - name: /director/deployment/blobstore4
   type: value
   value: test_value_2
+- name: /director/deployment/blobstore4
+  type: value
+  value:
+    value: lasdkfj;oiasdf;lk

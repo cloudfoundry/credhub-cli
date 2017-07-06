@@ -30,10 +30,20 @@ value: test_password_1`))
 type: password
 value: test_password_2`))
 		})
+
+		It("prevents misconfigured yaml from creating a request", func() {
+			SetupOverwritePutValueServer("/director/deployment/blobstore1", "password", "test_password_1", true)
+			SetupOverwritePutValueServer("/director/deployment/blobstore2", "password", "test_password_2", true)
+
+			session := runCommand("import", "-f", "../test/test_password_import_file.yml")
+
+			Eventually(session).Should(Exit(0))
+			Eventually(session.Err).Should(Say(`Interface conversion error`))
+		})
 	})
 
 	Describe("importing a file with value credentials", func() {
-		It("sets the password credentials", func() {
+		It("sets the value credentials", func() {
 			SetupOverwritePutValueServer("/director/deployment/blobstore3", "value", "test_value_1", true)
 			SetupOverwritePutValueServer("/director/deployment/blobstore4", "value", "test_value_2", true)
 
@@ -47,6 +57,16 @@ value: test_value_1`))
 			Eventually(session.Out).Should(Say(`name: /director/deployment/blobstore4
 type: value
 value: test_value_2`))
+		})
+
+		It("prevents misconfigured yaml from creating a request", func() {
+			SetupOverwritePutValueServer("/director/deployment/blobstore3", "value", "test_value_1", true)
+			SetupOverwritePutValueServer("/director/deployment/blobstore4", "value", "test_value_2", true)
+
+			session := runCommand("import", "-f", "../test/test_value_import_file.yml")
+
+			Eventually(session).Should(Exit(0))
+			Eventually(session.Err).Should(Say(`Interface conversion error`))
 		})
 	})
 
@@ -77,6 +97,22 @@ value:
   ca: known-ca-value
   certificate: certificate
   private_key: private-key`))
+		})
+
+		It("prevents misconfigured yaml from creating a request", func() {
+			SetupPutCertificateServer("/director/deployment/bosh-ca-cert",
+				`ca-certificate`,
+				`certificate`,
+				`private-key`)
+			SetupPutCertificateWithCaNameServer("/director/deployment/bosh-cert-secondary",
+				"/dan-cert",
+				`certificate`,
+				`private-key`)
+
+			session := runCommand("import", "-f", "../test/test_certificate_import_file.yml")
+
+			Eventually(session).Should(Exit(0))
+			Eventually(session.Err).Should(Say(`'' expected a map, got 'string'`))
 		})
 	})
 
