@@ -5,13 +5,14 @@ import (
 
 	"net/http"
 
+	"os"
+
 	"github.com/cloudfoundry-incubator/credhub-cli/actions"
 	"github.com/cloudfoundry-incubator/credhub-cli/client"
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	"github.com/cloudfoundry-incubator/credhub-cli/models"
 	"github.com/cloudfoundry-incubator/credhub-cli/repositories"
 	"github.com/mitchellh/mapstructure"
-	"os"
 )
 
 type ImportCommand struct {
@@ -48,7 +49,7 @@ func setCredentials(bulkImport models.CredentialBulkImport) {
 		case "password", "value":
 			value, ok := credential.Value.(string)
 			if !ok {
-				fmt.Fprintf(os.Stderr,"%v\n", "Interface conversion error")
+				fmt.Fprintf(os.Stderr, "%v\n", "Interface conversion error")
 				continue
 			}
 			request = client.NewSetCredentialRequest(cfg, credential.Type, credential.Name, value, true)
