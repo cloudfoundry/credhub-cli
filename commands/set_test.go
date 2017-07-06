@@ -247,7 +247,7 @@ var _ = Describe("Set", func() {
 
 	Describe("setting certificate secrets", func() {
 		It("puts a secret using explicit certificate type and string values", func() {
-			setupPutCertificateServer("my-secret", "my-ca", "my-cert", "my-priv")
+			SetupPutCertificateServer("my-secret", "my-ca", "my-cert", "my-priv")
 
 			session := runCommand("set", "-n", "my-secret",
 				"-t", "certificate", "--root-string", "my-ca",
@@ -258,7 +258,7 @@ var _ = Describe("Set", func() {
 		})
 
 		It("puts a secret using explicit certificate type, string values, and certificate authority name", func() {
-			setupPutCertificateWithCaNameServer("my-secret", "my-ca", "my-cert", "my-priv")
+			SetupPutCertificateWithCaNameServer("my-secret", "my-ca", "my-cert", "my-priv")
 
 			session := runCommand("set", "-n", "my-secret",
 				"-t", "certificate", "--ca-name", "my-ca",
@@ -269,7 +269,7 @@ var _ = Describe("Set", func() {
 		})
 
 		It("puts a secret using explicit certificate type and string values with no-overwrite", func() {
-			setupOverwritePutCertificateServer("my-secret", "my-ca", "my-cert", "my-priv", false)
+			SetupOverwritePutCertificateServer("my-secret", "my-ca", "my-cert", "my-priv", false)
 
 			session := runCommand("set", "-n", "my-secret",
 				"-t", "certificate", "--root-string", "my-ca",
@@ -279,7 +279,7 @@ var _ = Describe("Set", func() {
 		})
 
 		It("puts a secret using explicit certificate type and values read from files", func() {
-			setupPutCertificateServer("my-secret", "my-ca", "my-cert", "my-priv")
+			SetupPutCertificateServer("my-secret", "my-ca", "my-cert", "my-priv")
 			tempDir := createTempDir("certFilesForTesting")
 			caFilename := createCredentialFile(tempDir, "ca.txt", "my-ca")
 			certificateFilename := createCredentialFile(tempDir, "certificate.txt", "my-cert")
@@ -307,7 +307,7 @@ var _ = Describe("Set", func() {
 		})
 
 		It("puts a secret using explicit certificate type and string values in json format", func() {
-			setupPutCertificateServer("my-secret", "my-ca", "my-cert", "my-priv")
+			SetupPutCertificateServer("my-secret", "my-ca", "my-cert", "my-priv")
 
 			session := runCommand("set", "-n", "my-secret",
 				"-t", "certificate", "--root-string", "my-ca",
@@ -462,15 +462,15 @@ func setupOverwritePutJsonServer(name, value string, overwrite bool) {
 	)
 }
 
-func setupPutCertificateServer(name, ca, cert, priv string) {
-	setupOverwritePutCertificateServer(name, ca, cert, priv, true)
+func SetupPutCertificateServer(name, ca, cert, priv string) {
+	SetupOverwritePutCertificateServer(name, ca, cert, priv, true)
 }
 
-func setupPutCertificateWithCaNameServer(name, caName, cert, priv string) {
-	setupOverwritePutCertificateWithCaNameServer(name, caName, cert, priv, true)
+func SetupPutCertificateWithCaNameServer(name, caName, cert, priv string) {
+	SetupOverwritePutCertificateWithCaNameServer(name, caName, cert, priv, true)
 }
 
-func setupOverwritePutCertificateServer(name, ca, cert, priv string, overwrite bool) {
+func SetupOverwritePutCertificateServer(name, ca, cert, priv string, overwrite bool) {
 	var jsonRequest string
 	jsonRequest = fmt.Sprintf(CERTIFICATE_CREDENTIAL_REQUEST_JSON, name, ca, cert, priv, overwrite)
 	server.AppendHandlers(
@@ -482,7 +482,7 @@ func setupOverwritePutCertificateServer(name, ca, cert, priv string, overwrite b
 	)
 }
 
-func setupOverwritePutCertificateWithCaNameServer(name, caName, cert, priv string, overwrite bool) {
+func SetupOverwritePutCertificateWithCaNameServer(name, caName, cert, priv string, overwrite bool) {
 	var jsonRequest string
 	jsonRequest = fmt.Sprintf(CERTIFICATE_CREDENTIAL_WITH_NAMED_CA_REQUEST_JSON, name, caName, cert, priv, overwrite)
 	server.AppendHandlers(
@@ -546,7 +546,7 @@ func testSetFileFailure(caFilename, certificateFilename, privateFilename string)
 }
 
 func testSetCertFileDuplicationFailure(option, optionValue string) {
-	setupPutCertificateServer("my-secret", "my-ca", "my-cert", "my-priv")
+	SetupPutCertificateServer("my-secret", "my-ca", "my-cert", "my-priv")
 	tempDir := createTempDir("certFilesForTesting")
 	caFilename := createCredentialFile(tempDir, "ca.txt", "my-ca")
 	certificateFilename := createCredentialFile(tempDir, "certificate.txt", "my-cert")

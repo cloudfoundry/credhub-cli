@@ -8,6 +8,7 @@ import (
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	"github.com/cloudfoundry-incubator/credhub-cli/models"
 	"github.com/cloudfoundry-incubator/credhub-cli/repositories"
+	"github.com/mitchellh/mapstructure"
 )
 
 type ImportCommand struct {
@@ -40,14 +41,29 @@ func setCredentials(bulkImport models.CredentialBulkImport) {
 	action := actions.NewAction(repository, cfg)
 
 	for _, credential := range bulkImport.Credentials {
+		setCommand = SetCommand{}
 		setCommand.CredentialIdentifier = credential.Name
 		setCommand.Type = credential.Type
 
 		switch credential.Type {
 		case "password":
-			setCommand.Password = credential.Value
+			setCommand.Password = credential.Value.(string)
 		case "value":
-			setCommand.Value = credential.Value
+			setCommand.Value = credential.Value.(string)
+		case "certificate":
+			certificate := new(models.Certificate)
+			err = mapstructure.Decode(credential.Value, &certificate)
+
+			if certificate.CaName != "" {
+				setCommand.CaName = certificate.CaName
+			}
+
+			if certificate.Ca != "" {
+				setCommand.RootString = certificate.Ca
+			}
+
+			setCommand.CertificateString = certificate.Certificate
+			setCommand.PrivateString = certificate.PrivateKey
 		default:
 			fmt.Errorf("unrecognized type: %s", credential.Type)
 		}

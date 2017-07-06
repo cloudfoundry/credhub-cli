@@ -7,9 +7,9 @@ import (
 )
 
 type Credential struct {
-	Name  string `yaml:"name"`
-	Type  string `yaml:"type"`
-	Value string `yaml:"value"`
+	Name  string      `yaml:"name"`
+	Type  string      `yaml:"type"`
+	Value interface{} `yaml:"value"`
 }
 
 type CredentialBulkImport struct {
