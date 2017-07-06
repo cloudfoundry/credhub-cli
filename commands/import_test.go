@@ -116,8 +116,58 @@ value:
 		})
 	})
 
+	Describe("importing a file with rsa credentials", func() {
+		It("sets the rsa credentials", func() {
+			SetupPutRsaSshServer("/director/deployment/rsa1", "rsa", "public-key", "private-key", true)
+
+			session := runCommand("import", "-f", "../test/test_rsa_import_file.yml")
+
+			Eventually(session).Should(Exit(0))
+
+			Eventually(session.Out).Should(Say(`name: /director/deployment/rsa1
+type: rsa
+value:
+  private_key: private-key
+  public_key: public-key`))
+		})
+
+		It("prevents misconfigured yaml from creating a request", func() {
+			SetupPutRsaSshServer("/director/deployment/rsa1", "rsa", "public-key", "private-key", true)
+
+			session := runCommand("import", "-f", "../test/test_rsa_import_file.yml")
+
+			Eventually(session).Should(Exit(0))
+			Eventually(session.Err).Should(Say(`'' expected a map, got 'string'`))
+		})
+	})
+
+	Describe("importing a file with ssh credentials", func() {
+		It("sets the ssh credentials", func() {
+			SetupPutRsaSshServer("/director/deployment/ssh1", "ssh", "ssh-public-key", "private-key", true)
+
+			session := runCommand("import", "-f", "../test/test_ssh_import_file.yml")
+
+			Eventually(session).Should(Exit(0))
+
+			Eventually(session.Out).Should(Say(`name: /director/deployment/ssh1
+type: ssh
+value:
+  private_key: private-key
+  public_key: ssh-public-key`))
+		})
+
+		It("prevents misconfigured yaml from creating a request", func() {
+			SetupPutRsaSshServer("/director/deployment/ssh1", "ssh", "ssh-public-key", "private-key", true)
+
+			session := runCommand("import", "-f", "../test/test_ssh_import_file.yml")
+
+			Eventually(session).Should(Exit(0))
+			Eventually(session.Err).Should(Say(`'' expected a map, got 'string'`))
+		})
+	})
+
 	Describe("importing a file with mixed credentials", func() {
-		It("sets the password credentials", func() {
+		It("sets the all credentials", func() {
 			SetupOverwritePutValueServer("/director/deployment/blobstore - agent", "password", "gx4ll8193j5rw0wljgqo", true)
 			SetupOverwritePutValueServer("/director/deployment/blobstore - director", "value", "y14ck84ef51dnchgk4kp", true)
 			SetupPutCertificateServer("/director/deployment/bosh-ca",
@@ -128,6 +178,8 @@ value:
 				"/dan-cert",
 				`certificate`,
 				`private-key`)
+			SetupPutRsaSshServer("/director/deployment/rsa", "rsa", "public-key", "private-key", true)
+			SetupPutRsaSshServer("/director/deployment/ssh", "ssh", "ssh-public-key", "private-key", true)
 
 			session := runCommand("import", "-f", "../test/test_import_file.yml")
 
@@ -151,6 +203,16 @@ value:
   ca: known-ca-value
   certificate: certificate
   private_key: private-key`))
+			Eventually(session.Out).Should(Say(`name: /director/deployment/rsa
+type: rsa
+value:
+  private_key: private-key
+  public_key: public-key`))
+			Eventually(session.Out).Should(Say(`name: /director/deployment/ssh
+type: ssh
+value:
+  private_key: private-key
+  public_key: ssh-public-key`))
 		})
 	})
 })

@@ -1,0 +1,9 @@
+credentials:
+- name: /director/deployment/rsa1
+  type: rsa
+  value:
+    public_key: public-key
+    private_key: private-key
+- name: /director/deployment/rsa2
+  type: rsa
+  value: alsdkfjasdf

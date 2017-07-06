@@ -98,7 +98,7 @@ var _ = Describe("Set", func() {
 
 	Describe("setting SSH secrets", func() {
 		It("puts a secret using explicit ssh type", func() {
-			setupPutRsaSshServer("foo-ssh-key", "ssh", "some-public-key", "some-private-key", true)
+			SetupPutRsaSshServer("foo-ssh-key", "ssh", "some-public-key", "some-private-key", true)
 
 			session := runCommand("set", "-n", "foo-ssh-key", "-U", "some-public-key", "-P", "some-private-key", "-t", "ssh")
 
@@ -107,7 +107,7 @@ var _ = Describe("Set", func() {
 		})
 
 		It("puts a secret using values read from files", func() {
-			setupPutRsaSshServer("foo-ssh-key", "ssh", "some-public-key", "some-private-key", true)
+			SetupPutRsaSshServer("foo-ssh-key", "ssh", "some-public-key", "some-private-key", true)
 
 			tempDir := createTempDir("sshFilesForTesting")
 			publicFileName := createCredentialFile(tempDir, "rsa.pub", "some-public-key")
@@ -124,7 +124,7 @@ var _ = Describe("Set", func() {
 		})
 
 		It("puts a secret specifying no-overwrite", func() {
-			setupPutRsaSshServer("foo-ssh-key", "ssh", "some-public-key", "some-private-key", false)
+			SetupPutRsaSshServer("foo-ssh-key", "ssh", "some-public-key", "some-private-key", false)
 
 			session := runCommand("set", "-n", "foo-ssh-key", "-t", "ssh", "-U", "some-public-key", "-P", "some-private-key", "--no-overwrite")
 
@@ -132,7 +132,7 @@ var _ = Describe("Set", func() {
 		})
 
 		It("puts a secret using explicit ssh type and returns in json format", func() {
-			setupPutRsaSshServer("foo-ssh-key", "ssh", "some-public-key", "some-private-key", true)
+			SetupPutRsaSshServer("foo-ssh-key", "ssh", "some-public-key", "some-private-key", true)
 
 			session := runCommand("set", "-n", "foo-ssh-key", "-U", "some-public-key", "-P", "some-private-key", "-t", "ssh", "--output-json")
 
@@ -143,7 +143,7 @@ var _ = Describe("Set", func() {
 
 	Describe("setting RSA secrets", func() {
 		It("puts a secret using explicit rsa type", func() {
-			setupPutRsaSshServer("foo-rsa-key", "rsa", "some-public-key", "some-private-key", true)
+			SetupPutRsaSshServer("foo-rsa-key", "rsa", "some-public-key", "some-private-key", true)
 
 			session := runCommand("set", "-n", "foo-rsa-key", "-U", "some-public-key", "-P", "some-private-key", "-t", "rsa")
 
@@ -152,7 +152,7 @@ var _ = Describe("Set", func() {
 		})
 
 		It("puts a secret using values read from files", func() {
-			setupPutRsaSshServer("foo-rsa-key", "rsa", "some-public-key", "some-private-key", true)
+			SetupPutRsaSshServer("foo-rsa-key", "rsa", "some-public-key", "some-private-key", true)
 
 			tempDir := createTempDir("rsaFilesForTesting")
 			publicFileName := createCredentialFile(tempDir, "rsa.pub", "some-public-key")
@@ -169,7 +169,7 @@ var _ = Describe("Set", func() {
 		})
 
 		It("puts a secret specifying no-overwrite", func() {
-			setupPutRsaSshServer("foo-rsa-key", "rsa", "some-public-key", "some-private-key", false)
+			SetupPutRsaSshServer("foo-rsa-key", "rsa", "some-public-key", "some-private-key", false)
 
 			session := runCommand("set", "-n", "foo-rsa-key", "-t", "rsa", "-U", "some-public-key", "-P", "some-private-key", "--no-overwrite")
 
@@ -177,7 +177,7 @@ var _ = Describe("Set", func() {
 		})
 
 		It("puts a secret using explicit rsa type and returns in json format", func() {
-			setupPutRsaSshServer("foo-rsa-key", "rsa", "some-public-key", "some-private-key", true)
+			SetupPutRsaSshServer("foo-rsa-key", "rsa", "some-public-key", "some-private-key", true)
 
 			session := runCommand("set", "-n", "foo-rsa-key", "-U", "some-public-key", "-P", "some-private-key", "-t", "rsa", "--output-json")
 
@@ -418,7 +418,7 @@ var _ = Describe("Set", func() {
 	})
 })
 
-func setupPutRsaSshServer(name, keyType, publicKey, privateKey string, overwrite bool) {
+func SetupPutRsaSshServer(name, keyType, publicKey, privateKey string, overwrite bool) {
 	var jsonRequest string
 	jsonRequest = fmt.Sprintf(RSA_SSH_CREDENTIAL_REQUEST_JSON, keyType, name, publicKey, privateKey, overwrite)
 	server.AppendHandlers(

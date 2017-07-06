@@ -1,0 +1,9 @@
+credentials:
+- name: /director/deployment/ssh1
+  type: ssh
+  value:
+    public_key: ssh-public-key
+    private_key: private-key
+- name: /director/deployment/ssh2
+  type: ssh
+  value: alsdkfjasdf

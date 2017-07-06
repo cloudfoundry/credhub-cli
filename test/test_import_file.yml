@@ -17,3 +17,13 @@ credentials:
     ca_name: /dan-cert
     certificate: certificate
     private_key: private-key
+- name: /director/deployment/rsa
+  type: rsa
+  value:
+    public_key: public-key
+    private_key: private-key
+- name: /director/deployment/ssh
+  type: ssh
+  value:
+    public_key: ssh-public-key
+    private_key: private-key

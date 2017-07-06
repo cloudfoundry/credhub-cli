@@ -61,6 +61,15 @@ func setCredentials(bulkImport models.CredentialBulkImport) {
 				continue
 			}
 			request = client.NewSetCertificateRequest(cfg, credential.Name, certificate.Ca, certificate.CaName, certificate.Certificate, certificate.PrivateKey, true)
+		case "rsa", "ssh":
+			rsaSsh := new(models.RsaSsh)
+			err = mapstructure.Decode(credential.Value, &rsaSsh)
+
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "%v\n", err)
+				continue
+			}
+			request = client.NewSetRsaSshRequest(cfg, credential.Name, credential.Type, rsaSsh.PublicKey, rsaSsh.PrivateKey, true)
 		default:
 			fmt.Fprintf(os.Stderr, "unrecognized type: %s", credential.Type)
 		}
