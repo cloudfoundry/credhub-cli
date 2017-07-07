@@ -166,6 +166,32 @@ value:
 		})
 	})
 
+	Describe("importing a file with user credentials", func() {
+		It("sets the user credentials", func() {
+			SetupPutUserServer("/director/deployment/user1", `{"username": "covfefe", "password": "jidiofj1239i1293i12n3"}`, "covfefe", "jidiofj1239i1293i12n3", "P455W0rd-H45H", true)
+
+			session := runCommand("import", "-f", "../test/test_user_import_file.yml")
+
+			Eventually(session).Should(Exit(0))
+
+			Eventually(session.Out).Should(Say(`name: /director/deployment/user1
+type: user
+value:
+  password: jidiofj1239i1293i12n3
+  password_hash: P455W0rd-H45H
+  username: covfefe`))
+		})
+
+		It("prevents misconfigured yaml from creating a request", func() {
+			SetupPutUserServer("/director/deployment/user1", `{"username": "covfefe", "password": "jidiofj1239i1293i12n3"}`, "covfefe", "jidiofj1239i1293i12n3", "P455W0rd-H45H", true)
+
+			session := runCommand("import", "-f", "../test/test_user_import_file.yml")
+
+			Eventually(session).Should(Exit(0))
+			Eventually(session.Err).Should(Say(`'' expected a map, got 'string'`))
+		})
+	})
+
 	Describe("importing a file with mixed credentials", func() {
 		It("sets the all credentials", func() {
 			SetupOverwritePutValueServer("/director/deployment/blobstore - agent", "password", "gx4ll8193j5rw0wljgqo", true)
@@ -180,6 +206,7 @@ value:
 				`private-key`)
 			SetupPutRsaSshServer("/director/deployment/rsa", "rsa", "public-key", "private-key", true)
 			SetupPutRsaSshServer("/director/deployment/ssh", "ssh", "ssh-public-key", "private-key", true)
+			SetupPutUserServer("/director/deployment/user", `{"username": "covfefe", "password": "jidiofj1239i1293i12n3"}`, "covfefe", "jidiofj1239i1293i12n3", "P455W0rd-H45H", true)
 
 			session := runCommand("import", "-f", "../test/test_import_file.yml")
 
@@ -213,6 +240,12 @@ type: ssh
 value:
   private_key: private-key
   public_key: ssh-public-key`))
+			Eventually(session.Out).Should(Say(`name: /director/deployment/user
+type: user
+value:
+  password: jidiofj1239i1293i12n3
+  password_hash: P455W0rd-H45H
+  username: covfefe`))
 		})
 	})
 })

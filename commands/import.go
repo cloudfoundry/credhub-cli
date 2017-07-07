@@ -71,6 +71,15 @@ func setCredentials(bulkImport models.CredentialBulkImport) {
 				continue
 			}
 			request = client.NewSetRsaSshRequest(cfg, credential.Name, credential.Type, rsaSsh.PublicKey, rsaSsh.PrivateKey, true)
+		case "user":
+			user := new(models.User)
+			err = mapstructure.Decode(credential.Value, &user)
+
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "%v\n", err)
+				continue
+			}
+			request = client.NewSetUserRequest(cfg, credential.Name, user.Username, user.Password, true)
 		default:
 			fmt.Fprintf(os.Stderr, "unrecognized type: %s", credential.Type)
 		}

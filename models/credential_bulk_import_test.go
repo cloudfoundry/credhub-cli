@@ -65,22 +65,29 @@ var _ = Describe("CredentialBulkImport", func() {
     private_key: |
       -----BEGIN RSA PRIVATE KEY-----
       ...
-      -----END RSA PRIVATE KEY-----`))
+      -----END RSA PRIVATE KEY-----
+- name: /director/deployment/user
+  type: user
+  value:
+    username: covfefe
+    password: jidiofj1239i1293i12n3`))
 
 			Expect(err).To(BeNil())
-			Expect(len(credentialBulkImport.Credentials)).To(Equal(6))
+			Expect(len(credentialBulkImport.Credentials)).To(Equal(7))
 			Expect(credentialBulkImport.Credentials[0].Name).To(Equal("/director/deployment/blobstore - agent"))
 			Expect(credentialBulkImport.Credentials[1].Name).To(Equal("/director/deployment/blobstore - director"))
 			Expect(credentialBulkImport.Credentials[2].Name).To(Equal("/director/deployment/bosh-ca"))
 			Expect(credentialBulkImport.Credentials[3].Name).To(Equal("/director/deployment/bosh-cert"))
 			Expect(credentialBulkImport.Credentials[4].Name).To(Equal("/director/deployment/rsa"))
 			Expect(credentialBulkImport.Credentials[5].Name).To(Equal("/director/deployment/ssh"))
+			Expect(credentialBulkImport.Credentials[6].Name).To(Equal("/director/deployment/user"))
 			Expect(credentialBulkImport.Credentials[0].Type).To(Equal("password"))
 			Expect(credentialBulkImport.Credentials[1].Type).To(Equal("value"))
 			Expect(credentialBulkImport.Credentials[2].Type).To(Equal("certificate"))
 			Expect(credentialBulkImport.Credentials[3].Type).To(Equal("certificate"))
 			Expect(credentialBulkImport.Credentials[4].Type).To(Equal("rsa"))
 			Expect(credentialBulkImport.Credentials[5].Type).To(Equal("ssh"))
+			Expect(credentialBulkImport.Credentials[6].Type).To(Equal("user"))
 
 			Expect(credentialBulkImport.Credentials[0].Value.(string)).To(Equal("gx4ll8193j5rw0wljgqo"))
 			Expect(credentialBulkImport.Credentials[1].Value.(string)).To(Equal("y14ck84ef51dnchgk4kp"))
@@ -112,6 +119,12 @@ var _ = Describe("CredentialBulkImport", func() {
 			Expect(err).To(BeNil())
 			Expect(ssh.PublicKey).To(ContainSubstring(`ssh-rsa AAAAB3NzaC...C1X7`))
 			Expect(ssh.PrivateKey).To(ContainSubstring(`-----BEGIN RSA PRIVATE KEY-----`))
+
+			var user models.User
+			err = mapstructure.Decode(credentialBulkImport.Credentials[6].Value, &user)
+			Expect(err).To(BeNil())
+			Expect(user.Username).To(ContainSubstring(`covfefe`))
+			Expect(user.Password).To(ContainSubstring(`jidiofj1239i1293i12n3`))
 		})
 	})
 
@@ -121,19 +134,21 @@ var _ = Describe("CredentialBulkImport", func() {
 			err := credentialBulkImport.ReadFile("../test/test_import_file.yml")
 
 			Expect(err).To(BeNil())
-			Expect(len(credentialBulkImport.Credentials)).To(Equal(6))
+			Expect(len(credentialBulkImport.Credentials)).To(Equal(7))
 			Expect(credentialBulkImport.Credentials[0].Name).To(Equal("/director/deployment/blobstore - agent"))
 			Expect(credentialBulkImport.Credentials[1].Name).To(Equal("/director/deployment/blobstore - director"))
 			Expect(credentialBulkImport.Credentials[2].Name).To(Equal("/director/deployment/bosh-ca"))
 			Expect(credentialBulkImport.Credentials[3].Name).To(Equal("/director/deployment/bosh-cert"))
 			Expect(credentialBulkImport.Credentials[4].Name).To(Equal("/director/deployment/rsa"))
 			Expect(credentialBulkImport.Credentials[5].Name).To(Equal("/director/deployment/ssh"))
+			Expect(credentialBulkImport.Credentials[6].Name).To(Equal("/director/deployment/user"))
 			Expect(credentialBulkImport.Credentials[0].Type).To(Equal("password"))
 			Expect(credentialBulkImport.Credentials[1].Type).To(Equal("value"))
 			Expect(credentialBulkImport.Credentials[2].Type).To(Equal("certificate"))
 			Expect(credentialBulkImport.Credentials[3].Type).To(Equal("certificate"))
 			Expect(credentialBulkImport.Credentials[4].Type).To(Equal("rsa"))
 			Expect(credentialBulkImport.Credentials[5].Type).To(Equal("ssh"))
+			Expect(credentialBulkImport.Credentials[6].Type).To(Equal("user"))
 
 			Expect(credentialBulkImport.Credentials[0].Value.(string)).To(Equal("gx4ll8193j5rw0wljgqo"))
 			Expect(credentialBulkImport.Credentials[1].Value.(string)).To(Equal("y14ck84ef51dnchgk4kp"))
@@ -166,6 +181,11 @@ var _ = Describe("CredentialBulkImport", func() {
 			Expect(ssh.PublicKey).To(ContainSubstring(`ssh-public-key`))
 			Expect(ssh.PrivateKey).To(ContainSubstring(`private-key`))
 
+			var user models.User
+			err = mapstructure.Decode(credentialBulkImport.Credentials[6].Value, &user)
+			Expect(err).To(BeNil())
+			Expect(user.Username).To(ContainSubstring(`covfefe`))
+			Expect(user.Password).To(ContainSubstring(`jidiofj1239i1293i12n3`))
 		})
 	})
 })

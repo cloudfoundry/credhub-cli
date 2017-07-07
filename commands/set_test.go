@@ -320,7 +320,7 @@ var _ = Describe("Set", func() {
 
 	Describe("setting User secrets", func() {
 		It("puts a secret using explicit user type", func() {
-			setupPutUserServer("my-username-credential", `{"username": "my-username", "password": "test-password"}`, "my-username", "test-password", "passw0rd-H4$h", true)
+			SetupPutUserServer("my-username-credential", `{"username": "my-username", "password": "test-password"}`, "my-username", "test-password", "passw0rd-H4$h", true)
 
 			session := runCommand("set", "-n", "my-username-credential", "-z", "my-username", "-w", "test-password", "-t", "user")
 
@@ -329,7 +329,7 @@ var _ = Describe("Set", func() {
 		})
 
 		It("puts a secret specifying no-overwrite", func() {
-			setupPutUserServer("my-username-credential", `{"username": "my-username", "password": "test-password"}`, "my-username", "test-password", "passw0rd-H4$h", false)
+			SetupPutUserServer("my-username-credential", `{"username": "my-username", "password": "test-password"}`, "my-username", "test-password", "passw0rd-H4$h", false)
 
 			session := runCommand("set", "-n", "my-username-credential", "-t", "user", "-z", "my-username", "-w", "test-password", "--no-overwrite")
 
@@ -337,7 +337,7 @@ var _ = Describe("Set", func() {
 		})
 
 		It("should set password interactively for user", func() {
-			setupPutUserServer("my-username-credential", `{"username": "my-username", "password": "test-password"}`, "my-username", "test-password", "passw0rd-H4$h", true)
+			SetupPutUserServer("my-username-credential", `{"username": "my-username", "password": "test-password"}`, "my-username", "test-password", "passw0rd-H4$h", true)
 
 			session := runCommandWithStdin(strings.NewReader("test-password\n"), "set", "-n", "my-username-credential", "-t", "user", "--username", "my-username")
 
@@ -349,7 +349,7 @@ var _ = Describe("Set", func() {
 		})
 
 		It("should set null username when it isn't provided", func() {
-			setupPutUserWithoutUsernameServer("my-username-credential", `{"password": "test-password"}`, "test-password", "passw0rd-H4$h", true)
+			SetupPutUserWithoutUsernameServer("my-username-credential", `{"password": "test-password"}`, "test-password", "passw0rd-H4$h", true)
 
 			session := runCommandWithStdin(strings.NewReader("test-password\n"), "set", "-n", "my-username-credential", "-t", "user")
 
@@ -361,7 +361,7 @@ var _ = Describe("Set", func() {
 		})
 
 		It("puts a secret using explicit user type in json format", func() {
-			setupPutUserServer("my-username-credential", `{"username": "my-username", "password": "test-password"}`, "my-username", "test-password", "passw0rd-H4$h", true)
+			SetupPutUserServer("my-username-credential", `{"username": "my-username", "password": "test-password"}`, "my-username", "test-password", "passw0rd-H4$h", true)
 
 			session := runCommand("set", "-n", "my-username-credential", "-z", "my-username", "-w", "test-password", "-t", "user",
 				"--output-json")
@@ -494,7 +494,7 @@ func SetupOverwritePutCertificateWithCaNameServer(name, caName, cert, priv strin
 	)
 }
 
-func setupPutUserServer(name, value, username, password, passwordHash string, overwrite bool) {
+func SetupPutUserServer(name, value, username, password, passwordHash string, overwrite bool) {
 	var jsonRequest string
 	jsonRequest = fmt.Sprintf(USER_SET_CREDENTIAL_REQUEST_JSON, name, value, overwrite)
 	server.AppendHandlers(
@@ -506,7 +506,7 @@ func setupPutUserServer(name, value, username, password, passwordHash string, ov
 	)
 }
 
-func setupPutUserWithoutUsernameServer(name, value, password, passwordHash string, overwrite bool) {
+func SetupPutUserWithoutUsernameServer(name, value, password, passwordHash string, overwrite bool) {
 	var jsonRequest string
 	jsonRequest = fmt.Sprintf(USER_SET_CREDENTIAL_REQUEST_JSON, name, value, overwrite)
 	server.AppendHandlers(

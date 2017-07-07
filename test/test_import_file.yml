@@ -27,3 +27,8 @@ credentials:
   value:
     public_key: ssh-public-key
     private_key: private-key
+- name: /director/deployment/user
+  type: user
+  value:
+    username: covfefe
+    password: jidiofj1239i1293i12n3
