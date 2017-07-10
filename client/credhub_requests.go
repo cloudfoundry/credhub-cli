@@ -51,7 +51,7 @@ func NewSetCredentialRequest(config config.Config, credentialType string, creden
 		Overwrite:      &overwrite,
 	}
 
-	return newCredentialRequest("PUT", config, credentialIdentifier, credential)
+	return newCredentialRequest("PUT", config, credential)
 }
 
 func NewSetJsonCredentialRequest(config config.Config, credentialType string, credentialIdentifier string, content interface{}, overwrite bool) *http.Request {
@@ -73,7 +73,7 @@ func NewSetJsonCredentialRequest(config config.Config, credentialType string, cr
 		Overwrite:      &overwrite,
 	}
 
-	return newCredentialRequest("PUT", config, credentialIdentifier, credential)
+	return newCredentialRequest("PUT", config, credential)
 }
 
 func NewGenerateCredentialRequest(config config.Config, identifier string, parameters models.GenerationParameters, value *models.ProvidedValue, credentialType string, overwrite bool) *http.Request {
@@ -85,7 +85,7 @@ func NewGenerateCredentialRequest(config config.Config, identifier string, param
 		Value:          value,
 	}
 
-	return newCredentialRequest("POST", config, identifier, generateRequest)
+	return newCredentialRequest("POST", config, generateRequest)
 }
 
 func NewRegenerateCredentialRequest(config config.Config, identifier string) *http.Request {
@@ -94,7 +94,7 @@ func NewRegenerateCredentialRequest(config config.Config, identifier string) *ht
 		Regenerate: true,
 	}
 
-	return newCredentialRequest("POST", config, identifier, regenerateRequest)
+	return newCredentialRequest("POST", config, regenerateRequest)
 }
 
 func NewGetCredentialByNameRequest(config config.Config, name string) *http.Request {
@@ -153,7 +153,7 @@ func NewFindCredentialsByPathRequest(config config.Config, path string) *http.Re
 	return newRequestWithoutBody("GET", config, urlString)
 }
 
-func newCredentialRequest(requestType string, config config.Config, identifier string, bodyModel interface{}) *http.Request {
+func newCredentialRequest(requestType string, config config.Config, bodyModel interface{}) *http.Request {
 	urlString := config.ApiURL + "/api/v1/data"
 	return newRequest(requestType, config, urlString, bodyModel)
 }
