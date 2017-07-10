@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"gopkg.in/yaml.v2"
+	"github.com/cloudfoundry-incubator/credhub-cli/errors"
 )
 
 type CredentialBulkImport struct {
@@ -27,7 +28,11 @@ func (credentialBulkImport *CredentialBulkImport) readBytes(data []byte) error {
 		credentialBulkImport.Credentials[i] = unpackCredential(credential)
 	}
 
-	return err
+	if err != nil {
+		return errors.NewInvalidImportYamlError()
+	} else {
+		return nil
+	}
 }
 
 func unpackCredential(interfaceToInterfaceMap map[string]interface{}) map[string]interface{} {

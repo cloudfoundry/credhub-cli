@@ -74,6 +74,16 @@ value:
 			Eventually(session.Err).Should(Say(`test error`))
 		})
 	})
+
+	Describe("when importing file with incorrect YAML", func() {
+		It("returns an error message", func() {
+			errorMessage := `The referenced file does not contain valid yaml structure. Please update and retry your request.`
+
+			session := runCommand("import", "-f", "../test/test_import_incorrect_yaml.yml")
+
+			Eventually(session.Err).Should(Say(errorMessage))
+		})
+	})
 })
 
 func setUpImportRequests() {

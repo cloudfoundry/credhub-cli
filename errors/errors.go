@@ -84,3 +84,7 @@ func NewGenerateEmptyTypeError() error {
 func NewNoApiUrlSetError() error {
 	return errors.New("An API target is not set. Please target the location of your server with `credhub api --server api.example.com` to continue.")
 }
+
+func NewInvalidImportYamlError() error {
+	return errors.New("The referenced file does not contain valid yaml structure. Please update and retry your request.")
+}
