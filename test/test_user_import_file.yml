@@ -1,9 +1,0 @@
-credentials:
-- name: /director/deployment/user1
-  type: user
-  value:
-    username: covfefe
-    password: jidiofj1239i1293i12n3
-- name: /director/deployment/user2
-  type: user
-  value: covfefe

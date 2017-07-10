@@ -21,7 +21,6 @@ func DoSendRequest(httpClient client.HttpClient, request *http.Request) (*http.R
 	if err != nil {
 		return nil, credhub_errors.NewNetworkError(err)
 	}
-
 	if response.StatusCode < 200 || response.StatusCode > 299 {
 		decoder := json.NewDecoder(response.Body)
 		serverError := models.ServerError{}

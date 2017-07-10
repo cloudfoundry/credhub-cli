@@ -518,6 +518,16 @@ func SetupPutUserWithoutUsernameServer(name, value, password, passwordHash strin
 	)
 }
 
+func SetupPutBadRequestServer(body string) {
+	server.AppendHandlers(
+		CombineHandlers(
+			VerifyRequest("PUT", "/api/v1/data"),
+			VerifyJSON(body),
+			RespondWith(http.StatusBadRequest, `{"error":"test error"}`),
+		),
+	)
+}
+
 func testSetFileFailure(caFilename, certificateFilename, privateFilename string) {
 	tempDir := createTempDir("certFilesForTesting")
 	if caFilename != "" {

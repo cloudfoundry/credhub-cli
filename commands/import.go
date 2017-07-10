@@ -12,11 +12,10 @@ import (
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	"github.com/cloudfoundry-incubator/credhub-cli/models"
 	"github.com/cloudfoundry-incubator/credhub-cli/repositories"
-	"github.com/mitchellh/mapstructure"
 )
 
 type ImportCommand struct {
-	File string `short:"f" long:"file" description:"File containing credentials to import"`
+	File string `short:"f" long:"file" description:"File containing credentials to import" required:"true"`
 }
 
 var (
@@ -27,7 +26,6 @@ var (
 )
 
 func (cmd ImportCommand) Execute([]string) error {
-
 	err = bulkImport.ReadFile(cmd.File)
 
 	if err != nil {
@@ -40,51 +38,23 @@ func (cmd ImportCommand) Execute([]string) error {
 }
 
 func setCredentials(bulkImport models.CredentialBulkImport) {
+	var name string
+
 	cfg := config.ReadConfig()
 	repository = repositories.NewCredentialRepository(client.NewHttpClient(cfg))
 	action := actions.NewAction(repository, cfg)
 
 	for _, credential := range bulkImport.Credentials {
-		switch credential.Type {
-		case "password", "value":
-			value, ok := credential.Value.(string)
-			if !ok {
-				fmt.Fprintf(os.Stderr, "%v\n", "Interface conversion error")
-				continue
-			}
-			request = client.NewSetCredentialRequest(cfg, credential.Type, credential.Name, value, true)
-		case "certificate":
-			certificate := new(models.Certificate)
-			err = mapstructure.Decode(credential.Value, &certificate)
+		request = client.NewSetRequest(cfg, credential)
 
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "%v\n", err)
-				continue
-			}
-			request = client.NewSetCertificateRequest(cfg, credential.Name, certificate.Ca, certificate.CaName, certificate.Certificate, certificate.PrivateKey, true)
-		case "rsa", "ssh":
-			rsaSsh := new(models.RsaSsh)
-			err = mapstructure.Decode(credential.Value, &rsaSsh)
-
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "%v\n", err)
-				continue
-			}
-			request = client.NewSetRsaSshRequest(cfg, credential.Name, credential.Type, rsaSsh.PublicKey, rsaSsh.PrivateKey, true)
-		case "user":
-			user := new(models.User)
-			err = mapstructure.Decode(credential.Value, &user)
-
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "%v\n", err)
-				continue
-			}
-			request = client.NewSetUserRequest(cfg, credential.Name, user.Username, user.Password, true)
+		switch credentialName := credential["name"].(type) {
+		case string:
+			name = credentialName
 		default:
-			fmt.Fprintf(os.Stderr, "unrecognized type: %s", credential.Type)
+			name = ""
 		}
 
-		result, err := action.DoAction(request, credential.Name)
+		result, err := action.DoAction(request, name)
 
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "%v\n", err)

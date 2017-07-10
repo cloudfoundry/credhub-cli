@@ -1,34 +1,38 @@
 credentials:
-- name: /director/deployment/blobstore - agent
+- name: /test/password
   type: password
-  value: gx4ll8193j5rw0wljgqo
-- name: /director/deployment/blobstore - director
+  value: test-password-value
+- name: /test/value
   type: value
-  value: y14ck84ef51dnchgk4kp
-- name: /director/deployment/bosh-ca
+  value: test-value
+- name: /test/certificate
   type: certificate
   value:
     ca: ca-certificate
     certificate: certificate
     private_key: private-key
-- name: /director/deployment/bosh-cert
-  type: certificate
-  value:
-    ca_name: /dan-cert
-    certificate: certificate
-    private_key: private-key
-- name: /director/deployment/rsa
+- name: /test/rsa
   type: rsa
   value:
     public_key: public-key
     private_key: private-key
-- name: /director/deployment/ssh
+- name: /test/ssh
   type: ssh
   value:
     public_key: ssh-public-key
     private_key: private-key
-- name: /director/deployment/user
+- name: /test/user
   type: user
   value:
     username: covfefe
-    password: jidiofj1239i1293i12n3
+    password: test-user-password
+- name: /test/json
+  type: json
+  value:
+    arbitrary_object:
+      nested_array:
+      - array_val1
+      - array_object_subvalue: covfefe
+    1: key is not a string
+    3.14: pi
+    true: key is a bool

@@ -43,6 +43,10 @@ func NewSetUserRequest(config config.Config, credentialIdentifier, username, pas
 	return NewSetCredentialRequest(config, "user", credentialIdentifier, user, overwrite)
 }
 
+func NewSetRequest(config config.Config, content map[string]interface{}) *http.Request {
+	return newCredentialRequest("PUT", config, content)
+}
+
 func NewSetCredentialRequest(config config.Config, credentialType string, credentialIdentifier string, content interface{}, overwrite bool) *http.Request {
 	credential := models.RequestBody{
 		CredentialType: credentialType,

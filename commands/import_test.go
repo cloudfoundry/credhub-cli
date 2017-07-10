@@ -14,238 +14,77 @@ var _ = Describe("Import", func() {
 
 	ItRequiresAuthentication("get", "-n", "test-credential")
 
-	Describe("importing a file with password credentials", func() {
-		It("sets the password credentials", func() {
-			SetupOverwritePutValueServer("/director/deployment/blobstore1", "password", "test_password_1", true)
-			SetupOverwritePutValueServer("/director/deployment/blobstore2", "password", "test_password_2", true)
-
-			session := runCommand("import", "-f", "../test/test_password_import_file.yml")
-
-			Eventually(session).Should(Exit(0))
-
-			Eventually(session.Out).Should(Say(`name: /director/deployment/blobstore1
-type: password
-value: test_password_1`))
-			Eventually(session.Out).Should(Say(`name: /director/deployment/blobstore2
-type: password
-value: test_password_2`))
-		})
-
-		It("prevents misconfigured yaml from creating a request", func() {
-			SetupOverwritePutValueServer("/director/deployment/blobstore1", "password", "test_password_1", true)
-			SetupOverwritePutValueServer("/director/deployment/blobstore2", "password", "test_password_2", true)
-
-			session := runCommand("import", "-f", "../test/test_password_import_file.yml")
-
-			Eventually(session).Should(Exit(0))
-			Eventually(session.Err).Should(Say(`Interface conversion error`))
-		})
-	})
-
-	Describe("importing a file with value credentials", func() {
-		It("sets the value credentials", func() {
-			SetupOverwritePutValueServer("/director/deployment/blobstore3", "value", "test_value_1", true)
-			SetupOverwritePutValueServer("/director/deployment/blobstore4", "value", "test_value_2", true)
-
-			session := runCommand("import", "-f", "../test/test_value_import_file.yml")
-
-			Eventually(session).Should(Exit(0))
-
-			Eventually(session.Out).Should(Say(`name: /director/deployment/blobstore3
-type: value
-value: test_value_1`))
-			Eventually(session.Out).Should(Say(`name: /director/deployment/blobstore4
-type: value
-value: test_value_2`))
-		})
-
-		It("prevents misconfigured yaml from creating a request", func() {
-			SetupOverwritePutValueServer("/director/deployment/blobstore3", "value", "test_value_1", true)
-			SetupOverwritePutValueServer("/director/deployment/blobstore4", "value", "test_value_2", true)
-
-			session := runCommand("import", "-f", "../test/test_value_import_file.yml")
-
-			Eventually(session).Should(Exit(0))
-			Eventually(session.Err).Should(Say(`Interface conversion error`))
-		})
-	})
-
-	Describe("importing a file with certificate credentials", func() {
-		It("sets the password credentials", func() {
-			SetupPutCertificateServer("/director/deployment/bosh-ca-cert",
-				`ca-certificate`,
-				`certificate`,
-				`private-key`)
-			SetupPutCertificateWithCaNameServer("/director/deployment/bosh-cert-secondary",
-				"/dan-cert",
-				`certificate`,
-				`private-key`)
-
-			session := runCommand("import", "-f", "../test/test_certificate_import_file.yml")
-
-			Eventually(session).Should(Exit(0))
-
-			Eventually(session.Out).Should(Say(`name: /director/deployment/bosh-ca-cert
-type: certificate
-value:
-  ca: ca-certificate
-  certificate: certificate
-  private_key: private-key`))
-			Eventually(session.Out).Should(Say(`name: /director/deployment/bosh-cert-secondary
-type: certificate
-value:
-  ca: known-ca-value
-  certificate: certificate
-  private_key: private-key`))
-		})
-
-		It("prevents misconfigured yaml from creating a request", func() {
-			SetupPutCertificateServer("/director/deployment/bosh-ca-cert",
-				`ca-certificate`,
-				`certificate`,
-				`private-key`)
-			SetupPutCertificateWithCaNameServer("/director/deployment/bosh-cert-secondary",
-				"/dan-cert",
-				`certificate`,
-				`private-key`)
-
-			session := runCommand("import", "-f", "../test/test_certificate_import_file.yml")
-
-			Eventually(session).Should(Exit(0))
-			Eventually(session.Err).Should(Say(`'' expected a map, got 'string'`))
-		})
-	})
-
-	Describe("importing a file with rsa credentials", func() {
-		It("sets the rsa credentials", func() {
-			SetupPutRsaSshServer("/director/deployment/rsa1", "rsa", "public-key", "private-key", true)
-
-			session := runCommand("import", "-f", "../test/test_rsa_import_file.yml")
-
-			Eventually(session).Should(Exit(0))
-
-			Eventually(session.Out).Should(Say(`name: /director/deployment/rsa1
-type: rsa
-value:
-  private_key: private-key
-  public_key: public-key`))
-		})
-
-		It("prevents misconfigured yaml from creating a request", func() {
-			SetupPutRsaSshServer("/director/deployment/rsa1", "rsa", "public-key", "private-key", true)
-
-			session := runCommand("import", "-f", "../test/test_rsa_import_file.yml")
-
-			Eventually(session).Should(Exit(0))
-			Eventually(session.Err).Should(Say(`'' expected a map, got 'string'`))
-		})
-	})
-
-	Describe("importing a file with ssh credentials", func() {
-		It("sets the ssh credentials", func() {
-			SetupPutRsaSshServer("/director/deployment/ssh1", "ssh", "ssh-public-key", "private-key", true)
-
-			session := runCommand("import", "-f", "../test/test_ssh_import_file.yml")
-
-			Eventually(session).Should(Exit(0))
-
-			Eventually(session.Out).Should(Say(`name: /director/deployment/ssh1
-type: ssh
-value:
-  private_key: private-key
-  public_key: ssh-public-key`))
-		})
-
-		It("prevents misconfigured yaml from creating a request", func() {
-			SetupPutRsaSshServer("/director/deployment/ssh1", "ssh", "ssh-public-key", "private-key", true)
-
-			session := runCommand("import", "-f", "../test/test_ssh_import_file.yml")
-
-			Eventually(session).Should(Exit(0))
-			Eventually(session.Err).Should(Say(`'' expected a map, got 'string'`))
-		})
-	})
-
-	Describe("importing a file with user credentials", func() {
-		It("sets the user credentials", func() {
-			SetupPutUserServer("/director/deployment/user1", `{"username": "covfefe", "password": "jidiofj1239i1293i12n3"}`, "covfefe", "jidiofj1239i1293i12n3", "P455W0rd-H45H", true)
-
-			session := runCommand("import", "-f", "../test/test_user_import_file.yml")
-
-			Eventually(session).Should(Exit(0))
-
-			Eventually(session.Out).Should(Say(`name: /director/deployment/user1
-type: user
-value:
-  password: jidiofj1239i1293i12n3
-  password_hash: P455W0rd-H45H
-  username: covfefe`))
-		})
-
-		It("prevents misconfigured yaml from creating a request", func() {
-			SetupPutUserServer("/director/deployment/user1", `{"username": "covfefe", "password": "jidiofj1239i1293i12n3"}`, "covfefe", "jidiofj1239i1293i12n3", "P455W0rd-H45H", true)
-
-			session := runCommand("import", "-f", "../test/test_user_import_file.yml")
-
-			Eventually(session).Should(Exit(0))
-			Eventually(session.Err).Should(Say(`'' expected a map, got 'string'`))
-		})
-	})
-
 	Describe("importing a file with mixed credentials", func() {
 		It("sets the all credentials", func() {
-			SetupOverwritePutValueServer("/director/deployment/blobstore - agent", "password", "gx4ll8193j5rw0wljgqo", true)
-			SetupOverwritePutValueServer("/director/deployment/blobstore - director", "value", "y14ck84ef51dnchgk4kp", true)
-			SetupPutCertificateServer("/director/deployment/bosh-ca",
-				`ca-certificate`,
-				`certificate`,
-				`private-key`)
-			SetupPutCertificateWithCaNameServer("/director/deployment/bosh-cert",
-				"/dan-cert",
-				`certificate`,
-				`private-key`)
-			SetupPutRsaSshServer("/director/deployment/rsa", "rsa", "public-key", "private-key", true)
-			SetupPutRsaSshServer("/director/deployment/ssh", "ssh", "ssh-public-key", "private-key", true)
-			SetupPutUserServer("/director/deployment/user", `{"username": "covfefe", "password": "jidiofj1239i1293i12n3"}`, "covfefe", "jidiofj1239i1293i12n3", "P455W0rd-H45H", true)
+			setUpImportRequests()
 
 			session := runCommand("import", "-f", "../test/test_import_file.yml")
 
 			Eventually(session).Should(Exit(0))
 
-			Eventually(session.Out).Should(Say(`name: /director/deployment/blobstore - agent
+			Eventually(session.Out).Should(Say(`name: /test/password
 type: password
-value: gx4ll8193j5rw0wljgqo`))
-			Eventually(session.Out).Should(Say(`name: /director/deployment/blobstore - director
+value: test-password-value`))
+			Eventually(session.Out).Should(Say(`name: /test/value
 type: value
-value: y14ck84ef51dnchgk4kp`))
-			Eventually(session.Out).Should(Say(`name: /director/deployment/bosh-ca
+value: test-value`))
+			Eventually(session.Out).Should(Say(`name: /test/certificate
 type: certificate
 value:
   ca: ca-certificate
   certificate: certificate
   private_key: private-key`))
-			Eventually(session.Out).Should(Say(`name: /director/deployment/bosh-cert
-type: certificate
-value:
-  ca: known-ca-value
-  certificate: certificate
-  private_key: private-key`))
-			Eventually(session.Out).Should(Say(`name: /director/deployment/rsa
+			Eventually(session.Out).Should(Say(`name: /test/rsa
 type: rsa
 value:
   private_key: private-key
   public_key: public-key`))
-			Eventually(session.Out).Should(Say(`name: /director/deployment/ssh
+			Eventually(session.Out).Should(Say(`name: /test/ssh
 type: ssh
 value:
   private_key: private-key
   public_key: ssh-public-key`))
-			Eventually(session.Out).Should(Say(`name: /director/deployment/user
+			Eventually(session.Out).Should(Say(`name: /test/user
 type: user
 value:
-  password: jidiofj1239i1293i12n3
+  password: test-user-password
   password_hash: P455W0rd-H45H
   username: covfefe`))
+			Eventually(session.Out).Should(Say(`name: /test/json
+type: json
+value:
+  "1": key is not a string
+  "3.14": pi
+  arbitrary_object:
+    nested_array:
+    - array_val1
+    - array_object_subvalue: covfefe
+  "true": key is a bool
+`))
+		})
+	})
+
+	Describe("when importing file with no name specified", func() {
+		It("passes through the server error", func() {
+			jsonBody := `{"type":"password","value":"test-password","overwrite":true}`
+			SetupPutBadRequestServer(jsonBody)
+
+			session := runCommand("import", "-f", "../test/test_import_missing_name.yml")
+
+			Eventually(session.Err).Should(Say(`test error`))
 		})
 	})
 })
+
+func setUpImportRequests() {
+	SetupOverwritePutValueServer("/test/password", "password", "test-password-value", true)
+	SetupOverwritePutValueServer("/test/value", "value", "test-value", true)
+	SetupPutCertificateServer("/test/certificate",
+		`ca-certificate`,
+		`certificate`,
+		`private-key`)
+	SetupPutRsaSshServer("/test/rsa", "rsa", "public-key", "private-key", true)
+	SetupPutRsaSshServer("/test/ssh", "ssh", "ssh-public-key", "private-key", true)
+	SetupPutUserServer("/test/user", `{"username": "covfefe", "password": "test-user-password"}`, "covfefe", "test-user-password", "P455W0rd-H45H", true)
+	setupPutJsonServer("/test/json", `{"1":"key is not a string","3.14":"pi","true":"key is a bool","arbitrary_object":{"nested_array":["array_val1",{"array_object_subvalue":"covfefe"}]}}`)
+}
