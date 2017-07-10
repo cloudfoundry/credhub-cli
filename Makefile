@@ -22,7 +22,6 @@ dependencies:
 	go get golang.org/x/tools/cmd/goimports
 	go get github.com/maxbrunsfeld/counterfeiter
 	go get -u github.com/kardianos/govendor
-	go get github.com/mitchellh/mapstructure
 	govendor sync
 
 format:
