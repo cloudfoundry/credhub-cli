@@ -30,7 +30,7 @@ format:
 	go fmt .
 
 ginkgo:
-	ginkgo -r -randomizeSuites -randomizeAllSpecs -race 2>&1
+	ginkgo -r -randomizeSuites -randomizeAllSpecs -race -p 2>&1
 
 test: format ginkgo
 
