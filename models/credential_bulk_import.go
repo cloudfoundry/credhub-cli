@@ -5,8 +5,8 @@ import (
 
 	"strconv"
 
-	"gopkg.in/yaml.v2"
 	"github.com/cloudfoundry-incubator/credhub-cli/errors"
+	"gopkg.in/yaml.v2"
 )
 
 type CredentialBulkImport struct {
