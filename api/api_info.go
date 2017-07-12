@@ -14,6 +14,7 @@ func ApiInfo(serverUrl string, caCert []string, skipTlsValidation bool) error {
 
 	cfg.CaCert = caCert
 
+	// FIXME should be happening on consumer
 	if !strings.Contains(serverUrl, "://") {
 		serverUrl = "https://" + serverUrl
 	}
@@ -34,6 +35,7 @@ func ApiInfo(serverUrl string, caCert []string, skipTlsValidation bool) error {
 
 	cfg.AuthURL = credhubInfo.AuthServer.Url
 
+	// FIXME instead of writing config, should return credhubinfo
 	config.WriteConfig(cfg)
 
 	return nil

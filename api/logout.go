@@ -16,6 +16,7 @@ func Logout() error {
 		}
 	}
 
+	// FIXME should be handled by consumer
 	cfg.MarkTokensAsRevoked()
 	config.WriteConfig(cfg)
 

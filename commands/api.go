@@ -47,7 +47,9 @@ func (cmd ApiCommand) Execute([]string) error {
 
 	var err error
 	err = api.ApiInfo(serverUrl, cmd.CaCert, cmd.SkipTlsValidation)
+	// FIXME should update config if call was successful
 
+	// FIXME should be happening before we even call the API
 	if !strings.Contains(serverUrl, "://") {
 		serverUrl = "https://" + serverUrl
 	}
@@ -67,11 +69,14 @@ func (cmd ApiCommand) Execute([]string) error {
 		return err
 	}
 
+	// FIXME shouldn't be necessary if we update config after the API call
 	newCfg := config.ReadConfig()
 	fmt.Println("Setting the target url:", newCfg.ApiURL)
 
+	// FIXME will look different after we update config
 	if cfg.AuthURL != newCfg.AuthURL {
 		api.Logout()
+		// FIXME revoke tokens on success
 	}
 
 	return nil

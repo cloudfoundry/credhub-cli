@@ -56,10 +56,12 @@ func Login(username string, password string, clientName string, clientSecret str
 	}
 
 	if err != nil {
+		// FIXME should be handled by consumer
 		Logout()
 		return token, err
 	}
 
+	// FIXME should be handled by consumer
 	cfg.AccessToken = token.AccessToken
 	cfg.RefreshToken = token.RefreshToken
 	config.WriteConfig(cfg)

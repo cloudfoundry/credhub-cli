@@ -26,6 +26,7 @@ func (cmd LoginCommand) Execute([]string) error {
 		promptForMissingCredentials(&cmd)
 	}
 	_, err := api.Login(cmd.Username, cmd.Password, cmd.ClientName, cmd.ClientSecret, cmd.ServerUrl, cmd.CaCert, cmd.SkipTlsValidation)
+	// FIXME we should handle updating the session tokens here (and logout on error)
 
 	parsedUrl, _ := url.Parse(cmd.ServerUrl)
 	if parsedUrl.Scheme != "https" {
@@ -52,6 +53,7 @@ func (cmd LoginCommand) Execute([]string) error {
 	return nil
 }
 
+// FIXME not needed
 func validateParameters(cmd *LoginCommand) error {
 	if cmd.ClientName != "" || cmd.ClientSecret != "" {
 		if cmd.Username != "" || cmd.Password != "" {
