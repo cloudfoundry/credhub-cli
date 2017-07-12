@@ -2,12 +2,11 @@ package commands
 
 import (
 	"fmt"
+	"net/url"
 
-	"github.com/cloudfoundry-incubator/credhub-cli/actions"
-	"github.com/cloudfoundry-incubator/credhub-cli/client"
+	"github.com/cloudfoundry-incubator/credhub-cli/api"
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	"github.com/cloudfoundry-incubator/credhub-cli/errors"
-	"github.com/cloudfoundry-incubator/credhub-cli/models"
 	"github.com/howeyc/gopass"
 )
 
@@ -22,52 +21,28 @@ type LoginCommand struct {
 }
 
 func (cmd LoginCommand) Execute([]string) error {
-	var (
-		token models.Token
-		err   error
-	)
-	cfg := config.ReadConfig()
 
-	if cfg.ApiURL == "" && cmd.ServerUrl == "" {
-		return errors.NewNoApiUrlSetError()
+	if cmd.ClientName == "" && cmd.ClientSecret == "" {
+		promptForMissingCredentials(&cmd)
 	}
+	_, err := api.Login(cmd.Username, cmd.Password, cmd.ClientName, cmd.ClientSecret, cmd.ServerUrl, cmd.CaCert, cmd.SkipTlsValidation)
 
-	if len(cmd.CaCert) > 0 {
-		cfg.CaCert = cmd.CaCert
-	}
-
-	if cmd.ServerUrl != "" {
-		err = GetApiInfo(&cfg, cmd.ServerUrl, cmd.SkipTlsValidation)
-		if err != nil {
-			return err
+	parsedUrl, _ := url.Parse(cmd.ServerUrl)
+	if parsedUrl.Scheme != "https" {
+		warning("Warning: Insecure HTTP API detected. Data sent to this API could be intercepted" +
+			" in transit by third parties. Secure HTTPS API endpoints are recommended.")
+	} else {
+		if cmd.SkipTlsValidation {
+			warning("Warning: The targeted TLS certificate has not been verified for this connection.")
+			deprecation("Warning: The --skip-tls-validation flag is deprecated. Please use --ca-cert instead.")
 		}
 	}
 
-	err = validateParameters(&cmd)
-
 	if err != nil {
 		return err
 	}
 
-	if cmd.ClientName != "" || cmd.ClientSecret != "" {
-		token, err = actions.NewAuthToken(client.NewHttpClient(cfg), cfg).GetAuthTokenByClientCredential(cmd.ClientName, cmd.ClientSecret)
-	} else {
-		promptForMissingCredentials(&cmd)
-
-		token, err = actions.NewAuthToken(client.NewHttpClient(cfg), cfg).GetAuthTokenByPasswordGrant(cmd.Username, cmd.Password)
-	}
-
-	if err != nil {
-		RevokeTokenIfNecessary(cfg)
-		MarkTokensAsRevokedInConfig(&cfg)
-		config.WriteConfig(cfg)
-		return err
-	}
-
-	cfg.AccessToken = token.AccessToken
-	cfg.RefreshToken = token.RefreshToken
-	config.WriteConfig(cfg)
-
+	cfg := config.ReadConfig()
 	if cmd.ServerUrl != "" {
 		fmt.Println("Setting the target url:", cfg.ApiURL)
 	}

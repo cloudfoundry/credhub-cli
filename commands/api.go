@@ -2,11 +2,11 @@ package commands
 
 import (
 	"fmt"
+	"strings"
 
 	"net/url"
 
-	"github.com/cloudfoundry-incubator/credhub-cli/actions"
-	"github.com/cloudfoundry-incubator/credhub-cli/client"
+	"github.com/cloudfoundry-incubator/credhub-cli/api"
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	"github.com/cloudfoundry-incubator/credhub-cli/errors"
 	"github.com/fatih/color"
@@ -28,68 +28,51 @@ type ApiPositionalArgs struct {
 
 func (cmd ApiCommand) Execute([]string) error {
 	cfg := config.ReadConfig()
-	serverUrl := targetUrl(cmd)
 
-	cfg.CaCert = cmd.CaCert
+	var serverUrl string
+	if cmd.Server.ServerUrl != "" {
+		serverUrl = cmd.Server.ServerUrl
+	} else {
+		serverUrl = cmd.ServerFlagUrl
+	}
 
 	if serverUrl == "" {
 		if cfg.ApiURL != "" {
 			fmt.Println(cfg.ApiURL)
+			return nil
 		} else {
 			return errors.NewNoTargetUrlError()
 		}
-	} else {
-		existingCfg := cfg
-		err := GetApiInfo(&cfg, serverUrl, cmd.SkipTlsValidation)
-		if err != nil {
-			return err
-		}
-
-		fmt.Println("Setting the target url:", cfg.ApiURL)
-
-		if existingCfg.AuthURL != cfg.AuthURL {
-			RevokeTokenIfNecessary(existingCfg)
-			MarkTokensAsRevokedInConfig(&cfg)
-		}
-		config.WriteConfig(cfg)
 	}
 
-	return nil
-}
+	var err error
+	err = api.ApiInfo(serverUrl, cmd.CaCert, cmd.SkipTlsValidation)
 
-func GetApiInfo(cfg *config.Config, serverUrl string, skipTlsValidation bool) error {
-	serverUrl = AddDefaultSchemeIfNecessary(serverUrl)
-	parsedUrl, err := url.Parse(serverUrl)
-	if err != nil {
-		return err
+	if !strings.Contains(serverUrl, "://") {
+		serverUrl = "https://" + serverUrl
 	}
-
-	cfg.ApiURL = parsedUrl.String()
-
-	cfg.InsecureSkipVerify = skipTlsValidation
-	credhubInfo, err := actions.NewInfo(client.NewHttpClient(*cfg), *cfg).GetServerInfo()
-	if err != nil {
-		return err
-	}
-	cfg.AuthURL = credhubInfo.AuthServer.Url
+	parsedUrl, _ := url.Parse(serverUrl)
 
 	if parsedUrl.Scheme != "https" {
 		warning("Warning: Insecure HTTP API detected. Data sent to this API could be intercepted" +
 			" in transit by third parties. Secure HTTPS API endpoints are recommended.")
 	} else {
-		if skipTlsValidation {
+		if cmd.SkipTlsValidation {
 			warning("Warning: The targeted TLS certificate has not been verified for this connection.")
 			deprecation("Warning: The --skip-tls-validation flag is deprecated. Please use --ca-cert instead.")
 		}
 	}
 
-	return nil
-}
-
-func targetUrl(cmd ApiCommand) string {
-	if cmd.Server.ServerUrl != "" {
-		return cmd.Server.ServerUrl
-	} else {
-		return cmd.ServerFlagUrl
+	if err != nil {
+		return err
 	}
+
+	newCfg := config.ReadConfig()
+	fmt.Println("Setting the target url:", newCfg.ApiURL)
+
+	if cfg.AuthURL != newCfg.AuthURL {
+		api.Logout()
+	}
+
+	return nil
 }

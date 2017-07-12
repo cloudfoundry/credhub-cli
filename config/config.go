@@ -58,3 +58,8 @@ func WriteConfig(c Config) error {
 func RemoveConfig() error {
 	return os.Remove(ConfigPath())
 }
+
+func (c *Config) MarkTokensAsRevoked() {
+	c.AccessToken = "revoked"
+	c.RefreshToken = "revoked"
+}
