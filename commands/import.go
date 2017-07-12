@@ -42,7 +42,7 @@ func setCredentials(bulkImport models.CredentialBulkImport) {
 
 	cfg := config.ReadConfig()
 	repository = repositories.NewCredentialRepository(client.NewHttpClient(cfg))
-	action := actions.NewAction(repository, cfg)
+	action := actions.NewAction(repository, &cfg)
 
 	for _, credential := range bulkImport.Credentials {
 		request = client.NewSetRequest(cfg, credential)

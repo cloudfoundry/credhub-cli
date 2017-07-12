@@ -35,7 +35,7 @@ var _ = Describe("Action", func() {
 			AuthURL:     "auth.example.com",
 			AccessToken: "test-access-token",
 		}
-		subject = NewAction(&repository, cfg)
+		subject = NewAction(&repository, &cfg)
 
 		// language=JSON
 		expectedJSON = `{"name": "my-item", "type": "value", "value": "potatoes"}`
@@ -67,7 +67,7 @@ var _ = Describe("Action", func() {
 
 		Describe("Errors", func() {
 			It("returns a invalid target error when no api is set", func() {
-				subject = NewAction(&repository, config.Config{})
+				subject = NewAction(&repository, &config.Config{})
 				req, _ := http.NewRequest("POST", "my-url", bytes.NewBufferString("{}"))
 				_, error := subject.DoAction(req, "my-item")
 

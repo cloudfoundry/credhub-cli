@@ -5,6 +5,8 @@ import (
 
 	"reflect"
 
+	"os"
+
 	"github.com/cloudfoundry-incubator/credhub-cli/client"
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	"github.com/cloudfoundry-incubator/credhub-cli/errors"
@@ -18,9 +20,19 @@ type Action struct {
 	AuthRepository repositories.Repository
 }
 
-func NewAction(repository repositories.Repository, config config.Config) Action {
-	action := Action{repository: repository, config: config}
-	action.AuthRepository = repositories.NewAuthRepository(client.NewHttpClient(config), true)
+func NewAction(repository repositories.Repository, cfg *config.Config) Action {
+	err := config.ValidateConfig(*cfg)
+	var token models.Token
+
+	if reflect.DeepEqual(err, errors.NewRevokedTokenError()) && (os.Getenv("CREDHUB_CLIENT") != "" || os.Getenv("CREDHUB_SECRET") != "") {
+		token, err = NewAuthToken(client.NewHttpClient(*cfg), *cfg).GetAuthTokenByClientCredential(os.Getenv("CREDHUB_CLIENT"), os.Getenv("CREDHUB_SECRET"))
+		cfg.AccessToken = token.AccessToken
+		cfg.RefreshToken = token.RefreshToken
+		config.WriteConfig(*cfg)
+	}
+
+	action := Action{repository: repository, config: *cfg}
+	action.AuthRepository = repositories.NewAuthRepository(client.NewHttpClient(*cfg), true)
 	return action
 }
 
@@ -39,7 +51,6 @@ func (action Action) DoAction(req *http.Request, identifier string) (models.Prin
 		req.Body = bodyClone
 		item, err = action.refreshTokenAndResendRequest(req, identifier)
 	}
-
 	return item, err
 }
 

@@ -23,7 +23,7 @@ func (cmd GetCommand) Execute([]string) error {
 
 	cfg := config.ReadConfig()
 	repository := repositories.NewCredentialRepository(client.NewHttpClient(cfg))
-	action := actions.NewAction(repository, cfg)
+	action := actions.NewAction(repository, &cfg)
 
 	if cmd.Name != "" {
 		credential, err = action.DoAction(client.NewGetCredentialByNameRequest(cfg, cmd.Name), cmd.Name)

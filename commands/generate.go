@@ -75,7 +75,7 @@ func (cmd GenerateCommand) Execute([]string) error {
 		}
 	}
 
-	action := actions.NewAction(repository, cfg)
+	action := actions.NewAction(repository, &cfg)
 	request := client.NewGenerateCredentialRequest(cfg, cmd.CredentialIdentifier, parameters, value, cmd.CredentialType, !cmd.NoOverwrite)
 	credential, err := action.DoAction(request, cmd.CredentialIdentifier)
 

@@ -28,7 +28,7 @@ func (cmd FindCommand) Execute([]string) error {
 		repository = repositories.NewCredentialQueryRepository(client.NewHttpClient(cfg))
 	}
 
-	action := actions.NewAction(repository, cfg)
+	action := actions.NewAction(repository, &cfg)
 
 	if cmd.AllPaths {
 		credentials, err = action.DoAction(client.NewFindAllCredentialPathsRequest(cfg), "")
