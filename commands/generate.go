@@ -1,12 +1,9 @@
 package commands
 
 import (
-	"github.com/cloudfoundry-incubator/credhub-cli/actions"
-	"github.com/cloudfoundry-incubator/credhub-cli/client"
-	"github.com/cloudfoundry-incubator/credhub-cli/config"
+	"github.com/cloudfoundry-incubator/credhub-cli/api"
 	"github.com/cloudfoundry-incubator/credhub-cli/errors"
 	"github.com/cloudfoundry-incubator/credhub-cli/models"
-	"github.com/cloudfoundry-incubator/credhub-cli/repositories"
 )
 
 type GenerateCommand struct {
@@ -42,42 +39,33 @@ func (cmd GenerateCommand) Execute([]string) error {
 		return errors.NewGenerateEmptyTypeError()
 	}
 
-	cfg := config.ReadConfig()
-	repository := repositories.NewCredentialRepository(client.NewHttpClient(cfg))
-
-	parameters := models.GenerationParameters{
-		IncludeSpecial:   cmd.IncludeSpecial,
-		ExcludeNumber:    cmd.ExcludeNumber,
-		ExcludeUpper:     cmd.ExcludeUpper,
-		ExcludeLower:     cmd.ExcludeLower,
-		Length:           cmd.Length,
-		CommonName:       cmd.CommonName,
-		Organization:     cmd.Organization,
-		OrganizationUnit: cmd.OrganizationUnit,
-		Locality:         cmd.Locality,
-		State:            cmd.State,
-		Country:          cmd.Country,
-		AlternativeName:  cmd.AlternativeName,
-		ExtendedKeyUsage: cmd.ExtendedKeyUsage,
-		KeyUsage:         cmd.KeyUsage,
-		KeyLength:        cmd.KeyLength,
-		Duration:         cmd.Duration,
-		Ca:               cmd.Ca,
-		SelfSign:         cmd.SelfSign,
-		IsCA:             cmd.IsCA,
-		SshComment:       cmd.SshComment,
-	}
-
-	var value *models.ProvidedValue
-	if len(cmd.Username) > 0 {
-		value = &models.ProvidedValue{
-			Username: cmd.Username,
-		}
-	}
-
-	action := actions.NewAction(repository, &cfg)
-	request := client.NewGenerateCredentialRequest(cfg, cmd.CredentialIdentifier, parameters, value, cmd.CredentialType, !cmd.NoOverwrite)
-	credential, err := action.DoAction(request, cmd.CredentialIdentifier)
+	credential, err := api.Generate(
+		cmd.CredentialIdentifier,
+		cmd.CredentialType,
+		cmd.NoOverwrite,
+		cmd.OutputJson,
+		cmd.Username,
+		cmd.Length,
+		cmd.IncludeSpecial,
+		cmd.ExcludeNumber,
+		cmd.ExcludeUpper,
+		cmd.ExcludeLower,
+		cmd.SshComment,
+		cmd.KeyLength,
+		cmd.Duration,
+		cmd.CommonName,
+		cmd.Organization,
+		cmd.OrganizationUnit,
+		cmd.Locality,
+		cmd.State,
+		cmd.Country,
+		cmd.AlternativeName,
+		cmd.KeyUsage,
+		cmd.ExtendedKeyUsage,
+		cmd.Ca,
+		cmd.IsCA,
+		cmd.SelfSign,
+	)
 
 	if err != nil {
 		return err
