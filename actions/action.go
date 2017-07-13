@@ -74,7 +74,14 @@ func (action *Action) refreshToken() error {
 	refreshed_token, err := action.AuthRepository.SendRequest(refresh_request, "")
 
 	if err != nil {
-		return errors.NewRefreshError()
+		if os.Getenv("CREDHUB_CLIENT") != "" || os.Getenv("CREDHUB_SECRET") != "" {
+			refreshed_token, err = NewAuthToken(client.NewHttpClient(action.config), action.config).GetAuthTokenByClientCredential(os.Getenv("CREDHUB_CLIENT"), os.Getenv("CREDHUB_SECRET"))
+			if err != nil {
+				return errors.NewRefreshError()
+			}
+		} else {
+			return errors.NewRefreshError()
+		}
 	}
 
 	action.config.AccessToken = refreshed_token.(models.Token).AccessToken
