@@ -29,6 +29,8 @@ type ApiPositionalArgs struct {
 func (cmd ApiCommand) Execute([]string) error {
 	cfg := config.ReadConfig()
 
+	oldAuthURL := cfg.AuthURL
+
 	var serverUrl string
 	if cmd.Server.ServerUrl != "" {
 		serverUrl = cmd.Server.ServerUrl
@@ -45,15 +47,19 @@ func (cmd ApiCommand) Execute([]string) error {
 		}
 	}
 
-	var err error
-	err = api.ApiInfo(serverUrl, cmd.CaCert, cmd.SkipTlsValidation)
-	// FIXME should update config if call was successful
-
-	// FIXME should be happening before we even call the API
 	if !strings.Contains(serverUrl, "://") {
 		serverUrl = "https://" + serverUrl
 	}
-	parsedUrl, _ := url.Parse(serverUrl)
+
+	parsedUrl, err := url.Parse(serverUrl)
+	if err != nil {
+		return err
+	}
+
+	credhubInfo, err := api.ApiInfo(serverUrl, cmd.CaCert, cmd.SkipTlsValidation)
+	if err != nil {
+		return err
+	}
 
 	if parsedUrl.Scheme != "https" {
 		warning("Warning: Insecure HTTP API detected. Data sent to this API could be intercepted" +
@@ -65,19 +71,19 @@ func (cmd ApiCommand) Execute([]string) error {
 		}
 	}
 
-	if err != nil {
-		return err
-	}
-
-	// FIXME shouldn't be necessary if we update config after the API call
-	newCfg := config.ReadConfig()
-	fmt.Println("Setting the target url:", newCfg.ApiURL)
-
-	// FIXME will look different after we update config
-	if cfg.AuthURL != newCfg.AuthURL {
+	if credhubInfo.AuthServer.Url != oldAuthURL {
 		api.Logout()
-		// FIXME revoke tokens on success
+		cfg.MarkTokensAsRevoked()
+		config.WriteConfig(cfg)
 	}
+
+	cfg.CaCert = cmd.CaCert
+	cfg.ApiURL = parsedUrl.String()
+	cfg.InsecureSkipVerify = cmd.SkipTlsValidation
+	cfg.AuthURL = credhubInfo.AuthServer.Url
+	config.WriteConfig(cfg)
+
+	fmt.Println("Setting the target url:", cfg.ApiURL)
 
 	return nil
 }

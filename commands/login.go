@@ -3,6 +3,7 @@ package commands
 import (
 	"fmt"
 	"net/url"
+	"strings"
 
 	"github.com/cloudfoundry-incubator/credhub-cli/api"
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
@@ -21,53 +22,67 @@ type LoginCommand struct {
 }
 
 func (cmd LoginCommand) Execute([]string) error {
+	cfg := config.ReadConfig()
+
+	if cfg.ApiURL == "" && cmd.ServerUrl == "" {
+		return errors.NewNoApiUrlSetError()
+	}
+
+	if len(cmd.CaCert) > 0 {
+		cfg.CaCert = cmd.CaCert
+	}
+
+	serverUrl := cmd.ServerUrl
+
+	if serverUrl != "" {
+		if !strings.Contains(serverUrl, "://") {
+			serverUrl = "https://" + serverUrl
+		}
+
+		credhubInfo, err := api.ApiInfo(serverUrl, cfg.CaCert, cmd.SkipTlsValidation)
+		if err != nil {
+			return err
+		}
+
+		parsedUrl, _ := url.Parse(cmd.ServerUrl)
+		if parsedUrl.Scheme != "https" {
+			warning("Warning: Insecure HTTP API detected. Data sent to this API could be intercepted" +
+				" in transit by third parties. Secure HTTPS API endpoints are recommended.")
+		} else {
+			if cmd.SkipTlsValidation {
+				warning("Warning: The targeted TLS certificate has not been verified for this connection.")
+				deprecation("Warning: The --skip-tls-validation flag is deprecated. Please use --ca-cert instead.")
+			}
+		}
+		cfg.ApiURL = parsedUrl.String()
+		cfg.InsecureSkipVerify = cmd.SkipTlsValidation
+		cfg.AuthURL = credhubInfo.AuthServer.Url
+		config.WriteConfig(cfg)
+	}
 
 	if cmd.ClientName == "" && cmd.ClientSecret == "" {
 		promptForMissingCredentials(&cmd)
-	}
-	_, err := api.Login(cmd.Username, cmd.Password, cmd.ClientName, cmd.ClientSecret, cmd.ServerUrl, cmd.CaCert, cmd.SkipTlsValidation)
-	// FIXME we should handle updating the session tokens here (and logout on error)
 
-	parsedUrl, _ := url.Parse(cmd.ServerUrl)
-	if parsedUrl.Scheme != "https" {
-		warning("Warning: Insecure HTTP API detected. Data sent to this API could be intercepted" +
-			" in transit by third parties. Secure HTTPS API endpoints are recommended.")
-	} else {
-		if cmd.SkipTlsValidation {
-			warning("Warning: The targeted TLS certificate has not been verified for this connection.")
-			deprecation("Warning: The --skip-tls-validation flag is deprecated. Please use --ca-cert instead.")
-		}
 	}
+
+	token, err := api.Login(cmd.Username, cmd.Password, cmd.ClientName, cmd.ClientSecret)
 
 	if err != nil {
+		api.Logout()
+		cfg.MarkTokensAsRevoked()
+		config.WriteConfig(cfg)
 		return err
+	} else {
+		cfg.AccessToken = token.AccessToken
+		cfg.RefreshToken = token.RefreshToken
+		config.WriteConfig(cfg)
 	}
 
-	cfg := config.ReadConfig()
-	if cmd.ServerUrl != "" {
+	if serverUrl != "" {
 		fmt.Println("Setting the target url:", cfg.ApiURL)
 	}
 
 	fmt.Println("Login Successful")
-
-	return nil
-}
-
-// FIXME not needed
-func validateParameters(cmd *LoginCommand) error {
-	if cmd.ClientName != "" || cmd.ClientSecret != "" {
-		if cmd.Username != "" || cmd.Password != "" {
-			return errors.NewMixedAuthorizationParametersError()
-		}
-
-		if cmd.ClientName == "" || cmd.ClientSecret == "" {
-			return errors.NewClientAuthorizationParametersError()
-		}
-	}
-
-	if cmd.Username == "" && cmd.Password != "" {
-		return errors.NewPasswordAuthorizationParametersError()
-	}
 
 	return nil
 }

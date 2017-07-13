@@ -2,41 +2,32 @@ package api
 
 import (
 	"net/url"
-	"strings"
 
 	"github.com/cloudfoundry-incubator/credhub-cli/actions"
 	"github.com/cloudfoundry-incubator/credhub-cli/client"
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
+	"github.com/cloudfoundry-incubator/credhub-cli/models"
 )
 
-func ApiInfo(serverUrl string, caCert []string, skipTlsValidation bool) error {
+func ApiInfo(serverUrl string, caCert []string, skipTlsValidation bool) (models.Info, error) {
+	var credhubInfo models.Info
 	cfg := config.ReadConfig()
 
 	cfg.CaCert = caCert
 
-	// FIXME should be happening on consumer
-	if !strings.Contains(serverUrl, "://") {
-		serverUrl = "https://" + serverUrl
-	}
-
 	parsedUrl, err := url.Parse(serverUrl)
 	if err != nil {
-		return err
+		return credhubInfo, err
 	}
 
 	cfg.ApiURL = parsedUrl.String()
 
 	cfg.InsecureSkipVerify = skipTlsValidation
 
-	credhubInfo, err := actions.NewInfo(client.NewHttpClient(cfg), cfg).GetServerInfo()
+	credhubInfo, err = actions.NewInfo(client.NewHttpClient(cfg), cfg).GetServerInfo()
 	if err != nil {
-		return err
+		return credhubInfo, err
 	}
 
-	cfg.AuthURL = credhubInfo.AuthServer.Url
-
-	// FIXME instead of writing config, should return credhubinfo
-	config.WriteConfig(cfg)
-
-	return nil
+	return credhubInfo, nil
 }
