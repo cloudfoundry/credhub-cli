@@ -3,6 +3,7 @@ package commands_test
 import (
 	"net/http"
 
+	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -110,6 +111,32 @@ value:
 			Eventually(session.Err).Should(Say(importFail))
 			importFail1 := "Credential '/test/invalid_type1' at index 1 could not be set: The request does not include a valid type. Valid values include 'value', 'json', 'password', 'user', 'certificate', 'ssh' and 'rsa'."
 			Eventually(session.Err).Should(Say(importFail1))
+		})
+	})
+
+	Describe("when no api set", func() {
+		It("prints one error message", func() {
+			config.RemoveConfig()
+
+			session := runCommand("import", "-f", "../test/test_import_file.yml")
+
+			Expect(string(session.Out.Contents())).Should(Equal("An API target is not set. Please target the location of your server with `credhub api --server api.example.com` to continue.\n"))
+		})
+	})
+
+	Describe("when not authenticated", func() {
+		It("prints one error message", func() {
+			authServer.AppendHandlers(
+				CombineHandlers(
+					RespondWith(http.StatusOK, ""),
+				),
+			)
+
+			runCommand("logout")
+
+			session := runCommand("import", "-f", "../test/test_import_file.yml")
+
+			Expect(string(session.Out.Contents())).Should(Equal("You are not currently authenticated. Please log in to continue.\n"))
 		})
 	})
 })

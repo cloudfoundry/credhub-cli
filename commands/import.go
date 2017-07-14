@@ -7,9 +7,12 @@ import (
 
 	"os"
 
+	"reflect"
+
 	"github.com/cloudfoundry-incubator/credhub-cli/actions"
 	"github.com/cloudfoundry-incubator/credhub-cli/client"
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
+	"github.com/cloudfoundry-incubator/credhub-cli/errors"
 	"github.com/cloudfoundry-incubator/credhub-cli/models"
 	"github.com/cloudfoundry-incubator/credhub-cli/repositories"
 )
@@ -57,10 +60,19 @@ func setCredentials(bulkImport models.CredentialBulkImport) {
 		result, err := action.DoAction(request, name)
 
 		if err != nil {
+			if isAuthenticationError(err) {
+				fmt.Println(err)
+				break
+			}
 			fmt.Fprintf(os.Stderr, "Credential '%s' at index %d could not be set: %v\n", name, i, err)
 			continue
 		}
 
 		models.Println(result, false)
 	}
+}
+func isAuthenticationError(err error) bool {
+	return reflect.DeepEqual(err, errors.NewNoApiUrlSetError()) ||
+		reflect.DeepEqual(err, errors.NewRevokedTokenError()) ||
+		reflect.DeepEqual(err, errors.NewRefreshError())
 }
