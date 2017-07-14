@@ -15,6 +15,8 @@ import (
 	"os/exec"
 	"runtime"
 	"testing"
+
+	test_util "github.com/cloudfoundry-incubator/credhub-cli/test"
 )
 
 const TIMESTAMP = `2016-01-01T12:00:00Z`
@@ -124,6 +126,7 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	return []byte(executable_path)
 }, func(data []byte) {
 	commandPath = string(data)
+	test_util.CleanEnv()
 })
 
 var _ = SynchronizedAfterSuite(func() {}, func() {
