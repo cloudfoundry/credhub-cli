@@ -229,3 +229,77 @@ func ItRequiresAuthentication(args ...string) {
 		Expect(session.Err).To(Say("You are not currently authenticated. Please log in to continue."))
 	})
 }
+
+func ItAutomaticallyLogsIn(method string, args ...string) {
+	Describe("automatic authentication", func() {
+		BeforeEach(func() {
+			server.AppendHandlers(
+				CombineHandlers(
+					VerifyRequest(method, "/api/v1/data"),
+					RespondWith(http.StatusOK, `{"type":"json","id":"some_uuid","name":"my-json","version_created_at":"idc","value":{"key": 1}, "credentials": [{"name": "key", "version_created_at": "something"}]}`),
+				))
+		})
+
+		AfterEach(func() {
+			server.Reset()
+		})
+
+		Context("with correct environment and unauthenticated", func() {
+			It("automatically authenticates", func() {
+
+				authServer.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest("DELETE", "/oauth/token/revoke/test-refresh-token"),
+						RespondWith(http.StatusOK, nil),
+					),
+				)
+
+				authServer.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest("POST", "/oauth/token/"),
+						VerifyBody([]byte(`client_id=test_client&client_secret=test_secret&grant_type=client_credentials&response_type=token`)),
+						RespondWith(http.StatusOK, `{
+								"access_token":"2YotnFZFEjr1zCsicMWpAA",
+								"refresh_token":"erousflkajqwer",
+								"token_type":"bearer",
+								"expires_in":3600}`),
+					),
+				)
+
+				runCommand("logout")
+
+				session := runCommandWithEnv([]string{"CREDHUB_CLIENT=test_client", "CREDHUB_SECRET=test_secret"}, args...)
+
+				Eventually(session).Should(Exit(0))
+			})
+		})
+
+		Context("with correct environment and expired token", func() {
+			It("automatically authenticates", func() {
+				authServer.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest("POST", "/oauth/token/"),
+						VerifyBody([]byte(`client_id=test_client&client_secret=test_secret&grant_type=client_credentials&response_type=token`)),
+						RespondWith(http.StatusOK, `{
+								"access_token":"2YotnFZFEjr1zCsicMWpAA",
+								"refresh_token":"erousflkajqwer",
+								"token_type":"bearer",
+								"expires_in":3600}`),
+					),
+				)
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(method, "/api/v1/data"),
+						RespondWith(http.StatusUnauthorized, `{
+						"error":"access_token_expired",
+						"error_description":"error description"}`),
+					),
+				)
+
+				session := runCommandWithEnv([]string{"CREDHUB_CLIENT=test_client", "CREDHUB_SECRET=test_secret"}, args...)
+				Eventually(session).Should(Exit(0))
+			})
+		})
+	})
+}

@@ -13,13 +13,14 @@ import (
 
 	"encoding/json"
 
+	"io/ioutil"
+	"os"
+	"runtime"
+
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	credhub_errors "github.com/cloudfoundry-incubator/credhub-cli/errors"
 	"github.com/cloudfoundry-incubator/credhub-cli/models"
 	"github.com/cloudfoundry-incubator/credhub-cli/repositories/repositoriesfakes"
-	"io/ioutil"
-	"runtime"
-	"os"
 )
 
 var _ = Describe("Action", func() {
