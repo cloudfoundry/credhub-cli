@@ -44,7 +44,7 @@ func setCredentials(bulkImport models.CredentialBulkImport) {
 	repository = repositories.NewCredentialRepository(client.NewHttpClient(cfg))
 	action := actions.NewAction(repository, &cfg)
 
-	for _, credential := range bulkImport.Credentials {
+	for i, credential := range bulkImport.Credentials {
 		request = client.NewSetRequest(cfg, credential)
 
 		switch credentialName := credential["name"].(type) {
@@ -57,7 +57,7 @@ func setCredentials(bulkImport models.CredentialBulkImport) {
 		result, err := action.DoAction(request, name)
 
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "%v\n", err)
+			fmt.Fprintf(os.Stderr, "Credential '%s' at index %d could not be set: %v\n", name, i, err)
 			continue
 		}
 

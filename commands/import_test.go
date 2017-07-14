@@ -1,10 +1,13 @@
 package commands_test
 
 import (
+	"net/http"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
+	. "github.com/onsi/gomega/ghttp"
 )
 
 var _ = Describe("Import", func() {
@@ -82,6 +85,31 @@ value:
 			session := runCommand("import", "-f", "../test/test_import_incorrect_yaml.yml")
 
 			Eventually(session.Err).Should(Say(errorMessage))
+		})
+	})
+
+	Describe("when credential can not be imported", func() {
+		It("should display error message", func() {
+			error := "The request does not include a valid type. Valid values include 'value', 'json', 'password', 'user', 'certificate', 'ssh' and 'rsa'."
+
+			request := `{"type":"invalid_type","name":"/test/invalid_type","value":"some string","overwrite":true}`
+			request1 := `{"type":"invalid_type","name":"/test/invalid_type1","value":"some string","overwrite":true}`
+			server.AppendHandlers(
+				CombineHandlers(
+					VerifyRequest("PUT", "/api/v1/data"),
+					VerifyJSON(request),
+					RespondWith(http.StatusBadRequest, `{"error": "`+error+`"}`)),
+				CombineHandlers(
+					VerifyRequest("PUT", "/api/v1/data"),
+					VerifyJSON(request1),
+					RespondWith(http.StatusBadRequest, `{"error": "`+error+`"}`)),
+			)
+
+			session := runCommand("import", "-f", "../test/test_import_fail_set.yml")
+			importFail := "Credential '/test/invalid_type' at index 0 could not be set: The request does not include a valid type. Valid values include 'value', 'json', 'password', 'user', 'certificate', 'ssh' and 'rsa'."
+			Eventually(session.Err).Should(Say(importFail))
+			importFail1 := "Credential '/test/invalid_type1' at index 1 could not be set: The request does not include a valid type. Valid values include 'value', 'json', 'password', 'user', 'certificate', 'ssh' and 'rsa'."
+			Eventually(session.Err).Should(Say(importFail1))
 		})
 	})
 })
