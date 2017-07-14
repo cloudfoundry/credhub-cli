@@ -3,17 +3,11 @@ package commands
 import (
 	"fmt"
 
-	"net/http"
-
-	"github.com/cloudfoundry-incubator/credhub-cli/actions"
-	"github.com/cloudfoundry-incubator/credhub-cli/client"
-	"github.com/cloudfoundry-incubator/credhub-cli/config"
-	"github.com/cloudfoundry-incubator/credhub-cli/repositories"
-
 	"bufio"
 	"os"
 	"strings"
 
+	"github.com/cloudfoundry-incubator/credhub-cli/api"
 	"github.com/cloudfoundry-incubator/credhub-cli/errors"
 	"github.com/cloudfoundry-incubator/credhub-cli/models"
 )
@@ -51,71 +45,94 @@ func (cmd SetCommand) Execute([]string) error {
 		promptForInput("password: ", &cmd.Password)
 	}
 
-	cfg := config.ReadConfig()
-	repository := repositories.NewCredentialRepository(client.NewHttpClient(cfg))
+	//cfg := config.ReadConfig()
+	//repository := repositories.NewCredentialRepository(client.NewHttpClient(cfg))
 
-	action := actions.NewAction(repository, &cfg)
-	request, err := MakeRequest(cmd, cfg)
+	//action := actions.NewAction(repository, &cfg)
+	//request, err := MakeRequest(cmd, cfg)
+	//if err != nil {
+	//return err
+	//}
+
+	//credential, err := action.DoAction(request, cmd.CredentialIdentifier)
+	//if err != nil {
+	//return err
+	//}
+
+	credential, err := api.Set(
+		cmd.CredentialIdentifier,
+		cmd.Type,
+		cmd.NoOverwrite,
+		cmd.Value,
+		cmd.CaName,
+		cmd.Root,
+		cmd.Certificate,
+		cmd.Private,
+		cmd.Public,
+		cmd.RootString,
+		cmd.CertificateString,
+		cmd.PrivateString,
+		cmd.PublicString,
+		cmd.Username,
+		cmd.Password,
+	)
+
 	if err != nil {
 		return err
 	}
 
-	credential, err := action.DoAction(request, cmd.CredentialIdentifier)
-	if err != nil {
-		return err
-	}
 	models.Println(credential, cmd.OutputJson)
 
 	return nil
 }
 
-func MakeRequest(cmd SetCommand, config config.Config) (*http.Request, error) {
-	var request *http.Request
-	if cmd.Type == "ssh" || cmd.Type == "rsa" {
-		var err error
+//func MakeRequest(cmd SetCommand, config config.Config) (*http.Request, error) {
+//var request *http.Request
+//if cmd.Type == "ssh" || cmd.Type == "rsa" {
+//var err error
 
-		err = setStringFieldFromFile(&cmd.Public, &cmd.PublicString)
-		if err != nil {
-			return nil, err
-		}
+//err = setStringFieldFromFile(&cmd.Public, &cmd.PublicString)
+//if err != nil {
+//return nil, err
+//}
 
-		err = setStringFieldFromFile(&cmd.Private, &cmd.PrivateString)
-		if err != nil {
-			return nil, err
-		}
+//err = setStringFieldFromFile(&cmd.Private, &cmd.PrivateString)
+//if err != nil {
+//return nil, err
+//}
 
-		request = client.NewSetRsaSshRequest(config, cmd.CredentialIdentifier, cmd.Type, cmd.PublicString, cmd.PrivateString, !cmd.NoOverwrite)
-	} else if cmd.Type == "certificate" {
-		var err error
+//request = client.NewSetRsaSshRequest(config, cmd.CredentialIdentifier, cmd.Type, cmd.PublicString, cmd.PrivateString, !cmd.NoOverwrite)
+//} else if cmd.Type == "certificate" {
+//var err error
 
-		err = setStringFieldFromFile(&cmd.Root, &cmd.RootString)
-		if err != nil {
-			return nil, err
-		}
+//err = setStringFieldFromFile(&cmd.Root, &cmd.RootString)
+//if err != nil {
+//return nil, err
+//}
 
-		err = setStringFieldFromFile(&cmd.Certificate, &cmd.CertificateString)
-		if err != nil {
-			return nil, err
-		}
+//err = setStringFieldFromFile(&cmd.Certificate, &cmd.CertificateString)
+//if err != nil {
+//return nil, err
+//}
 
-		err = setStringFieldFromFile(&cmd.Private, &cmd.PrivateString)
-		if err != nil {
-			return nil, err
-		}
+//err = setStringFieldFromFile(&cmd.Private, &cmd.PrivateString)
+//if err != nil {
+//return nil, err
+//}
 
-		request = client.NewSetCertificateRequest(config, cmd.CredentialIdentifier, cmd.RootString, cmd.CaName, cmd.CertificateString, cmd.PrivateString, !cmd.NoOverwrite)
-	} else if cmd.Type == "user" {
-		request = client.NewSetUserRequest(config, cmd.CredentialIdentifier, cmd.Username, cmd.Password, !cmd.NoOverwrite)
-	} else if cmd.Type == "password" {
-		request = client.NewSetCredentialRequest(config, cmd.Type, cmd.CredentialIdentifier, cmd.Password, !cmd.NoOverwrite)
-	} else if cmd.Type == "json" {
-		request = client.NewSetJsonCredentialRequest(config, cmd.Type, cmd.CredentialIdentifier, cmd.Value, !cmd.NoOverwrite)
-	} else {
-		request = client.NewSetCredentialRequest(config, cmd.Type, cmd.CredentialIdentifier, cmd.Value, !cmd.NoOverwrite)
-	}
+//request = client.NewSetCertificateRequest(config, cmd.CredentialIdentifier, cmd.RootString, cmd.CaName, cmd.CertificateString, cmd.PrivateString, !cmd.NoOverwrite)
+//} else if cmd.Type == "user" {
+//request = client.NewSetUserRequest(config, cmd.CredentialIdentifier, cmd.Username, cmd.Password, !cmd.NoOverwrite)
+//} else if cmd.Type == "password" {
+//request = client.NewSetCredentialRequest(config, cmd.Type, cmd.CredentialIdentifier, cmd.Password, !cmd.NoOverwrite)
+//} else if cmd.Type == "json" {
+//request = client.NewSetJsonCredentialRequest(config, cmd.Type, cmd.CredentialIdentifier, cmd.Value, !cmd.NoOverwrite)
+//} else {
+//request = client.NewSetCredentialRequest(config, cmd.Type, cmd.CredentialIdentifier, cmd.Value, !cmd.NoOverwrite)
+//}
 
-	return request, nil
-}
+//return request, nil
+//}
 
 func promptForInput(prompt string, value *string) {
 	fmt.Printf(prompt)
@@ -124,16 +141,16 @@ func promptForInput(prompt string, value *string) {
 	*value = string(strings.TrimSpace(val))
 }
 
-func setStringFieldFromFile(fileField, stringField *string) error {
-	var err error
-	if *fileField != "" {
-		if *stringField != "" {
-			return errors.NewCombinationOfParametersError()
-		}
-		*stringField, err = ReadFile(*fileField)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
+//func setStringFieldFromFile(fileField, stringField *string) error {
+//var err error
+//if *fileField != "" {
+//if *stringField != "" {
+//return errors.NewCombinationOfParametersError()
+//}
+//*stringField, err = ReadFile(*fileField)
+//if err != nil {
+//return err
+//}
+//}
+//return nil
+//}
