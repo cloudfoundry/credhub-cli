@@ -20,6 +20,7 @@ var _ = Describe("Get", func() {
 	})
 
 	ItRequiresAuthentication("get", "-n", "test-credential")
+	ItAutomaticallyLogsIn("GET", "get", "-n", "test-credential")
 
 	ItBehavesLikeHelp("get", "g", func(session *Session) {
 		Expect(session.Err).To(Say("Usage"))

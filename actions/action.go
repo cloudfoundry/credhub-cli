@@ -26,9 +26,11 @@ func NewAction(repository repositories.Repository, cfg *config.Config) Action {
 
 	if reflect.DeepEqual(err, errors.NewRevokedTokenError()) && (os.Getenv("CREDHUB_CLIENT") != "" || os.Getenv("CREDHUB_SECRET") != "") {
 		token, err = NewAuthToken(client.NewHttpClient(*cfg), *cfg).GetAuthTokenByClientCredential(os.Getenv("CREDHUB_CLIENT"), os.Getenv("CREDHUB_SECRET"))
-		cfg.AccessToken = token.AccessToken
-		cfg.RefreshToken = token.RefreshToken
-		config.WriteConfig(*cfg)
+		if err == nil {
+			cfg.AccessToken = token.AccessToken
+			cfg.RefreshToken = token.RefreshToken
+			config.WriteConfig(*cfg)
+		}
 	}
 
 	action := Action{repository: repository, config: *cfg}
@@ -70,22 +72,29 @@ func (action Action) refreshTokenAndResendRequest(req *http.Request, identifier 
 }
 
 func (action *Action) refreshToken() error {
-	refresh_request := client.NewRefreshTokenRequest(action.config)
-	refreshed_token, err := action.AuthRepository.SendRequest(refresh_request, "")
+	var (
+		token models.Token
+		err   error
+	)
+	if os.Getenv("CREDHUB_CLIENT") != "" || os.Getenv("CREDHUB_SECRET") != "" {
+		token, err = NewAuthToken(client.NewHttpClient(action.config), action.config).GetAuthTokenByClientCredential(os.Getenv("CREDHUB_CLIENT"), os.Getenv("CREDHUB_SECRET"))
+		if err != nil {
+			return err
+		}
 
-	if err != nil {
-		if os.Getenv("CREDHUB_CLIENT") != "" || os.Getenv("CREDHUB_SECRET") != "" {
-			refreshed_token, err = NewAuthToken(client.NewHttpClient(action.config), action.config).GetAuthTokenByClientCredential(os.Getenv("CREDHUB_CLIENT"), os.Getenv("CREDHUB_SECRET"))
-			if err != nil {
-				return errors.NewRefreshError()
-			}
-		} else {
+		action.config.AccessToken = token.AccessToken
+		action.config.RefreshToken = token.RefreshToken
+	} else {
+		refresh_request := client.NewRefreshTokenRequest(action.config)
+		refreshed_token, err := action.AuthRepository.SendRequest(refresh_request, "")
+
+		if err != nil {
 			return errors.NewRefreshError()
 		}
-	}
 
-	action.config.AccessToken = refreshed_token.(models.Token).AccessToken
-	action.config.RefreshToken = refreshed_token.(models.Token).RefreshToken
+		action.config.AccessToken = refreshed_token.(models.Token).AccessToken
+		action.config.RefreshToken = refreshed_token.(models.Token).RefreshToken
+	}
 
 	config.WriteConfig(action.config)
 

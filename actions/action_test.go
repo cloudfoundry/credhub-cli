@@ -13,6 +13,10 @@ import (
 
 	"encoding/json"
 
+	"io/ioutil"
+	"os"
+	"runtime"
+
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	credhub_errors "github.com/cloudfoundry-incubator/credhub-cli/errors"
 	"github.com/cloudfoundry-incubator/credhub-cli/models"
@@ -30,6 +34,15 @@ var _ = Describe("Action", func() {
 	)
 
 	BeforeEach(func() {
+		homeDir, err := ioutil.TempDir("", "cm-test")
+		Expect(err).NotTo(HaveOccurred())
+
+		if runtime.GOOS == "windows" {
+			os.Setenv("USERPROFILE", homeDir)
+		} else {
+			os.Setenv("HOME", homeDir)
+		}
+
 		cfg = config.Config{
 			ApiURL:      "api.example.com",
 			AuthURL:     "auth.example.com",

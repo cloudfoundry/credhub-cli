@@ -19,6 +19,7 @@ var _ = Describe("Find", func() {
 	})
 
 	ItRequiresAuthentication("get", "-n", "test-credential")
+	ItAutomaticallyLogsIn("GET", "find")
 
 	Describe("Help", func() {
 		ItBehavesLikeHelp("find", "f", func(session *Session) {

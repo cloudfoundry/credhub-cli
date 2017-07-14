@@ -21,6 +21,7 @@ var _ = Describe("Regenerate", func() {
 	})
 
 	ItRequiresAuthentication("get", "-n", "test-credential")
+	ItAutomaticallyLogsIn("POST", "regenerate", "-n", "test-credential")
 
 	Describe("Regenerating password", func() {
 		It("prints the regenerated password secret in yaml format", func() {
