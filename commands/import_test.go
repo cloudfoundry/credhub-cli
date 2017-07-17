@@ -65,6 +65,10 @@ value:
     - array_object_subvalue: covfefe
   "true": key is a bool
 `))
+			Eventually(session.Out).Should(Say(`Import complete.
+Successfully set: 7
+Failed to set: 0
+`))
 		})
 	})
 
@@ -75,7 +79,7 @@ value:
 
 			session := runCommand("import", "-f", "../test/test_import_missing_name.yml")
 
-			Eventually(session.Err).Should(Say(`test error`))
+			Eventually(session.Out).Should(Say(`test error`))
 		})
 	})
 
@@ -89,7 +93,7 @@ value:
 		})
 	})
 
-	Describe("when credential can not be imported", func() {
+	Describe("when some credentials fail to set it prints errors in summary", func() {
 		It("should display error message", func() {
 			error := "The request does not include a valid type. Valid values include 'value', 'json', 'password', 'user', 'certificate', 'ssh' and 'rsa'."
 
@@ -105,12 +109,24 @@ value:
 					VerifyJSON(request1),
 					RespondWith(http.StatusBadRequest, `{"error": "`+error+`"}`)),
 			)
+			SetupPutUserServer("/test/user", `{"username": "covfefe", "password": "test-user-password"}`, "covfefe", "test-user-password", "P455W0rd-H45H", true)
 
-			session := runCommand("import", "-f", "../test/test_import_fail_set.yml")
-			importFail := "Credential '/test/invalid_type' at index 0 could not be set: The request does not include a valid type. Valid values include 'value', 'json', 'password', 'user', 'certificate', 'ssh' and 'rsa'."
-			Eventually(session.Err).Should(Say(importFail))
-			importFail1 := "Credential '/test/invalid_type1' at index 1 could not be set: The request does not include a valid type. Valid values include 'value', 'json', 'password', 'user', 'certificate', 'ssh' and 'rsa'."
-			Eventually(session.Err).Should(Say(importFail1))
+			session := runCommand("import", "-f", "../test/test_import_partial_fail_set.yml")
+			successfulSetMessage := `id: 5a2edd4f-1686-4c8d-80eb-5daa866f9f86
+name: /test/user
+type: user
+value:
+  password: test-user-password
+  password_hash: P455W0rd-H45H
+  username: covfefe`
+			summaryMessage := `Import complete.
+Successfully set: 1
+Failed to set: 2
+ - Credential '/test/invalid_type' at index 0 could not be set: The request does not include a valid type. Valid values include 'value', 'json', 'password', 'user', 'certificate', 'ssh' and 'rsa'.
+ - Credential '/test/invalid_type1' at index 1 could not be set: The request does not include a valid type. Valid values include 'value', 'json', 'password', 'user', 'certificate', 'ssh' and 'rsa'.
+`
+			Eventually(session.Out).Should(Say(successfulSetMessage))
+			Eventually(session.Out).Should(Say(summaryMessage))
 		})
 	})
 
