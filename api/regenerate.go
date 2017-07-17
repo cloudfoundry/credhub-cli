@@ -8,11 +8,11 @@ import (
 	"github.com/cloudfoundry-incubator/credhub-cli/repositories"
 )
 
-func Regenerate(credentialIdentifier string) (models.Printable, error) {
+func Regenerate(credentialIdentifier string) (models.CredentialResponse, error) {
 	cfg := config.ReadConfig()
 	repository := repositories.NewCredentialRepository(client.NewHttpClient(cfg))
 	action := actions.NewAction(repository, &cfg)
 
 	credential, err := action.DoAction(client.NewRegenerateCredentialRequest(cfg, credentialIdentifier), credentialIdentifier)
-	return credential, err
+	return credential.(models.CredentialResponse), err
 }

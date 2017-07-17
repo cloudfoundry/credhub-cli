@@ -28,7 +28,7 @@ func Set(
 	publicString string,
 	username string,
 	password string,
-) (models.Printable, error) {
+) (models.CredentialResponse, error) {
 
 	cfg := config.ReadConfig()
 	repository := repositories.NewCredentialRepository(client.NewHttpClient(cfg))
@@ -40,12 +40,12 @@ func Set(
 
 		err = setStringFieldFromFile(&public, &publicString)
 		if err != nil {
-			return nil, err
+			return models.CredentialResponse{}, err
 		}
 
 		err = setStringFieldFromFile(&private, &privateString)
 		if err != nil {
-			return nil, err
+			return models.CredentialResponse{}, err
 		}
 
 		request = client.NewSetRsaSshRequest(cfg, credentialIdentifier, credentialType, publicString, privateString, !noOverwrite)
@@ -54,17 +54,17 @@ func Set(
 
 		err = setStringFieldFromFile(&root, &rootString)
 		if err != nil {
-			return nil, err
+			return models.CredentialResponse{}, err
 		}
 
 		err = setStringFieldFromFile(&certificate, &certificateString)
 		if err != nil {
-			return nil, err
+			return models.CredentialResponse{}, err
 		}
 
 		err = setStringFieldFromFile(&private, &privateString)
 		if err != nil {
-			return nil, err
+			return models.CredentialResponse{}, err
 		}
 
 		request = client.NewSetCertificateRequest(cfg, credentialIdentifier, rootString, caName, certificateString, privateString, !noOverwrite)
@@ -80,7 +80,7 @@ func Set(
 
 	credential, err := action.DoAction(request, credentialIdentifier)
 
-	return credential, err
+	return credential.(models.CredentialResponse), err
 }
 
 func setStringFieldFromFile(fileField, stringField *string) error {

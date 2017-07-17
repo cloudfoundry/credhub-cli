@@ -8,7 +8,7 @@ import (
 	"github.com/cloudfoundry-incubator/credhub-cli/repositories"
 )
 
-func Find(partialCredentialIdentifier string, pathIdentifier string, allPaths bool) (models.Printable, error) {
+func Find(partialCredentialIdentifier string, pathIdentifier string, allPaths bool) (models.CredentialResponse, error) {
 	var credentials models.Printable
 	var err error
 	var repository repositories.Repository
@@ -31,5 +31,5 @@ func Find(partialCredentialIdentifier string, pathIdentifier string, allPaths bo
 		credentials, err = action.DoAction(client.NewFindCredentialsByPathRequest(cfg, pathIdentifier), partialCredentialIdentifier)
 	}
 
-	return credentials, err
+	return credentials.(models.CredentialResponse), err
 }

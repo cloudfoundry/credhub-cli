@@ -34,7 +34,7 @@ func Generate(
 	ca string,
 	isCA bool,
 	selfSign bool,
-) (models.Printable, error) {
+) (models.CredentialResponse, error) {
 
 	cfg := config.ReadConfig()
 	repository := repositories.NewCredentialRepository(client.NewHttpClient(cfg))
@@ -73,5 +73,5 @@ func Generate(
 	request := client.NewGenerateCredentialRequest(cfg, credentialIdentifier, parameters, value, credentialType, !noOverwrite)
 	credential, err := action.DoAction(request, credentialIdentifier)
 
-	return credential, err
+	return credential.(models.CredentialResponse), err
 }

@@ -56,7 +56,7 @@ func (cmd ApiCommand) Execute([]string) error {
 		return err
 	}
 
-	credhubInfo, err := api.ApiInfo(serverUrl, cmd.CaCert, cmd.SkipTlsValidation)
+	credhubInfo, err := api.Api(serverUrl, cmd.CaCert, cmd.SkipTlsValidation)
 	if err != nil {
 		return err
 	}

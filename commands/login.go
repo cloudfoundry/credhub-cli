@@ -39,7 +39,7 @@ func (cmd LoginCommand) Execute([]string) error {
 			serverUrl = "https://" + serverUrl
 		}
 
-		credhubInfo, err := api.ApiInfo(serverUrl, cfg.CaCert, cmd.SkipTlsValidation)
+		credhubInfo, err := api.Api(serverUrl, cfg.CaCert, cmd.SkipTlsValidation)
 		if err != nil {
 			return err
 		}

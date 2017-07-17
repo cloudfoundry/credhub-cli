@@ -9,7 +9,7 @@ import (
 	"github.com/cloudfoundry-incubator/credhub-cli/repositories"
 )
 
-func Get(name string, id string) (models.Printable, error) {
+func Get(name string, id string) (models.CredentialResponse, error) {
 	var (
 		credential models.Printable
 		err        error
@@ -24,12 +24,12 @@ func Get(name string, id string) (models.Printable, error) {
 	} else if id != "" {
 		credential, err = action.DoAction(client.NewGetCredentialByIdRequest(cfg, id), id)
 	} else {
-		return credential, errors.NewMissingGetParametersError()
+		return models.CredentialResponse{}, errors.NewMissingGetParametersError()
 	}
 
 	if err != nil {
-		return credential, err
+		return models.CredentialResponse{}, err
 	}
 
-	return credential, err
+	return credential.(models.CredentialResponse), err
 }

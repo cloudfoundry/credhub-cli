@@ -9,7 +9,7 @@ import (
 	"github.com/cloudfoundry-incubator/credhub-cli/models"
 )
 
-func ApiInfo(serverUrl string, caCert []string, skipTlsValidation bool) (models.Info, error) {
+func Api(serverUrl string, caCert []string, skipTlsValidation bool) (models.Info, error) {
 	var credhubInfo models.Info
 	cfg := config.ReadConfig()
 
