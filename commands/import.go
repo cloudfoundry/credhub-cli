@@ -70,8 +70,8 @@ func setCredentials(bulkImport models.CredentialBulkImport) {
 				return
 			}
 			failure := fmt.Sprintf("Credential '%s' at index %d could not be set: %v", name, i, err)
-			fmt.Println(failure)
-			errors = append(errors, " - " + failure)
+			fmt.Println(failure + "\n")
+			errors = append(errors, " - "+failure)
 			failed++
 			continue
 		} else {

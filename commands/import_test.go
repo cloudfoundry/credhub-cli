@@ -113,7 +113,9 @@ Failed to set: 0
 
 			session := runCommand("import", "-f", "../test/test_import_partial_fail_set.yml")
 			successfulSetMessage := `Credential '/test/invalid_type' at index 0 could not be set: The request does not include a valid type. Valid values include 'value', 'json', 'password', 'user', 'certificate', 'ssh' and 'rsa'.
+
 Credential '/test/invalid_type1' at index 1 could not be set: The request does not include a valid type. Valid values include 'value', 'json', 'password', 'user', 'certificate', 'ssh' and 'rsa'.
+
 id: 5a2edd4f-1686-4c8d-80eb-5daa866f9f86
 name: /test/user
 type: user
