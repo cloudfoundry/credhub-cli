@@ -1,10 +1,14 @@
 package commands_test
 
 import (
+	"net/http"
+
+	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
+	. "github.com/onsi/gomega/ghttp"
 )
 
 var _ = Describe("Import", func() {
@@ -82,6 +86,66 @@ value:
 			session := runCommand("import", "-f", "../test/test_import_incorrect_yaml.yml")
 
 			Eventually(session.Err).Should(Say(errorMessage))
+		})
+	})
+
+	Describe("when credential can not be imported", func() {
+		It("should display error message", func() {
+			error := "The request does not include a valid type. Valid values include 'value', 'json', 'password', 'user', 'certificate', 'ssh' and 'rsa'."
+
+			request := `{"type":"invalid_type","name":"/test/invalid_type","value":"some string","overwrite":true}`
+			request1 := `{"type":"invalid_type","name":"/test/invalid_type1","value":"some string","overwrite":true}`
+			server.AppendHandlers(
+				CombineHandlers(
+					VerifyRequest("PUT", "/api/v1/data"),
+					VerifyJSON(request),
+					RespondWith(http.StatusBadRequest, `{"error": "`+error+`"}`)),
+				CombineHandlers(
+					VerifyRequest("PUT", "/api/v1/data"),
+					VerifyJSON(request1),
+					RespondWith(http.StatusBadRequest, `{"error": "`+error+`"}`)),
+			)
+
+			session := runCommand("import", "-f", "../test/test_import_fail_set.yml")
+			importFail := "Credential '/test/invalid_type' at index 0 could not be set: The request does not include a valid type. Valid values include 'value', 'json', 'password', 'user', 'certificate', 'ssh' and 'rsa'."
+			Eventually(session.Err).Should(Say(importFail))
+			importFail1 := "Credential '/test/invalid_type1' at index 1 could not be set: The request does not include a valid type. Valid values include 'value', 'json', 'password', 'user', 'certificate', 'ssh' and 'rsa'."
+			Eventually(session.Err).Should(Say(importFail1))
+		})
+	})
+
+	Describe("when no api set", func() {
+		It("prints one error message", func() {
+			config.RemoveConfig()
+
+			session := runCommand("import", "-f", "../test/test_import_file.yml")
+
+			Expect(string(session.Out.Contents())).Should(Equal("An API target is not set. Please target the location of your server with `credhub api --server api.example.com` to continue.\n"))
+		})
+	})
+
+	Describe("when not authenticated", func() {
+		It("prints one error message", func() {
+			authServer.AppendHandlers(
+				CombineHandlers(
+					RespondWith(http.StatusOK, ""),
+				),
+			)
+
+			runCommand("logout")
+
+			session := runCommand("import", "-f", "../test/test_import_file.yml")
+
+			Expect(string(session.Out.Contents())).Should(Equal("You are not currently authenticated. Please log in to continue.\n"))
+		})
+	})
+
+	Describe("when no credential tag present in import file", func() {
+		It("prints correct error message", func() {
+			session := runCommand("import", "-f", "../test/test_import_incorrect_format.yml")
+
+			noCredentialTagError := "The referenced import file does not contain a 'credentials' key. The import file must contain a list of credentials under the key 'credentials'. Please update and retry your request."
+			Eventually(session.Err).Should(Say(noCredentialTagError))
 		})
 	})
 })
