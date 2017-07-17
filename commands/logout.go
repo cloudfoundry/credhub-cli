@@ -14,9 +14,14 @@ func (cmd LogoutCommand) Execute([]string) error {
 	api.Logout()
 
 	cfg := config.ReadConfig()
-	cfg.MarkTokensAsRevoked()
+	MarkTokensAsRevokedInConfig(&cfg)
 	config.WriteConfig(cfg)
 
 	fmt.Println("Logout Successful")
 	return nil
+}
+
+func MarkTokensAsRevokedInConfig(cfg *config.Config) {
+	cfg.AccessToken = "revoked"
+	cfg.RefreshToken = "revoked"
 }

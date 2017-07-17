@@ -56,7 +56,7 @@ func (cmd ApiCommand) Execute([]string) error {
 		return err
 	}
 
-	credhubInfo, err := api.Api(serverUrl, cmd.CaCert, cmd.SkipTlsValidation)
+	credhubInfo, err := api.Target(serverUrl, cmd.CaCert, cmd.SkipTlsValidation)
 	if err != nil {
 		return err
 	}
@@ -73,7 +73,7 @@ func (cmd ApiCommand) Execute([]string) error {
 
 	if credhubInfo.AuthServer.Url != oldAuthURL {
 		api.Logout()
-		cfg.MarkTokensAsRevoked()
+		MarkTokensAsRevokedInConfig(&cfg)
 		config.WriteConfig(cfg)
 	}
 

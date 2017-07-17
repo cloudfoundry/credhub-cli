@@ -39,7 +39,7 @@ func (cmd LoginCommand) Execute([]string) error {
 			serverUrl = "https://" + serverUrl
 		}
 
-		credhubInfo, err := api.Api(serverUrl, cfg.CaCert, cmd.SkipTlsValidation)
+		credhubInfo, err := api.Target(serverUrl, cfg.CaCert, cmd.SkipTlsValidation)
 		if err != nil {
 			return err
 		}
@@ -69,7 +69,7 @@ func (cmd LoginCommand) Execute([]string) error {
 
 	if err != nil {
 		api.Logout()
-		cfg.MarkTokensAsRevoked()
+		MarkTokensAsRevokedInConfig(&cfg)
 		config.WriteConfig(cfg)
 		return err
 	} else {
