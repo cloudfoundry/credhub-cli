@@ -22,14 +22,14 @@ func (credentialBulkImport *CredentialBulkImport) ReadFile(filepath string) erro
 		return err
 	}
 
+	return credentialBulkImport.ReadBytes(data)
+}
+
+func (credentialBulkImport *CredentialBulkImport) ReadBytes(data []byte) error {
 	if missingCredentialTag(data) {
 		return errors.NewNoCredentialsTag()
 	}
 
-	return credentialBulkImport.readBytes(data)
-}
-
-func (credentialBulkImport *CredentialBulkImport) readBytes(data []byte) error {
 	err := yaml.Unmarshal(data, credentialBulkImport)
 
 	for i, credential := range credentialBulkImport.Credentials {
@@ -100,6 +100,6 @@ func unpackArray(array []interface{}) []interface{} {
 
 func missingCredentialTag(data []byte) bool {
 	lines := strings.Split(string(data), "\n")
-	match, _ := regexp.MatchString("^credentials:$", lines[0])
+	match, _ := regexp.MatchString("^credentials:\\s*$", lines[0])
 	return !match
 }

@@ -1,6 +1,7 @@
 package models_test
 
 import (
+	"github.com/cloudfoundry-incubator/credhub-cli/errors"
 	"github.com/cloudfoundry-incubator/credhub-cli/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -93,6 +94,56 @@ var _ = Describe("CredentialBulkImport", func() {
 			expectedJson["overwrite"] = true
 
 			Expect(credentialBulkImport.Credentials[6]).To(Equal(expectedJson))
+		})
+
+	})
+	Describe("improper formatting", func() {
+		Context("when first line is credentials tag", func() {
+			credentials := `credentials:
+- name: /test/password
+  type: password
+  value: test-password-value`
+			It("does not return an error", func() {
+				var credentialBulkImport models.CredentialBulkImport
+				error := credentialBulkImport.ReadBytes([]byte(credentials))
+				Expect(error).To(BeNil())
+			})
+		})
+
+		Context("when first line is credentials tag with trailing white space", func() {
+			credentials := "credentials:   \n" +
+				`- name: /test/password
+  type: password
+  value: test-password-value`
+			It("does not return an error", func() {
+				var credentialBulkImport models.CredentialBulkImport
+				error := credentialBulkImport.ReadBytes([]byte(credentials))
+				Expect(error).To(BeNil())
+			})
+		})
+
+		Context("when first line is not credentials tag", func() {
+			credentials := `not-credentials:
+- name: /test/password
+  type: password
+  value: test-password-value`
+			It("does not return an error", func() {
+				var credentialBulkImport models.CredentialBulkImport
+				error := credentialBulkImport.ReadBytes([]byte(credentials))
+				Expect(error).To(Equal(errors.NewNoCredentialsTag()))
+			})
+		})
+
+		Context("when yaml is incorrect", func() {
+			credentials := `credentials:
+1
+2
+			`
+			It("does not return an error", func() {
+				var credentialBulkImport models.CredentialBulkImport
+				error := credentialBulkImport.ReadBytes([]byte(credentials))
+				Expect(error).To(Equal(errors.NewInvalidImportYamlError()))
+			})
 		})
 	})
 })
