@@ -5,6 +5,9 @@ import (
 
 	"strconv"
 
+	"regexp"
+	"strings"
+
 	"github.com/cloudfoundry-incubator/credhub-cli/errors"
 	"gopkg.in/yaml.v2"
 )
@@ -18,6 +21,13 @@ func (credentialBulkImport *CredentialBulkImport) ReadFile(filepath string) erro
 	if err != nil {
 		return err
 	}
+
+	lines := strings.Split(string(data), "\n")
+	match, _ := regexp.MatchString("^credentials:$", lines[0])
+	if !match {
+		return errors.NewNoCredentialsTag()
+	}
+
 	return credentialBulkImport.readBytes(data)
 }
 

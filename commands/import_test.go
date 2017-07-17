@@ -139,6 +139,15 @@ value:
 			Expect(string(session.Out.Contents())).Should(Equal("You are not currently authenticated. Please log in to continue.\n"))
 		})
 	})
+
+	Describe("when no credential tag present in import file", func() {
+		It("prints correct error message", func() {
+			session := runCommand("import", "-f", "../test/test_import_incorrect_format.yml")
+
+			noCredentialTagError := "The referenced import file does not contain a 'credentials' key. The import file must contain a list of credentials under the key 'credentials'. Please update and retry your request."
+			Eventually(session.Err).Should(Say(noCredentialTagError))
+		})
+	})
 })
 
 func setUpImportRequests() {
