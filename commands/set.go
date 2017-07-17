@@ -1,14 +1,11 @@
 package commands
 
 import (
+	"encoding/json"
 	"fmt"
 
-	"net/http"
-
-	"github.com/cloudfoundry-incubator/credhub-cli/actions"
-	"github.com/cloudfoundry-incubator/credhub-cli/client"
+	"github.com/cloudfoundry-incubator/credhub-cli/api"
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
-	"github.com/cloudfoundry-incubator/credhub-cli/repositories"
 
 	"bufio"
 	"os"
@@ -52,25 +49,26 @@ func (cmd SetCommand) Execute([]string) error {
 	}
 
 	cfg := config.ReadConfig()
-	repository := repositories.NewCredentialRepository(client.NewHttpClient(cfg))
 
-	action := actions.NewAction(repository, &cfg)
-	request, err := MakeRequest(cmd, cfg)
+	value, err := GetCredentialValue(cmd, cfg)
+
 	if err != nil {
 		return err
 	}
 
-	credential, err := action.DoAction(request, cmd.CredentialIdentifier)
+	credential, err := api.Set(cmd.Type, cmd.CredentialIdentifier, value, !cmd.NoOverwrite)
+
 	if err != nil {
 		return err
 	}
+
 	models.Println(credential, cmd.OutputJson)
 
 	return nil
 }
 
-func MakeRequest(cmd SetCommand, config config.Config) (*http.Request, error) {
-	var request *http.Request
+func GetCredentialValue(cmd SetCommand, config config.Config) (interface{}, error) {
+	var value interface{}
 	if cmd.Type == "ssh" || cmd.Type == "rsa" {
 		var err error
 
@@ -84,7 +82,10 @@ func MakeRequest(cmd SetCommand, config config.Config) (*http.Request, error) {
 			return nil, err
 		}
 
-		request = client.NewSetRsaSshRequest(config, cmd.CredentialIdentifier, cmd.Type, cmd.PublicString, cmd.PrivateString, !cmd.NoOverwrite)
+		value = models.RsaSsh{
+			PublicKey:  cmd.PublicString,
+			PrivateKey: cmd.PrivateString,
+		}
 	} else if cmd.Type == "certificate" {
 		var err error
 
@@ -103,18 +104,33 @@ func MakeRequest(cmd SetCommand, config config.Config) (*http.Request, error) {
 			return nil, err
 		}
 
-		request = client.NewSetCertificateRequest(config, cmd.CredentialIdentifier, cmd.RootString, cmd.CaName, cmd.CertificateString, cmd.PrivateString, !cmd.NoOverwrite)
+		value = models.Certificate{
+			Ca:          cmd.RootString,
+			Certificate: cmd.CertificateString,
+			PrivateKey:  cmd.PrivateString,
+			CaName:      cmd.CaName,
+		}
 	} else if cmd.Type == "user" {
-		request = client.NewSetUserRequest(config, cmd.CredentialIdentifier, cmd.Username, cmd.Password, !cmd.NoOverwrite)
+		value = models.User{
+			Username: cmd.Username,
+			Password: cmd.Password,
+		}
 	} else if cmd.Type == "password" {
-		request = client.NewSetCredentialRequest(config, cmd.Type, cmd.CredentialIdentifier, cmd.Password, !cmd.NoOverwrite)
+		value = cmd.Password
 	} else if cmd.Type == "json" {
-		request = client.NewSetJsonCredentialRequest(config, cmd.Type, cmd.CredentialIdentifier, cmd.Value, !cmd.NoOverwrite)
+		valueObject := make(map[string]interface{})
+		err := json.Unmarshal([]byte(cmd.Value), &valueObject)
+
+		if err != nil {
+			value = cmd.Value
+		} else {
+			value = valueObject
+		}
 	} else {
-		request = client.NewSetCredentialRequest(config, cmd.Type, cmd.CredentialIdentifier, cmd.Value, !cmd.NoOverwrite)
+		value = cmd.Value
 	}
 
-	return request, nil
+	return value, nil
 }
 
 func promptForInput(prompt string, value *string) {
