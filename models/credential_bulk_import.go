@@ -22,9 +22,7 @@ func (credentialBulkImport *CredentialBulkImport) ReadFile(filepath string) erro
 		return err
 	}
 
-	lines := strings.Split(string(data), "\n")
-	match, _ := regexp.MatchString("^credentials:$", lines[0])
-	if !match {
+	if missingCredentialTag(data) {
 		return errors.NewNoCredentialsTag()
 	}
 
@@ -98,4 +96,10 @@ func unpackArray(array []interface{}) []interface{} {
 		array[i] = unpackAnyType(value)
 	}
 	return array
+}
+
+func missingCredentialTag(data []byte) bool {
+	lines := strings.Split(string(data), "\n")
+	match, _ := regexp.MatchString("^credentials:$", lines[0])
+	return !match
 }
