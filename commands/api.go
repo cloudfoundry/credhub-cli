@@ -52,16 +52,12 @@ func (cmd ApiCommand) Execute([]string) error {
 		serverUrl = "https://" + serverUrl
 	}
 
-	parsedUrl, err := url.Parse(serverUrl)
-	if err != nil {
-		return err
-	}
-
 	credhubInfo, err := a.Target(serverUrl, cmd.CaCert, cmd.SkipTlsValidation)
 	if err != nil {
 		return err
 	}
 
+	parsedUrl, _ := url.Parse(serverUrl)
 	if parsedUrl.Scheme != "https" {
 		warning("Warning: Insecure HTTP API detected. Data sent to this API could be intercepted" +
 			" in transit by third parties. Secure HTTPS API endpoints are recommended.")

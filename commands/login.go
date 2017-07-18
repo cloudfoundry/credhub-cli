@@ -29,10 +29,6 @@ func (cmd LoginCommand) Execute([]string) error {
 		return errors.NewNoApiUrlSetError()
 	}
 
-	if len(cmd.CaCert) > 0 {
-		cfg.CaCert = cmd.CaCert
-	}
-
 	serverUrl := cmd.ServerUrl
 
 	if serverUrl != "" {
@@ -40,7 +36,7 @@ func (cmd LoginCommand) Execute([]string) error {
 			serverUrl = "https://" + serverUrl
 		}
 
-		credhubInfo, err := a.Target(serverUrl, cfg.CaCert, cmd.SkipTlsValidation)
+		credhubInfo, err := a.Target(serverUrl, cmd.CaCert, cmd.SkipTlsValidation)
 		if err != nil {
 			return err
 		}
@@ -55,6 +51,10 @@ func (cmd LoginCommand) Execute([]string) error {
 				deprecation("Warning: The --skip-tls-validation flag is deprecated. Please use --ca-cert instead.")
 			}
 		}
+
+		if len(cmd.CaCert) > 0 {
+			cfg.CaCert = cmd.CaCert
+		}
 		cfg.ApiURL = parsedUrl.String()
 		cfg.InsecureSkipVerify = cmd.SkipTlsValidation
 		cfg.AuthURL = credhubInfo.AuthServer.Url
@@ -63,7 +63,6 @@ func (cmd LoginCommand) Execute([]string) error {
 
 	if cmd.ClientName == "" && cmd.ClientSecret == "" {
 		promptForMissingCredentials(&cmd)
-
 	}
 
 	token, err := a.Login(cmd.Username, cmd.Password, cmd.ClientName, cmd.ClientSecret)
