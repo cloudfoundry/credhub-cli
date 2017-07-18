@@ -2,15 +2,13 @@ package api
 
 import (
 	"github.com/cloudfoundry-incubator/credhub-cli/client"
-	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	"github.com/cloudfoundry-incubator/credhub-cli/repositories"
 )
 
-func Logout() error {
-	cfg := config.ReadConfig()
-	if cfg.RefreshToken != "" && cfg.RefreshToken != "revoked" {
-		authRepository := repositories.NewAuthRepository(client.NewHttpClient(cfg), false)
-		request, err := client.NewTokenRevocationRequest(cfg)
+func (a *Api) Logout() error {
+	if a.Config.RefreshToken != "" && a.Config.RefreshToken != "revoked" {
+		authRepository := repositories.NewAuthRepository(client.NewHttpClient(*a.Config), false)
+		request, err := client.NewTokenRevocationRequest(*a.Config)
 		if err == nil {
 			authRepository.SendRequest(request, "logout")
 		}

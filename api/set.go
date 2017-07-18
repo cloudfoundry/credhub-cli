@@ -3,19 +3,16 @@ package api
 import (
 	"github.com/cloudfoundry-incubator/credhub-cli/actions"
 	"github.com/cloudfoundry-incubator/credhub-cli/client"
-	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	"github.com/cloudfoundry-incubator/credhub-cli/models"
 	"github.com/cloudfoundry-incubator/credhub-cli/repositories"
 )
 
-func Set(credentialType string, name string, value interface{}, overwrite bool) (models.CredentialResponse, error) {
-	cfg := config.ReadConfig()
+func (a *Api) Set(credentialType string, name string, value interface{}, overwrite bool) (models.CredentialResponse, error) {
+	repository := repositories.NewCredentialRepository(client.NewHttpClient(*a.Config))
 
-	repository := repositories.NewCredentialRepository(client.NewHttpClient(cfg))
+	action := actions.NewAction(repository, a.Config)
 
-	action := actions.NewAction(repository, &cfg)
-
-	request := client.NewSetCredentialRequest(cfg, credentialType, name, value, overwrite)
+	request := client.NewSetCredentialRequest(*a.Config, credentialType, name, value, overwrite)
 
 	result, err := action.DoAction(request, name)
 

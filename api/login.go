@@ -3,17 +3,15 @@ package api
 import (
 	"github.com/cloudfoundry-incubator/credhub-cli/actions"
 	"github.com/cloudfoundry-incubator/credhub-cli/client"
-	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	"github.com/cloudfoundry-incubator/credhub-cli/errors"
 	"github.com/cloudfoundry-incubator/credhub-cli/models"
 )
 
-func Login(username string, password string, clientName string, clientSecret string) (models.Token, error) {
+func (a *Api) Login(username string, password string, clientName string, clientSecret string) (models.Token, error) {
 	var (
 		token models.Token
 		err   error
 	)
-	cfg := config.ReadConfig()
 
 	if clientName != "" || clientSecret != "" {
 		if username != "" || password != "" {
@@ -34,9 +32,9 @@ func Login(username string, password string, clientName string, clientSecret str
 	}
 
 	if clientName != "" || clientSecret != "" {
-		token, err = actions.NewAuthToken(client.NewHttpClient(cfg), cfg).GetAuthTokenByClientCredential(clientName, clientSecret)
+		token, err = actions.NewAuthToken(client.NewHttpClient(*a.Config), *a.Config).GetAuthTokenByClientCredential(clientName, clientSecret)
 	} else {
-		token, err = actions.NewAuthToken(client.NewHttpClient(cfg), cfg).GetAuthTokenByPasswordGrant(username, password)
+		token, err = actions.NewAuthToken(client.NewHttpClient(*a.Config), *a.Config).GetAuthTokenByPasswordGrant(username, password)
 	}
 
 	return token, err

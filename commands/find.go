@@ -2,6 +2,7 @@ package commands
 
 import (
 	"github.com/cloudfoundry-incubator/credhub-cli/api"
+	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	"github.com/cloudfoundry-incubator/credhub-cli/models"
 )
 
@@ -13,7 +14,9 @@ type FindCommand struct {
 }
 
 func (cmd FindCommand) Execute([]string) error {
-	credentials, err := api.Find(cmd.PartialCredentialIdentifier, cmd.PathIdentifier, cmd.AllPaths)
+	cfg := config.ReadConfig()
+	a := api.NewApi(&cfg)
+	credentials, err := a.Find(cmd.PartialCredentialIdentifier, cmd.PathIdentifier, cmd.AllPaths)
 
 	if err != nil {
 		return err

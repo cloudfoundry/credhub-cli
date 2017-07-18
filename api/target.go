@@ -5,26 +5,24 @@ import (
 
 	"github.com/cloudfoundry-incubator/credhub-cli/actions"
 	"github.com/cloudfoundry-incubator/credhub-cli/client"
-	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	"github.com/cloudfoundry-incubator/credhub-cli/models"
 )
 
-func Target(serverUrl string, caCert []string, skipTlsValidation bool) (models.Info, error) {
+func (a *Api) Target(serverUrl string, caCert []string, skipTlsValidation bool) (models.Info, error) {
 	var credhubInfo models.Info
-	cfg := config.ReadConfig()
 
-	cfg.CaCert = caCert
+	a.Config.CaCert = caCert
 
 	parsedUrl, err := url.Parse(serverUrl)
 	if err != nil {
 		return credhubInfo, err
 	}
 
-	cfg.ApiURL = parsedUrl.String()
+	a.Config.ApiURL = parsedUrl.String()
 
-	cfg.InsecureSkipVerify = skipTlsValidation
+	a.Config.InsecureSkipVerify = skipTlsValidation
 
-	credhubInfo, err = actions.NewInfo(client.NewHttpClient(cfg), cfg).GetServerInfo()
+	credhubInfo, err = actions.NewInfo(client.NewHttpClient(*a.Config), *a.Config).GetServerInfo()
 	if err != nil {
 		return credhubInfo, err
 	}

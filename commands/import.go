@@ -10,6 +10,7 @@ import (
 	"reflect"
 
 	"github.com/cloudfoundry-incubator/credhub-cli/api"
+	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	"github.com/cloudfoundry-incubator/credhub-cli/errors"
 	"github.com/cloudfoundry-incubator/credhub-cli/models"
 	"github.com/cloudfoundry-incubator/credhub-cli/repositories"
@@ -41,6 +42,9 @@ func (cmd ImportCommand) Execute([]string) error {
 func setCredentials(bulkImport models.CredentialBulkImport) {
 	var name string
 
+	cfg := config.ReadConfig()
+	a := api.NewApi(&cfg)
+
 	for i, credential := range bulkImport.Credentials {
 
 		switch credentialName := credential["name"].(type) {
@@ -54,7 +58,7 @@ func setCredentials(bulkImport models.CredentialBulkImport) {
 		value := credential["value"]
 		overwrite := credential["overwrite"].(bool)
 
-		result, err := api.Set(credentialType, name, value, overwrite)
+		result, err := a.Set(credentialType, name, value, overwrite)
 
 		if err != nil {
 			if isAuthenticationError(err) {

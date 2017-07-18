@@ -3,16 +3,14 @@ package api
 import (
 	"github.com/cloudfoundry-incubator/credhub-cli/actions"
 	"github.com/cloudfoundry-incubator/credhub-cli/client"
-	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	"github.com/cloudfoundry-incubator/credhub-cli/models"
 	"github.com/cloudfoundry-incubator/credhub-cli/repositories"
 )
 
-func Regenerate(credentialIdentifier string) (models.CredentialResponse, error) {
-	cfg := config.ReadConfig()
-	repository := repositories.NewCredentialRepository(client.NewHttpClient(cfg))
-	action := actions.NewAction(repository, &cfg)
+func (a *Api) Regenerate(credentialIdentifier string) (models.CredentialResponse, error) {
+	repository := repositories.NewCredentialRepository(client.NewHttpClient(*a.Config))
+	action := actions.NewAction(repository, a.Config)
 
-	credential, err := action.DoAction(client.NewRegenerateCredentialRequest(cfg, credentialIdentifier), credentialIdentifier)
+	credential, err := action.DoAction(client.NewRegenerateCredentialRequest(*a.Config, credentialIdentifier), credentialIdentifier)
 	return credential.(models.CredentialResponse), err
 }

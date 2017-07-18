@@ -28,6 +28,7 @@ type ApiPositionalArgs struct {
 
 func (cmd ApiCommand) Execute([]string) error {
 	cfg := config.ReadConfig()
+	a := api.NewApi(&cfg)
 
 	oldAuthURL := cfg.AuthURL
 
@@ -56,7 +57,7 @@ func (cmd ApiCommand) Execute([]string) error {
 		return err
 	}
 
-	credhubInfo, err := api.Target(serverUrl, cmd.CaCert, cmd.SkipTlsValidation)
+	credhubInfo, err := a.Target(serverUrl, cmd.CaCert, cmd.SkipTlsValidation)
 	if err != nil {
 		return err
 	}
@@ -72,7 +73,7 @@ func (cmd ApiCommand) Execute([]string) error {
 	}
 
 	if credhubInfo.AuthServer.Url != oldAuthURL {
-		api.Logout()
+		a.Logout()
 		MarkTokensAsRevokedInConfig(&cfg)
 		config.WriteConfig(cfg)
 	}

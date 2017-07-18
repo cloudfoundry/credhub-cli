@@ -2,6 +2,7 @@ package commands
 
 import (
 	"github.com/cloudfoundry-incubator/credhub-cli/api"
+	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	"github.com/cloudfoundry-incubator/credhub-cli/models"
 )
 
@@ -11,7 +12,10 @@ type RegenerateCommand struct {
 }
 
 func (cmd RegenerateCommand) Execute([]string) error {
-	credential, err := api.Regenerate(cmd.CredentialIdentifier)
+	cfg := config.ReadConfig()
+	a := api.NewApi(&cfg)
+
+	credential, err := a.Regenerate(cmd.CredentialIdentifier)
 
 	if err != nil {
 		return err

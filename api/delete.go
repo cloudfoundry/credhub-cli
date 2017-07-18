@@ -3,16 +3,14 @@ package api
 import (
 	"github.com/cloudfoundry-incubator/credhub-cli/actions"
 	"github.com/cloudfoundry-incubator/credhub-cli/client"
-	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	"github.com/cloudfoundry-incubator/credhub-cli/repositories"
 )
 
-func Delete(credentialIdentifier string) error {
-	cfg := config.ReadConfig()
-	repository := repositories.NewCredentialRepository(client.NewHttpClient(cfg))
-	action := actions.NewAction(repository, &cfg)
+func (a *Api) Delete(credentialIdentifier string) error {
+	repository := repositories.NewCredentialRepository(client.NewHttpClient(*a.Config))
+	action := actions.NewAction(repository, a.Config)
 
-	_, err := action.DoAction(client.NewDeleteCredentialRequest(cfg, credentialIdentifier), credentialIdentifier)
+	_, err := action.DoAction(client.NewDeleteCredentialRequest(*a.Config, credentialIdentifier), credentialIdentifier)
 
 	return err
 }

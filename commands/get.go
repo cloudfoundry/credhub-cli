@@ -2,6 +2,7 @@ package commands
 
 import (
 	"github.com/cloudfoundry-incubator/credhub-cli/api"
+	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	"github.com/cloudfoundry-incubator/credhub-cli/models"
 )
 
@@ -12,7 +13,10 @@ type GetCommand struct {
 }
 
 func (cmd GetCommand) Execute([]string) error {
-	credential, err := api.Get(cmd.Name, cmd.Id)
+	cfg := config.ReadConfig()
+	a := api.NewApi(&cfg)
+
+	credential, err := a.Get(cmd.Name, cmd.Id)
 
 	if err != nil {
 		return err

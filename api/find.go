@@ -3,32 +3,29 @@ package api
 import (
 	"github.com/cloudfoundry-incubator/credhub-cli/actions"
 	"github.com/cloudfoundry-incubator/credhub-cli/client"
-	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	"github.com/cloudfoundry-incubator/credhub-cli/models"
 	"github.com/cloudfoundry-incubator/credhub-cli/repositories"
 )
 
-func Find(partialCredentialIdentifier string, pathIdentifier string, allPaths bool) (models.CredentialResponse, error) {
+func (a *Api) Find(partialCredentialIdentifier string, pathIdentifier string, allPaths bool) (models.CredentialResponse, error) {
 	var credentials models.Printable
 	var err error
 	var repository repositories.Repository
 
-	cfg := config.ReadConfig()
-
 	if allPaths {
-		repository = repositories.NewAllPathRepository(client.NewHttpClient(cfg))
+		repository = repositories.NewAllPathRepository(client.NewHttpClient(*a.Config))
 	} else {
-		repository = repositories.NewCredentialQueryRepository(client.NewHttpClient(cfg))
+		repository = repositories.NewCredentialQueryRepository(client.NewHttpClient(*a.Config))
 	}
 
-	action := actions.NewAction(repository, &cfg)
+	action := actions.NewAction(repository, a.Config)
 
 	if allPaths {
-		credentials, err = action.DoAction(client.NewFindAllCredentialPathsRequest(cfg), "")
+		credentials, err = action.DoAction(client.NewFindAllCredentialPathsRequest(*a.Config), "")
 	} else if partialCredentialIdentifier != "" {
-		credentials, err = action.DoAction(client.NewFindCredentialsBySubstringRequest(cfg, partialCredentialIdentifier), partialCredentialIdentifier)
+		credentials, err = action.DoAction(client.NewFindCredentialsBySubstringRequest(*a.Config, partialCredentialIdentifier), partialCredentialIdentifier)
 	} else {
-		credentials, err = action.DoAction(client.NewFindCredentialsByPathRequest(cfg, pathIdentifier), partialCredentialIdentifier)
+		credentials, err = action.DoAction(client.NewFindCredentialsByPathRequest(*a.Config, pathIdentifier), partialCredentialIdentifier)
 	}
 
 	return credentials.(models.CredentialResponse), err

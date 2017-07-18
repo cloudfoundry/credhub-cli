@@ -11,9 +11,11 @@ type LogoutCommand struct {
 }
 
 func (cmd LogoutCommand) Execute([]string) error {
-	api.Logout()
-
 	cfg := config.ReadConfig()
+	a := api.NewApi(&cfg)
+
+	a.Logout()
+
 	MarkTokensAsRevokedInConfig(&cfg)
 	config.WriteConfig(cfg)
 

@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/cloudfoundry-incubator/credhub-cli/api"
+	"github.com/cloudfoundry-incubator/credhub-cli/config"
 )
 
 type DeleteCommand struct {
@@ -11,7 +12,10 @@ type DeleteCommand struct {
 }
 
 func (cmd DeleteCommand) Execute([]string) error {
-	err := api.Delete(cmd.CredentialIdentifier)
+	cfg := config.ReadConfig()
+	a := api.NewApi(&cfg)
+
+	err := a.Delete(cmd.CredentialIdentifier)
 
 	if err == nil {
 		fmt.Println("Credential successfully deleted")

@@ -2,6 +2,7 @@ package commands
 
 import (
 	"github.com/cloudfoundry-incubator/credhub-cli/api"
+	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	"github.com/cloudfoundry-incubator/credhub-cli/errors"
 	"github.com/cloudfoundry-incubator/credhub-cli/models"
 )
@@ -35,11 +36,14 @@ type GenerateCommand struct {
 }
 
 func (cmd GenerateCommand) Execute([]string) error {
+	cfg := config.ReadConfig()
+	a := api.NewApi(&cfg)
+
 	if cmd.CredentialType == "" {
 		return errors.NewGenerateEmptyTypeError()
 	}
 
-	credential, err := api.Generate(
+	credential, err := a.Generate(
 		cmd.CredentialIdentifier,
 		cmd.CredentialType,
 		cmd.NoOverwrite,

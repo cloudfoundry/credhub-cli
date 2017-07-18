@@ -23,6 +23,7 @@ type LoginCommand struct {
 
 func (cmd LoginCommand) Execute([]string) error {
 	cfg := config.ReadConfig()
+	a := api.NewApi(&cfg)
 
 	if cfg.ApiURL == "" && cmd.ServerUrl == "" {
 		return errors.NewNoApiUrlSetError()
@@ -39,7 +40,7 @@ func (cmd LoginCommand) Execute([]string) error {
 			serverUrl = "https://" + serverUrl
 		}
 
-		credhubInfo, err := api.Target(serverUrl, cfg.CaCert, cmd.SkipTlsValidation)
+		credhubInfo, err := a.Target(serverUrl, cfg.CaCert, cmd.SkipTlsValidation)
 		if err != nil {
 			return err
 		}
@@ -65,10 +66,10 @@ func (cmd LoginCommand) Execute([]string) error {
 
 	}
 
-	token, err := api.Login(cmd.Username, cmd.Password, cmd.ClientName, cmd.ClientSecret)
+	token, err := a.Login(cmd.Username, cmd.Password, cmd.ClientName, cmd.ClientSecret)
 
 	if err != nil {
-		api.Logout()
+		a.Logout()
 		MarkTokensAsRevokedInConfig(&cfg)
 		config.WriteConfig(cfg)
 		return err

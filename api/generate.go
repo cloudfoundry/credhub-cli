@@ -3,12 +3,11 @@ package api
 import (
 	"github.com/cloudfoundry-incubator/credhub-cli/actions"
 	"github.com/cloudfoundry-incubator/credhub-cli/client"
-	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	"github.com/cloudfoundry-incubator/credhub-cli/models"
 	"github.com/cloudfoundry-incubator/credhub-cli/repositories"
 )
 
-func Generate(
+func (a *Api) Generate(
 	credentialIdentifier string,
 	credentialType string,
 	noOverwrite bool,
@@ -36,8 +35,7 @@ func Generate(
 	selfSign bool,
 ) (models.CredentialResponse, error) {
 
-	cfg := config.ReadConfig()
-	repository := repositories.NewCredentialRepository(client.NewHttpClient(cfg))
+	repository := repositories.NewCredentialRepository(client.NewHttpClient(*a.Config))
 
 	parameters := models.GenerationParameters{
 		IncludeSpecial:   includeSpecial,
@@ -69,8 +67,8 @@ func Generate(
 		}
 	}
 
-	action := actions.NewAction(repository, &cfg)
-	request := client.NewGenerateCredentialRequest(cfg, credentialIdentifier, parameters, value, credentialType, !noOverwrite)
+	action := actions.NewAction(repository, a.Config)
+	request := client.NewGenerateCredentialRequest(*a.Config, credentialIdentifier, parameters, value, credentialType, !noOverwrite)
 	credential, err := action.DoAction(request, credentialIdentifier)
 
 	return credential.(models.CredentialResponse), err
