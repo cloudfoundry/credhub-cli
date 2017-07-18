@@ -21,4 +21,11 @@ var _ = Describe("Config", func() {
 	It("places the config file in .cm in the home directory", func() {
 		Expect(config.ConfigPath()).To(HaveSuffix(`/.credhub/config.json`))
 	})
+
+	Describe("#ReadTrustedCAs", func() {
+		It("reads multiple certs", func() {
+			cfg.ReadTrustedCAs([]string{"../test/test-ca.pem", "../test/test-ca.pem"})
+			Expect(cfg.CaCerts).To(HaveLen(2))
+		})
+	})
 })
