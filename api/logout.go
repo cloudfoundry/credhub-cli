@@ -14,5 +14,8 @@ func (a *Api) Logout() error {
 		}
 	}
 
+	a.Config.AccessToken = "revoked"
+	a.Config.RefreshToken = "revoked"
+
 	return nil
 }

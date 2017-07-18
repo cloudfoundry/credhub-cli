@@ -1,8 +1,6 @@
 package api
 
 import (
-	"net/url"
-
 	"github.com/cloudfoundry-incubator/credhub-cli/actions"
 	"github.com/cloudfoundry-incubator/credhub-cli/client"
 	"github.com/cloudfoundry-incubator/credhub-cli/models"
@@ -12,20 +10,20 @@ func (a *Api) Target(serverUrl string, caCert []string, skipTlsValidation bool) 
 	var credhubInfo models.Info
 
 	a.Config.CaCert = caCert
-
-	parsedUrl, err := url.Parse(serverUrl)
-	if err != nil {
-		return credhubInfo, err
-	}
-
-	a.Config.ApiURL = parsedUrl.String()
-
+	a.Config.ApiURL = serverUrl
 	a.Config.InsecureSkipVerify = skipTlsValidation
 
-	credhubInfo, err = actions.NewInfo(client.NewHttpClient(*a.Config), *a.Config).GetServerInfo()
+	credhubInfo, err := actions.NewInfo(client.NewHttpClient(*a.Config), *a.Config).GetServerInfo()
 	if err != nil {
 		return credhubInfo, err
 	}
+
+	if a.Config.AuthURL != credhubInfo.AuthServer.Url {
+		a.Config.AccessToken = "revoked"
+		a.Config.RefreshToken = "revoked"
+	}
+
+	a.Config.AuthURL = credhubInfo.AuthServer.Url
 
 	return credhubInfo, nil
 }

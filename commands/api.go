@@ -2,7 +2,6 @@ package commands
 
 import (
 	"fmt"
-	"strings"
 
 	"net/url"
 
@@ -28,59 +27,67 @@ type ApiPositionalArgs struct {
 
 func (cmd ApiCommand) Execute([]string) error {
 	cfg := config.ReadConfig()
-	a := api.NewApi(&cfg)
+	serverUrl := targetUrl(cmd)
 
-	oldAuthURL := cfg.AuthURL
-
-	var serverUrl string
-	if cmd.Server.ServerUrl != "" {
-		serverUrl = cmd.Server.ServerUrl
-	} else {
-		serverUrl = cmd.ServerFlagUrl
-	}
+	cfg.CaCert = cmd.CaCert
 
 	if serverUrl == "" {
 		if cfg.ApiURL != "" {
 			fmt.Println(cfg.ApiURL)
-			return nil
 		} else {
 			return errors.NewNoTargetUrlError()
 		}
+	} else {
+		existingCfg := cfg
+		err := GetApiInfo(&cfg, serverUrl, cmd.SkipTlsValidation)
+		if err != nil {
+			return err
+		}
+
+		fmt.Println("Setting the target url:", cfg.ApiURL)
+
+		if existingCfg.AuthURL != cfg.AuthURL {
+			a := api.NewApi(&existingCfg)
+			a.Logout()
+		}
+
+		config.WriteConfig(cfg)
 	}
 
-	if !strings.Contains(serverUrl, "://") {
-		serverUrl = "https://" + serverUrl
-	}
+	return nil
+}
 
-	credhubInfo, err := a.Target(serverUrl, cmd.CaCert, cmd.SkipTlsValidation)
+func GetApiInfo(cfg *config.Config, serverUrl string, skipTlsValidation bool) error {
+	serverUrl = AddDefaultSchemeIfNecessary(serverUrl)
+	parsedUrl, err := url.Parse(serverUrl)
 	if err != nil {
 		return err
 	}
 
-	parsedUrl, _ := url.Parse(serverUrl)
+	a := api.NewApi(cfg)
+	_, err = a.Target(parsedUrl.String(), cfg.CaCert, skipTlsValidation)
+
+	if err != nil {
+		return err
+	}
+
 	if parsedUrl.Scheme != "https" {
 		warning("Warning: Insecure HTTP API detected. Data sent to this API could be intercepted" +
 			" in transit by third parties. Secure HTTPS API endpoints are recommended.")
 	} else {
-		if cmd.SkipTlsValidation {
+		if skipTlsValidation {
 			warning("Warning: The targeted TLS certificate has not been verified for this connection.")
 			deprecation("Warning: The --skip-tls-validation flag is deprecated. Please use --ca-cert instead.")
 		}
 	}
 
-	if credhubInfo.AuthServer.Url != oldAuthURL {
-		a.Logout()
-		MarkTokensAsRevokedInConfig(&cfg)
-		config.WriteConfig(cfg)
-	}
-
-	cfg.CaCert = cmd.CaCert
-	cfg.ApiURL = parsedUrl.String()
-	cfg.InsecureSkipVerify = cmd.SkipTlsValidation
-	cfg.AuthURL = credhubInfo.AuthServer.Url
-	config.WriteConfig(cfg)
-
-	fmt.Println("Setting the target url:", cfg.ApiURL)
-
 	return nil
+}
+
+func targetUrl(cmd ApiCommand) string {
+	if cmd.Server.ServerUrl != "" {
+		return cmd.Server.ServerUrl
+	} else {
+		return cmd.ServerFlagUrl
+	}
 }

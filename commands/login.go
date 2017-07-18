@@ -2,8 +2,6 @@ package commands
 
 import (
 	"fmt"
-	"net/url"
-	"strings"
 
 	"github.com/cloudfoundry-incubator/credhub-cli/api"
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
@@ -22,67 +20,72 @@ type LoginCommand struct {
 }
 
 func (cmd LoginCommand) Execute([]string) error {
+	var (
+		err error
+	)
 	cfg := config.ReadConfig()
+
 	a := api.NewApi(&cfg)
 
 	if cfg.ApiURL == "" && cmd.ServerUrl == "" {
 		return errors.NewNoApiUrlSetError()
 	}
 
-	serverUrl := cmd.ServerUrl
+	if len(cmd.CaCert) > 0 {
+		cfg.CaCert = cmd.CaCert
+	}
 
-	if serverUrl != "" {
-		if !strings.Contains(serverUrl, "://") {
-			serverUrl = "https://" + serverUrl
-		}
-
-		credhubInfo, err := a.Target(serverUrl, cmd.CaCert, cmd.SkipTlsValidation)
+	if cmd.ServerUrl != "" {
+		err = GetApiInfo(&cfg, cmd.ServerUrl, cmd.SkipTlsValidation)
 		if err != nil {
 			return err
 		}
-
-		parsedUrl, _ := url.Parse(cmd.ServerUrl)
-		if parsedUrl.Scheme != "https" {
-			warning("Warning: Insecure HTTP API detected. Data sent to this API could be intercepted" +
-				" in transit by third parties. Secure HTTPS API endpoints are recommended.")
-		} else {
-			if cmd.SkipTlsValidation {
-				warning("Warning: The targeted TLS certificate has not been verified for this connection.")
-				deprecation("Warning: The --skip-tls-validation flag is deprecated. Please use --ca-cert instead.")
-			}
-		}
-
-		if len(cmd.CaCert) > 0 {
-			cfg.CaCert = cmd.CaCert
-		}
-		cfg.ApiURL = parsedUrl.String()
-		cfg.InsecureSkipVerify = cmd.SkipTlsValidation
-		cfg.AuthURL = credhubInfo.AuthServer.Url
-		config.WriteConfig(cfg)
 	}
 
-	if cmd.ClientName == "" && cmd.ClientSecret == "" {
+	err = validateParameters(&cmd)
+
+	if err != nil {
+		return err
+	}
+
+	if cmd.ClientName != "" || cmd.ClientSecret != "" {
+		_, err = a.Login("", "", cmd.ClientName, cmd.ClientSecret)
+	} else {
 		promptForMissingCredentials(&cmd)
+		_, err = a.Login(cmd.Username, cmd.Password, "", "")
 	}
-
-	token, err := a.Login(cmd.Username, cmd.Password, cmd.ClientName, cmd.ClientSecret)
 
 	if err != nil {
 		a.Logout()
-		MarkTokensAsRevokedInConfig(&cfg)
 		config.WriteConfig(cfg)
 		return err
-	} else {
-		cfg.AccessToken = token.AccessToken
-		cfg.RefreshToken = token.RefreshToken
-		config.WriteConfig(cfg)
 	}
 
-	if serverUrl != "" {
+	config.WriteConfig(cfg)
+
+	if cmd.ServerUrl != "" {
 		fmt.Println("Setting the target url:", cfg.ApiURL)
 	}
 
 	fmt.Println("Login Successful")
+
+	return nil
+}
+
+func validateParameters(cmd *LoginCommand) error {
+	if cmd.ClientName != "" || cmd.ClientSecret != "" {
+		if cmd.Username != "" || cmd.Password != "" {
+			return errors.NewMixedAuthorizationParametersError()
+		}
+
+		if cmd.ClientName == "" || cmd.ClientSecret == "" {
+			return errors.NewClientAuthorizationParametersError()
+		}
+	}
+
+	if cmd.Username == "" && cmd.Password != "" {
+		return errors.NewPasswordAuthorizationParametersError()
+	}
 
 	return nil
 }
