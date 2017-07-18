@@ -2,7 +2,9 @@ package config
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"path"
 )
@@ -16,7 +18,7 @@ type Config struct {
 	AccessToken        string
 	RefreshToken       string
 	InsecureSkipVerify bool
-	CaCert             []string
+	CaCerts            []string
 }
 
 func ConfigDir() string {
@@ -57,4 +59,21 @@ func WriteConfig(c Config) error {
 
 func RemoveConfig() error {
 	return os.Remove(ConfigPath())
+}
+
+func (cfg *Config) ReadTrustedCAs(caCerts []string) {
+	for _, certPath := range caCerts {
+		_, err := os.Stat(certPath)
+		handleError(err)
+		serverCA, err := ioutil.ReadFile(certPath)
+		handleError(err)
+		cfg.CaCerts = append(cfg.CaCerts, string(serverCA))
+	}
+}
+
+func handleError(err error) {
+	if err != nil {
+		fmt.Println(err)
+		log.Fatal("Fatal", err)
+	}
 }

@@ -3,6 +3,8 @@ package client_test
 import (
 	"net/http"
 
+	"io/ioutil"
+
 	"github.com/cloudfoundry-incubator/credhub-cli/client"
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	. "github.com/onsi/ginkgo"
@@ -10,8 +12,18 @@ import (
 )
 
 var _ = Describe("#NewHttpClient", func() {
+	var (
+		cfg    config.Config
+		testCa string
+	)
+
+	BeforeEach(func() {
+		ca, _ := ioutil.ReadFile("../test/test-ca.pem")
+		testCa = string(ca)
+	})
+
 	It("returns http client when a url specifies http scheme", func() {
-		cfg := config.Config{
+		cfg = config.Config{
 			ApiURL: "http://foo.bar",
 		}
 
@@ -20,7 +32,7 @@ var _ = Describe("#NewHttpClient", func() {
 	})
 
 	It("returns https client when url scheme is https", func() {
-		cfg := config.Config{
+		cfg = config.Config{
 			ApiURL: "https://foo.bar",
 		}
 
@@ -29,7 +41,7 @@ var _ = Describe("#NewHttpClient", func() {
 	})
 
 	It("requires tls verification for https client", func() {
-		cfg := config.Config{
+		cfg = config.Config{
 			ApiURL:             "https://foo.bar",
 			InsecureSkipVerify: false,
 		}
@@ -39,7 +51,7 @@ var _ = Describe("#NewHttpClient", func() {
 	})
 
 	It("can skip tls verification for https client", func() {
-		cfg := config.Config{
+		cfg = config.Config{
 			ApiURL:             "https://foo.bar",
 			InsecureSkipVerify: true,
 		}
@@ -49,7 +61,7 @@ var _ = Describe("#NewHttpClient", func() {
 	})
 
 	It("prefers server cipher suites for https client", func() {
-		cfg := config.Config{
+		cfg = config.Config{
 			ApiURL: "https://foo.bar",
 		}
 
@@ -58,13 +70,13 @@ var _ = Describe("#NewHttpClient", func() {
 	})
 
 	It("uses server ca cert in tls connection if provided", func() {
-		cfg := config.Config{
-			CaCert: []string{"../test/test-ca.pem"},
-			ApiURL: "https://test.com",
+		cfg = config.Config{
+			CaCerts: []string{testCa},
+			ApiURL:  "https://test.com",
 		}
+
 		httpsClient := client.NewHttpClient(cfg)
 		Expect(httpsClient.Transport.(*http.Transport).TLSClientConfig.RootCAs).To(Not(BeNil()))
-
 	})
 
 })

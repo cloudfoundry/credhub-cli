@@ -5,6 +5,8 @@ import (
 
 	"os"
 
+	"io/ioutil"
+
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -157,7 +159,7 @@ var _ = Describe("API", func() {
 				cfg := config.ReadConfig()
 
 				Expect(cfg.AuthURL).To(Equal("https://example.com"))
-				Expect(len(cfg.CaCert)).To(Equal(0))
+				Expect(len(cfg.CaCerts)).To(Equal(0))
 			})
 
 			It("sets the target URL using a flag", func() {
@@ -247,7 +249,7 @@ var _ = Describe("API", func() {
 				Context("when the user skips TLS validation", func() {
 					BeforeEach(func() {
 						cfg := config.ReadConfig()
-						cfg.CaCert = []string{}
+						cfg.CaCerts = []string{}
 						config.WriteConfig(cfg)
 					})
 
@@ -317,11 +319,12 @@ var _ = Describe("API", func() {
 
 			Context("and ca-cert is provided", func() {
 				It("saves the caCert in the config", func() {
+					testCa, _ := ioutil.ReadFile("../test/test-ca.pem")
 					session := runCommand("api", "-s", theServer.URL(), "--ca-cert", "../test/test-ca.pem")
 					Eventually(session).Should(Exit(0))
 
 					cfg := config.ReadConfig()
-					Expect(cfg.CaCert).To(Equal([]string{"../test/test-ca.pem"}))
+					Expect(cfg.CaCerts).To(Equal([]string{string(testCa)}))
 				})
 			})
 		})

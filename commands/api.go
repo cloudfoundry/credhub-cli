@@ -30,7 +30,7 @@ func (cmd ApiCommand) Execute([]string) error {
 	cfg := config.ReadConfig()
 	serverUrl := targetUrl(cmd)
 
-	cfg.CaCert = cmd.CaCert
+	cfg.ReadTrustedCAs(cmd.CaCert)
 
 	if serverUrl == "" {
 		if cfg.ApiURL != "" {
