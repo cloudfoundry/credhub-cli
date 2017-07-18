@@ -64,8 +64,7 @@ func GetApiInfo(cfg *config.Config, serverUrl string, skipTlsValidation bool) er
 		return err
 	}
 
-	a := api.NewApi(cfg)
-	_, err = a.Target(parsedUrl.String(), cfg.CaCert, skipTlsValidation)
+	_, err = api.NewApi(cfg).Target(parsedUrl.String(), cfg.CaCert, skipTlsValidation)
 
 	if err != nil {
 		return err

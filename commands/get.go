@@ -14,9 +14,8 @@ type GetCommand struct {
 
 func (cmd GetCommand) Execute([]string) error {
 	cfg := config.ReadConfig()
-	a := api.NewApi(&cfg)
 
-	credential, err := a.Get(cmd.Name, cmd.Id)
+	credential, err := api.NewApi(&cfg).Get(cmd.Name, cmd.Id)
 
 	if err != nil {
 		return err

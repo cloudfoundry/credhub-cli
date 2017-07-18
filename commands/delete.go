@@ -13,9 +13,7 @@ type DeleteCommand struct {
 
 func (cmd DeleteCommand) Execute([]string) error {
 	cfg := config.ReadConfig()
-	a := api.NewApi(&cfg)
-
-	err := a.Delete(cmd.CredentialIdentifier)
+	err := api.NewApi(&cfg).Delete(cmd.CredentialIdentifier)
 
 	if err == nil {
 		fmt.Println("Credential successfully deleted")

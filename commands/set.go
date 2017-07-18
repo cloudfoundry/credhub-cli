@@ -36,7 +36,6 @@ type SetCommand struct {
 
 func (cmd SetCommand) Execute([]string) error {
 	cfg := config.ReadConfig()
-	a := api.NewApi(&cfg)
 
 	if cmd.Type == "" {
 		return errors.NewSetEmptyTypeError()
@@ -56,7 +55,7 @@ func (cmd SetCommand) Execute([]string) error {
 		return err
 	}
 
-	credential, err := a.Set(cmd.Type, cmd.CredentialIdentifier, value, !cmd.NoOverwrite)
+	credential, err := api.NewApi(&cfg).Set(cmd.Type, cmd.CredentialIdentifier, value, !cmd.NoOverwrite)
 
 	if err != nil {
 		return err

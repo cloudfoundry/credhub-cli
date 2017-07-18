@@ -37,13 +37,12 @@ type GenerateCommand struct {
 
 func (cmd GenerateCommand) Execute([]string) error {
 	cfg := config.ReadConfig()
-	a := api.NewApi(&cfg)
 
 	if cmd.CredentialType == "" {
 		return errors.NewGenerateEmptyTypeError()
 	}
 
-	credential, err := a.Generate(
+	credential, err := api.NewApi(&cfg).Generate(
 		cmd.CredentialIdentifier,
 		cmd.CredentialType,
 		cmd.NoOverwrite,

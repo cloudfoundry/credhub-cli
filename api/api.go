@@ -8,10 +8,10 @@ type Api struct {
 	Config *config.Config
 }
 
-func NewApi(cfg *config.Config) Api {
+func NewApi(cfg *config.Config) *Api {
 	if cfg == nil {
 		cfg = &config.Config{}
 	}
 
-	return Api{cfg}
+	return &Api{cfg}
 }

@@ -12,9 +12,7 @@ type LogoutCommand struct {
 
 func (cmd LogoutCommand) Execute([]string) error {
 	cfg := config.ReadConfig()
-	a := api.NewApi(&cfg)
-
-	a.Logout()
+	api.NewApi(&cfg).Logout()
 	config.WriteConfig(cfg)
 
 	fmt.Println("Logout Successful")

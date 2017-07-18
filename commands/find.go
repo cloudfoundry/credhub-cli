@@ -15,8 +15,7 @@ type FindCommand struct {
 
 func (cmd FindCommand) Execute([]string) error {
 	cfg := config.ReadConfig()
-	a := api.NewApi(&cfg)
-	credentials, err := a.Find(cmd.PartialCredentialIdentifier, cmd.PathIdentifier, cmd.AllPaths)
+	credentials, err := api.NewApi(&cfg).Find(cmd.PartialCredentialIdentifier, cmd.PathIdentifier, cmd.AllPaths)
 
 	if err != nil {
 		return err

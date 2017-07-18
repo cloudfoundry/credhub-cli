@@ -13,9 +13,8 @@ type RegenerateCommand struct {
 
 func (cmd RegenerateCommand) Execute([]string) error {
 	cfg := config.ReadConfig()
-	a := api.NewApi(&cfg)
 
-	credential, err := a.Regenerate(cmd.CredentialIdentifier)
+	credential, err := api.NewApi(&cfg).Regenerate(cmd.CredentialIdentifier)
 
 	if err != nil {
 		return err
