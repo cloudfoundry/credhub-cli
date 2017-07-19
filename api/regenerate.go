@@ -12,5 +12,9 @@ func (a *Api) Regenerate(credentialIdentifier string) (models.CredentialResponse
 	action := actions.NewAction(repository, a.Config)
 
 	credential, err := action.DoAction(client.NewRegenerateCredentialRequest(*a.Config, credentialIdentifier), credentialIdentifier)
+	if err != nil {
+		return models.CredentialResponse{}, err
+	}
+
 	return credential.(models.CredentialResponse), err
 }

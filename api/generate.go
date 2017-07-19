@@ -70,6 +70,9 @@ func (a *Api) Generate(
 	action := actions.NewAction(repository, a.Config)
 	request := client.NewGenerateCredentialRequest(*a.Config, credentialIdentifier, parameters, value, credentialType, !noOverwrite)
 	credential, err := action.DoAction(request, credentialIdentifier)
+	if err != nil {
+		return models.CredentialResponse{}, err
+	}
 
 	return credential.(models.CredentialResponse), err
 }

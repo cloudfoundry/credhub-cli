@@ -28,5 +28,9 @@ func (a *Api) Find(partialCredentialIdentifier string, pathIdentifier string, al
 		credentials, err = action.DoAction(client.NewFindCredentialsByPathRequest(*a.Config, pathIdentifier), partialCredentialIdentifier)
 	}
 
+	if err != nil {
+		return models.CredentialResponse{}, err
+	}
+
 	return credentials.(models.CredentialResponse), err
 }
