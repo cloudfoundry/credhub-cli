@@ -317,14 +317,27 @@ var _ = Describe("API", func() {
 				})
 			})
 
-			Context("and ca-cert is provided", func() {
-				It("saves the caCert in the config", func() {
-					testCa, _ := ioutil.ReadFile("../test/test-ca.pem")
-					session := runCommand("api", "-s", theServer.URL(), "--ca-cert", "../test/test-ca.pem")
-					Eventually(session).Should(Exit(0))
+			Describe("ca certs", func() {
+				Context("with a single ca cert", func() {
+					It("saves the caCert in the config", func() {
+						testCa, _ := ioutil.ReadFile("../test/test-ca.pem")
+						session := runCommand("api", "-s", theServer.URL(), "--ca-cert", "../test/test-ca.pem")
+						Eventually(session).Should(Exit(0))
 
-					cfg := config.ReadConfig()
-					Expect(cfg.CaCerts).To(Equal([]string{string(testCa)}))
+						cfg := config.ReadConfig()
+						Expect(cfg.CaCerts).To(Equal([]string{string(testCa)}))
+					})
+				})
+
+				Context("with multiple ca certs", func() {
+					It("saves the certs in the config", func() {
+						testCa, _ := ioutil.ReadFile("../test/test-ca.pem")
+						session := runCommand("api", "-s", theServer.URL(), "--ca-cert", "../test/test-ca.pem", "--ca-cert", "../test/test-ca.pem")
+						Eventually(session).Should(Exit(0))
+
+						cfg := config.ReadConfig()
+						Expect(cfg.CaCerts).To(Equal([]string{string(testCa), string(testCa)}))
+					})
 				})
 			})
 		})
