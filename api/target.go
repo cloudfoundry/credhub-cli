@@ -6,10 +6,10 @@ import (
 	"github.com/cloudfoundry-incubator/credhub-cli/models"
 )
 
-func (a *Api) Target(serverUrl string, caCert []string, skipTlsValidation bool) (models.Info, error) {
+func (a *Api) Target(serverUrl string, caCerts []string, skipTlsValidation bool) (models.Info, error) {
 	var credhubInfo models.Info
 
-	a.Config.CaCert = caCert
+	a.Config.CaCerts = caCerts
 	a.Config.ApiURL = serverUrl
 	a.Config.InsecureSkipVerify = skipTlsValidation
 

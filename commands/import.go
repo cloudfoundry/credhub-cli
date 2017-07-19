@@ -40,7 +40,12 @@ func (cmd ImportCommand) Execute([]string) error {
 }
 
 func setCredentials(bulkImport models.CredentialBulkImport) {
-	var name string
+	var (
+		name       string
+		successful int
+		failed     int
+	)
+	errors := make([]string, 0)
 
 	cfg := config.ReadConfig()
 	a := api.NewApi(&cfg)
@@ -63,13 +68,24 @@ func setCredentials(bulkImport models.CredentialBulkImport) {
 		if err != nil {
 			if isAuthenticationError(err) {
 				fmt.Println(err)
-				break
+				return
 			}
-			fmt.Fprintf(os.Stderr, "Credential '%s' at index %d could not be set: %v\n", name, i, err)
+			failure := fmt.Sprintf("Credential '%s' at index %d could not be set: %v", name, i, err)
+			fmt.Println(failure + "\n")
+			errors = append(errors, " - "+failure)
+			failed++
 			continue
+		} else {
+			successful++
 		}
-
 		models.Println(result, false)
+	}
+
+	fmt.Println("Import complete.")
+	fmt.Fprintf(os.Stdout, "Successfully set: %d\n", successful)
+	fmt.Fprintf(os.Stdout, "Failed to set: %d\n", failed)
+	for _, v := range errors {
+		fmt.Println(v)
 	}
 }
 func isAuthenticationError(err error) bool {

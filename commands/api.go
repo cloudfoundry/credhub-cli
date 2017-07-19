@@ -29,7 +29,7 @@ func (cmd ApiCommand) Execute([]string) error {
 	cfg := config.ReadConfig()
 	serverUrl := targetUrl(cmd)
 
-	cfg.CaCert = cmd.CaCert
+	cfg.ReadTrustedCAs(cmd.CaCert)
 
 	if serverUrl == "" {
 		if cfg.ApiURL != "" {
@@ -64,7 +64,7 @@ func GetApiInfo(cfg *config.Config, serverUrl string, skipTlsValidation bool) er
 		return err
 	}
 
-	_, err = api.NewApi(cfg).Target(parsedUrl.String(), cfg.CaCert, skipTlsValidation)
+	_, err = api.NewApi(cfg).Target(parsedUrl.String(), cfg.CaCerts, skipTlsValidation)
 
 	if err != nil {
 		return err

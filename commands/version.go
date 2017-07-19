@@ -14,7 +14,7 @@ func PrintVersion() error {
 	cfg := config.ReadConfig()
 
 	credHubServerVersion := "Not Found"
-	credhubInfo, err := api.NewApi(&cfg).Target(cfg.ApiURL, cfg.CaCert, cfg.InsecureSkipVerify)
+	credhubInfo, err := api.NewApi(&cfg).Target(cfg.ApiURL, cfg.CaCerts, cfg.InsecureSkipVerify)
 	if err == nil {
 		credHubServerVersion = credhubInfo.App.Version
 	}

@@ -7,6 +7,8 @@ import (
 
 	"strings"
 
+	"io/ioutil"
+
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -296,12 +298,13 @@ var _ = Describe("Login", func() {
 		})
 
 		It("saves caCert to config when it is provided", func() {
+			testCa, _ := ioutil.ReadFile("../test/test-ca.pem")
 			session := runCommand("login", "-u", "user", "-p", "pass", "-s", apiServer.URL(), "--ca-cert", "../test/test-ca.pem")
 
 			Expect(session).Should(Exit(0))
 			cfg := config.ReadConfig()
 
-			Expect(cfg.CaCert).Should(Equal([]string{"../test/test-ca.pem"}))
+			Expect(cfg.CaCerts).Should(Equal([]string{string(testCa)}))
 		})
 
 		Context("when the user skips TLS validation", func() {

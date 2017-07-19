@@ -90,5 +90,5 @@ func NewInvalidImportYamlError() error {
 }
 
 func NewNoCredentialsTag() error {
-	return errors.New("The referenced import file does not contain a 'credentials' key. The import file must contain a list of credentials under the key 'credentials'. Please update and retry your request.")
+	return errors.New("The referenced import file does not begin with the key 'credentials'. The import file must contain a list of credentials under the key 'credentials'. Please update and retry your request.")
 }

@@ -31,9 +31,7 @@ func (cmd LoginCommand) Execute([]string) error {
 		return errors.NewNoApiUrlSetError()
 	}
 
-	if len(cmd.CaCert) > 0 {
-		cfg.CaCert = cmd.CaCert
-	}
+	cfg.ReadTrustedCAs(cmd.CaCert)
 
 	if cmd.ServerUrl != "" {
 		err = GetApiInfo(&cfg, cmd.ServerUrl, cmd.SkipTlsValidation)
