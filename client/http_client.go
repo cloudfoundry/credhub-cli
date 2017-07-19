@@ -6,8 +6,9 @@ import (
 	"net/url"
 	"time"
 
-	"crypto/x509"
 	"log"
+
+	"crypto/x509"
 
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
 )
@@ -34,8 +35,6 @@ func newHttpClient() *http.Client {
 }
 
 func newHttpsClient(cfg config.Config) *http.Client {
-	trustedCAs := x509.NewCertPool()
-
 	tlsConfig := &tls.Config{
 		InsecureSkipVerify:       cfg.InsecureSkipVerify,
 		PreferServerCipherSuites: true,
@@ -43,14 +42,15 @@ func newHttpsClient(cfg config.Config) *http.Client {
 
 	if !cfg.InsecureSkipVerify {
 		for _, cert := range cfg.CaCerts {
-			ok := trustedCAs.AppendCertsFromPEM([]byte(cert))
+			if tlsConfig.RootCAs == nil {
+				tlsConfig.RootCAs = x509.NewCertPool()
+			}
+			ok := tlsConfig.RootCAs.AppendCertsFromPEM([]byte(cert))
 
 			if !ok {
 				log.Fatal("failed to parse root certificate")
 			}
 		}
-
-		tlsConfig.RootCAs = trustedCAs
 	}
 
 	tr := &http.Transport{
