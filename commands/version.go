@@ -5,8 +5,7 @@ import (
 
 	"os"
 
-	"github.com/cloudfoundry-incubator/credhub-cli/actions"
-	"github.com/cloudfoundry-incubator/credhub-cli/client"
+	"github.com/cloudfoundry-incubator/credhub-cli/api"
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	"github.com/cloudfoundry-incubator/credhub-cli/version"
 )
@@ -15,7 +14,7 @@ func PrintVersion() error {
 	cfg := config.ReadConfig()
 
 	credHubServerVersion := "Not Found"
-	credhubInfo, err := actions.NewInfo(client.NewHttpClient(cfg), cfg).GetServerInfo()
+	credhubInfo, err := api.NewApi(&cfg).Target(cfg.ApiURL, cfg.CaCert, cfg.InsecureSkipVerify)
 	if err == nil {
 		credHubServerVersion = credhubInfo.App.Version
 	}
