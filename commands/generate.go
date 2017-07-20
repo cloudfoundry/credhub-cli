@@ -1,6 +1,8 @@
 package commands
 
 import (
+	"strings"
+
 	"github.com/cloudfoundry-incubator/credhub-cli/actions"
 	"github.com/cloudfoundry-incubator/credhub-cli/client"
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
@@ -41,6 +43,8 @@ func (cmd GenerateCommand) Execute([]string) error {
 	if cmd.CredentialType == "" {
 		return errors.NewGenerateEmptyTypeError()
 	}
+
+	cmd.CredentialType = strings.ToLower(cmd.CredentialType)
 
 	cfg := config.ReadConfig()
 	repository := repositories.NewCredentialRepository(client.NewHttpClient(cfg))

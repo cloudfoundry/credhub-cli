@@ -60,6 +60,13 @@ var _ = Describe("Generate", func() {
 				"value": "potatoes"
 			}`))
 		})
+
+		It("allows the type to be any case", func() {
+			setupPasswordPostServer("my-password", "potatoes", generateDefaultTypeRequestJson("my-password", `{}`, true))
+
+			session := runCommand("generate", "-n", "my-password", "-t", "PASSWORD")
+			Eventually(session).Should(Exit(0))
+		})
 	})
 
 	Describe("with a variety of password parameters", func() {
@@ -139,6 +146,15 @@ var _ = Describe("Generate", func() {
 			Expect(session.Out).To(Say(responseMySSHFooYaml))
 		})
 
+		It("allows the type to be any case", func() {
+			setupRsaSshPostServer("foo-ssh-key", "ssh", "some-public-key", "some-private-key", generateRequestJson("ssh", "foo-ssh-key", `{}`, true))
+
+			session := runCommand("generate", "-n", "foo-ssh-key", "-t", "SSH")
+
+			Eventually(session).Should(Exit(0))
+			Expect(session.Out).To(Say(responseMySSHFooYaml))
+		})
+
 		It("can print the SSH key as JSON", func() {
 			setupRsaSshPostServer("foo-ssh-key", "ssh", "some-public-key", "fake-private-key", generateRequestJson("ssh", "foo-ssh-key", `{}`, true))
 
@@ -187,6 +203,15 @@ var _ = Describe("Generate", func() {
 			Expect(session.Out).To(Say(responseMyRSAFooYaml))
 		})
 
+		It("allows the type to be any case", func() {
+			setupRsaSshPostServer("foo-rsa-key", "rsa", "some-public-key", "some-private-key", generateRequestJson("rsa", "foo-rsa-key", `{}`, true))
+
+			session := runCommand("generate", "-n", "foo-rsa-key", "-t", "RSA")
+
+			Eventually(session).Should(Exit(0))
+			Expect(session.Out).To(Say(responseMyRSAFooYaml))
+		})
+
 		It("can print the RSA key as JSON", func() {
 			setupRsaSshPostServer("foo-rsa-key", "rsa", "some-public-key", "fake-private-key", generateRequestJson("rsa", "foo-rsa-key", `{}`, true))
 
@@ -224,6 +249,16 @@ var _ = Describe("Generate", func() {
 			setupCertificatePostServer("my-secret", "my-ca", "my-cert", "my-priv", expectedRequestJson)
 
 			session := runCommand("generate", "-n", "my-secret", "-t", "certificate", "--common-name", "common.name.io")
+
+			Eventually(session).Should(Exit(0))
+			Expect(session.Out).To(Say(responseMyCertificateYaml))
+		})
+
+		It("allows the type to be any case", func() {
+			expectedRequestJson := generateRequestJson("certificate", "my-secret", `{"common_name":"common.name.io"}`, true)
+			setupCertificatePostServer("my-secret", "my-ca", "my-cert", "my-priv", expectedRequestJson)
+
+			session := runCommand("generate", "-n", "my-secret", "-t", "CERTIFICATE", "--common-name", "common.name.io")
 
 			Eventually(session).Should(Exit(0))
 			Expect(session.Out).To(Say(responseMyCertificateYaml))
@@ -367,6 +402,21 @@ var _ = Describe("Generate", func() {
 				expectedRequestJson)
 
 			session := runCommand("generate", "-n", name, "-t", "user")
+
+			Eventually(session).Should(Exit(0))
+			Expect(session.Out.Contents()).To(ContainSubstring(responseMyUsernameYaml))
+		})
+
+		It("allows the type to be any case", func() {
+			expectedRequestJson := generateRequestJson("user", name, `{}`, true)
+			setupUserPostServer(
+				name,
+				"my-username",
+				"test-password",
+				"passw0rd-H4$h",
+				expectedRequestJson)
+
+			session := runCommand("generate", "-n", name, "-t", "USER")
 
 			Eventually(session).Should(Exit(0))
 			Expect(session.Out.Contents()).To(ContainSubstring(responseMyUsernameYaml))
