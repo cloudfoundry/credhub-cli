@@ -30,8 +30,6 @@ func (cmd ApiCommand) Execute([]string) error {
 	cfg := config.ReadConfig()
 	serverUrl := targetUrl(cmd)
 
-	cfg.ReadTrustedCAs(cmd.CaCerts)
-
 	if serverUrl == "" {
 		if cfg.ApiURL != "" {
 			fmt.Println(cfg.ApiURL)
@@ -40,7 +38,13 @@ func (cmd ApiCommand) Execute([]string) error {
 		}
 	} else {
 		existingCfg := cfg
-		err := GetApiInfo(&cfg, serverUrl, cmd.SkipTlsValidation)
+
+		err := cfg.UpdateTrustedCAs(cmd.CaCerts)
+		if err != nil {
+			return err
+		}
+
+		err = GetApiInfo(&cfg, serverUrl, cmd.SkipTlsValidation)
 		if err != nil {
 			return err
 		}
@@ -51,7 +55,11 @@ func (cmd ApiCommand) Execute([]string) error {
 			RevokeTokenIfNecessary(existingCfg)
 			MarkTokensAsRevokedInConfig(&cfg)
 		}
-		config.WriteConfig(cfg)
+		err = config.WriteConfig(cfg)
+
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

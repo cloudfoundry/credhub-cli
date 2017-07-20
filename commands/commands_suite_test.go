@@ -16,6 +16,8 @@ import (
 	"runtime"
 	"testing"
 
+	"crypto/tls"
+
 	test_util "github.com/cloudfoundry-incubator/credhub-cli/test"
 )
 
@@ -95,20 +97,46 @@ var _ = BeforeEach(func() {
 		os.Setenv("HOME", homeDir)
 	}
 
-	server = NewServer()
-	authServer = NewServer()
+	server = NewUnstartedServer()
+	authServer = NewUnstartedServer()
 
-	server.AppendHandlers(
-		CombineHandlers(
-			VerifyRequest("GET", "/info"),
-			RespondWith(http.StatusOK, `{
-					"app":{"version":"my-version","name":"CredHub"},
-					"auth-server":{"url":"`+authServer.URL()+`"}
-					}`),
-		),
+	serverTlsCert, err := ioutil.ReadFile("../test/server-tls-cert.pem")
+	Expect(err).To(BeNil())
+	serverTlsKey, err := ioutil.ReadFile("../test/server-tls-key.pem")
+	Expect(err).To(BeNil())
+
+	serverCert, err := tls.X509KeyPair(serverTlsCert, serverTlsKey)
+	Expect(err).To(BeNil())
+
+	server.HTTPTestServer.TLS = &tls.Config{
+		Certificates: []tls.Certificate{serverCert},
+	}
+
+	server.HTTPTestServer.StartTLS()
+
+	authTlsCert, err := ioutil.ReadFile("../test/auth-tls-cert.pem")
+	Expect(err).To(BeNil())
+	authTlsKey, err := ioutil.ReadFile("../test/auth-tls-key.pem")
+	Expect(err).To(BeNil())
+
+	authCert, err := tls.X509KeyPair(authTlsCert, authTlsKey)
+	Expect(err).To(BeNil())
+
+	authServer.HTTPTestServer.TLS = &tls.Config{
+		Certificates: []tls.Certificate{authCert},
+	}
+
+	authServer.HTTPTestServer.StartTLS()
+
+	server.RouteToHandler("GET", "/info",
+		RespondWith(http.StatusOK, `{
+				"app":{"version":"my-version","name":"CredHub"},
+				"auth-server":{"url":"`+authServer.URL()+`"}
+				}`),
 	)
 
-	session := runCommand("api", server.URL())
+	session := runCommand("api", server.URL(), "--ca-cert", "../test/server-tls-ca.pem", "--ca-cert", "../test/auth-tls-ca.pem")
+
 	server.Reset()
 
 	Eventually(session).Should(Exit(0))

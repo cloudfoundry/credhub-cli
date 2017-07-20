@@ -14,11 +14,8 @@ var _ = Describe("Version", func() {
 		BeforeEach(func() {
 			responseJson := `{"app":{"name":"CredHub","version":"0.2.0"}}`
 
-			server.AppendHandlers(
-				CombineHandlers(
-					VerifyRequest("GET", "/info"),
-					RespondWith(http.StatusOK, responseJson),
-				),
+			server.RouteToHandler("GET", "/info",
+				RespondWith(http.StatusOK, responseJson),
 			)
 		})
 
@@ -34,11 +31,8 @@ var _ = Describe("Version", func() {
 
 	Context("when the request fails", func() {
 		BeforeEach(func() {
-			server.AppendHandlers(
-				CombineHandlers(
-					VerifyRequest("GET", "/info"),
-					RespondWith(http.StatusNotFound, ""),
-				),
+			server.RouteToHandler("GET", "/info",
+				RespondWith(http.StatusNotFound, ""),
 			)
 		})
 

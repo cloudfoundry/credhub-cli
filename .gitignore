@@ -8,3 +8,4 @@ credhub-cli
 vendor/*
 !vendor/vendor.json
 tmp
+!test/*.pem

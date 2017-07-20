@@ -22,9 +22,16 @@ var _ = Describe("Config", func() {
 		Expect(config.ConfigPath()).To(HaveSuffix(`/.credhub/config.json`))
 	})
 
-	Describe("#ReadTrustedCAs", func() {
+	Describe("#UpdateTrustedCAs", func() {
 		It("reads multiple certs", func() {
-			cfg.ReadTrustedCAs([]string{"../test/test-ca.pem", "../test/test-ca.pem"})
+			cfg.UpdateTrustedCAs([]string{"../test/test-ca.pem", "../test/test-ca.pem"})
+			Expect(cfg.CaCerts).To(HaveLen(2))
+		})
+
+		It("overrides previous CAs", func() {
+			cfg.CaCerts = []string{"cert1", "cert2"}
+
+			cfg.UpdateTrustedCAs([]string{"../test/test-ca.pem", "../test/test-ca.pem"})
 			Expect(cfg.CaCerts).To(HaveLen(2))
 		})
 	})
