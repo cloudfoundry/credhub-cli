@@ -38,6 +38,7 @@ type SetCommand struct {
 }
 
 func (cmd SetCommand) Execute([]string) error {
+	cmd.Type = strings.ToLower(cmd.Type)
 
 	if cmd.Type == "" {
 		return errors.NewSetEmptyTypeError()
