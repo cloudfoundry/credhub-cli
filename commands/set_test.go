@@ -63,6 +63,15 @@ var _ = Describe("Set", func() {
 			Eventually(session).Should(Exit(0))
 			Eventually(string(session.Out.Contents())).Should(MatchJSON(responseMyValuePotatoesJson))
 		})
+
+		It("accepts case-insensitive type", func() {
+			SetupPutValueServer("my-value", "value", "potatoes")
+
+			session := runCommand("set", "-n", "my-value", "-v", "potatoes", "-t", "VALUE", "--output-json")
+
+			Eventually(session).Should(Exit(0))
+			Eventually(string(session.Out.Contents())).Should(MatchJSON(responseMyValuePotatoesJson))
+		})
 	})
 
 	Describe("setting json secrets", func() {
@@ -95,6 +104,15 @@ var _ = Describe("Set", func() {
 			Eventually(string(session.Out.Contents())).Should(MatchJSON(responseMyJsonFormatJson))
 		})
 
+		It("accepts case-insensitive type", func() {
+			jsonValue := `{"foo":"bar","nested":{"a":1},"an":["array"]}`
+			setupPutJsonServer("json-secret", jsonValue)
+
+			session := runCommand("set", "-n", "json-secret", "-v", jsonValue, "-t", "JSON")
+
+			Eventually(session).Should(Exit(0))
+			Eventually(session.Out).Should(Say(responseMyJsonFormatYaml))
+		})
 	})
 
 	Describe("setting SSH secrets", func() {
@@ -140,6 +158,15 @@ var _ = Describe("Set", func() {
 			Eventually(session).Should(Exit(0))
 			Eventually(string(session.Out.Contents())).Should(MatchJSON(responseMySSHFooJson))
 		})
+
+		It("accepts case-insensitive type", func() {
+			SetupPutRsaSshServer("foo-ssh-key", "ssh", "some-public-key", "some-private-key", true)
+
+			session := runCommand("set", "-n", "foo-ssh-key", "-U", "some-public-key", "-P", "some-private-key", "-t", "SSH")
+
+			Eventually(session).Should(Exit(0))
+			Eventually(session.Out).Should(Say(responseMySSHFooYaml))
+		})
 	})
 
 	Describe("setting RSA secrets", func() {
@@ -184,6 +211,15 @@ var _ = Describe("Set", func() {
 
 			Eventually(session).Should(Exit(0))
 			Eventually(string(session.Out.Contents())).Should(MatchJSON(responseMyRSAFooJson))
+		})
+
+		It("accepts case-insensitive type", func() {
+			SetupPutRsaSshServer("foo-rsa-key", "rsa", "some-public-key", "some-private-key", true)
+
+			session := runCommand("set", "-n", "foo-rsa-key", "-U", "some-public-key", "-P", "some-private-key", "-t", "RSA")
+
+			Eventually(session).Should(Exit(0))
+			Eventually(session.Out).Should(Say(responseMyRSAFooYaml))
 		})
 	})
 
@@ -243,6 +279,15 @@ var _ = Describe("Set", func() {
 
 			Eventually(session).Should(Exit(0))
 			Eventually(string(session.Out.Contents())).Should(MatchJSON(responseMyPasswordPotatoesJson))
+		})
+
+		It("accepts case-insensitive type", func() {
+			SetupPutValueServer("my-password", "password", "potatoes")
+
+			session := runCommand("set", "-n", "my-password", "-w", "potatoes", "-t", "PASSWORD")
+
+			Eventually(session).Should(Exit(0))
+			Eventually(session.Out).Should(Say(responseMyPasswordPotatoesYaml))
 		})
 	})
 
@@ -317,6 +362,17 @@ var _ = Describe("Set", func() {
 			Eventually(session).Should(Exit(0))
 			Eventually(string(session.Out.Contents())).Should(MatchJSON(responseMyCertificateJson))
 		})
+
+		It("accepts case insensitive type", func() {
+			SetupPutCertificateServer("my-secret", "my-ca", "my-cert", "my-priv")
+
+			session := runCommand("set", "-n", "my-secret",
+				"-t", "CERTIFICATE", "--root-string", "my-ca",
+				"--certificate-string", "my-cert", "--private-string", "my-priv")
+
+			Eventually(session).Should(Exit(0))
+			Eventually(session.Out).Should(Say(responseMyCertificateYaml))
+		})
 	})
 
 	Describe("setting User secrets", func() {
@@ -369,6 +425,15 @@ var _ = Describe("Set", func() {
 
 			Eventually(session).Should(Exit(0))
 			Expect(string(session.Out.Contents())).Should(MatchJSON(responseMyUsernameJson))
+		})
+
+		It("accepts case-insensitive type", func() {
+			SetupPutUserServer("my-username-credential", `{"username": "my-username", "password": "test-password"}`, "my-username", "test-password", "passw0rd-H4$h", true)
+
+			session := runCommand("set", "-n", "my-username-credential", "-z", "my-username", "-w", "test-password", "-t", "USER")
+
+			Eventually(session).Should(Exit(0))
+			Expect(session.Out.Contents()).To(ContainSubstring(responseMyUsernameYaml))
 		})
 	})
 

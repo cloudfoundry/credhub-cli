@@ -79,4 +79,14 @@ var _ = Describe("#NewHttpClient", func() {
 		Expect(httpsClient.Transport.(*http.Transport).TLSClientConfig.RootCAs).To(Not(BeNil()))
 	})
 
+	It("leaves tls Root CA as nil if no cert provided", func() {
+		cfg = config.Config{
+			CaCerts: []string{},
+			ApiURL:  "https://test.com",
+		}
+
+		httpsClient := client.NewHttpClient(cfg)
+		Expect(httpsClient.Transport.(*http.Transport).TLSClientConfig.RootCAs).To(BeNil())
+	})
+
 })

@@ -36,6 +36,7 @@ type SetCommand struct {
 
 func (cmd SetCommand) Execute([]string) error {
 	cfg := config.ReadConfig()
+	cmd.Type = strings.ToLower(cmd.Type)
 
 	if cmd.Type == "" {
 		return errors.NewSetEmptyTypeError()
