@@ -97,45 +97,10 @@ var _ = BeforeEach(func() {
 		os.Setenv("HOME", homeDir)
 	}
 
-	server = NewUnstartedServer()
-	authServer = NewUnstartedServer()
+	server = NewTlsServer("../test/server-tls-cert.pem", "../test/server-tls-key.pem")
+	authServer = NewTlsServer("../test/auth-tls-cert.pem", "../test/auth-tls-key.pem")
 
-	serverTlsCert, err := ioutil.ReadFile("../test/server-tls-cert.pem")
-	Expect(err).To(BeNil())
-	serverTlsKey, err := ioutil.ReadFile("../test/server-tls-key.pem")
-	Expect(err).To(BeNil())
-
-	serverCert, err := tls.X509KeyPair(serverTlsCert, serverTlsKey)
-	Expect(err).To(BeNil())
-
-	server.HTTPTestServer.TLS = &tls.Config{
-		Certificates: []tls.Certificate{serverCert},
-	}
-
-	server.HTTPTestServer.StartTLS()
-
-	authTlsCert, err := ioutil.ReadFile("../test/auth-tls-cert.pem")
-	Expect(err).To(BeNil())
-	authTlsKey, err := ioutil.ReadFile("../test/auth-tls-key.pem")
-	Expect(err).To(BeNil())
-
-	authCert, err := tls.X509KeyPair(authTlsCert, authTlsKey)
-	Expect(err).To(BeNil())
-
-	authServer.HTTPTestServer.TLS = &tls.Config{
-		Certificates: []tls.Certificate{authCert},
-	}
-
-	authServer.HTTPTestServer.StartTLS()
-
-	server.RouteToHandler("GET", "/info",
-		RespondWith(http.StatusOK, `{
-				"app":{"version":"my-version","name":"CredHub"},
-				"auth-server":{"url":"`+authServer.URL()+`"}
-				}`),
-	)
-
-	authServer.RouteToHandler("GET", "/info", RespondWith(http.StatusOK, ""))
+	SetupServers(server, authServer)
 
 	session := runCommand("api", server.URL(), "--ca-cert", "../test/server-tls-ca.pem", "--ca-cert", "../test/auth-tls-ca.pem")
 
@@ -230,6 +195,37 @@ func createCredentialFile(dir, filename string, contents string) string {
 		panic(err)
 	}
 	return path
+}
+
+func NewTlsServer(certPath, keyPath string) *Server {
+	tlsServer := NewUnstartedServer()
+
+	cert, err := ioutil.ReadFile(certPath)
+	Expect(err).To(BeNil())
+	key, err := ioutil.ReadFile(keyPath)
+	Expect(err).To(BeNil())
+
+	tlsCert, err := tls.X509KeyPair(cert, key)
+	Expect(err).To(BeNil())
+
+	tlsServer.HTTPTestServer.TLS = &tls.Config{
+		Certificates: []tls.Certificate{tlsCert},
+	}
+
+	tlsServer.HTTPTestServer.StartTLS()
+
+	return tlsServer
+}
+
+func SetupServers(chServer, uaaServer *Server) {
+	chServer.RouteToHandler("GET", "/info",
+		RespondWith(http.StatusOK, `{
+				"app":{"version":"my-version","name":"CredHub"},
+				"auth-server":{"url":"`+uaaServer.URL()+`"}
+				}`),
+	)
+
+	uaaServer.RouteToHandler("GET", "/info", RespondWith(http.StatusOK, ""))
 }
 
 func ItBehavesLikeHelp(command string, alias string, validate func(*Session)) {
