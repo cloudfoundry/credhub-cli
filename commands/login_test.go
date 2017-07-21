@@ -315,6 +315,33 @@ var _ = Describe("Login", func() {
 			Expect(cfg.CaCerts).Should(Equal([]string{string(testCa)}))
 		})
 
+		It("accepts the ca cert through the environment", func() {
+			authServer.Close()
+
+			authServer = NewTlsServer("../test/server-tls-cert.pem", "../test/server-tls-key.pem")
+			SetupServers(server, authServer)
+
+			authServer.RouteToHandler("POST", "/oauth/token/",
+				CombineHandlers(
+					VerifyBody([]byte(`grant_type=password&password=pass&response_type=token&username=user`)),
+					RespondWith(http.StatusOK, `{
+						"access_token":"2YotnFZFEjr1zCsicMWpAA",
+						"refresh_token":"erousflkajqwer",
+						"token_type":"bearer",
+						"expires_in":3600}`),
+				),
+			)
+
+			serverCa, err := ioutil.ReadFile("../test/server-tls-ca.pem")
+			Expect(err).To(BeNil())
+
+			session := runCommandWithEnv([]string{"CREDHUB_CA_CERT=../test/server-tls-ca.pem"}, "login", "-s", server.URL(), "-u", "user", "-p", "pass")
+			Eventually(session).Should(Exit(0))
+
+			cfg := config.ReadConfig()
+			Expect(cfg.CaCerts).To(ConsistOf([]string{string(serverCa)}))
+		})
+
 		Context("when the user skips TLS validation", func() {
 
 			It("prints warning and deprecation notice when --skip-tls-validation flag is present", func() {

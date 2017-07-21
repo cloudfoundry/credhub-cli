@@ -378,6 +378,22 @@ var _ = Describe("API", func() {
 					cfg := config.ReadConfig()
 					Expect(cfg.CaCerts).To(Equal(previousCfg.CaCerts))
 				})
+
+				It("accepts the ca cert through the environment", func() {
+					authServer.Close()
+
+					authServer = NewTlsServer("../test/server-tls-cert.pem", "../test/server-tls-key.pem")
+					SetupServers(server, authServer)
+
+					serverCa, err := ioutil.ReadFile("../test/server-tls-ca.pem")
+					Expect(err).To(BeNil())
+
+					session := runCommandWithEnv([]string{"CREDHUB_CA_CERT=../test/server-tls-ca.pem"}, "api", server.URL())
+					Eventually(session).Should(Exit(0))
+
+					cfg := config.ReadConfig()
+					Expect(cfg.CaCerts).To(ConsistOf([]string{string(serverCa)}))
+				})
 			})
 		})
 
