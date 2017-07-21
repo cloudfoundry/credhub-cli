@@ -248,11 +248,8 @@ func ItBehavesLikeHelp(command string, alias string, validate func(*Session)) {
 
 func ItRequiresAuthentication(args ...string) {
 	It("requires authentication", func() {
-		authServer.AppendHandlers(
-			CombineHandlers(
-				VerifyRequest("DELETE", "/oauth/token/revoke/test-refresh-token"),
-				RespondWith(http.StatusOK, nil),
-			),
+		authServer.RouteToHandler("DELETE", "/oauth/token/revoke/test-refresh-token",
+			RespondWith(http.StatusOK, nil),
 		)
 
 		runCommand("logout")
@@ -267,11 +264,9 @@ func ItRequiresAuthentication(args ...string) {
 func ItAutomaticallyLogsIn(method string, args ...string) {
 	Describe("automatic authentication", func() {
 		BeforeEach(func() {
-			server.AppendHandlers(
-				CombineHandlers(
-					VerifyRequest(method, "/api/v1/data"),
-					RespondWith(http.StatusOK, `{"type":"json","id":"some_uuid","name":"my-json","version_created_at":"idc","value":{"key": 1}, "credentials": [{"name": "key", "version_created_at": "something"}]}`),
-				))
+			server.RouteToHandler(method, "/api/v1/data",
+				RespondWith(http.StatusOK, `{"type":"json","id":"some_uuid","name":"my-json","version_created_at":"idc","value":{"key": 1}, "credentials": [{"name": "key", "version_created_at": "something"}]}`),
+			)
 		})
 
 		AfterEach(func() {
@@ -281,11 +276,9 @@ func ItAutomaticallyLogsIn(method string, args ...string) {
 		Context("with correct environment and unauthenticated", func() {
 			It("automatically authenticates", func() {
 
-				authServer.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest("DELETE", "/oauth/token/revoke/test-refresh-token"),
-						RespondWith(http.StatusOK, nil),
-					),
+				authServer.RouteToHandler(
+					"DELETE", "/oauth/token/revoke/test-refresh-token",
+					RespondWith(http.StatusOK, nil),
 				)
 
 				authServer.AppendHandlers(

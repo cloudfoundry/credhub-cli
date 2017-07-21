@@ -25,9 +25,8 @@ var _ = Describe("Regenerate", func() {
 
 	Describe("Regenerating password", func() {
 		It("prints the regenerated password secret in yaml format", func() {
-			server.AppendHandlers(
+			server.RouteToHandler("POST", "/api/v1/data",
 				CombineHandlers(
-					VerifyRequest("POST", "/api/v1/data"),
 					VerifyJSON(REGENERATE_CREDENTIAL_REQUEST_JSON),
 					RespondWith(http.StatusOK, fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_JSON, "password", "my-password-stuffs", "nu-potatoes")),
 				),
@@ -40,9 +39,8 @@ var _ = Describe("Regenerate", func() {
 		})
 
 		It("prints the regenerated password secret in json format", func() {
-			server.AppendHandlers(
+			server.RouteToHandler("POST", "/api/v1/data",
 				CombineHandlers(
-					VerifyRequest("POST", "/api/v1/data"),
 					VerifyJSON(REGENERATE_CREDENTIAL_REQUEST_JSON),
 					RespondWith(http.StatusOK, fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_JSON, "password", "my-password-stuffs", "nu-potatoes")),
 				),

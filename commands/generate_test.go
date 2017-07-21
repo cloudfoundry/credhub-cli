@@ -560,9 +560,8 @@ var _ = Describe("Generate", func() {
 })
 
 func setupUserPostServer(name, username, password, passwordHash, requestJson string) {
-	server.AppendHandlers(
+	server.RouteToHandler("POST", "/api/v1/data",
 		CombineHandlers(
-			VerifyRequest("POST", "/api/v1/data"),
 			VerifyJSON(requestJson),
 			RespondWith(http.StatusOK, fmt.Sprintf(USER_CREDENTIAL_RESPONSE_JSON, name, username, password, passwordHash)),
 		),
@@ -570,9 +569,8 @@ func setupUserPostServer(name, username, password, passwordHash, requestJson str
 }
 
 func setupPasswordPostServer(name, value, requestJson string) {
-	server.AppendHandlers(
+	server.RouteToHandler("POST", "/api/v1/data",
 		CombineHandlers(
-			VerifyRequest("POST", "/api/v1/data"),
 			VerifyJSON(requestJson),
 			RespondWith(http.StatusOK, fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_JSON, "password", name, value)),
 		),
@@ -580,9 +578,8 @@ func setupPasswordPostServer(name, value, requestJson string) {
 }
 
 func setupRsaSshPostServer(name, credentialType, publicKey, privateKey, requestJson string) {
-	server.AppendHandlers(
+	server.RouteToHandler("POST", "/api/v1/data",
 		CombineHandlers(
-			VerifyRequest("POST", "/api/v1/data"),
 			VerifyJSON(requestJson),
 			RespondWith(http.StatusOK, fmt.Sprintf(RSA_SSH_CREDENTIAL_RESPONSE_JSON, credentialType, name, publicKey, privateKey)),
 		),
@@ -590,9 +587,8 @@ func setupRsaSshPostServer(name, credentialType, publicKey, privateKey, requestJ
 }
 
 func setupCertificatePostServer(name, ca, certificate, privateKey, requestJson string) {
-	server.AppendHandlers(
+	server.RouteToHandler("POST", "/api/v1/data",
 		CombineHandlers(
-			VerifyRequest("POST", "/api/v1/data"),
 			VerifyJSON(requestJson),
 			RespondWith(http.StatusOK, fmt.Sprintf(CERTIFICATE_CREDENTIAL_RESPONSE_JSON, name, ca, certificate, privateKey)),
 		),

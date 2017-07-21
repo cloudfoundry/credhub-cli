@@ -59,22 +59,13 @@ var _ = Describe("API", func() {
 			newAuthServer := NewServer()
 
 			apiServer := NewServer()
-			apiServer.AppendHandlers(
-				CombineHandlers(
-					VerifyRequest("GET", "/info"),
-					RespondWith(http.StatusOK, `{
+			apiServer.RouteToHandler("GET", "/info", RespondWith(http.StatusOK, `{
 						"app":{"version":"0.1.0 build DEV","name":"CredHub"},
 						"auth-server":{"url":"`+newAuthServer.URL()+`"}
 						}`),
-				),
 			)
 
-			authServer.AppendHandlers(
-				CombineHandlers(
-					VerifyRequest("DELETE", "/oauth/token/revoke/5b9c9fd51ba14838ac2e6b222d487106-r"),
-					RespondWith(http.StatusOK, ""),
-				),
-			)
+			authServer.RouteToHandler("DELETE", "/oauth/token/revoke/5b9c9fd51ba14838ac2e6b222d487106-r", RespondWith(http.StatusOK, ""))
 
 			newAuthServer.RouteToHandler("GET", "/info", RespondWith(http.StatusOK, ""))
 
@@ -95,14 +86,11 @@ var _ = Describe("API", func() {
 
 		It("leaves existing auth tokens intact when setting a new api with the same auth server", func() {
 			apiServer := NewServer()
-			apiServer.AppendHandlers(
-				CombineHandlers(
-					VerifyRequest("GET", "/info"),
-					RespondWith(http.StatusOK, `{
+			apiServer.RouteToHandler("GET", "/info",
+				RespondWith(http.StatusOK, `{
 						"app":{"version":"my-version","name":"CredHub"},
 						"auth-server":{"url":"`+authServer.URL()+`"}
 						}`),
-				),
 			)
 
 			cfg := config.ReadConfig()
@@ -121,12 +109,7 @@ var _ = Describe("API", func() {
 
 		It("retains existing tokens when setting the api fails", func() {
 			apiServer := NewServer()
-			apiServer.AppendHandlers(
-				CombineHandlers(
-					VerifyRequest("GET", "/info"),
-					RespondWith(http.StatusNotFound, ""),
-				),
-			)
+			apiServer.RouteToHandler("GET", "/info", RespondWith(http.StatusNotFound, ""))
 
 			cfg := config.ReadConfig()
 			cfg.AuthURL = authServer.URL()
@@ -209,12 +192,7 @@ var _ = Describe("API", func() {
 					Eventually(session).Should(Exit(0))
 
 					badServer = NewServer()
-					badServer.AppendHandlers(
-						CombineHandlers(
-							VerifyRequest("GET", "/info"),
-							RespondWith(http.StatusNotFound, ""),
-						),
-					)
+					badServer.RouteToHandler("GET", "/info", RespondWith(http.StatusNotFound, ""))
 				})
 
 				AfterEach(func() {
@@ -409,14 +387,11 @@ var _ = Describe("API", func() {
 			BeforeEach(func() {
 				httpServer = NewServer()
 
-				httpServer.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest("GET", "/info"),
-						RespondWith(http.StatusOK, `{
+				httpServer.RouteToHandler("GET", "/info",
+					RespondWith(http.StatusOK, `{
 						"app":{"version":"my-version","name":"CredHub"},
 						"auth-server":{"url":"https://example.com"}
 						}`),
-					),
 				)
 			})
 
@@ -448,14 +423,11 @@ var _ = Describe("API", func() {
 func setUpServer(aServer *Server) string {
 	aUrl := aServer.URL()
 
-	aServer.AppendHandlers(
-		CombineHandlers(
-			VerifyRequest("GET", "/info"),
-			RespondWith(http.StatusOK, `{
+	aServer.RouteToHandler("GET", "/info",
+		RespondWith(http.StatusOK, `{
 					"app":{"version":"0.1.0 build DEV","name":"CredHub"},
 					"auth-server":{"url":"https://example.com"}
 					}`),
-		),
 	)
 
 	return aUrl

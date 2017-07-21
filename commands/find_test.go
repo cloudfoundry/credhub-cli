@@ -69,7 +69,7 @@ var _ = Describe("Find", func() {
 			responseTable :=
 				"paths:\n- path: consul/\n- path: consul/deploy123/\n- path: deploy12/\n- path: deploy123/\n- path: deploy123/dan/\n- path: deploy123/dan/consul/"
 
-			server.AppendHandlers(
+			server.RouteToHandler("GET", "/api/v1/data",
 				CombineHandlers(
 					VerifyRequest("GET", "/api/v1/data", "paths=true"),
 					RespondWith(http.StatusOK, responseJson),
@@ -107,7 +107,7 @@ var _ = Describe("Find", func() {
    ]
 }`
 
-			server.AppendHandlers(
+			server.RouteToHandler("GET", "/api/v1/data",
 				CombineHandlers(
 					VerifyRequest("GET", "/api/v1/data", "paths=true"),
 					RespondWith(http.StatusOK, responseJson),
@@ -126,7 +126,7 @@ var _ = Describe("Find", func() {
 				"paths": []
 			}`
 
-			server.AppendHandlers(
+			server.RouteToHandler("GET", "/api/v1/data",
 				CombineHandlers(
 					VerifyRequest("GET", "/api/v1/data", "paths=true"),
 					RespondWith(http.StatusOK, responseJson),
@@ -159,7 +159,7 @@ var _ = Describe("Find", func() {
 				responseTable :=
 					"credentials:\n- name: dan.password\n  version_created_at: 2016-09-06T23:26:58Z\n- name: deploy1/dan/id.key\n  version_created_at: 2016-09-06T23:26:58Z"
 
-				server.AppendHandlers(
+				server.RouteToHandler("GET", "/api/v1/data",
 					CombineHandlers(
 						VerifyRequest("GET", "/api/v1/data", "name-like=dan"),
 						RespondWith(http.StatusOK, responseJson),
@@ -180,7 +180,7 @@ var _ = Describe("Find", func() {
 						"credentials": []
 					}`
 
-					server.AppendHandlers(
+					server.RouteToHandler("GET", "/api/v1/data",
 						CombineHandlers(
 							VerifyRequest("GET", "/api/v1/data", "name-like=dan"),
 							RespondWith(http.StatusOK, responseJson),
@@ -224,7 +224,7 @@ var _ = Describe("Find", func() {
 				responseTable :=
 					"credentials:\n- name: deploy123/dan.password\n  version_created_at: 2016-09-06T23:26:58Z\n- name: deploy123/dan.key\n  version_created_at: 2016-09-06T23:26:58Z\n- name: deploy123/dan/id.key\n  version_created_at: 2016-09-06T23:26:58Z"
 
-				server.AppendHandlers(
+				server.RouteToHandler("GET", "/api/v1/data",
 					CombineHandlers(
 						VerifyRequest("GET", "/api/v1/data", "path=deploy123"),
 						RespondWith(http.StatusOK, responseJson),

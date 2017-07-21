@@ -93,9 +93,8 @@ var _ = Describe("Login", func() {
 
 	Describe("password flow", func() {
 		BeforeEach(func() {
-			uaaServer.AppendHandlers(
+			uaaServer.RouteToHandler("POST", "/oauth/token/",
 				CombineHandlers(
-					VerifyRequest("POST", "/oauth/token/"),
 					VerifyBody([]byte(`grant_type=password&password=pass&response_type=token&username=user`)),
 					RespondWith(http.StatusOK, `{
 						"access_token":"2YotnFZFEjr1zCsicMWpAA",
@@ -157,9 +156,8 @@ var _ = Describe("Login", func() {
 
 	Describe("client flow", func() {
 		BeforeEach(func() {
-			uaaServer.AppendHandlers(
+			uaaServer.RouteToHandler("POST", "/oauth/token/",
 				CombineHandlers(
-					VerifyRequest("POST", "/oauth/token/"),
 					VerifyBody([]byte(`client_id=test_client&client_secret=test_secret&grant_type=client_credentials&response_type=token`)),
 					RespondWith(http.StatusOK, `{
 						"access_token":"2YotnFZFEjr1zCsicMWpAA",
@@ -273,9 +271,8 @@ var _ = Describe("Login", func() {
 
 		BeforeEach(func() {
 			uaaServer = NewServer()
-			uaaServer.AppendHandlers(
+			uaaServer.RouteToHandler("POST", "/oauth/token/",
 				CombineHandlers(
-					VerifyRequest("POST", "/oauth/token/"),
 					VerifyBody([]byte(`grant_type=password&password=pass&response_type=token&username=user`)),
 					RespondWith(http.StatusOK, `{
 						"access_token":"2YotnFZFEjr1zCsicMWpAA",
@@ -420,12 +417,7 @@ var _ = Describe("Login", func() {
 
 			BeforeEach(func() {
 				badServer = NewServer()
-				badServer.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest("GET", "/info"),
-						RespondWith(http.StatusBadGateway, nil),
-					),
-				)
+				badServer.RouteToHandler("GET", "/info", RespondWith(http.StatusBadGateway, nil))
 			})
 
 			It("should not login", func() {
@@ -460,19 +452,16 @@ var _ = Describe("Login", func() {
 
 			BeforeEach(func() {
 				badUaaServer = NewServer()
-				badUaaServer.AppendHandlers(
+				badUaaServer.RouteToHandler("POST", "/oauth/token/",
 					CombineHandlers(
-						VerifyRequest("POST", "/oauth/token/"),
 						VerifyBody([]byte(`grant_type=password&password=pass&response_type=token&username=user`)),
 						RespondWith(http.StatusUnauthorized, `{
 						"error":"unauthorized",
 						"error_description":"An Authentication object was not found in the SecurityContext"
 						}`),
-					),
-					CombineHandlers(
-						VerifyRequest("DELETE", "/oauth/token/revoke/5b9c9fd51ba14838ac2e6b222d487106-r"),
-						RespondWith(http.StatusOK, ""),
-					),
+					))
+				badUaaServer.RouteToHandler("DELETE", "/oauth/token/revoke/5b9c9fd51ba14838ac2e6b222d487106-r",
+					RespondWith(http.StatusOK, ""),
 				)
 				badUaaServer.RouteToHandler("GET", "/info", RespondWith(http.StatusOK, ""))
 
@@ -565,13 +554,10 @@ func setConfigAuthUrl(authUrl string) {
 }
 
 func setupServer(theServer *Server, uaaUrl string) {
-	theServer.AppendHandlers(
-		CombineHandlers(
-			VerifyRequest("GET", "/info"),
-			RespondWith(http.StatusOK, fmt.Sprintf(`{
+	theServer.RouteToHandler("GET", "/info",
+		RespondWith(http.StatusOK, fmt.Sprintf(`{
 					"app":{"version":"0.1.0 build DEV","name":"CredHub"},
 					"auth-server":{"url":"%s"}
 					}`, uaaUrl)),
-		),
 	)
 }
