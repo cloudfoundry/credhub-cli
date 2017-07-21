@@ -23,6 +23,8 @@ var _ = Describe("API", func() {
 					"auth-server":{"url":"`+authServer.URL()+`"}
 					}`),
 		)
+
+		authServer.RouteToHandler("GET", "/info", RespondWith(http.StatusOK, ""))
 	})
 
 	ItBehavesLikeHelp("api", "a", func(session *Session) {
@@ -74,6 +76,8 @@ var _ = Describe("API", func() {
 				),
 			)
 
+			newAuthServer.RouteToHandler("GET", "/info", RespondWith(http.StatusOK, ""))
+
 			cfg := config.ReadConfig()
 			cfg.AuthURL = authServer.URL()
 			cfg.AccessToken = "fake_token"
@@ -106,7 +110,7 @@ var _ = Describe("API", func() {
 			cfg.RefreshToken = "fake_refresh"
 			config.WriteConfig(cfg)
 
-			session := runCommand("api", apiServer.URL())
+			session := runCommand("api", apiServer.URL(), "--skip-tls-validation")
 
 			Eventually(session).Should(Exit(0))
 			newCfg := config.ReadConfig()
@@ -371,6 +375,28 @@ var _ = Describe("API", func() {
 
 					cfg = config.ReadConfig()
 					Expect(cfg.CaCerts).To(Equal([]string{string(serverCa), string(authCa)}))
+				})
+
+				It("returns an error if no cert is valid for CredHub", func() {
+					previousCfg := config.ReadConfig()
+					session := runCommand("api", "-s", server.URL(), "--ca-cert", "../test/auth-tls-ca.pem")
+
+					Eventually(session).Should(Exit(1))
+					Eventually(session.Err).Should(Say("certificate signed by unknown authority"))
+
+					cfg := config.ReadConfig()
+					Expect(cfg.CaCerts).To(Equal(previousCfg.CaCerts))
+				})
+
+				It("returns an error if no cert is valid for the auth server", func() {
+					previousCfg := config.ReadConfig()
+					session := runCommand("api", "-s", server.URL(), "--ca-cert", "../test/server-tls-ca.pem")
+
+					Eventually(session).Should(Exit(1))
+					Eventually(session.Err).Should(Say("certificate signed by unknown authority"))
+
+					cfg := config.ReadConfig()
+					Expect(cfg.CaCerts).To(Equal(previousCfg.CaCerts))
 				})
 			})
 		})

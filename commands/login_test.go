@@ -24,6 +24,15 @@ var _ = Describe("Login", func() {
 
 	BeforeEach(func() {
 		uaaServer = NewServer()
+
+		server.RouteToHandler("GET", "/info",
+			RespondWith(http.StatusOK, `{
+				"app":{"version":"my-version","name":"CredHub"},
+				"auth-server":{"url":"`+authServer.URL()+`"}
+				}`),
+		)
+
+		authServer.RouteToHandler("GET", "/info", RespondWith(http.StatusOK, ""))
 	})
 
 	AfterEach(func() {
@@ -276,6 +285,8 @@ var _ = Describe("Login", func() {
 				),
 			)
 
+			uaaServer.RouteToHandler("GET", "/info", RespondWith(http.StatusOK, ""))
+
 			apiServer = NewServer()
 			setupServer(apiServer, uaaServer.URL())
 		})
@@ -289,7 +300,7 @@ var _ = Describe("Login", func() {
 			session := runCommand("login", "-u", "user", "-p", "pass", "-s", apiServer.URL())
 
 			Expect(apiServer.ReceivedRequests()).Should(HaveLen(1))
-			Expect(uaaServer.ReceivedRequests()).Should(HaveLen(1))
+			Expect(uaaServer.ReceivedRequests()).Should(HaveLen(2))
 			Eventually(session).Should(Exit(0))
 			Eventually(session.Out).Should(Say("Login Successful"))
 			cfg := config.ReadConfig()
@@ -380,6 +391,28 @@ var _ = Describe("Login", func() {
 			Expect(cfg.RefreshToken).To(Equal("erousflkajqwer"))
 		})
 
+		It("returns an error if no cert is valid for CredHub", func() {
+			previousCfg := config.ReadConfig()
+			session := runCommand("login", "-s", server.URL(), "u", "user", "-p", "pass", "--ca-cert", "../test/auth-tls-ca.pem")
+
+			Eventually(session).Should(Exit(1))
+			Eventually(session.Err).Should(Say("certificate signed by unknown authority"))
+
+			cfg := config.ReadConfig()
+			Expect(cfg.CaCerts).To(Equal(previousCfg.CaCerts))
+		})
+
+		It("returns an error if no cert is valid for the auth server", func() {
+			previousCfg := config.ReadConfig()
+			session := runCommand("login", "-s", server.URL(), "-u", "user", "-p", "pass", "--ca-cert", "../test/server-tls-ca.pem")
+
+			Eventually(session).Should(Exit(1))
+			Eventually(session.Err).Should(Say("certificate signed by unknown authority"))
+
+			cfg := config.ReadConfig()
+			Expect(cfg.CaCerts).To(Equal(previousCfg.CaCerts))
+		})
+
 		Context("when api server is unavailable", func() {
 			var (
 				badServer *Server
@@ -441,6 +474,7 @@ var _ = Describe("Login", func() {
 						RespondWith(http.StatusOK, ""),
 					),
 				)
+				badUaaServer.RouteToHandler("GET", "/info", RespondWith(http.StatusOK, ""))
 
 				apiServer = NewServer()
 				setupServer(apiServer, badUaaServer.URL())

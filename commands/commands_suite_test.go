@@ -135,9 +135,12 @@ var _ = BeforeEach(func() {
 				}`),
 	)
 
+	authServer.RouteToHandler("GET", "/info", RespondWith(http.StatusOK, ""))
+
 	session := runCommand("api", server.URL(), "--ca-cert", "../test/server-tls-ca.pem", "--ca-cert", "../test/auth-tls-ca.pem")
 
 	server.Reset()
+	authServer.Reset()
 
 	Eventually(session).Should(Exit(0))
 })

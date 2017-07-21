@@ -91,6 +91,11 @@ func GetApiInfo(cfg *config.Config, serverUrl string, skipTlsValidation bool) er
 		}
 	}
 
+	err = verifyAuthServerConnection(*cfg, skipTlsValidation)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -100,4 +105,14 @@ func targetUrl(cmd ApiCommand) string {
 	} else {
 		return cmd.ServerFlagUrl
 	}
+}
+
+func verifyAuthServerConnection(cfg config.Config, skipTlsValidation bool) error {
+	var err error
+
+	if !skipTlsValidation {
+		err = actions.VerifyAuthServerConnection(client.NewHttpClient(cfg), cfg)
+	}
+
+	return err
 }
