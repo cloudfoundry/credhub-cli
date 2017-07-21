@@ -24,14 +24,14 @@ var _ = Describe("Config", func() {
 
 	Describe("#UpdateTrustedCAs", func() {
 		It("reads multiple certs", func() {
-			cfg.UpdateTrustedCAs([]string{"../test/test-ca.pem", "../test/test-ca.pem"})
+			cfg.UpdateTrustedCAs([]string{"../test/server-tls-ca.pem", "../test/auth-tls-ca.pem"})
 			Expect(cfg.CaCerts).To(HaveLen(2))
 		})
 
 		It("overrides previous CAs", func() {
 			cfg.CaCerts = []string{"cert1", "cert2"}
 
-			cfg.UpdateTrustedCAs([]string{"../test/test-ca.pem", "../test/test-ca.pem"})
+			cfg.UpdateTrustedCAs([]string{"../test/server-tls-ca.pem", "../test/auth-tls-ca.pem"})
 			Expect(cfg.CaCerts).To(HaveLen(2))
 		})
 	})

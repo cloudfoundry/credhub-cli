@@ -310,10 +310,10 @@ var _ = Describe("API", func() {
 			Describe("ca certs", func() {
 				Context("with a single ca cert", func() {
 					It("saves the caCert in the config", func() {
-						testCa, err := ioutil.ReadFile("../test/test-ca.pem")
+						testCa, err := ioutil.ReadFile("../test/server-tls-ca.pem")
 						Expect(err).To(BeNil())
 
-						session := runCommand("api", "-s", theServer.URL(), "--ca-cert", "../test/test-ca.pem")
+						session := runCommand("api", "-s", theServer.URL(), "--ca-cert", "../test/server-tls-ca.pem")
 						Eventually(session).Should(Exit(0))
 
 						cfg := config.ReadConfig()
@@ -323,14 +323,16 @@ var _ = Describe("API", func() {
 
 				Context("with multiple ca certs", func() {
 					It("saves the certs in the config", func() {
-						testCa, err := ioutil.ReadFile("../test/test-ca.pem")
+						ca1, err := ioutil.ReadFile("../test/server-tls-ca.pem")
+						Expect(err).To(BeNil())
+						ca2, err := ioutil.ReadFile("../test/extra-ca.pem")
 						Expect(err).To(BeNil())
 
-						session := runCommand("api", "-s", theServer.URL(), "--ca-cert", "../test/test-ca.pem", "--ca-cert", "../test/test-ca.pem")
+						session := runCommand("api", "-s", theServer.URL(), "--ca-cert", "../test/server-tls-ca.pem", "--ca-cert", "../test/extra-ca.pem")
 						Eventually(session).Should(Exit(0))
 
 						cfg := config.ReadConfig()
-						Expect(cfg.CaCerts).To(Equal([]string{string(testCa), string(testCa)}))
+						Expect(cfg.CaCerts).To(Equal([]string{string(ca1), string(ca2)}))
 					})
 				})
 
@@ -339,10 +341,10 @@ var _ = Describe("API", func() {
 					Expect(err).To(BeNil())
 					authCa, err := ioutil.ReadFile("../test/auth-tls-ca.pem")
 					Expect(err).To(BeNil())
-					extraCa, err := ioutil.ReadFile("../test/test-ca.pem")
+					extraCa, err := ioutil.ReadFile("../test/extra-ca.pem")
 					Expect(err).To(BeNil())
 
-					session := runCommand("api", "-s", server.URL(), "--ca-cert", "../test/server-tls-ca.pem", "--ca-cert", "../test/auth-tls-ca.pem", "--ca-cert", "../test/test-ca.pem")
+					session := runCommand("api", "-s", server.URL(), "--ca-cert", "../test/server-tls-ca.pem", "--ca-cert", "../test/auth-tls-ca.pem", "--ca-cert", "../test/extra-ca.pem")
 					Eventually(session).Should(Exit(0))
 
 					cfg := config.ReadConfig()
