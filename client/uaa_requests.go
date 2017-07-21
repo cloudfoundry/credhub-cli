@@ -57,3 +57,13 @@ func NewTokenRevocationRequest(cfg config.Config) (*http.Request, error) {
 	request.Header.Add("Authorization", "Bearer "+cfg.AccessToken)
 	return request, nil
 }
+
+func NewAuthServerInfoRequest(cfg config.Config) (*http.Request, error) {
+	requestUrl := cfg.AuthURL + "/info"
+	request, err := http.NewRequest("GET", requestUrl, nil)
+	if err != nil {
+		return nil, err
+	}
+	request.Header.Add("Accept", "application/json")
+	return request, nil
+}

@@ -2,9 +2,7 @@ package config
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"path"
 )
@@ -61,19 +59,26 @@ func RemoveConfig() error {
 	return os.Remove(ConfigPath())
 }
 
-func (cfg *Config) ReadTrustedCAs(caCerts []string) {
-	for _, certPath := range caCerts {
-		_, err := os.Stat(certPath)
-		handleError(err)
-		serverCA, err := ioutil.ReadFile(certPath)
-		handleError(err)
-		cfg.CaCerts = append(cfg.CaCerts, string(serverCA))
-	}
-}
+func (cfg *Config) UpdateTrustedCAs(caCerts []string) error {
+	certs := []string{}
 
-func handleError(err error) {
-	if err != nil {
-		fmt.Println(err)
-		log.Fatal("Fatal", err)
+	for _, cert := range caCerts {
+		_, err := os.Stat(cert)
+
+		if err != nil {
+			certs = append(certs, string(cert))
+		} else {
+			certContents, err := ioutil.ReadFile(cert)
+
+			if err != nil {
+				return err
+			}
+
+			certs = append(certs, string(certContents))
+		}
 	}
+
+	cfg.CaCerts = certs
+
+	return nil
 }

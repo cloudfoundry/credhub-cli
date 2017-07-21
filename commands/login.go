@@ -15,7 +15,7 @@ type LoginCommand struct {
 	ClientName        string   `long:"client-name" description:"Client name for UAA client grant" env:"CREDHUB_CLIENT"`
 	ClientSecret      string   `long:"client-secret" description:"Client secret for UAA client grant" env:"CREDHUB_SECRET"`
 	ServerUrl         string   `short:"s" long:"server" description:"URI of API server to target"`
-	CaCert            []string `long:"ca-cert" description:"Trusted CA for API and UAA TLS connections"`
+	CaCerts           []string `long:"ca-cert" description:"Trusted CA for API and UAA TLS connections" env:"CREDHUB_CA_CERT"`
 	SkipTlsValidation bool     `long:"skip-tls-validation" description:"Skip certificate validation of the API endpoint. Not recommended!"`
 }
 
@@ -31,9 +31,13 @@ func (cmd LoginCommand) Execute([]string) error {
 		return errors.NewNoApiUrlSetError()
 	}
 
-	cfg.ReadTrustedCAs(cmd.CaCert)
-
 	if cmd.ServerUrl != "" {
+		err = cfg.UpdateTrustedCAs(cmd.CaCerts)
+
+		if err != nil {
+			return err
+		}
+
 		err = GetApiInfo(&cfg, cmd.ServerUrl, cmd.SkipTlsValidation)
 		if err != nil {
 			return err

@@ -30,9 +30,8 @@ var _ = Describe("Token", func() {
 			cfg.AccessToken = "2YotnFZFEjr1zCsicMWpAA"
 			config.WriteConfig(cfg)
 
-			uaaServer.AppendHandlers(
+			uaaServer.RouteToHandler("POST", "/oauth/token/",
 				CombineHandlers(
-					VerifyRequest("POST", "/oauth/token/"),
 					VerifyBody([]byte(`grant_type=refresh_token&refresh_token=revoked`)),
 					RespondWith(http.StatusOK, `{
 						"access_token":"2YotnFZFEjr1zCsicMWpAA",

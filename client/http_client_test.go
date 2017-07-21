@@ -18,7 +18,7 @@ var _ = Describe("#NewHttpClient", func() {
 	)
 
 	BeforeEach(func() {
-		ca, _ := ioutil.ReadFile("../test/test-ca.pem")
+		ca, _ := ioutil.ReadFile("../test/server-tls-ca.pem")
 		testCa = string(ca)
 	})
 

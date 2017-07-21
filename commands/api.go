@@ -5,7 +5,9 @@ import (
 
 	"net/url"
 
+	"github.com/cloudfoundry-incubator/credhub-cli/actions"
 	"github.com/cloudfoundry-incubator/credhub-cli/api"
+	"github.com/cloudfoundry-incubator/credhub-cli/client"
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	"github.com/cloudfoundry-incubator/credhub-cli/errors"
 	"github.com/fatih/color"
@@ -17,7 +19,7 @@ var deprecation = color.New(color.Bold, color.FgRed).PrintlnFunc()
 type ApiCommand struct {
 	Server            ApiPositionalArgs `positional-args:"yes"`
 	ServerFlagUrl     string            `short:"s" long:"server" description:"URI of API server to target"`
-	CaCerts           []string          `long:"ca-cert" description:"Trusted CA for API and UAA TLS connections"`
+	CaCerts           []string          `long:"ca-cert" description:"Trusted CA for API and UAA TLS connections" env:"CREDHUB_CA_CERT"`
 	SkipTlsValidation bool              `long:"skip-tls-validation" description:"Skip certificate validation of the API endpoint. Not recommended!"`
 }
 
@@ -29,8 +31,6 @@ func (cmd ApiCommand) Execute([]string) error {
 	cfg := config.ReadConfig()
 	serverUrl := targetUrl(cmd)
 
-	cfg.ReadTrustedCAs(cmd.CaCerts)
-
 	if serverUrl == "" {
 		if cfg.ApiURL != "" {
 			fmt.Println(cfg.ApiURL)
@@ -39,7 +39,13 @@ func (cmd ApiCommand) Execute([]string) error {
 		}
 	} else {
 		existingCfg := cfg
-		err := GetApiInfo(&cfg, serverUrl, cmd.SkipTlsValidation)
+
+		err := cfg.UpdateTrustedCAs(cmd.CaCerts)
+		if err != nil {
+			return err
+		}
+
+		err = GetApiInfo(&cfg, serverUrl, cmd.SkipTlsValidation)
 		if err != nil {
 			return err
 		}
@@ -50,8 +56,11 @@ func (cmd ApiCommand) Execute([]string) error {
 			a := api.NewApi(&existingCfg)
 			a.Logout()
 		}
+		err = config.WriteConfig(cfg)
 
-		config.WriteConfig(cfg)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -80,6 +89,11 @@ func GetApiInfo(cfg *config.Config, serverUrl string, skipTlsValidation bool) er
 		}
 	}
 
+	err = verifyAuthServerConnection(*cfg, skipTlsValidation)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -89,4 +103,14 @@ func targetUrl(cmd ApiCommand) string {
 	} else {
 		return cmd.ServerFlagUrl
 	}
+}
+
+func verifyAuthServerConnection(cfg config.Config, skipTlsValidation bool) error {
+	var err error
+
+	if !skipTlsValidation {
+		err = actions.VerifyAuthServerConnection(client.NewHttpClient(cfg), cfg)
+	}
+
+	return err
 }

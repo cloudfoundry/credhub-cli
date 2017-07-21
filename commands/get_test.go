@@ -46,7 +46,7 @@ var _ = Describe("Get", func() {
 	It("gets a value secret", func() {
 		responseJson := fmt.Sprintf(STRING_CREDENTIAL_ARRAY_RESPONSE_JSON, "value", "my-value", "potatoes")
 
-		server.AppendHandlers(
+		server.RouteToHandler("GET", "/api/v1/data",
 			CombineHandlers(
 				VerifyRequest("GET", "/api/v1/data", "name=my-value&current=true"),
 				RespondWith(http.StatusOK, responseJson),
@@ -62,7 +62,7 @@ var _ = Describe("Get", func() {
 	It("gets a password secret", func() {
 		responseJson := fmt.Sprintf(STRING_CREDENTIAL_ARRAY_RESPONSE_JSON, "password", "my-password", "potatoes")
 
-		server.AppendHandlers(
+		server.RouteToHandler("GET", "/api/v1/data",
 			CombineHandlers(
 				VerifyRequest("GET", "/api/v1/data", "name=my-password&current=true"),
 				RespondWith(http.StatusOK, responseJson),
@@ -78,7 +78,7 @@ var _ = Describe("Get", func() {
 	It("gets a json secret", func() {
 		serverResponse := fmt.Sprintf(JSON_CREDENTIAL_ARRAY_RESPONSE_JSON, "json-secret", `{"foo":"bar","nested":{"a":1},"an":["array"]}`)
 
-		server.AppendHandlers(
+		server.RouteToHandler("GET", "/api/v1/data",
 			CombineHandlers(
 				VerifyRequest("GET", "/api/v1/data", "name=json-secret&current=true"),
 				RespondWith(http.StatusOK, serverResponse),
@@ -94,7 +94,7 @@ var _ = Describe("Get", func() {
 	It("gets a certificate secret", func() {
 		responseJson := fmt.Sprintf(CERTIFICATE_CREDENTIAL_ARRAY_RESPONSE_JSON, "my-secret", "my-ca", "my-cert", "my-priv")
 
-		server.AppendHandlers(
+		server.RouteToHandler("GET", "/api/v1/data",
 			CombineHandlers(
 				VerifyRequest("GET", "/api/v1/data", "name=my-secret&current=true"),
 				RespondWith(http.StatusOK, responseJson),
@@ -110,7 +110,7 @@ var _ = Describe("Get", func() {
 	It("gets an rsa secret", func() {
 		responseJson := fmt.Sprintf(RSA_SSH_CREDENTIAL_ARRAY_RESPONSE_JSON, "rsa", "foo-rsa-key", "some-public-key", "some-private-key")
 
-		server.AppendHandlers(
+		server.RouteToHandler("GET", "/api/v1/data",
 			CombineHandlers(
 				VerifyRequest("GET", "/api/v1/data", "name=foo-rsa-key&current=true"),
 				RespondWith(http.StatusOK, responseJson),
@@ -126,7 +126,7 @@ var _ = Describe("Get", func() {
 	It("can output json", func() {
 		responseJson := fmt.Sprintf(STRING_CREDENTIAL_ARRAY_RESPONSE_JSON, "password", "my-password", "potatoes")
 
-		server.AppendHandlers(
+		server.RouteToHandler("GET", "/api/v1/data",
 			CombineHandlers(
 				VerifyRequest("GET", "/api/v1/data", "name=my-password&current=true"),
 				RespondWith(http.StatusOK, responseJson),
@@ -148,7 +148,7 @@ var _ = Describe("Get", func() {
 	It("gets a user secret", func() {
 		responseJson := fmt.Sprintf(USER_CREDENTIAL_ARRAY_RESPONSE_JSON, "my-username-credential", "my-username", "test-password", "passw0rd-H4$h")
 
-		server.AppendHandlers(
+		server.RouteToHandler("GET", "/api/v1/data",
 			CombineHandlers(
 				VerifyRequest("GET", "/api/v1/data", "name=my-username-credential&current=true"),
 				RespondWith(http.StatusOK, responseJson),
@@ -164,7 +164,7 @@ var _ = Describe("Get", func() {
 	It("gets a secret by ID", func() {
 		responseJson := fmt.Sprintf(STRING_CREDENTIAL_ARRAY_RESPONSE_JSON, "password", "my-password", "potatoes")
 
-		server.AppendHandlers(
+		server.RouteToHandler("GET", "/api/v1/data/"+UUID,
 			CombineHandlers(
 				VerifyRequest("GET", "/api/v1/data/"+UUID),
 				RespondWith(http.StatusOK, responseJson),
@@ -180,7 +180,7 @@ var _ = Describe("Get", func() {
 	It("does not use Printf on user-supplied data", func() {
 		responseJson := fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_JSON, "password", "injected", "et''%/7(V&`|?m|Ckih$")
 
-		server.AppendHandlers(
+		server.RouteToHandler("GET", "/api/v1/data",
 			CombineHandlers(
 				VerifyRequest("GET", "/api/v1/data", "name=injected&current=true"),
 				RespondWith(http.StatusOK, responseJson),

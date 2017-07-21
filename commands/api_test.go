@@ -16,6 +16,16 @@ import (
 )
 
 var _ = Describe("API", func() {
+	BeforeEach(func() {
+		server.RouteToHandler("GET", "/info",
+			RespondWith(http.StatusOK, `{
+					"app":{"version":"my-version","name":"CredHub"},
+					"auth-server":{"url":"`+authServer.URL()+`"}
+					}`),
+		)
+
+		authServer.RouteToHandler("GET", "/info", RespondWith(http.StatusOK, ""))
+	})
 
 	ItBehavesLikeHelp("api", "a", func(session *Session) {
 		Expect(session.Err).To(Say("api"))
@@ -49,22 +59,15 @@ var _ = Describe("API", func() {
 			newAuthServer := NewServer()
 
 			apiServer := NewServer()
-			apiServer.AppendHandlers(
-				CombineHandlers(
-					VerifyRequest("GET", "/info"),
-					RespondWith(http.StatusOK, `{
+			apiServer.RouteToHandler("GET", "/info", RespondWith(http.StatusOK, `{
 						"app":{"version":"0.1.0 build DEV","name":"CredHub"},
 						"auth-server":{"url":"`+newAuthServer.URL()+`"}
 						}`),
-				),
 			)
 
-			authServer.AppendHandlers(
-				CombineHandlers(
-					VerifyRequest("DELETE", "/oauth/token/revoke/5b9c9fd51ba14838ac2e6b222d487106-r"),
-					RespondWith(http.StatusOK, ""),
-				),
-			)
+			authServer.RouteToHandler("DELETE", "/oauth/token/revoke/5b9c9fd51ba14838ac2e6b222d487106-r", RespondWith(http.StatusOK, ""))
+
+			newAuthServer.RouteToHandler("GET", "/info", RespondWith(http.StatusOK, ""))
 
 			cfg := config.ReadConfig()
 			cfg.AuthURL = authServer.URL()
@@ -83,14 +86,11 @@ var _ = Describe("API", func() {
 
 		It("leaves existing auth tokens intact when setting a new api with the same auth server", func() {
 			apiServer := NewServer()
-			apiServer.AppendHandlers(
-				CombineHandlers(
-					VerifyRequest("GET", "/info"),
-					RespondWith(http.StatusOK, `{
+			apiServer.RouteToHandler("GET", "/info",
+				RespondWith(http.StatusOK, `{
 						"app":{"version":"my-version","name":"CredHub"},
 						"auth-server":{"url":"`+authServer.URL()+`"}
 						}`),
-				),
 			)
 
 			cfg := config.ReadConfig()
@@ -98,7 +98,7 @@ var _ = Describe("API", func() {
 			cfg.RefreshToken = "fake_refresh"
 			config.WriteConfig(cfg)
 
-			session := runCommand("api", apiServer.URL())
+			session := runCommand("api", apiServer.URL(), "--skip-tls-validation")
 
 			Eventually(session).Should(Exit(0))
 			newCfg := config.ReadConfig()
@@ -109,12 +109,7 @@ var _ = Describe("API", func() {
 
 		It("retains existing tokens when setting the api fails", func() {
 			apiServer := NewServer()
-			apiServer.AppendHandlers(
-				CombineHandlers(
-					VerifyRequest("GET", "/info"),
-					RespondWith(http.StatusNotFound, ""),
-				),
-			)
+			apiServer.RouteToHandler("GET", "/info", RespondWith(http.StatusNotFound, ""))
 
 			cfg := config.ReadConfig()
 			cfg.AuthURL = authServer.URL()
@@ -197,12 +192,7 @@ var _ = Describe("API", func() {
 					Eventually(session).Should(Exit(0))
 
 					badServer = NewServer()
-					badServer.AppendHandlers(
-						CombineHandlers(
-							VerifyRequest("GET", "/info"),
-							RespondWith(http.StatusNotFound, ""),
-						),
-					)
+					badServer.RouteToHandler("GET", "/info", RespondWith(http.StatusNotFound, ""))
 				})
 
 				AfterEach(func() {
@@ -320,8 +310,10 @@ var _ = Describe("API", func() {
 			Describe("ca certs", func() {
 				Context("with a single ca cert", func() {
 					It("saves the caCert in the config", func() {
-						testCa, _ := ioutil.ReadFile("../test/test-ca.pem")
-						session := runCommand("api", "-s", theServer.URL(), "--ca-cert", "../test/test-ca.pem")
+						testCa, err := ioutil.ReadFile("../test/server-tls-ca.pem")
+						Expect(err).To(BeNil())
+
+						session := runCommand("api", "-s", theServer.URL(), "--ca-cert", "../test/server-tls-ca.pem")
 						Eventually(session).Should(Exit(0))
 
 						cfg := config.ReadConfig()
@@ -331,13 +323,76 @@ var _ = Describe("API", func() {
 
 				Context("with multiple ca certs", func() {
 					It("saves the certs in the config", func() {
-						testCa, _ := ioutil.ReadFile("../test/test-ca.pem")
-						session := runCommand("api", "-s", theServer.URL(), "--ca-cert", "../test/test-ca.pem", "--ca-cert", "../test/test-ca.pem")
+						ca1, err := ioutil.ReadFile("../test/server-tls-ca.pem")
+						Expect(err).To(BeNil())
+						ca2, err := ioutil.ReadFile("../test/extra-ca.pem")
+						Expect(err).To(BeNil())
+
+						session := runCommand("api", "-s", theServer.URL(), "--ca-cert", "../test/server-tls-ca.pem", "--ca-cert", "../test/extra-ca.pem")
 						Eventually(session).Should(Exit(0))
 
 						cfg := config.ReadConfig()
-						Expect(cfg.CaCerts).To(Equal([]string{string(testCa), string(testCa)}))
+						Expect(cfg.CaCerts).To(Equal([]string{string(ca1), string(ca2)}))
 					})
+				})
+
+				It("overwrites previously set certificates", func() {
+					serverCa, err := ioutil.ReadFile("../test/server-tls-ca.pem")
+					Expect(err).To(BeNil())
+					authCa, err := ioutil.ReadFile("../test/auth-tls-ca.pem")
+					Expect(err).To(BeNil())
+					extraCa, err := ioutil.ReadFile("../test/extra-ca.pem")
+					Expect(err).To(BeNil())
+
+					session := runCommand("api", "-s", server.URL(), "--ca-cert", "../test/server-tls-ca.pem", "--ca-cert", "../test/auth-tls-ca.pem", "--ca-cert", "../test/extra-ca.pem")
+					Eventually(session).Should(Exit(0))
+
+					cfg := config.ReadConfig()
+					Expect(cfg.CaCerts).To(Equal([]string{string(serverCa), string(authCa), string(extraCa)}))
+
+					session = runCommand("api", "-s", server.URL(), "--ca-cert", "../test/server-tls-ca.pem", "--ca-cert", "../test/auth-tls-ca.pem")
+					Eventually(session).Should(Exit(0))
+
+					cfg = config.ReadConfig()
+					Expect(cfg.CaCerts).To(Equal([]string{string(serverCa), string(authCa)}))
+				})
+
+				It("returns an error if no cert is valid for CredHub", func() {
+					previousCfg := config.ReadConfig()
+					session := runCommand("api", "-s", server.URL(), "--ca-cert", "../test/auth-tls-ca.pem")
+
+					Eventually(session).Should(Exit(1))
+					Eventually(session.Err).Should(Say("certificate signed by unknown authority"))
+
+					cfg := config.ReadConfig()
+					Expect(cfg.CaCerts).To(Equal(previousCfg.CaCerts))
+				})
+
+				It("returns an error if no cert is valid for the auth server", func() {
+					previousCfg := config.ReadConfig()
+					session := runCommand("api", "-s", server.URL(), "--ca-cert", "../test/server-tls-ca.pem")
+
+					Eventually(session).Should(Exit(1))
+					Eventually(session.Err).Should(Say("certificate signed by unknown authority"))
+
+					cfg := config.ReadConfig()
+					Expect(cfg.CaCerts).To(Equal(previousCfg.CaCerts))
+				})
+
+				It("accepts the ca cert through the environment", func() {
+					authServer.Close()
+
+					authServer = NewTlsServer("../test/server-tls-cert.pem", "../test/server-tls-key.pem")
+					SetupServers(server, authServer)
+
+					serverCa, err := ioutil.ReadFile("../test/server-tls-ca.pem")
+					Expect(err).To(BeNil())
+
+					session := runCommandWithEnv([]string{"CREDHUB_CA_CERT=../test/server-tls-ca.pem"}, "api", server.URL())
+					Eventually(session).Should(Exit(0))
+
+					cfg := config.ReadConfig()
+					Expect(cfg.CaCerts).To(ConsistOf([]string{string(serverCa)}))
 				})
 			})
 		})
@@ -350,14 +405,11 @@ var _ = Describe("API", func() {
 			BeforeEach(func() {
 				httpServer = NewServer()
 
-				httpServer.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest("GET", "/info"),
-						RespondWith(http.StatusOK, `{
+				httpServer.RouteToHandler("GET", "/info",
+					RespondWith(http.StatusOK, `{
 						"app":{"version":"my-version","name":"CredHub"},
 						"auth-server":{"url":"https://example.com"}
 						}`),
-					),
 				)
 			})
 
@@ -389,14 +441,11 @@ var _ = Describe("API", func() {
 func setUpServer(aServer *Server) string {
 	aUrl := aServer.URL()
 
-	aServer.AppendHandlers(
-		CombineHandlers(
-			VerifyRequest("GET", "/info"),
-			RespondWith(http.StatusOK, `{
+	aServer.RouteToHandler("GET", "/info",
+		RespondWith(http.StatusOK, `{
 					"app":{"version":"0.1.0 build DEV","name":"CredHub"},
 					"auth-server":{"url":"https://example.com"}
 					}`),
-		),
 	)
 
 	return aUrl

@@ -24,6 +24,15 @@ var _ = Describe("Login", func() {
 
 	BeforeEach(func() {
 		uaaServer = NewServer()
+
+		server.RouteToHandler("GET", "/info",
+			RespondWith(http.StatusOK, `{
+				"app":{"version":"my-version","name":"CredHub"},
+				"auth-server":{"url":"`+authServer.URL()+`"}
+				}`),
+		)
+
+		authServer.RouteToHandler("GET", "/info", RespondWith(http.StatusOK, ""))
 	})
 
 	AfterEach(func() {
@@ -84,9 +93,8 @@ var _ = Describe("Login", func() {
 
 	Describe("password flow", func() {
 		BeforeEach(func() {
-			uaaServer.AppendHandlers(
+			uaaServer.RouteToHandler("POST", "/oauth/token/",
 				CombineHandlers(
-					VerifyRequest("POST", "/oauth/token/"),
 					VerifyBody([]byte(`grant_type=password&password=pass&response_type=token&username=user`)),
 					RespondWith(http.StatusOK, `{
 						"access_token":"2YotnFZFEjr1zCsicMWpAA",
@@ -148,9 +156,8 @@ var _ = Describe("Login", func() {
 
 	Describe("client flow", func() {
 		BeforeEach(func() {
-			uaaServer.AppendHandlers(
+			uaaServer.RouteToHandler("POST", "/oauth/token/",
 				CombineHandlers(
-					VerifyRequest("POST", "/oauth/token/"),
 					VerifyBody([]byte(`client_id=test_client&client_secret=test_secret&grant_type=client_credentials&response_type=token`)),
 					RespondWith(http.StatusOK, `{
 						"access_token":"2YotnFZFEjr1zCsicMWpAA",
@@ -264,9 +271,8 @@ var _ = Describe("Login", func() {
 
 		BeforeEach(func() {
 			uaaServer = NewServer()
-			uaaServer.AppendHandlers(
+			uaaServer.RouteToHandler("POST", "/oauth/token/",
 				CombineHandlers(
-					VerifyRequest("POST", "/oauth/token/"),
 					VerifyBody([]byte(`grant_type=password&password=pass&response_type=token&username=user`)),
 					RespondWith(http.StatusOK, `{
 						"access_token":"2YotnFZFEjr1zCsicMWpAA",
@@ -275,6 +281,8 @@ var _ = Describe("Login", func() {
 						"expires_in":3600}`),
 				),
 			)
+
+			uaaServer.RouteToHandler("GET", "/info", RespondWith(http.StatusOK, ""))
 
 			apiServer = NewServer()
 			setupServer(apiServer, uaaServer.URL())
@@ -289,7 +297,7 @@ var _ = Describe("Login", func() {
 			session := runCommand("login", "-u", "user", "-p", "pass", "-s", apiServer.URL())
 
 			Expect(apiServer.ReceivedRequests()).Should(HaveLen(1))
-			Expect(uaaServer.ReceivedRequests()).Should(HaveLen(1))
+			Expect(uaaServer.ReceivedRequests()).Should(HaveLen(2))
 			Eventually(session).Should(Exit(0))
 			Eventually(session.Out).Should(Say("Login Successful"))
 			cfg := config.ReadConfig()
@@ -298,13 +306,40 @@ var _ = Describe("Login", func() {
 		})
 
 		It("saves caCert to config when it is provided", func() {
-			testCa, _ := ioutil.ReadFile("../test/test-ca.pem")
-			session := runCommand("login", "-u", "user", "-p", "pass", "-s", apiServer.URL(), "--ca-cert", "../test/test-ca.pem")
+			testCa, _ := ioutil.ReadFile("../test/server-tls-ca.pem")
+			session := runCommand("login", "-u", "user", "-p", "pass", "-s", apiServer.URL(), "--ca-cert", "../test/server-tls-ca.pem")
 
 			Expect(session).Should(Exit(0))
 			cfg := config.ReadConfig()
 
 			Expect(cfg.CaCerts).Should(Equal([]string{string(testCa)}))
+		})
+
+		It("accepts the ca cert through the environment", func() {
+			authServer.Close()
+
+			authServer = NewTlsServer("../test/server-tls-cert.pem", "../test/server-tls-key.pem")
+			SetupServers(server, authServer)
+
+			authServer.RouteToHandler("POST", "/oauth/token/",
+				CombineHandlers(
+					VerifyBody([]byte(`grant_type=password&password=pass&response_type=token&username=user`)),
+					RespondWith(http.StatusOK, `{
+						"access_token":"2YotnFZFEjr1zCsicMWpAA",
+						"refresh_token":"erousflkajqwer",
+						"token_type":"bearer",
+						"expires_in":3600}`),
+				),
+			)
+
+			serverCa, err := ioutil.ReadFile("../test/server-tls-ca.pem")
+			Expect(err).To(BeNil())
+
+			session := runCommandWithEnv([]string{"CREDHUB_CA_CERT=../test/server-tls-ca.pem"}, "login", "-s", server.URL(), "-u", "user", "-p", "pass")
+			Eventually(session).Should(Exit(0))
+
+			cfg := config.ReadConfig()
+			Expect(cfg.CaCerts).To(ConsistOf([]string{string(serverCa)}))
 		})
 
 		Context("when the user skips TLS validation", func() {
@@ -380,6 +415,28 @@ var _ = Describe("Login", func() {
 			Expect(cfg.RefreshToken).To(Equal("erousflkajqwer"))
 		})
 
+		It("returns an error if no cert is valid for CredHub", func() {
+			previousCfg := config.ReadConfig()
+			session := runCommand("login", "-s", server.URL(), "u", "user", "-p", "pass", "--ca-cert", "../test/auth-tls-ca.pem")
+
+			Eventually(session).Should(Exit(1))
+			Eventually(session.Err).Should(Say("certificate signed by unknown authority"))
+
+			cfg := config.ReadConfig()
+			Expect(cfg.CaCerts).To(Equal(previousCfg.CaCerts))
+		})
+
+		It("returns an error if no cert is valid for the auth server", func() {
+			previousCfg := config.ReadConfig()
+			session := runCommand("login", "-s", server.URL(), "-u", "user", "-p", "pass", "--ca-cert", "../test/server-tls-ca.pem")
+
+			Eventually(session).Should(Exit(1))
+			Eventually(session.Err).Should(Say("certificate signed by unknown authority"))
+
+			cfg := config.ReadConfig()
+			Expect(cfg.CaCerts).To(Equal(previousCfg.CaCerts))
+		})
+
 		Context("when api server is unavailable", func() {
 			var (
 				badServer *Server
@@ -387,12 +444,7 @@ var _ = Describe("Login", func() {
 
 			BeforeEach(func() {
 				badServer = NewServer()
-				badServer.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest("GET", "/info"),
-						RespondWith(http.StatusBadGateway, nil),
-					),
-				)
+				badServer.RouteToHandler("GET", "/info", RespondWith(http.StatusBadGateway, nil))
 			})
 
 			It("should not login", func() {
@@ -427,20 +479,18 @@ var _ = Describe("Login", func() {
 
 			BeforeEach(func() {
 				badUaaServer = NewServer()
-				badUaaServer.AppendHandlers(
+				badUaaServer.RouteToHandler("POST", "/oauth/token/",
 					CombineHandlers(
-						VerifyRequest("POST", "/oauth/token/"),
 						VerifyBody([]byte(`grant_type=password&password=pass&response_type=token&username=user`)),
 						RespondWith(http.StatusUnauthorized, `{
 						"error":"unauthorized",
 						"error_description":"An Authentication object was not found in the SecurityContext"
 						}`),
-					),
-					CombineHandlers(
-						VerifyRequest("DELETE", "/oauth/token/revoke/5b9c9fd51ba14838ac2e6b222d487106-r"),
-						RespondWith(http.StatusOK, ""),
-					),
+					))
+				badUaaServer.RouteToHandler("DELETE", "/oauth/token/revoke/5b9c9fd51ba14838ac2e6b222d487106-r",
+					RespondWith(http.StatusOK, ""),
 				)
+				badUaaServer.RouteToHandler("GET", "/info", RespondWith(http.StatusOK, ""))
 
 				apiServer = NewServer()
 				setupServer(apiServer, badUaaServer.URL())
@@ -531,13 +581,10 @@ func setConfigAuthUrl(authUrl string) {
 }
 
 func setupServer(theServer *Server, uaaUrl string) {
-	theServer.AppendHandlers(
-		CombineHandlers(
-			VerifyRequest("GET", "/info"),
-			RespondWith(http.StatusOK, fmt.Sprintf(`{
+	theServer.RouteToHandler("GET", "/info",
+		RespondWith(http.StatusOK, fmt.Sprintf(`{
 					"app":{"version":"0.1.0 build DEV","name":"CredHub"},
 					"auth-server":{"url":"%s"}
 					}`, uaaUrl)),
-		),
 	)
 }

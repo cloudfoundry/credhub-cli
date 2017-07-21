@@ -103,4 +103,16 @@ var _ = Describe("UAA Requests", func() {
 			Expect(request).To(Equal(expectedRequest))
 		})
 	})
+
+	Describe("NewAuthServerInfoRequest", func() {
+		It("returns a request to the info endpoint", func() {
+			expectedUrl := cfg.AuthURL + "/info"
+			expectedRequest, _ := http.NewRequest("GET", expectedUrl, nil)
+			expectedRequest.Header.Add("Accept", "application/json")
+
+			request, _ := NewAuthServerInfoRequest(cfg)
+
+			Expect(request).To(Equal(expectedRequest))
+		})
+	})
 })

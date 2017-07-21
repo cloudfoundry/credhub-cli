@@ -55,11 +55,9 @@ func doRevoke(uaaResponseStatus int) {
 	}
 	config.WriteConfig(cfg)
 
-	authServer.AppendHandlers(
-		CombineHandlers(
-			VerifyRequest("DELETE", "/oauth/token/revoke/5b9c9fd51ba14838ac2e6b222d487106-r"),
-			RespondWith(uaaResponseStatus, ""),
-		),
+	authServer.RouteToHandler(
+		"DELETE", "/oauth/token/revoke/5b9c9fd51ba14838ac2e6b222d487106-r",
+		RespondWith(uaaResponseStatus, ""),
 	)
 	runLogoutCommand()
 }

@@ -16,6 +16,8 @@ import (
 	"runtime"
 	"testing"
 
+	"crypto/tls"
+
 	test_util "github.com/cloudfoundry-incubator/credhub-cli/test"
 )
 
@@ -95,21 +97,15 @@ var _ = BeforeEach(func() {
 		os.Setenv("HOME", homeDir)
 	}
 
-	server = NewServer()
-	authServer = NewServer()
+	server = NewTlsServer("../test/server-tls-cert.pem", "../test/server-tls-key.pem")
+	authServer = NewTlsServer("../test/auth-tls-cert.pem", "../test/auth-tls-key.pem")
 
-	server.AppendHandlers(
-		CombineHandlers(
-			VerifyRequest("GET", "/info"),
-			RespondWith(http.StatusOK, `{
-					"app":{"version":"my-version","name":"CredHub"},
-					"auth-server":{"url":"`+authServer.URL()+`"}
-					}`),
-		),
-	)
+	SetupServers(server, authServer)
 
-	session := runCommand("api", server.URL())
+	session := runCommand("api", server.URL(), "--ca-cert", "../test/server-tls-ca.pem", "--ca-cert", "../test/auth-tls-ca.pem")
+
 	server.Reset()
+	authServer.Reset()
 
 	Eventually(session).Should(Exit(0))
 })
@@ -201,6 +197,37 @@ func createCredentialFile(dir, filename string, contents string) string {
 	return path
 }
 
+func NewTlsServer(certPath, keyPath string) *Server {
+	tlsServer := NewUnstartedServer()
+
+	cert, err := ioutil.ReadFile(certPath)
+	Expect(err).To(BeNil())
+	key, err := ioutil.ReadFile(keyPath)
+	Expect(err).To(BeNil())
+
+	tlsCert, err := tls.X509KeyPair(cert, key)
+	Expect(err).To(BeNil())
+
+	tlsServer.HTTPTestServer.TLS = &tls.Config{
+		Certificates: []tls.Certificate{tlsCert},
+	}
+
+	tlsServer.HTTPTestServer.StartTLS()
+
+	return tlsServer
+}
+
+func SetupServers(chServer, uaaServer *Server) {
+	chServer.RouteToHandler("GET", "/info",
+		RespondWith(http.StatusOK, `{
+				"app":{"version":"my-version","name":"CredHub"},
+				"auth-server":{"url":"`+uaaServer.URL()+`"}
+				}`),
+	)
+
+	uaaServer.RouteToHandler("GET", "/info", RespondWith(http.StatusOK, ""))
+}
+
 func ItBehavesLikeHelp(command string, alias string, validate func(*Session)) {
 	It("displays help", func() {
 		session := runCommand(command, "-h")
@@ -217,11 +244,8 @@ func ItBehavesLikeHelp(command string, alias string, validate func(*Session)) {
 
 func ItRequiresAuthentication(args ...string) {
 	It("requires authentication", func() {
-		authServer.AppendHandlers(
-			CombineHandlers(
-				VerifyRequest("DELETE", "/oauth/token/revoke/test-refresh-token"),
-				RespondWith(http.StatusOK, nil),
-			),
+		authServer.RouteToHandler("DELETE", "/oauth/token/revoke/test-refresh-token",
+			RespondWith(http.StatusOK, nil),
 		)
 
 		runCommand("logout")
@@ -236,11 +260,9 @@ func ItRequiresAuthentication(args ...string) {
 func ItAutomaticallyLogsIn(method string, args ...string) {
 	Describe("automatic authentication", func() {
 		BeforeEach(func() {
-			server.AppendHandlers(
-				CombineHandlers(
-					VerifyRequest(method, "/api/v1/data"),
-					RespondWith(http.StatusOK, `{"type":"json","id":"some_uuid","name":"my-json","version_created_at":"idc","value":{"key": 1}, "credentials": [{"name": "key", "version_created_at": "something"}]}`),
-				))
+			server.RouteToHandler(method, "/api/v1/data",
+				RespondWith(http.StatusOK, `{"type":"json","id":"some_uuid","name":"my-json","version_created_at":"idc","value":{"key": 1}, "credentials": [{"name": "key", "version_created_at": "something"}]}`),
+			)
 		})
 
 		AfterEach(func() {
@@ -250,11 +272,9 @@ func ItAutomaticallyLogsIn(method string, args ...string) {
 		Context("with correct environment and unauthenticated", func() {
 			It("automatically authenticates", func() {
 
-				authServer.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest("DELETE", "/oauth/token/revoke/test-refresh-token"),
-						RespondWith(http.StatusOK, nil),
-					),
+				authServer.RouteToHandler(
+					"DELETE", "/oauth/token/revoke/test-refresh-token",
+					RespondWith(http.StatusOK, nil),
 				)
 
 				authServer.AppendHandlers(
