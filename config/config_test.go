@@ -3,6 +3,8 @@
 package config_test
 
 import (
+	"io/ioutil"
+
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -24,15 +26,24 @@ var _ = Describe("Config", func() {
 
 	Describe("#UpdateTrustedCAs", func() {
 		It("reads multiple certs", func() {
+			ca1, err := ioutil.ReadFile("../test/server-tls-ca.pem")
+			Expect(err).To(BeNil())
+			ca2, err := ioutil.ReadFile("../test/auth-tls-ca.pem")
+			Expect(err).To(BeNil())
+
 			cfg.UpdateTrustedCAs([]string{"../test/server-tls-ca.pem", "../test/auth-tls-ca.pem"})
-			Expect(cfg.CaCerts).To(HaveLen(2))
+
+			Expect(cfg.CaCerts).To(ConsistOf([]string{string(ca1), string(ca2)}))
 		})
 
 		It("overrides previous CAs", func() {
-			cfg.CaCerts = []string{"cert1", "cert2"}
+			testCa, err := ioutil.ReadFile("../test/server-tls-ca.pem")
+			Expect(err).To(BeNil())
 
-			cfg.UpdateTrustedCAs([]string{"../test/server-tls-ca.pem", "../test/auth-tls-ca.pem"})
-			Expect(cfg.CaCerts).To(HaveLen(2))
+			cfg.CaCerts = []string{"cert1", "cert2"}
+			cfg.UpdateTrustedCAs([]string{"../test/server-tls-ca.pem"})
+
+			Expect(cfg.CaCerts).To(ConsistOf([]string{string(testCa)}))
 		})
 	})
 })
