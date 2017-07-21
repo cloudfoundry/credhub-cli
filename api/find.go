@@ -34,3 +34,15 @@ func (a *Api) Find(partialCredentialIdentifier string, pathIdentifier string, al
 
 	return credentials.(models.CredentialResponse), err
 }
+
+func (a *Api) FindAll() (models.CredentialResponse, error) {
+	return a.Find("", "", true)
+}
+
+func (a *Api) FindByPath(pathIdentifier string) (models.CredentialResponse, error) {
+	return a.Find("", pathIdentifier, false)
+}
+
+func (a *Api) FindByPartialName(partialCredentialIdentifier string) (models.CredentialResponse, error) {
+	return a.Find(partialCredentialIdentifier, "", false)
+}

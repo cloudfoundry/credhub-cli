@@ -52,31 +52,12 @@ func (cmd GenerateCommand) Execute([]string) error {
 	}
 
 	credential, err := api.NewApi(&cfg).Generate(
-		cmd.CredentialIdentifier,
-		cmd.CredentialType,
-		cmd.NoOverwrite,
-		cmd.OutputJson,
-		cmd.Username,
-		cmd.Length,
-		cmd.IncludeSpecial,
-		cmd.ExcludeNumber,
-		cmd.ExcludeUpper,
-		cmd.ExcludeLower,
-		cmd.SshComment,
-		cmd.KeyLength,
-		cmd.Duration,
-		cmd.CommonName,
-		cmd.Organization,
-		cmd.OrganizationUnit,
-		cmd.Locality,
-		cmd.State,
-		cmd.Country,
-		cmd.AlternativeName,
-		cmd.KeyUsage,
-		cmd.ExtendedKeyUsage,
-		cmd.Ca,
-		cmd.IsCA,
-		cmd.SelfSign,
+		cmd.CredentialIdentifier, cmd.CredentialType, cmd.NoOverwrite,
+		cmd.Username, cmd.Length, cmd.ExcludeUpper, cmd.ExcludeLower, cmd.ExcludeNumber, cmd.IncludeSpecial,
+		cmd.CommonName, cmd.AlternativeName,
+		cmd.Organization, cmd.OrganizationUnit, cmd.Locality, cmd.State, cmd.Country,
+		cmd.KeyLength, cmd.KeyUsage, cmd.ExtendedKeyUsage, cmd.SshComment,
+		cmd.Duration, cmd.Ca, cmd.IsCA, cmd.SelfSign,
 	)
 
 	if err != nil {

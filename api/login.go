@@ -26,3 +26,11 @@ func (a *Api) Login(username string, password string, clientName string, clientS
 	a.Config.RefreshToken = token.RefreshToken
 	return token, err
 }
+
+func (a *Api) LoginWithPassword(username string, password string) (models.Token, error) {
+	return a.Login(username, password, "", "")
+}
+
+func (a *Api) LoginWithClientCredentials(clientName string, clientSecret string) (models.Token, error) {
+	return a.Login("", "", clientName, clientSecret)
+}

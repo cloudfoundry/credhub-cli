@@ -31,3 +31,11 @@ func (a *Api) Get(name string, id string) (models.CredentialResponse, error) {
 
 	return credential.(models.CredentialResponse), err
 }
+
+func (a *Api) GetByName(name string, id string) (models.CredentialResponse, error) {
+	return a.Get(name, "")
+}
+
+func (a *Api) GetById(id string) (models.CredentialResponse, error) {
+	return a.Get("", id)
+}
