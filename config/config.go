@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	"strings"
 )
 
 const AuthClient = "credhub_cli"
@@ -66,7 +67,7 @@ func (cfg *Config) UpdateTrustedCAs(caCerts []string) error {
 		_, err := os.Stat(cert)
 
 		if err != nil {
-			certs = append(certs, string(cert))
+			certs = append(certs, strings.Replace(cert, "\\n", "\n", -1))
 		} else {
 			certContents, err := ioutil.ReadFile(cert)
 
