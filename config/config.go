@@ -60,23 +60,25 @@ func RemoveConfig() error {
 }
 
 func (cfg *Config) UpdateTrustedCAs(caCerts []string) error {
-	cfg.CaCerts = []string{}
+	certs := []string{}
 
-	for _, certPath := range caCerts {
-		_, err := os.Stat(certPath)
-
-		if err != nil {
-			return err
-		}
-
-		serverCA, err := ioutil.ReadFile(certPath)
+	for _, cert := range caCerts {
+		_, err := os.Stat(cert)
 
 		if err != nil {
-			return err
-		}
+			certs = append(certs, string(cert))
+		} else {
+			certContents, err := ioutil.ReadFile(cert)
 
-		cfg.CaCerts = append(cfg.CaCerts, string(serverCA))
+			if err != nil {
+				return err
+			}
+
+			certs = append(certs, string(certContents))
+		}
 	}
+
+	cfg.CaCerts = certs
 
 	return nil
 }
