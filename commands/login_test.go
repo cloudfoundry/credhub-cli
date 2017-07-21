@@ -437,6 +437,28 @@ var _ = Describe("Login", func() {
 			Expect(cfg.CaCerts).To(Equal(previousCfg.CaCerts))
 		})
 
+		It("accepts the API URL from the environment", func() {
+			authServer.RouteToHandler("POST", "/oauth/token/",
+				CombineHandlers(
+					VerifyBody([]byte(`grant_type=password&password=pass&response_type=token&username=user`)),
+					RespondWith(http.StatusOK, `{
+						"access_token":"2YotnFZFEjr1zCsicMWpAA",
+						"refresh_token":"erousflkajqwer",
+						"token_type":"bearer",
+						"expires_in":3600}`),
+				),
+			)
+
+			config.RemoveConfig()
+
+			session := runCommandWithEnv([]string{"CREDHUB_SERVER=" + server.URL()}, "login", "-u", "user", "-p", "pass", "--ca-cert", "../test/server-tls-ca.pem", "--ca-cert", "../test/auth-tls-ca.pem")
+
+			Eventually(session).Should(Exit(0))
+
+			cfg := config.ReadConfig()
+			Expect(cfg.ApiURL).To(Equal(server.URL()))
+		})
+
 		Context("when api server is unavailable", func() {
 			var (
 				badServer *Server
