@@ -59,6 +59,16 @@ var _ = Describe("Config", func() {
 			Expect(cfg.CaCerts).To(ConsistOf([]string{string(ca1), ca2}))
 		})
 
+		It("handles new lines in certificate strings", func() {
+			caWithNewLines := `-----BEGIN CERTIFICATE-----\nFAKE CERTIFICATE CONTENTS\n-----END CERTIFICATE-----`
+			expectedCa := "-----BEGIN CERTIFICATE-----\nFAKE CERTIFICATE CONTENTS\n-----END CERTIFICATE-----"
+
+			err := cfg.UpdateTrustedCAs([]string{caWithNewLines})
+
+			Expect(err).To(BeNil())
+			Expect(cfg.CaCerts).To(ConsistOf([]string{expectedCa}))
+		})
+
 		It("returns an error if a file can't be read", func() {
 			invalidCaFile, err := ioutil.TempFile("", "no-read-access")
 			Expect(err).To(BeNil())

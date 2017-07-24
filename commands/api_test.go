@@ -126,6 +126,17 @@ var _ = Describe("API", func() {
 			Expect(authServer.ReceivedRequests()).Should(HaveLen(0))
 		})
 
+		It("accepts the API URL from the environment", func() {
+			config.RemoveConfig()
+
+			session := runCommandWithEnv([]string{"CREDHUB_SERVER=" + server.URL()}, "api", "--ca-cert", "../test/server-tls-ca.pem", "--ca-cert", "../test/auth-tls-ca.pem")
+
+			Eventually(session).Should(Exit(0))
+
+			cfg := config.ReadConfig()
+			Expect(cfg.ApiURL).To(Equal(server.URL()))
+		})
+
 		Context("when the provided server url's scheme is https", func() {
 			var (
 				theServer    *Server
