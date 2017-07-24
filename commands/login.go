@@ -3,11 +3,9 @@ package commands
 import (
 	"fmt"
 
-	"github.com/cloudfoundry-incubator/credhub-cli/actions"
-	"github.com/cloudfoundry-incubator/credhub-cli/client"
+	"github.com/cloudfoundry-incubator/credhub-cli/api"
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	"github.com/cloudfoundry-incubator/credhub-cli/errors"
-	"github.com/cloudfoundry-incubator/credhub-cli/models"
 	"github.com/howeyc/gopass"
 )
 
@@ -23,10 +21,11 @@ type LoginCommand struct {
 
 func (cmd LoginCommand) Execute([]string) error {
 	var (
-		token models.Token
-		err   error
+		err error
 	)
 	cfg := config.ReadConfig()
+
+	a := api.NewApi(&cfg)
 
 	if cfg.ApiURL == "" && cmd.ServerUrl == "" {
 		return errors.NewNoApiUrlSetError()
@@ -52,22 +51,18 @@ func (cmd LoginCommand) Execute([]string) error {
 	}
 
 	if cmd.ClientName != "" || cmd.ClientSecret != "" {
-		token, err = actions.NewAuthToken(client.NewHttpClient(cfg), cfg).GetAuthTokenByClientCredential(cmd.ClientName, cmd.ClientSecret)
+		_, err = a.Login("", "", cmd.ClientName, cmd.ClientSecret)
 	} else {
 		promptForMissingCredentials(&cmd)
-
-		token, err = actions.NewAuthToken(client.NewHttpClient(cfg), cfg).GetAuthTokenByPasswordGrant(cmd.Username, cmd.Password)
+		_, err = a.Login(cmd.Username, cmd.Password, "", "")
 	}
 
 	if err != nil {
-		RevokeTokenIfNecessary(cfg)
-		MarkTokensAsRevokedInConfig(&cfg)
+		a.Logout()
 		config.WriteConfig(cfg)
 		return err
 	}
 
-	cfg.AccessToken = token.AccessToken
-	cfg.RefreshToken = token.RefreshToken
 	config.WriteConfig(cfg)
 
 	if cmd.ServerUrl != "" {

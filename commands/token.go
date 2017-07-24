@@ -4,10 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/cloudfoundry-incubator/credhub-cli/client"
+	"github.com/cloudfoundry-incubator/credhub-cli/api"
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
-	"github.com/cloudfoundry-incubator/credhub-cli/models"
-	"github.com/cloudfoundry-incubator/credhub-cli/repositories"
 )
 
 func init() {
@@ -15,16 +13,10 @@ func init() {
 		cfg := config.ReadConfig()
 		if cfg.AccessToken != "" && cfg.AccessToken != "revoked" {
 
-			refresh_request := client.NewRefreshTokenRequest(cfg)
-			repository := repositories.NewAuthRepository(client.NewHttpClient(cfg), true)
-			refreshed_token, err := repository.SendRequest(refresh_request, "")
-
+			_, err := api.NewApi(&cfg).Refresh()
 			if err != nil {
 				fmt.Println("Bearer " + cfg.AccessToken)
 			}
-
-			cfg.AccessToken = refreshed_token.(models.Token).AccessToken
-			cfg.RefreshToken = refreshed_token.(models.Token).RefreshToken
 
 			config.WriteConfig(cfg)
 

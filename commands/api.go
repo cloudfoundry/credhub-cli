@@ -6,6 +6,7 @@ import (
 	"net/url"
 
 	"github.com/cloudfoundry-incubator/credhub-cli/actions"
+	"github.com/cloudfoundry-incubator/credhub-cli/api"
 	"github.com/cloudfoundry-incubator/credhub-cli/client"
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	"github.com/cloudfoundry-incubator/credhub-cli/errors"
@@ -52,8 +53,8 @@ func (cmd ApiCommand) Execute([]string) error {
 		fmt.Println("Setting the target url:", cfg.ApiURL)
 
 		if existingCfg.AuthURL != cfg.AuthURL {
-			RevokeTokenIfNecessary(existingCfg)
-			MarkTokensAsRevokedInConfig(&cfg)
+			a := api.NewApi(&existingCfg)
+			a.Logout()
 		}
 		err = config.WriteConfig(cfg)
 
@@ -72,14 +73,11 @@ func GetApiInfo(cfg *config.Config, serverUrl string, skipTlsValidation bool) er
 		return err
 	}
 
-	cfg.ApiURL = parsedUrl.String()
+	_, err = api.NewApi(cfg).Target(parsedUrl.String(), cfg.CaCerts, skipTlsValidation)
 
-	cfg.InsecureSkipVerify = skipTlsValidation
-	credhubInfo, err := actions.NewInfo(client.NewHttpClient(*cfg), *cfg).GetServerInfo()
 	if err != nil {
 		return err
 	}
-	cfg.AuthURL = credhubInfo.AuthServer.Url
 
 	if parsedUrl.Scheme != "https" {
 		warning("Warning: Insecure HTTP API detected. Data sent to this API could be intercepted" +

@@ -1,11 +1,9 @@
 package commands
 
 import (
-	"github.com/cloudfoundry-incubator/credhub-cli/actions"
-	"github.com/cloudfoundry-incubator/credhub-cli/client"
+	"github.com/cloudfoundry-incubator/credhub-cli/api"
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	"github.com/cloudfoundry-incubator/credhub-cli/models"
-	"github.com/cloudfoundry-incubator/credhub-cli/repositories"
 )
 
 type RegenerateCommand struct {
@@ -15,15 +13,13 @@ type RegenerateCommand struct {
 
 func (cmd RegenerateCommand) Execute([]string) error {
 	cfg := config.ReadConfig()
-	repository := repositories.NewCredentialRepository(client.NewHttpClient(cfg))
-	action := actions.NewAction(repository, &cfg)
 
-	credential, err := action.DoAction(client.NewRegenerateCredentialRequest(cfg, cmd.CredentialIdentifier), cmd.CredentialIdentifier)
+	credential, err := api.NewApi(&cfg).Regenerate(cmd.CredentialIdentifier)
+
 	if err != nil {
 		return err
 	}
 
 	models.Println(credential, cmd.OutputJson)
-
 	return nil
 }

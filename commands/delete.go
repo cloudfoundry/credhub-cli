@@ -3,10 +3,8 @@ package commands
 import (
 	"fmt"
 
-	"github.com/cloudfoundry-incubator/credhub-cli/actions"
-	"github.com/cloudfoundry-incubator/credhub-cli/client"
+	"github.com/cloudfoundry-incubator/credhub-cli/api"
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
-	"github.com/cloudfoundry-incubator/credhub-cli/repositories"
 )
 
 type DeleteCommand struct {
@@ -15,10 +13,7 @@ type DeleteCommand struct {
 
 func (cmd DeleteCommand) Execute([]string) error {
 	cfg := config.ReadConfig()
-	repository := repositories.NewCredentialRepository(client.NewHttpClient(cfg))
-	action := actions.NewAction(repository, &cfg)
-
-	_, err := action.DoAction(client.NewDeleteCredentialRequest(cfg, cmd.CredentialIdentifier), cmd.CredentialIdentifier)
+	err := api.NewApi(&cfg).Delete(cmd.CredentialIdentifier)
 
 	if err == nil {
 		fmt.Println("Credential successfully deleted")

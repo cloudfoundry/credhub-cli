@@ -9,8 +9,7 @@ import (
 
 	"reflect"
 
-	"github.com/cloudfoundry-incubator/credhub-cli/actions"
-	"github.com/cloudfoundry-incubator/credhub-cli/client"
+	"github.com/cloudfoundry-incubator/credhub-cli/api"
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	"github.com/cloudfoundry-incubator/credhub-cli/errors"
 	"github.com/cloudfoundry-incubator/credhub-cli/models"
@@ -49,11 +48,9 @@ func setCredentials(bulkImport models.CredentialBulkImport) {
 	errors := make([]string, 0)
 
 	cfg := config.ReadConfig()
-	repository = repositories.NewCredentialRepository(client.NewHttpClient(cfg))
-	action := actions.NewAction(repository, &cfg)
+	a := api.NewApi(&cfg)
 
 	for i, credential := range bulkImport.Credentials {
-		request = client.NewSetRequest(cfg, credential)
 
 		switch credentialName := credential["name"].(type) {
 		case string:
@@ -62,7 +59,11 @@ func setCredentials(bulkImport models.CredentialBulkImport) {
 			name = ""
 		}
 
-		result, err := action.DoAction(request, name)
+		credentialType := credential["type"].(string)
+		value := credential["value"]
+		overwrite := credential["overwrite"].(bool)
+
+		result, err := a.Set(credentialType, name, value, overwrite)
 
 		if err != nil {
 			if isAuthenticationError(err) {
