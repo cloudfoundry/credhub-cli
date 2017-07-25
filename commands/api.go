@@ -9,6 +9,7 @@ import (
 	"github.com/cloudfoundry-incubator/credhub-cli/client"
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	"github.com/cloudfoundry-incubator/credhub-cli/errors"
+	"github.com/cloudfoundry-incubator/credhub-cli/util"
 	"github.com/fatih/color"
 )
 
@@ -66,7 +67,7 @@ func (cmd ApiCommand) Execute([]string) error {
 }
 
 func GetApiInfo(cfg *config.Config, serverUrl string, skipTlsValidation bool) error {
-	serverUrl = AddDefaultSchemeIfNecessary(serverUrl)
+	serverUrl = util.AddDefaultSchemeIfNecessary(serverUrl)
 	parsedUrl, err := url.Parse(serverUrl)
 	if err != nil {
 		return err

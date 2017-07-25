@@ -1,15 +1,23 @@
-package commands
+package util
 
 import (
 	"io/ioutil"
 
 	"strings"
 
+	"os"
+
 	credhub_errors "github.com/cloudfoundry-incubator/credhub-cli/errors"
 )
 
-func ReadFile(filename string) (string, error) {
-	dat, err := ioutil.ReadFile(filename)
+func ReadFileOrStringFromField(field string) (string, error) {
+	_, err := os.Stat(field)
+
+	if err != nil {
+		return strings.Replace(field, "\\n", "\n", -1), nil
+	}
+
+	dat, err := ioutil.ReadFile(field)
 	if err != nil {
 		return "", credhub_errors.NewFileLoadError()
 	}

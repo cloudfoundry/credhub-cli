@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/cloudfoundry-incubator/credhub-cli/commands"
+	"github.com/cloudfoundry-incubator/credhub-cli/test"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -24,7 +25,7 @@ var _ = Describe("Set", func() {
 		login()
 	})
 
-	ItRequiresAuthentication("get", "-n", "test-credential")
+	ItRequiresAuthentication("set", "-n", "test-credential", "-t", "password", "-w", "value")
 	ItAutomaticallyLogsIn("PUT", "set", "-n", "test-credential", "-t", "password", "-w", "test-value")
 
 	Describe("not specifying type", func() {
@@ -119,7 +120,7 @@ var _ = Describe("Set", func() {
 		It("puts a secret using explicit ssh type", func() {
 			SetupPutRsaSshServer("foo-ssh-key", "ssh", "some-public-key", "some-private-key", true)
 
-			session := runCommand("set", "-n", "foo-ssh-key", "-U", "some-public-key", "-P", "some-private-key", "-t", "ssh")
+			session := runCommand("set", "-n", "foo-ssh-key", "-u", "some-public-key", "-p", "some-private-key", "-t", "ssh")
 
 			Eventually(session).Should(Exit(0))
 			Eventually(session.Out).Should(Say(responseMySSHFooYaml))
@@ -128,9 +129,9 @@ var _ = Describe("Set", func() {
 		It("puts a secret using values read from files", func() {
 			SetupPutRsaSshServer("foo-ssh-key", "ssh", "some-public-key", "some-private-key", true)
 
-			tempDir := createTempDir("sshFilesForTesting")
-			publicFileName := createCredentialFile(tempDir, "rsa.pub", "some-public-key")
-			privateFilename := createCredentialFile(tempDir, "rsa.key", "some-private-key")
+			tempDir := test.CreateTempDir("sshFilesForTesting")
+			publicFileName := test.CreateCredentialFile(tempDir, "rsa.pub", "some-public-key", 0644)
+			privateFilename := test.CreateCredentialFile(tempDir, "rsa.key", "some-private-key", 0644)
 
 			session := runCommand("set", "-n", "foo-ssh-key",
 				"-t", "ssh",
@@ -145,7 +146,7 @@ var _ = Describe("Set", func() {
 		It("puts a secret specifying no-overwrite", func() {
 			SetupPutRsaSshServer("foo-ssh-key", "ssh", "some-public-key", "some-private-key", false)
 
-			session := runCommand("set", "-n", "foo-ssh-key", "-t", "ssh", "-U", "some-public-key", "-P", "some-private-key", "--no-overwrite")
+			session := runCommand("set", "-n", "foo-ssh-key", "-t", "ssh", "-u", "some-public-key", "-p", "some-private-key", "--no-overwrite")
 
 			Eventually(session).Should(Exit(0))
 		})
@@ -153,7 +154,7 @@ var _ = Describe("Set", func() {
 		It("puts a secret using explicit ssh type and returns in json format", func() {
 			SetupPutRsaSshServer("foo-ssh-key", "ssh", "some-public-key", "some-private-key", true)
 
-			session := runCommand("set", "-n", "foo-ssh-key", "-U", "some-public-key", "-P", "some-private-key", "-t", "ssh", "--output-json")
+			session := runCommand("set", "-n", "foo-ssh-key", "-u", "some-public-key", "-p", "some-private-key", "-t", "ssh", "--output-json")
 
 			Eventually(session).Should(Exit(0))
 			Eventually(string(session.Out.Contents())).Should(MatchJSON(responseMySSHFooJson))
@@ -162,10 +163,18 @@ var _ = Describe("Set", func() {
 		It("accepts case-insensitive type", func() {
 			SetupPutRsaSshServer("foo-ssh-key", "ssh", "some-public-key", "some-private-key", true)
 
-			session := runCommand("set", "-n", "foo-ssh-key", "-U", "some-public-key", "-P", "some-private-key", "-t", "SSH")
+			session := runCommand("set", "-n", "foo-ssh-key", "-u", "some-public-key", "-p", "some-private-key", "-t", "SSH")
 
 			Eventually(session).Should(Exit(0))
 			Eventually(session.Out).Should(Say(responseMySSHFooYaml))
+		})
+
+		It("handles newline characters", func() {
+			SetupPutRsaSshServer("foo-ssh-key", "ssh", `some\npublic\nkey`, `some\nprivate\nkey`, true)
+			session := runCommand("set", "-n", "foo-ssh-key", "-u", `some\npublic\nkey`, "-p", `some\nprivate\nkey`, "-t", "ssh", "--output-json")
+
+			Eventually(session).Should(Exit(0))
+			Expect(string(session.Out.Contents())).Should(MatchJSON(responseMySSHWithNewlinesJson))
 		})
 	})
 
@@ -173,7 +182,7 @@ var _ = Describe("Set", func() {
 		It("puts a secret using explicit rsa type", func() {
 			SetupPutRsaSshServer("foo-rsa-key", "rsa", "some-public-key", "some-private-key", true)
 
-			session := runCommand("set", "-n", "foo-rsa-key", "-U", "some-public-key", "-P", "some-private-key", "-t", "rsa")
+			session := runCommand("set", "-n", "foo-rsa-key", "-u", "some-public-key", "-p", "some-private-key", "-t", "rsa")
 
 			Eventually(session).Should(Exit(0))
 			Eventually(session.Out).Should(Say(responseMyRSAFooYaml))
@@ -182,9 +191,9 @@ var _ = Describe("Set", func() {
 		It("puts a secret using values read from files", func() {
 			SetupPutRsaSshServer("foo-rsa-key", "rsa", "some-public-key", "some-private-key", true)
 
-			tempDir := createTempDir("rsaFilesForTesting")
-			publicFileName := createCredentialFile(tempDir, "rsa.pub", "some-public-key")
-			privateFilename := createCredentialFile(tempDir, "rsa.key", "some-private-key")
+			tempDir := test.CreateTempDir("rsaFilesForTesting")
+			publicFileName := test.CreateCredentialFile(tempDir, "rsa.pub", "some-public-key", 0644)
+			privateFilename := test.CreateCredentialFile(tempDir, "rsa.key", "some-private-key", 0644)
 
 			session := runCommand("set", "-n", "foo-rsa-key",
 				"-t", "rsa",
@@ -199,7 +208,7 @@ var _ = Describe("Set", func() {
 		It("puts a secret specifying no-overwrite", func() {
 			SetupPutRsaSshServer("foo-rsa-key", "rsa", "some-public-key", "some-private-key", false)
 
-			session := runCommand("set", "-n", "foo-rsa-key", "-t", "rsa", "-U", "some-public-key", "-P", "some-private-key", "--no-overwrite")
+			session := runCommand("set", "-n", "foo-rsa-key", "-t", "rsa", "-u", "some-public-key", "-p", "some-private-key", "--no-overwrite")
 
 			Eventually(session).Should(Exit(0))
 		})
@@ -207,7 +216,7 @@ var _ = Describe("Set", func() {
 		It("puts a secret using explicit rsa type and returns in json format", func() {
 			SetupPutRsaSshServer("foo-rsa-key", "rsa", "some-public-key", "some-private-key", true)
 
-			session := runCommand("set", "-n", "foo-rsa-key", "-U", "some-public-key", "-P", "some-private-key", "-t", "rsa", "--output-json")
+			session := runCommand("set", "-n", "foo-rsa-key", "-u", "some-public-key", "-p", "some-private-key", "-t", "rsa", "--output-json")
 
 			Eventually(session).Should(Exit(0))
 			Eventually(string(session.Out.Contents())).Should(MatchJSON(responseMyRSAFooJson))
@@ -216,10 +225,18 @@ var _ = Describe("Set", func() {
 		It("accepts case-insensitive type", func() {
 			SetupPutRsaSshServer("foo-rsa-key", "rsa", "some-public-key", "some-private-key", true)
 
-			session := runCommand("set", "-n", "foo-rsa-key", "-U", "some-public-key", "-P", "some-private-key", "-t", "RSA")
+			session := runCommand("set", "-n", "foo-rsa-key", "-u", "some-public-key", "-p", "some-private-key", "-t", "RSA")
 
 			Eventually(session).Should(Exit(0))
 			Eventually(session.Out).Should(Say(responseMyRSAFooYaml))
+		})
+
+		It("handles newline characters", func() {
+			SetupPutRsaSshServer("foo-rsa-key", "rsa", `some\npublic\nkey`, `some\nprivate\nkey`, true)
+			session := runCommand("set", "-n", "foo-rsa-key", "-u", `some\npublic\nkey`, "-p", `some\nprivate\nkey`, "-t", "rsa", "--output-json")
+
+			Eventually(session).Should(Exit(0))
+			Expect(string(session.Out.Contents())).Should(MatchJSON(responseMyRSAWithNewlinesJson))
 		})
 	})
 
@@ -296,8 +313,8 @@ var _ = Describe("Set", func() {
 			SetupPutCertificateServer("my-secret", "my-ca", "my-cert", "my-priv")
 
 			session := runCommand("set", "-n", "my-secret",
-				"-t", "certificate", "--root-string", "my-ca",
-				"--certificate-string", "my-cert", "--private-string", "my-priv")
+				"-t", "certificate", "--root", "my-ca",
+				"--certificate", "my-cert", "--private", "my-priv")
 
 			Eventually(session).Should(Exit(0))
 			Eventually(session.Out).Should(Say(responseMyCertificateYaml))
@@ -308,7 +325,7 @@ var _ = Describe("Set", func() {
 
 			session := runCommand("set", "-n", "my-secret",
 				"-t", "certificate", "--ca-name", "my-ca",
-				"--certificate-string", "my-cert", "--private-string", "my-priv")
+				"--certificate", "my-cert", "--private", "my-priv")
 
 			Eventually(session).Should(Exit(0))
 			Eventually(session.Out).Should(Say(responseMyCertificateWithNamedCAYaml))
@@ -318,18 +335,18 @@ var _ = Describe("Set", func() {
 			SetupOverwritePutCertificateServer("my-secret", "my-ca", "my-cert", "my-priv", false)
 
 			session := runCommand("set", "-n", "my-secret",
-				"-t", "certificate", "--root-string", "my-ca",
-				"--certificate-string", "my-cert", "--private-string", "my-priv", "--no-overwrite")
+				"-t", "certificate", "--root", "my-ca",
+				"--certificate", "my-cert", "--private", "my-priv", "--no-overwrite")
 
 			Eventually(session).Should(Exit(0))
 		})
 
 		It("puts a secret using explicit certificate type and values read from files", func() {
 			SetupPutCertificateServer("my-secret", "my-ca", "my-cert", "my-priv")
-			tempDir := createTempDir("certFilesForTesting")
-			caFilename := createCredentialFile(tempDir, "ca.txt", "my-ca")
-			certificateFilename := createCredentialFile(tempDir, "certificate.txt", "my-cert")
-			privateFilename := createCredentialFile(tempDir, "private.txt", "my-priv")
+			tempDir := test.CreateTempDir("certFilesForTesting")
+			caFilename := test.CreateCredentialFile(tempDir, "ca.txt", "my-ca", 0644)
+			certificateFilename := test.CreateCredentialFile(tempDir, "certificate.txt", "my-cert", 0644)
+			privateFilename := test.CreateCredentialFile(tempDir, "private.txt", "my-priv", 0644)
 
 			session := runCommand("set", "-n", "my-secret",
 				"-t", "certificate", "--root", caFilename,
@@ -340,24 +357,18 @@ var _ = Describe("Set", func() {
 			Eventually(session.Out).Should(Say(responseMyCertificateYaml))
 		})
 
-		It("fails to put a secret when failing to read from a file", func() {
-			testSetFileFailure("", "certificate.txt", "private.txt")
-			testSetFileFailure("ca.txt", "", "private.txt")
-			testSetFileFailure("ca.txt", "certificate.txt", "")
-		})
-
-		It("fails to put a secret when a specified cert string duplicates the contents of a file", func() {
-			testSetCertFileDuplicationFailure("--root-string", "my-ca")
-			testSetCertFileDuplicationFailure("--certificate-string", "my-cert")
-			testSetCertFileDuplicationFailure("--private-string", "my-priv")
+		It("fails to put a secret when reading from unreadable file", func() {
+			testSetFileFailure("unreadable.txt", "", "")
+			testSetFileFailure("", "unreadable.txt", "")
+			testSetFileFailure("", "", "unreadable.txt")
 		})
 
 		It("puts a secret using explicit certificate type and string values in json format", func() {
 			SetupPutCertificateServer("my-secret", "my-ca", "my-cert", "my-priv")
 
 			session := runCommand("set", "-n", "my-secret",
-				"-t", "certificate", "--root-string", "my-ca",
-				"--certificate-string", "my-cert", "--private-string", "my-priv", "--output-json")
+				"-t", "certificate", "--root", "my-ca",
+				"--certificate", "my-cert", "--private", "my-priv", "--output-json")
 
 			Eventually(session).Should(Exit(0))
 			Eventually(string(session.Out.Contents())).Should(MatchJSON(responseMyCertificateJson))
@@ -367,11 +378,20 @@ var _ = Describe("Set", func() {
 			SetupPutCertificateServer("my-secret", "my-ca", "my-cert", "my-priv")
 
 			session := runCommand("set", "-n", "my-secret",
-				"-t", "CERTIFICATE", "--root-string", "my-ca",
-				"--certificate-string", "my-cert", "--private-string", "my-priv")
+				"-t", "CERTIFICATE", "--root", "my-ca",
+				"--certificate", "my-cert", "--private", "my-priv")
 
 			Eventually(session).Should(Exit(0))
 			Eventually(session.Out).Should(Say(responseMyCertificateYaml))
+		})
+
+		It("handles newline characters", func() {
+			SetupPutCertificateServer("my-secret", `my\nca`, `my\ncert`, `my\npriv`)
+			session := runCommand("set", "-n", "my-secret",
+				"-t", "certificate", "--root", `my\nca`,
+				"--certificate", `my\ncert`, "--private", `my\npriv`, "--output-json")
+			Eventually(session).Should(Exit(0))
+			Expect(string(session.Out.Contents())).Should(MatchJSON(responseMyCertificateWithNewlinesJson))
 		})
 	})
 
@@ -447,9 +467,6 @@ var _ = Describe("Set", func() {
 				commands.HaveFlag("root", "r"),
 				commands.HaveFlag("certificate", "c"),
 				commands.HaveFlag("private", "p"),
-				commands.HaveFlag("root-string", "R"),
-				commands.HaveFlag("certificate-string", "C"),
-				commands.HaveFlag("private-string", "P"),
 			))
 		})
 
@@ -595,21 +612,15 @@ func SetupPutBadRequestServer(body string) {
 }
 
 func testSetFileFailure(caFilename, certificateFilename, privateFilename string) {
-	tempDir := createTempDir("certFilesForTesting")
-	if caFilename != "" {
-		caFilename = createCredentialFile(tempDir, caFilename, "my-ca")
-	} else {
-		caFilename = "dud"
+	tempDir := test.CreateTempDir("certFilesForTesting")
+	if caFilename == "unreadable.txt" {
+		caFilename = test.CreateCredentialFile(tempDir, caFilename, "my-ca", 0222)
 	}
-	if certificateFilename != "" {
-		certificateFilename = createCredentialFile(tempDir, certificateFilename, "my-cert")
-	} else {
-		certificateFilename = "dud"
+	if certificateFilename == "unreadable.txt" {
+		certificateFilename = test.CreateCredentialFile(tempDir, certificateFilename, "my-cert", 0222)
 	}
-	if privateFilename != "" {
-		privateFilename = createCredentialFile(tempDir, privateFilename, "my-priv")
-	} else {
-		privateFilename = "dud"
+	if privateFilename == "unreadable.txt" {
+		privateFilename = test.CreateCredentialFile(tempDir, privateFilename, "my-priv", 0222)
 	}
 
 	session := runCommand("set", "-n", "my-secret",
@@ -619,19 +630,4 @@ func testSetFileFailure(caFilename, certificateFilename, privateFilename string)
 	os.RemoveAll(tempDir)
 	Eventually(session).Should(Exit(1))
 	Eventually(session.Err).Should(Say("A referenced file could not be opened. Please validate the provided filenames and permissions, then retry your request."))
-}
-
-func testSetCertFileDuplicationFailure(option, optionValue string) {
-	SetupPutCertificateServer("my-secret", "my-ca", "my-cert", "my-priv")
-	tempDir := createTempDir("certFilesForTesting")
-	caFilename := createCredentialFile(tempDir, "ca.txt", "my-ca")
-	certificateFilename := createCredentialFile(tempDir, "certificate.txt", "my-cert")
-	privateFilename := createCredentialFile(tempDir, "private.txt", "my-priv")
-
-	session := runCommand("set", "-n", "my-secret", "-t", "certificate", "--root", caFilename,
-		"--certificate", certificateFilename, "--private", privateFilename, option, optionValue)
-
-	os.RemoveAll(tempDir)
-	Eventually(session).Should(Exit(1))
-	Eventually(session.Err).Should(Say("The combination of parameters in the request is not allowed. Please validate your input and retry your request."))
 }
