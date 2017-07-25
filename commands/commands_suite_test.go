@@ -64,10 +64,13 @@ var responseMyJsonFormatJson = fmt.Sprintf(JSON_CREDENTIAL_RESPONSE_JSON, "json-
 var responseMyCertificateYaml = fmt.Sprintf(CERTIFICATE_CREDENTIAL_RESPONSE_YAML, "my-secret", "my-ca", "my-cert", "my-priv")
 var responseMyCertificateWithNamedCAYaml = fmt.Sprintf(CERTIFICATE_CREDENTIAL_RESPONSE_YAML, "my-secret", "known-ca-value", "my-cert", "my-priv")
 var responseMyCertificateJson = fmt.Sprintf(CERTIFICATE_CREDENTIAL_RESPONSE_JSON, "my-secret", "my-ca", "my-cert", "my-priv")
+var responseMyCertificateWithNewlinesJson = fmt.Sprintf(CERTIFICATE_CREDENTIAL_RESPONSE_JSON, "my-secret", `my\nca`, `my\ncert`, `my\npriv`)
 var responseMySSHFooYaml = fmt.Sprintf(SSH_CREDENTIAL_RESPONSE_YAML, "foo-ssh-key", "some-private-key", "some-public-key")
 var responseMySSHFooJson = fmt.Sprintf(RSA_SSH_CREDENTIAL_RESPONSE_JSON, "ssh", "foo-ssh-key", "some-public-key", "some-private-key")
+var responseMySSHWithNewlinesJson = fmt.Sprintf(RSA_SSH_CREDENTIAL_RESPONSE_JSON, "ssh", "foo-ssh-key", `some\npublic\nkey`, `some\nprivate\nkey`)
 var responseMyRSAFooYaml = fmt.Sprintf(RSA_CREDENTIAL_RESPONSE_YAML, "foo-rsa-key", "some-private-key", "some-public-key")
 var responseMyRSAFooJson = fmt.Sprintf(RSA_SSH_CREDENTIAL_RESPONSE_JSON, "rsa", "foo-rsa-key", "some-public-key", "some-private-key")
+var responseMyRSAWithNewlinesJson = fmt.Sprintf(RSA_SSH_CREDENTIAL_RESPONSE_JSON, "rsa", "foo-rsa-key", `some\npublic\nkey`, `some\nprivate\nkey`)
 var responseMyUsernameYaml = fmt.Sprintf(USER_CREDENTIAL_RESPONSE_YAML, "my-username-credential", "test-password", "passw0rd-H4$h", "my-username")
 var responseMyUsernameJson = fmt.Sprintf(USER_CREDENTIAL_RESPONSE_JSON, "my-username-credential", "my-username", "test-password", "passw0rd-H4$h")
 var responseMySpecialCharacterValue = fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_YAML, "my-character-test", "value", `'{"password":"some-still-bad-password"}'`)
@@ -178,23 +181,6 @@ func runCommandWithStdin(stdin io.Reader, args ...string) *Session {
 	<-session.Exited
 
 	return session
-}
-
-func createTempDir(prefix string) string {
-	name, err := ioutil.TempDir("", prefix)
-	if err != nil {
-		panic(err)
-	}
-	return name
-}
-
-func createCredentialFile(dir, filename string, contents string) string {
-	path := dir + "/" + filename
-	err := ioutil.WriteFile(path, []byte(contents), 0644)
-	if err != nil {
-		panic(err)
-	}
-	return path
 }
 
 func NewTlsServer(certPath, keyPath string) *Server {
