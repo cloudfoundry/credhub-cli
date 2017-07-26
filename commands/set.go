@@ -25,10 +25,10 @@ type SetCommand struct {
 	NoOverwrite          bool   `short:"O" long:"no-overwrite" description:"Credential is not modified if stored value already exists"`
 	Value                string `short:"v" long:"value" description:"[Value, JSON] Sets the value for the credential"`
 	CaName               string `short:"m" long:"ca-name" description:"[Certificate] Sets the root CA to a stored CA credential"`
-	Root                 string `short:"r" long:"root" description:"[Certificate] Sets the root CA from file"`
-	Certificate          string `short:"c" long:"certificate" description:"[Certificate] Sets the certificate from file"`
-	Private              string `short:"p" long:"private" description:"[Certificate, SSH, RSA] Sets the private key from file"`
-	Public               string `short:"u" long:"public" description:"[SSH, RSA] Sets the public key from file"`
+	Root                 string `short:"r" long:"root" description:"[Certificate] Sets the root CA from file or value"`
+	Certificate          string `short:"c" long:"certificate" description:"[Certificate] Sets the certificate from file or value"`
+	Private              string `short:"p" long:"private" description:"[Certificate, SSH, RSA] Sets the private key from file or value"`
+	Public               string `short:"u" long:"public" description:"[SSH, RSA] Sets the public key from file or value"`
 	Username             string `short:"z" long:"username" description:"[User] Sets the username value of the credential"`
 	Password             string `short:"w" long:"password" description:"[Password, User] Sets the password value of the credential"`
 	OutputJson           bool   `          long:"output-json" description:"Return response in JSON format"`
