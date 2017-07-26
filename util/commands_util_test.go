@@ -8,6 +8,8 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
+	"runtime"
+
 	credhub_errors "github.com/cloudfoundry-incubator/credhub-cli/errors"
 	"github.com/cloudfoundry-incubator/credhub-cli/test"
 )
@@ -40,18 +42,20 @@ var _ = Describe("Util", func() {
 			})
 		})
 
-		Context("when the file is not readable", func() {
-			It("returns an error message if a file cannot be read", func() {
-				tempDir := test.CreateTempDir("filesForTesting")
-				fileContents := "My Test String"
-				filename := test.CreateCredentialFile(tempDir, "file.txt", fileContents)
-				err := os.Chmod(filename, 0222)
-				Expect(err).To(BeNil())
-				readContents, err := util.ReadFileOrStringFromField(filename)
-				Expect(readContents).To(Equal(""))
-				Expect(err).To(MatchError(credhub_errors.NewFileLoadError()))
+		if runtime.GOOS != "windows" {
+			Context("when the file is not readable", func() {
+				It("returns an error message if a file cannot be read", func() {
+					tempDir := test.CreateTempDir("filesForTesting")
+					fileContents := "My Test String"
+					filename := test.CreateCredentialFile(tempDir, "file.txt", fileContents)
+					err := os.Chmod(filename, 0222)
+					Expect(err).To(BeNil())
+					readContents, err := util.ReadFileOrStringFromField(filename)
+					Expect(readContents).To(Equal(""))
+					Expect(err).To(MatchError(credhub_errors.NewFileLoadError()))
+				})
 			})
-		})
+		}
 	})
 
 	Describe("#AddDefaultSchemeIfNecessary", func() {
