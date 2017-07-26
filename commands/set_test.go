@@ -615,17 +615,23 @@ func testSetFileFailure(caFilename, certificateFilename, privateFilename string)
 	tempDir := test.CreateTempDir("certFilesForTesting")
 	if caFilename == "unreadable.txt" {
 		caFilename = test.CreateCredentialFile(tempDir, caFilename, "my-ca")
-		err := os.Chmod(caFilename, 0222)
+		file, err := os.Open(caFilename)
+		Expect(err).To(BeNil())
+		err = file.Chmod(0222)
 		Expect(err).To(BeNil())
 	}
 	if certificateFilename == "unreadable.txt" {
 		certificateFilename = test.CreateCredentialFile(tempDir, certificateFilename, "my-cert")
-		err := os.Chmod(certificateFilename, 0222)
+		file, err := os.Open(certificateFilename)
+		Expect(err).To(BeNil())
+		err = file.Chmod(0222)
 		Expect(err).To(BeNil())
 	}
 	if privateFilename == "unreadable.txt" {
 		privateFilename = test.CreateCredentialFile(tempDir, privateFilename, "my-priv")
-		err := os.Chmod(privateFilename, 0222)
+		file, err := os.Open(privateFilename)
+		Expect(err).To(BeNil())
+		err = file.Chmod(0222)
 		Expect(err).To(BeNil())
 	}
 
