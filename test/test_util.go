@@ -18,9 +18,9 @@ func CreateTempDir(prefix string) string {
 	return name
 }
 
-func CreateCredentialFile(dir, filename string, contents string, perm os.FileMode) string {
+func CreateCredentialFile(dir, filename string, contents string) string {
 	path := dir + "/" + filename
-	err := ioutil.WriteFile(path, []byte(contents), perm)
+	err := ioutil.WriteFile(path, []byte(contents), 0644)
 	if err != nil {
 		panic(err)
 	}
