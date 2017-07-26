@@ -45,9 +45,7 @@ var _ = Describe("Util", func() {
 				tempDir := test.CreateTempDir("filesForTesting")
 				fileContents := "My Test String"
 				filename := test.CreateCredentialFile(tempDir, "file.txt", fileContents)
-				file, err := os.Open(filename)
-				Expect(err).To(BeNil())
-				err = file.Chmod(0222)
+				err := os.Chmod(filename, 0222)
 				Expect(err).To(BeNil())
 				readContents, err := util.ReadFileOrStringFromField(filename)
 				Expect(readContents).To(Equal(""))
