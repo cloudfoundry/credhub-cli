@@ -357,11 +357,13 @@ var _ = Describe("Set", func() {
 			Eventually(session.Out).Should(Say(responseMyCertificateYaml))
 		})
 
-		It("fails to put a secret when reading from unreadable file", func() {
-			testSetFileFailure("unreadable.txt", "", "")
-			testSetFileFailure("", "unreadable.txt", "")
-			testSetFileFailure("", "", "unreadable.txt")
-		})
+		if runtime.GOOS != "windows" {
+			It("fails to put a secret when reading from unreadable file", func() {
+				testSetFileFailure("unreadable.txt", "", "")
+				testSetFileFailure("", "unreadable.txt", "")
+				testSetFileFailure("", "", "unreadable.txt")
+			})
+		}
 
 		It("puts a secret using explicit certificate type and string values in json format", func() {
 			SetupPutCertificateServer("my-secret", "my-ca", "my-cert", "my-priv")
