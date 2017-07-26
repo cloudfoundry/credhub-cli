@@ -130,8 +130,8 @@ var _ = Describe("Set", func() {
 			SetupPutRsaSshServer("foo-ssh-key", "ssh", "some-public-key", "some-private-key", true)
 
 			tempDir := test.CreateTempDir("sshFilesForTesting")
-			publicFileName := test.CreateCredentialFile(tempDir, "rsa.pub", "some-public-key", 0644)
-			privateFilename := test.CreateCredentialFile(tempDir, "rsa.key", "some-private-key", 0644)
+			publicFileName := test.CreateCredentialFile(tempDir, "rsa.pub", "some-public-key")
+			privateFilename := test.CreateCredentialFile(tempDir, "rsa.key", "some-private-key")
 
 			session := runCommand("set", "-n", "foo-ssh-key",
 				"-t", "ssh",
@@ -192,8 +192,8 @@ var _ = Describe("Set", func() {
 			SetupPutRsaSshServer("foo-rsa-key", "rsa", "some-public-key", "some-private-key", true)
 
 			tempDir := test.CreateTempDir("rsaFilesForTesting")
-			publicFileName := test.CreateCredentialFile(tempDir, "rsa.pub", "some-public-key", 0644)
-			privateFilename := test.CreateCredentialFile(tempDir, "rsa.key", "some-private-key", 0644)
+			publicFileName := test.CreateCredentialFile(tempDir, "rsa.pub", "some-public-key")
+			privateFilename := test.CreateCredentialFile(tempDir, "rsa.key", "some-private-key")
 
 			session := runCommand("set", "-n", "foo-rsa-key",
 				"-t", "rsa",
@@ -344,9 +344,9 @@ var _ = Describe("Set", func() {
 		It("puts a secret using explicit certificate type and values read from files", func() {
 			SetupPutCertificateServer("my-secret", "my-ca", "my-cert", "my-priv")
 			tempDir := test.CreateTempDir("certFilesForTesting")
-			caFilename := test.CreateCredentialFile(tempDir, "ca.txt", "my-ca", 0644)
-			certificateFilename := test.CreateCredentialFile(tempDir, "certificate.txt", "my-cert", 0644)
-			privateFilename := test.CreateCredentialFile(tempDir, "private.txt", "my-priv", 0644)
+			caFilename := test.CreateCredentialFile(tempDir, "ca.txt", "my-ca")
+			certificateFilename := test.CreateCredentialFile(tempDir, "certificate.txt", "my-cert")
+			privateFilename := test.CreateCredentialFile(tempDir, "private.txt", "my-priv")
 
 			session := runCommand("set", "-n", "my-secret",
 				"-t", "certificate", "--root", caFilename,
@@ -614,13 +614,19 @@ func SetupPutBadRequestServer(body string) {
 func testSetFileFailure(caFilename, certificateFilename, privateFilename string) {
 	tempDir := test.CreateTempDir("certFilesForTesting")
 	if caFilename == "unreadable.txt" {
-		caFilename = test.CreateCredentialFile(tempDir, caFilename, "my-ca", 0222)
+		caFilename = test.CreateCredentialFile(tempDir, caFilename, "my-ca")
+		err := os.Chmod(caFilename, 0222)
+		Expect(err).To(BeNil())
 	}
 	if certificateFilename == "unreadable.txt" {
-		certificateFilename = test.CreateCredentialFile(tempDir, certificateFilename, "my-cert", 0222)
+		certificateFilename = test.CreateCredentialFile(tempDir, certificateFilename, "my-cert")
+		err := os.Chmod(certificateFilename, 0222)
+		Expect(err).To(BeNil())
 	}
 	if privateFilename == "unreadable.txt" {
-		privateFilename = test.CreateCredentialFile(tempDir, privateFilename, "my-priv", 0222)
+		privateFilename = test.CreateCredentialFile(tempDir, privateFilename, "my-priv")
+		err := os.Chmod(privateFilename, 0222)
+		Expect(err).To(BeNil())
 	}
 
 	session := runCommand("set", "-n", "my-secret",

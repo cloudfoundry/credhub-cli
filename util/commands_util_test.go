@@ -32,7 +32,7 @@ var _ = Describe("Util", func() {
 			It("reads a file into memory", func() {
 				tempDir := test.CreateTempDir("filesForTesting")
 				fileContents := "My Test String"
-				filename := test.CreateCredentialFile(tempDir, "file.txt", fileContents, 0644)
+				filename := test.CreateCredentialFile(tempDir, "file.txt", fileContents)
 				readContents, err := util.ReadFileOrStringFromField(filename)
 				Expect(readContents).To(Equal(fileContents))
 				Expect(err).To(BeNil())
@@ -44,7 +44,9 @@ var _ = Describe("Util", func() {
 			It("returns an error message if a file cannot be read", func() {
 				tempDir := test.CreateTempDir("filesForTesting")
 				fileContents := "My Test String"
-				filename := test.CreateCredentialFile(tempDir, "file.txt", fileContents, 0222)
+				filename := test.CreateCredentialFile(tempDir, "file.txt", fileContents)
+				err := os.Chmod(filename, 0222)
+				Expect(err).To(BeNil())
 				readContents, err := util.ReadFileOrStringFromField(filename)
 				Expect(readContents).To(Equal(""))
 				Expect(err).To(MatchError(credhub_errors.NewFileLoadError()))
