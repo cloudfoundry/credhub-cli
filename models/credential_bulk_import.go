@@ -6,7 +6,6 @@ import (
 	"strconv"
 
 	"regexp"
-	"strings"
 
 	"github.com/cloudfoundry-incubator/credhub-cli/errors"
 	"gopkg.in/yaml.v2"
@@ -26,7 +25,7 @@ func (credentialBulkImport *CredentialBulkImport) ReadFile(filepath string) erro
 }
 
 func (credentialBulkImport *CredentialBulkImport) ReadBytes(data []byte) error {
-	if missingCredentialTag(data) {
+	if !hasCredentialTag(data) {
 		return errors.NewNoCredentialsTag()
 	}
 
@@ -98,8 +97,8 @@ func unpackArray(array []interface{}) []interface{} {
 	return array
 }
 
-func missingCredentialTag(data []byte) bool {
-	lines := strings.Split(string(data), "\n")
-	match, _ := regexp.MatchString("^credentials:\\s*$", lines[0])
-	return !match
+func hasCredentialTag(data []byte) bool {
+	hasCredentialTag, _ := regexp.Match("^(?:---[ \\n])?credentials:[^\\w]*", data)
+
+	return hasCredentialTag
 }
