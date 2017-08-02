@@ -2,10 +2,6 @@ package credentials
 
 import "github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials/values"
 
-type Path struct {
-	Path string
-}
-
 type Base struct {
 	Name             string
 	VersionCreatedAt string

@@ -10,7 +10,6 @@ func (ch CredHub) FindByPath(path string) ([]credentials.Base, error) {
 	panic("Not implemented")
 }
 
-// FIXME Should Path be in credentials?
 func (ch CredHub) ShowAllPaths() ([]credentials.Path, error) {
 	panic("Not implemented")
 }

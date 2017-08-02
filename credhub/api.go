@@ -1,33 +1,22 @@
 // CredHub provides methods to interact with CredHub server
 package credhub
 
-type Config struct {
-	ApiURL             string
-	AuthURL            string
-	InsecureSkipVerify bool
-	CaCerts            []string
-	AccessToken        string
-	RefreshToken       string
-}
+import (
+	"net/http"
+
+	"github.com/cloudfoundry-incubator/credhub-cli/credhub/auth"
+	"github.com/cloudfoundry-incubator/credhub-cli/credhub/server"
+)
 
 type CredHub struct {
-	*Config
+	Server server.Server
+	Auth   auth.Auth
 }
 
-type Server struct {
-	ApiURL             string
-	InsecureSkipVerify bool
-	CaCerts            []string
-}
-
-func New() *CredHub {
+func (ch CredHub) Request(method string, pathStr string, body interface{}) (http.Response, error) {
 	panic("Not implemented")
 }
 
-func NewWithConfig(config *Config) *CredHub {
-	panic("Not implemented")
-}
-
-func (ch *CredHub) Target() error {
+func New(server Server, authConfig AuthConfig) CredHub {
 	panic("Not implemented")
 }

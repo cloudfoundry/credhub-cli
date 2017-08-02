@@ -23,7 +23,7 @@ func Example_lookup() {
 			found = true
 		}
 	}
-	if found == false {
+	if !found {
 		panic("key not found")
 	}
 
@@ -50,11 +50,19 @@ func Example_create() {
 		panic(err)
 	}
 
-	ch.SetCertificate("/some/path/to/dup-cert", cert.Value, false)
+	dupCert, err := ch.SetCertificate("/some/path/to/dup-cert", cert.Value, false)
+	if err != nil {
+		panic(err)
+	}
+
+	if dupCert.Value.Certificate != cert.Value.Certificate {
+		panic("certs don't match")
+	}
 }
 
 func Example_generate() {
 	ch := credhub.CredHub{}
+
 	username := "some-user"
 	path := "/some/path/" + username
 
