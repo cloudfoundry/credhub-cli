@@ -43,16 +43,16 @@ func (c *Uaa) Login() {
 }
 
 // Constructs a func that will produce a UaaConfig using password authentication
-func UaaPassword(username, password string) AuthConfig {
+func UaaPassword(username, password string) AuthOption {
 	panic("Not implemented")
 }
 
 // Constructs a func that will produce a UaaConfig using client credentials authentication
-func UaaClient(clientId, clientKey string) AuthConfig {
+func UaaClient(clientId, clientKey string) AuthOption {
 	panic("Not implemented")
 }
 
 // Constructs a func that will produce a UaaConfig using existing tokens
-func UaaSession(accessToken, refreshToken string) AuthConfig {
+func UaaSession(accessToken, refreshToken string) AuthOption {
 	panic("Not implemented")
 }

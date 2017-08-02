@@ -17,6 +17,6 @@ func (ch CredHub) Request(method string, pathStr string, body interface{}) (http
 	panic("Not implemented")
 }
 
-func New(server Server, authConfig AuthConfig) CredHub {
+func New(server server.Server, authOption auth.AuthOption) CredHub {
 	panic("Not implemented")
 }

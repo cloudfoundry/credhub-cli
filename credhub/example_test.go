@@ -40,7 +40,7 @@ func Example_create() {
 
 	name := "/some/path/to/cert"
 
-	gen := generator.Certificate{
+	gen := generate.Certificate{
 		CommonName: "pivotal",
 		KeyLength:  2048,
 	}
@@ -70,7 +70,7 @@ func Example_generate() {
 	if err != nil {
 		ch.Delete(path)
 
-		user, err = ch.GenerateUser(path, generator.User{Username: username}, false)
+		user, err = ch.GenerateUser(path, generate.User{Username: username}, false)
 		if err != nil {
 			panic(err)
 		}

@@ -1,7 +1,4 @@
-package generator
-
-type Generator interface {
-}
+package generate
 
 type Password struct {
 	Length         int

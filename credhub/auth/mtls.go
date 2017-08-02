@@ -14,6 +14,6 @@ func (c *MutualTls) Client() http.Client {
 }
 
 // Constructs a func that will produce a TlsConfig using the Tls certificate
-func MutualTls(certificate string) AuthOption {
+func MutualTlsCertificate(certificate string) AuthOption {
 	panic("Not implemented")
 }
