@@ -20,7 +20,7 @@ type Uaa struct {
 //        refresh token
 //        retry the request with cloned request body
 //   And returns the api response
-func (c *Uaa) Client() http.Client {
+func (a *Uaa) Do(http.Request) (http.Response, error) {
 	panic("Not implemented")
 }
 

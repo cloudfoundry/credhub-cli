@@ -6,10 +6,7 @@ type MutualTls struct {
 	Certificate string
 }
 
-// It will:
-//   Use its ApiClient to complete the request
-//   And returns the api response
-func (c *MutualTls) Client() http.Client {
+func (a *MutualTls) Do(http.Request) (http.Response, error) {
 	panic("Not implemented")
 }
 
