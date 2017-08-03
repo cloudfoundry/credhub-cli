@@ -14,42 +14,42 @@ func (ch CredHub) GetByName(name string) (credentials.Credential, error) {
 	panic("Not implemented")
 }
 
+// Returns all historical credential value(s) by name
+func (ch CredHub) GetAllByName(name string) ([]credentials.Credential, error) {
+	panic("Not implemented")
+}
+
 // Returns a credential's value by name
-func (ch CredHub) GetValueByName(name string) (credentials.Value, error) {
+func (ch CredHub) GetValue(name string) (credentials.Value, error) {
 	panic("Not implemented")
 }
 
 // Returns a credential's JSON by name
-func (ch CredHub) GetJSONByName(name string) (credentials.JSON, error) {
+func (ch CredHub) GetJSON(name string) (credentials.JSON, error) {
 	panic("Not implemented")
 }
 
 // Returns a credential's Password by name
-func (ch CredHub) GetPasswordByName(name string) (credentials.Password, error) {
+func (ch CredHub) GetPassword(name string) (credentials.Password, error) {
 	panic("Not implemented")
 }
 
 // Returns a credential's User by name
-func (ch CredHub) GetUserByName(name string) (credentials.User, error) {
+func (ch CredHub) GetUser(name string) (credentials.User, error) {
 	panic("Not implemented")
 }
 
 // Returns a credential's Certificate by name
-func (ch CredHub) GetCertificateByName(name string) (credentials.Certificate, error) {
+func (ch CredHub) GetCertificate(name string) (credentials.Certificate, error) {
 	panic("Not implemented")
 }
 
 // Returns a credential's RSA by name
-func (ch CredHub) GetRSAByName(name string) (credentials.RSA, error) {
+func (ch CredHub) GetRSA(name string) (credentials.RSA, error) {
 	panic("Not implemented")
 }
 
 // Returns a credential's SSH by name
-func (ch CredHub) GetSSHByName(name string) (credentials.SSH, error) {
-	panic("Not implemented")
-}
-
-// Returns all historical credential value(s) by name
-func (ch CredHub) GetAllByName(name string) ([]credentials.Credential, error) {
+func (ch CredHub) GetSSH(name string) (credentials.SSH, error) {
 	panic("Not implemented")
 }
