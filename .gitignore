@@ -5,8 +5,6 @@ credhub-cli
 *.crt
 *.key
 .idea
-vendor/*
-!vendor/vendor.json
 tmp
 !test/*.pem
 !credhub/fixtures/*.pem
