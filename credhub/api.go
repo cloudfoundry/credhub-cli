@@ -24,13 +24,11 @@ type CredHub struct {
 // Sends an authenticated request to the CredHub server.
 //
 // The pathStr should include the full path (eg. /api/v1/data) and any query parameters.
-//
 // The request body should be marshallable to JSON, but can be left nil for GET requests.
 //
 // Request() is used by other CredHub client methods to send authenticated requests to the CredHub server.
 //
 // Use Request() directly to access the CredHub server if an appropriate helper method is not available.
-//
 // For unauthenticated requests (eg. /health), use Server.Client() instead.
 func (ch *CredHub) Request(method string, pathStr string, body interface{}) (http.Response, error) {
 	panic("Not implemented")
