@@ -17,10 +17,10 @@ type Server struct {
 
 // Provides the authentication server's URL
 func (s *Server) AuthUrl() (string, error) {
-	panic("Not implemented")
+	panic("Not implemented yet")
 }
 
 // Provides an unauthenticated http.Client to the CredHub server
 func (s *Server) Client() http.Client {
-	panic("Not implemented")
+	panic("Not implemented yet")
 }

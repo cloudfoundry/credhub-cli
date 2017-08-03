@@ -31,11 +31,11 @@ type CredHub struct {
 // Use Request() directly to access the CredHub server if an appropriate helper method is not available.
 // For unauthenticated requests (eg. /health), use Server.Client() instead.
 func (ch *CredHub) Request(method string, pathStr string, body interface{}) (http.Response, error) {
-	panic("Not implemented")
+	panic("Not implemented yet")
 }
 
 // Creates a new CredHub API client with the provided server credentials and authentication method.
 // See the auth package for supported authentication methods.
 func New(server server.Server, authMethod auth.Method) *CredHub {
-	panic("Not implemented")
+	panic("Not implemented yet")
 }

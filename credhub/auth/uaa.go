@@ -22,7 +22,7 @@ type Uaa struct {
 //
 // Will automatically refresh the access token and retry the request if the token has expired.
 func (a *Uaa) Do(*http.Request) (*http.Response, error) {
-	panic("Not implemented")
+	panic("Not implemented yet")
 }
 
 // Refresh the access token
@@ -30,7 +30,7 @@ func (a *Uaa) Do(*http.Request) (*http.Response, error) {
 // a refresh grant will be used.
 // Otherwise, client credential grant will be used to retrieve a new access token.
 func (c *Uaa) Refresh() {
-	panic("Not implemented")
+	panic("Not implemented yet")
 }
 
 // Invalidate the access and refresh tokens on the UAA server
@@ -50,7 +50,7 @@ func UaaPasswordGrant(username, password string) Method {
 
 // Provides a constructor for a UAA authentication strategy using client credential grant
 func UaaClientCredentialGrant(clientId, clientKey string) Method {
-	panic("Not implemented")
+	panic("Not implemented yet")
 }
 
 // Provides a constructor for a UAA authentication strategy using existing tokens
