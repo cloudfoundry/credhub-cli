@@ -1,21 +1,26 @@
+// CredHub server
 package server
 
 import (
 	"net/http"
 )
 
+// CredHub server
 type Server struct {
-	ApiUrl             string
+	// Url to CredHub server
+	ApiUrl string
+	// CA Certs in PEM format
+	CaCerts []string
+	// Skip certificate verification
 	InsecureSkipVerify bool
-	CaCerts            []string
 }
 
-// Provides the Authentication server's URL
+// Provides the authentication server's URL
 func (s *Server) AuthUrl() (string, error) {
 	panic("Not implemented")
 }
 
-// Provides an unauthenticated http(s) client according to the Server fields
+// Provides an unauthenticated http.Client to the CredHub server
 func (s *Server) Client() http.Client {
 	panic("Not implemented")
 }

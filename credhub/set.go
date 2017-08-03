@@ -25,7 +25,7 @@ func (ch CredHub) SetUser(name string, value values.User, overwrite bool) (crede
 	panic("Not implemented")
 }
 
-// Sets a Certficiate credential with a user-provided value.
+// Sets a Certificate credential with a user-provided value.
 func (ch CredHub) SetCertificate(name string, value values.Certificate, overwrite bool) (credentials.Certificate, error) {
 	panic("Not implemented")
 }

@@ -1,3 +1,4 @@
+// CredHub credential types for generating credentials
 package generate
 
 type Password struct {

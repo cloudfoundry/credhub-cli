@@ -1,3 +1,4 @@
+// CredHub credential types
 package credentials
 
 import "github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials/values"
@@ -9,6 +10,10 @@ type Base struct {
 }
 
 // A generic credential
+//
+// Used when the Type of the credential is not known ahead of time.
+//
+// Value will be as unmarshalled by https://golang.org/pkg/encoding/json/#Unmarshal
 type Credential struct {
 	Base
 	Id    string

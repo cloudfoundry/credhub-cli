@@ -16,7 +16,7 @@ func ExampleCredHub() {
 		ApiUrl:             "https://example.com",
 		InsecureSkipVerify: true,
 	}
-	authOption := auth.UaaPassword("username", "password")
+	authOption := auth.UaaPasswordGrant("username", "password")
 
 	ch := credhub.New(server, authOption)
 
@@ -32,7 +32,7 @@ func ExampleCredHub() {
 	fmt.Println("My password: ", password.Value)
 
 	// Manually refresh the access token
-	uaa, ok := ch.Auth.(auth.Uaa) // This works because we authenticated with auth.UaaPassword
+	uaa, ok := ch.Auth.(auth.Uaa) // This works because we authenticated with auth.UaaPasswordGrant
 	if !ok {
 		panic("not using uaa")
 	}
@@ -55,7 +55,7 @@ func ExampleNew() {
 		ApiUrl:             "https://example.com",
 		InsecureSkipVerify: true,
 	}
-	authOption := auth.UaaClient("client-id", "client-secret")
+	authOption := auth.UaaClientCredentialGrant("client-id", "client-secret")
 
 	ch := credhub.New(server, authOption)
 }
@@ -76,13 +76,13 @@ func ExampleCredHub_Request() {
 }
 
 func Example() {
-	// Credhub server at https://example.com, using UAA Password grant
+	// CredHub server at https://example.com, using UAA Password grant
 	ch := credhub.New(
 		server.Server{
 			ApiUrl:  "https://example.com",
-			CaCerts: []string{"root-certificate"},
+			CaCerts: []string{"--- BEGIN ---\nroot-certificate\n--- END ---"},
 		},
-		auth.UaaPassword("username", "password"),
+		auth.UaaPasswordGrant("username", "password"),
 	)
 
 	// We'll be working with a certificate stored at "/my-certificates/the-cert"
@@ -100,7 +100,7 @@ func Example() {
 		CommonName: "pivotal",
 		KeyLength:  2048,
 	}
-	cert, err := ch.GenerateCertificate(name, gen, false)
+	cert, err := ch.GenerateCertificate(path+name, gen, false)
 	if err != nil {
 		panic("couldn't generate certificate")
 	}

@@ -1,3 +1,4 @@
+// CredHub permission types
 package permissions
 
 type Permission struct {

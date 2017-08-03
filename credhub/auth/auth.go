@@ -1,3 +1,4 @@
+// CredHub authentication strategies
 package auth
 
 import (
@@ -6,12 +7,13 @@ import (
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/server"
 )
 
-// Provides an authenticated http.Client utilizing the
-// authentication method as supplied by the AuthOption
+// Provides http.Client-like interface to send authenticated requests to the server
 type Auth interface {
 	Do(req *http.Request) (*http.Response, error)
 }
 
-// Provides a helper method that produces an authenticated client using
-// the authentication method of choice (*)
-type AuthOption func(*server.Server) Auth
+// Constructor for authentication strategy provided to credhub.New()
+//
+// The server.Server provided to credhub.New() will be given to Method to construct
+// the specified auth strategy.
+type Method func(*server.Server) Auth

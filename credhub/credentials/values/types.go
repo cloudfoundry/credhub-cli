@@ -1,3 +1,4 @@
+// CredHub credential value types
 package values
 
 type Value string
