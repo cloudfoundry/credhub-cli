@@ -78,20 +78,16 @@ func (a *Uaa) Login() error {
 	request.Header.Add("Accept", "application/json")
 	request.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
-	response, err := a.ApiClient.Do(request)
-	if err != nil {
-		panic(err)
-	}
+	response, _ := a.ApiClient.Do(request)
+
 	var token struct {
 		AccessToken  string `json:"access_token"`
 		RefreshToken string `json:"refresh_token"`
 		TokenType    string `json:"token_type"`
 	}
 	decoder := json.NewDecoder(response.Body)
-	err = decoder.Decode(&token)
-	if err != nil {
-		panic(err)
-	}
+	_ = decoder.Decode(&token)
+
 	a.AccessToken = token.AccessToken
 	a.RefreshToken = token.RefreshToken
 	return nil

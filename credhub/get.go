@@ -9,13 +9,13 @@ func (ch *CredHub) GetById(id string) (credentials.Credential, error) {
 	panic("Not implemented")
 }
 
-// Returns a credential by name.
-func (ch *CredHub) Get(name string) (credentials.Credential, error) {
+// Returns all historical credential value(s) by name.
+func (ch *CredHub) GetAll(name string) ([]credentials.Credential, error) {
 	panic("Not implemented")
 }
 
-// Returns all historical credential value(s) by name.
-func (ch *CredHub) GetAll(name string) ([]credentials.Credential, error) {
+// Returns a credential by name.
+func (ch *CredHub) Get(name string) (credentials.Credential, error) {
 	panic("Not implemented")
 }
 
@@ -31,7 +31,7 @@ func (ch *CredHub) GetJSON(name string) (credentials.JSON, error) {
 
 // Returns a Password credential by name.
 func (ch *CredHub) GetPassword(name string) (credentials.Password, error) {
-	panic("Not implemented")
+	panic("Not implemented yet")
 }
 
 // Returns a User credential by name.
