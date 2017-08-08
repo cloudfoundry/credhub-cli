@@ -19,8 +19,8 @@ type Certificate struct {
 }
 
 type RSA struct {
-	PublicKey  string
-	PrivateKey string
+	PublicKey  string `json:"public_key" yaml:"public_key"`
+	PrivateKey string `json:"private_key" yaml:"private_key"`
 }
 
 type SSH struct {

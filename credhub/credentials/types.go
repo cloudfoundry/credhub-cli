@@ -60,8 +60,8 @@ type Certificate struct {
 
 // An RSA type credential
 type RSA struct {
-	Metadata
-	Value values.RSA
+	Metadata `yaml:",inline"`
+	Value    values.RSA `json:"value"`
 }
 
 // An SSH type credential

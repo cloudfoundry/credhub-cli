@@ -258,4 +258,47 @@ version_created_at: '2017-01-05T01:01:01Z'
 		})
 	})
 
+	Describe("RSA", func() {
+		Specify("when decoding and encoding", func() {
+			var cred RSA
+			credJson := `{
+      "id": "some-id",
+      "name": "/example-rsa",
+      "type": "rsa",
+      "value": {
+        "public_key": "some-public-key",
+        "private_key": "some-private-key"
+      },
+      "version_created_at": "2017-01-05T01:01:01Z"
+}`
+
+			credYaml := `
+id: some-id
+name: "/example-rsa"
+type: rsa
+value:
+  public_key: some-public-key
+  private_key: some-private-key
+version_created_at: '2017-01-05T01:01:01Z'`
+
+			err := json.Unmarshal([]byte(credJson), &cred)
+
+			Expect(err).To(BeNil())
+
+			Expect(cred.Id).To(Equal("some-id"))
+			Expect(cred.Name).To(Equal("/example-rsa"))
+			Expect(cred.Type).To(Equal("rsa"))
+			Expect(cred.Value.PublicKey).To(Equal("some-public-key"))
+			Expect(cred.Value.PrivateKey).To(Equal("some-private-key"))
+			Expect(cred.VersionCreatedAt).To(Equal("2017-01-05T01:01:01Z"))
+
+			jsonOutput, err := json.Marshal(cred)
+
+			Expect(jsonOutput).To(MatchJSON(credJson))
+
+			yamlOutput, err := yaml.Marshal(cred)
+
+			Expect(yamlOutput).To(MatchYAML(credYaml))
+		})
+	})
 })
