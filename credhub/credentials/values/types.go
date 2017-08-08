@@ -13,9 +13,9 @@ type User struct {
 }
 
 type Certificate struct {
-	Ca          string
-	Certificate string
-	PrivateKey  string
+	Ca          string `json:"ca"`
+	Certificate string `json:"certificate"`
+	PrivateKey  string `json:"private_key" yaml:"private_key"`
 }
 
 type RSA struct {

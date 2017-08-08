@@ -5,8 +5,14 @@ import "github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials/values
 
 // Base fields of a credential
 type Base struct {
-	Name             string
-	VersionCreatedAt string
+	Name             string `json:"name"`
+	VersionCreatedAt string `json:"version_created_at" yaml:"version_created_at"`
+}
+
+type Metadata struct {
+	Base `yaml:",inline"`
+	Id   string `json:"id"`
+	Type string `json:"type"`
 }
 
 // A generic credential
@@ -15,33 +21,31 @@ type Base struct {
 //
 // Value will be as unmarshalled by https://golang.org/pkg/encoding/json/#Unmarshal
 type Credential struct {
-	Base
-	Id    string
-	Type  string
-	Value interface{}
+	Metadata
+	Value interface{} `json:"value"`
 }
 
 // A Value type credential
 type Value struct {
-	Credential
+	Metadata
 	Value values.Value
 }
 
 // A JSON type credential
 type JSON struct {
-	Credential
+	Metadata
 	Value values.JSON
 }
 
 // A Password type credential
 type Password struct {
-	Credential
+	Metadata
 	Value values.Password
 }
 
 // A User type credential
 type User struct {
-	Credential
+	Metadata
 	Value struct {
 		values.User
 		PasswordHash string
@@ -50,18 +54,18 @@ type User struct {
 
 // A Certificate type credential
 type Certificate struct {
-	Credential
-	Value values.Certificate
+	Metadata `yaml:",inline"`
+	Value    values.Certificate `json:"value"`
 }
 
 // An RSA type credential
 type RSA struct {
-	Credential
+	Metadata
 	Value values.RSA
 }
 
 // An SSH type credential
 type SSH struct {
-	Credential
+	Metadata
 	Value values.SSH
 }
