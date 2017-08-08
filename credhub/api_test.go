@@ -1,7 +1,6 @@
 package credhub_test
 
 import (
-	"encoding/json"
 	"errors"
 	"io/ioutil"
 	"net/http"
@@ -14,24 +13,11 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-type dummyAuth struct {
-	Server   *server.Server
-	Request  *http.Request
-	Response *http.Response
-	Error    error
-}
-
-func (d *dummyAuth) Do(req *http.Request) (*http.Response, error) {
-	d.Request = req
-
-	return d.Response, d.Error
-}
-
 var _ = Describe("Api", func() {
 	Context("New()", func() {
 		It("should assign Server and Auth", func() {
 			dummy := func(s *server.Server) auth.Auth {
-				return &dummyAuth{Server: s}
+				return &DummyAuth{Server: s}
 			}
 			s := &server.Server{ApiUrl: "http://example.com"}
 
@@ -39,7 +25,7 @@ var _ = Describe("Api", func() {
 
 			Expect(ch.Server).To(BeIdenticalTo(s))
 
-			da, ok := ch.Auth.(*dummyAuth)
+			da, ok := ch.Auth.(*DummyAuth)
 
 			Expect(ok).To(BeTrue())
 			Expect(da.Server).To(BeIdenticalTo(s))
@@ -48,12 +34,12 @@ var _ = Describe("Api", func() {
 
 	Context("Request()", func() {
 		var (
-			mockAuth *dummyAuth
+			mockAuth *DummyAuth
 			ch       *CredHub
 		)
 
 		BeforeEach(func() {
-			mockAuth = &dummyAuth{}
+			mockAuth = &DummyAuth{}
 			ch = &CredHub{
 				Server: &server.Server{ApiUrl: "http://example.com/"},
 				Auth:   mockAuth,
@@ -94,11 +80,3 @@ var _ = Describe("Api", func() {
 		})
 	})
 })
-
-type NotMarshallable struct{}
-
-func (u *NotMarshallable) MarshalJSON() ([]byte, error) {
-	return nil, errors.New("I cannot be marshalled")
-}
-
-var _ json.Marshaler = new(NotMarshallable)
