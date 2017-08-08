@@ -45,6 +45,7 @@ var _ = Describe("AuthUrl()", func() {
 
 			Expect(err).ToNot(BeNil())
 		})
+
 		Specify("when ApiUrl is inaccessible", func() {
 			server := Server{ApiUrl: "http://localhost:1"}
 
@@ -52,6 +53,7 @@ var _ = Describe("AuthUrl()", func() {
 
 			Expect(err).ToNot(BeNil())
 		})
+
 		Specify("when /info cannot be parsed", func() {
 			testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				if r.URL.Path == "/info" {
@@ -66,6 +68,7 @@ var _ = Describe("AuthUrl()", func() {
 
 			Expect(err).ToNot(BeNil())
 		})
+
 		Specify("when auth-server is not returned", func() {
 			testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				if r.URL.Path == "/info" {

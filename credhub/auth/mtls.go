@@ -1,6 +1,10 @@
 package auth
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.com/cloudfoundry-incubator/credhub-cli/credhub/server"
+)
 
 // Mutual TLS authentication strategy
 //
@@ -17,5 +21,7 @@ func (a *MutualTls) Do(http.Request) (http.Response, error) {
 
 // Provides a constructor for MutualTls authentication strategy
 func MutualTlsCertificate(certificate string) Method {
-	panic("Not implemented")
+	return func(s *server.Server) Auth {
+		panic("Not implemented")
+	}
 }

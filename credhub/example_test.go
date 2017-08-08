@@ -16,7 +16,7 @@ func ExampleCredHub() {
 		ApiUrl:             "https://example.com",
 		InsecureSkipVerify: true,
 	}
-	authOption := auth.UaaPasswordGrant("username", "password")
+	authOption := auth.UaaPasswordGrant("credhub_cli", "", "username", "password")
 
 	ch := credhub.New(server, authOption)
 
@@ -82,7 +82,7 @@ func Example() {
 			ApiUrl:  "https://example.com",
 			CaCerts: []string{"--- BEGIN ---\nroot-certificate\n--- END ---"},
 		},
-		auth.UaaPasswordGrant("username", "password"),
+		auth.UaaPasswordGrant("credhub_cli", "", "username", "password"),
 	)
 
 	// We'll be working with a certificate stored at "/my-certificates/the-cert"

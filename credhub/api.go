@@ -18,7 +18,7 @@ type CredHub struct {
 	// Provides http.Client-like method for authenticated requests to the CredHub server
 	// Can be typecast to a specific Auth type to get additional information and functionality.
 	// eg. auth.Uaa provides Logout(), Refresh(), AccessToken and RefreshToken
-	Auth *auth.Auth
+	Auth auth.Auth
 }
 
 // Sends an authenticated request to the CredHub server.

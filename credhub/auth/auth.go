@@ -12,7 +12,7 @@ type Auth interface {
 	Do(req *http.Request) (*http.Response, error)
 }
 
-// Constructor for authentication strategy provided to credhub.New()
+// Method is used to select an authentication strategy for CredHub.New()
 //
 // The server.Server provided to credhub.New() will be given to Method to construct
 // the specified auth strategy.
