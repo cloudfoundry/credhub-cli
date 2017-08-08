@@ -8,6 +8,8 @@ import (
 )
 
 func ExampleUaa() {
+	return
+
 	// To retrieve the access token from the CredHub client, use type assertion
 	ch := credhub.CredHub{}
 	uaa, ok := ch.Auth.(*auth.Uaa)

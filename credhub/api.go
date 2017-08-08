@@ -13,12 +13,12 @@ import (
 // Use New() to construct a new CredHub object, which can then interact with the CredHub api.
 type CredHub struct {
 	// Provides server information and http.Client for unauthenticated requests to the CredHub server
-	Server *server.Server
+	*server.Server
 
 	// Provides http.Client-like method for authenticated requests to the CredHub server
 	// Can be typecast to a specific Auth type to get additional information and functionality.
 	// eg. auth.Uaa provides Logout(), Refresh(), AccessToken and RefreshToken
-	Auth auth.Auth
+	auth.Auth
 }
 
 // Sends an authenticated request to the CredHub server.

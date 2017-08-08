@@ -11,6 +11,8 @@ import (
 )
 
 func ExampleCredHub() {
+	return
+
 	// Use a CredHub server on "https://example.com" using UAA password grant
 	server := server.Server{
 		ApiUrl:             "https://example.com",
@@ -20,8 +22,13 @@ func ExampleCredHub() {
 
 	ch := credhub.New(server, authOption)
 
+	authUrl, err := ch.AuthUrl()
+	if err != nil {
+		panic("couldn't fetch authurl")
+	}
+
 	fmt.Println("CredHub server: ", ch.ApiUrl)
-	fmt.Println("Auth server: ", ch.AuthUrl())
+	fmt.Println("Auth server: ", authUrl)
 
 	// Retrieve a password stored at "/my/password"
 	password, err := ch.GetPassword("/my/password")
@@ -51,6 +58,8 @@ func ExampleCredHub() {
 }
 
 func ExampleNew() {
+	return
+
 	server := server.Server{
 		ApiUrl:             "https://example.com",
 		InsecureSkipVerify: true,
@@ -58,9 +67,15 @@ func ExampleNew() {
 	authOption := auth.UaaClientCredentialGrant("client-id", "client-secret")
 
 	ch := credhub.New(server, authOption)
+
+	fmt.Println("Connected to ", ch.ApiUrl)
 }
 
 func ExampleCredHub_Request() {
+	return
+
+	ch := credhub.CredHub{}
+
 	// Get encryption key usage
 	response, err := ch.Request("POST", "/api/v1/key-usage", nil)
 	if err != nil {
@@ -68,7 +83,11 @@ func ExampleCredHub_Request() {
 	}
 
 	var keyUsage map[string]int
-	json.Unmarshal(response.Body, &keyUsage)
+	decoder := json.NewDecoder(response.Body)
+	err = decoder.Decode(&keyUsage)
+	if err != nil {
+		panic("couldn't parse response")
+	}
 
 	fmt.Println("Active Key: ", keyUsage["active_key"])
 	// Output:
@@ -76,6 +95,8 @@ func ExampleCredHub_Request() {
 }
 
 func Example() {
+	return
+
 	// CredHub server at https://example.com, using UAA Password grant
 	ch := credhub.New(
 		server.Server{
@@ -92,7 +113,7 @@ func Example() {
 	// If the certificate already exists, delete it
 	cert, err := ch.GetCertificate(path + name)
 	if err == nil {
-		ch.Delete(cert)
+		ch.Delete(cert.Name)
 	}
 
 	// Generate a new certificate
@@ -100,7 +121,7 @@ func Example() {
 		CommonName: "pivotal",
 		KeyLength:  2048,
 	}
-	cert, err := ch.GenerateCertificate(path+name, gen, false)
+	cert, err = ch.GenerateCertificate(path+name, gen, false)
 	if err != nil {
 		panic("couldn't generate certificate")
 	}

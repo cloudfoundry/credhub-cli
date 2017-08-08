@@ -108,7 +108,7 @@ func UaaPasswordGrant(clientId, clientSecret, username, password string) Method 
 // using client credential grant.
 func UaaClientCredentialGrant(clientId, clientSecret string) Method {
 	return func(s *server.Server) Auth {
-		panic("Not implemented")
+		panic("Not implemented yet")
 	}
 }
 
