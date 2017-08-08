@@ -1,6 +1,10 @@
 package credhub
 
 import (
+	"encoding/json"
+	"io/ioutil"
+	"net/http"
+
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials"
 )
 
@@ -16,7 +20,24 @@ func (ch *CredHub) GetAll(name string) ([]credentials.Credential, error) {
 
 // Returns a credential by name.
 func (ch *CredHub) Get(name string) (credentials.Credential, error) {
-	panic("Not implemented")
+	var cred credentials.Credential
+
+	resp, err := ch.Request(http.MethodGet, ch.ApiUrl+"/api/v1/data?name="+name, nil)
+
+	if err != nil {
+		return cred, err
+	}
+
+	defer resp.Body.Close()
+	body, _ := ioutil.ReadAll(resp.Body)
+
+	err = json.Unmarshal(body, &cred)
+
+	if err != nil {
+		return cred, err
+	}
+
+	return cred, nil
 }
 
 // Returns a Value credential by name.
