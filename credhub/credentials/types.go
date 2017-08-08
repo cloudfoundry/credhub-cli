@@ -21,8 +21,8 @@ type Metadata struct {
 //
 // Value will be as unmarshalled by https://golang.org/pkg/encoding/json/#Unmarshal
 type Credential struct {
-	Metadata
-	Value interface{} `json:"value"`
+	Metadata `yaml:",inline"`
+	Value    interface{} `json:"value"`
 }
 
 // A Value type credential
