@@ -20,7 +20,7 @@ func ExampleCredHub() {
 	}
 	authOption := auth.UaaPasswordGrant("credhub_cli", "", "username", "password")
 
-	ch := credhub.New(server, authOption)
+	ch := credhub.New(&server, authOption)
 
 	authUrl, err := ch.AuthUrl()
 	if err != nil {
@@ -66,7 +66,7 @@ func ExampleNew() {
 	}
 	authOption := auth.UaaClientCredentialGrant("client-id", "client-secret")
 
-	ch := credhub.New(server, authOption)
+	ch := credhub.New(&server, authOption)
 
 	fmt.Println("Connected to ", ch.ApiUrl)
 }
@@ -99,7 +99,7 @@ func Example() {
 
 	// CredHub server at https://example.com, using UAA Password grant
 	ch := credhub.New(
-		server.Server{
+		&server.Server{
 			ApiUrl:  "https://example.com",
 			CaCerts: []string{"--- BEGIN ---\nroot-certificate\n--- END ---"},
 		},

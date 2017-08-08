@@ -2,7 +2,10 @@
 package credhub
 
 import (
+	"bytes"
+	"encoding/json"
 	"net/http"
+	"net/url"
 
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/auth"
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/server"
@@ -30,12 +33,28 @@ type CredHub struct {
 //
 // Use Request() directly to access the CredHub server if an appropriate helper method is not available.
 // For unauthenticated requests (eg. /health), use Server.Client() instead.
-func (ch *CredHub) Request(method string, pathStr string, body interface{}) (http.Response, error) {
-	panic("Not implemented yet")
+func (ch *CredHub) Request(method string, pathStr string, body interface{}) (*http.Response, error) {
+	url, _ := url.Parse(ch.Server.ApiUrl)
+	url.Path = pathStr
+
+	jsonBody, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(method, url.String(), bytes.NewReader(jsonBody))
+	if err != nil {
+		return nil, err
+	}
+
+	return ch.Auth.Do(req)
 }
 
 // Creates a new CredHub API client with the provided server credentials and authentication method.
 // See the auth package for supported authentication methods.
-func New(server server.Server, authMethod auth.Method) *CredHub {
-	panic("Not implemented yet")
+func New(server *server.Server, authMethod auth.Method) *CredHub {
+	return &CredHub{
+		Server: server,
+		Auth:   authMethod(server),
+	}
 }
