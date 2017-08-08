@@ -45,11 +45,11 @@ type Password struct {
 
 // A User type credential
 type User struct {
-	Metadata
-	Value struct {
-		values.User
-		PasswordHash string
-	}
+	Metadata `yaml:",inline"`
+	Value    struct {
+		values.User  `yaml:",inline"`
+		PasswordHash string `json:"password_hash" yaml:"password_hash"`
+	} `json:"value"`
 }
 
 // A Certificate type credential

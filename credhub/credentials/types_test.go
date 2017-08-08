@@ -66,4 +66,50 @@ version_created_at: 2017-01-01T04:07:18Z`
 			Expect(yamlOutput).To(MatchYAML(credYaml))
 		})
 	})
+	Context("User", func() {
+		Specify("when decoding and encoding", func() {
+			var cred User
+			credJson := `{
+      "id": "some-id",
+      "name": "/example-user",
+      "type": "user",
+      "value": {
+        "username": "some-username",
+        "password": "some-password",
+        "password_hash": "some-password-hash"
+      },
+      "version_created_at": "2017-01-05T01:01:01Z"
+}`
+
+			credYaml := `
+id: some-id
+name: "/example-user"
+type: user
+value:
+  username: some-username
+  password: some-password
+  password_hash: some-password-hash
+version_created_at: '2017-01-05T01:01:01Z'`
+
+			err := json.Unmarshal([]byte(credJson), &cred)
+
+			Expect(err).To(BeNil())
+
+			Expect(cred.Id).To(Equal("some-id"))
+			Expect(cred.Name).To(Equal("/example-user"))
+			Expect(cred.Type).To(Equal("user"))
+			Expect(cred.Value.Username).To(Equal("some-username"))
+			Expect(cred.Value.Password).To(Equal("some-password"))
+			Expect(cred.Value.PasswordHash).To(Equal("some-password-hash"))
+			Expect(cred.VersionCreatedAt).To(Equal("2017-01-05T01:01:01Z"))
+
+			jsonOutput, err := json.Marshal(cred)
+
+			Expect(jsonOutput).To(MatchJSON(credJson))
+
+			yamlOutput, err := yaml.Marshal(cred)
+
+			Expect(yamlOutput).To(MatchYAML(credYaml))
+		})
+	})
 })
