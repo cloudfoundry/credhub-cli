@@ -27,20 +27,20 @@ type Credential struct {
 
 // A Value type credential
 type Value struct {
-	Metadata
-	Value values.Value
+	Metadata `yaml:",inline"`
+	Value    values.Value `json:"value"`
 }
 
 // A JSON type credential
 type JSON struct {
-	Metadata
-	Value values.JSON
+	Metadata `yaml:",inline"`
+	Value    values.JSON `json:"value"`
 }
 
 // A Password type credential
 type Password struct {
-	Metadata
-	Value values.Password
+	Metadata `yaml:",inline"`
+	Value    values.Password `json:"value"`
 }
 
 // A User type credential
