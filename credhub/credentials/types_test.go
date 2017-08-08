@@ -301,4 +301,51 @@ version_created_at: '2017-01-05T01:01:01Z'`
 			Expect(yamlOutput).To(MatchYAML(credYaml))
 		})
 	})
+
+	Describe("SSH", func() {
+		Specify("when decoding and encoding", func() {
+			var cred SSH
+			credJson := `{
+      "id": "some-id",
+      "name": "/example-ssh",
+      "type": "ssh",
+      "value": {
+        "public_key": "some-public-key",
+        "private_key": "some-private-key",
+        "public_key_fingerprint": "some-public-key-fingerprint"
+      },
+      "version_created_at": "2017-01-01T04:07:18Z"
+    }`
+
+			credYaml := `
+id: some-id
+name: "/example-ssh"
+type: ssh
+value:
+  public_key: some-public-key
+  private_key: some-private-key
+  public_key_fingerprint: some-public-key-fingerprint
+version_created_at: '2017-01-01T04:07:18Z'`
+
+			err := json.Unmarshal([]byte(credJson), &cred)
+
+			Expect(err).To(BeNil())
+
+			Expect(cred.Id).To(Equal("some-id"))
+			Expect(cred.Name).To(Equal("/example-ssh"))
+			Expect(cred.Type).To(Equal("ssh"))
+			Expect(cred.Value.PublicKey).To(Equal("some-public-key"))
+			Expect(cred.Value.PublicKeyFingerprint).To(Equal("some-public-key-fingerprint"))
+			Expect(cred.Value.PrivateKey).To(Equal("some-private-key"))
+			Expect(cred.VersionCreatedAt).To(Equal("2017-01-01T04:07:18Z"))
+
+			jsonOutput, err := json.Marshal(cred)
+
+			Expect(jsonOutput).To(MatchJSON(credJson))
+
+			yamlOutput, err := yaml.Marshal(cred)
+
+			Expect(yamlOutput).To(MatchYAML(credYaml))
+		})
+	})
 })

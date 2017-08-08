@@ -24,7 +24,7 @@ type RSA struct {
 }
 
 type SSH struct {
-	PublicKey            string
-	PublicKeyFingerprint string
-	PrivateKey           string
+	PublicKey            string `json:"public_key" yaml:"public_key"`
+	PublicKeyFingerprint string `json:"public_key_fingerprint" yaml:"public_key_fingerprint"`
+	PrivateKey           string `json:"private_key" yaml:"private_key"`
 }

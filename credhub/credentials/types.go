@@ -66,6 +66,6 @@ type RSA struct {
 
 // An SSH type credential
 type SSH struct {
-	Metadata
-	Value values.SSH
+	Metadata `yaml:",inline"`
+	Value    values.SSH `json:"value"`
 }
