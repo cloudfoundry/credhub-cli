@@ -1,12 +1,8 @@
 package auth
 
 import (
-	"bytes"
 	"encoding/json"
 	"net/http"
-	"net/url"
-
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub/server"
 )
 
 // UAA authentication strategy
@@ -22,23 +18,73 @@ type Uaa struct {
 	Password     string
 	ClientId     string
 	ClientSecret string
-	ApiClient    *http.Client
-	AuthUrl      string
+	ApiClient    HttpClient
+	UaaClient    UaaClient
+}
+
+type HttpClient interface {
+	Do(*http.Request) (*http.Response, error)
+}
+
+type UaaClient interface {
+	ClientCredentialGrant(clientId, clientSecret string) (string, error)
+	PasswordGrant(clientId, clientSecret, username, password string) (string, string, error)
+	RefreshTokenGrant(clientId, clientSecret, refreshToken string) (string, string, error)
+	RevokeToken(token string) error
 }
 
 // Provides http.Client-like interface to send requests authenticated with UAA
 //
 // Will automatically refresh the access token and retry the request if the token has expired.
-func (a Uaa) Do(req *http.Request) (*http.Response, error) {
-	panic("Not implemented yet")
+func (a *Uaa) Do(req *http.Request) (*http.Response, error) {
+	a.Login()
+
+	req.Header.Set("Authorization", "Bearer "+a.AccessToken)
+	resp, err := a.ApiClient.Do(req)
+
+	if err == nil && tokenExpired(resp) {
+		a.Refresh()
+
+		req.Header.Set("Authorization", "Bearer "+a.AccessToken)
+		resp, err = a.ApiClient.Do(req)
+	}
+
+	return resp, err
+}
+
+func tokenExpired(resp *http.Response) bool {
+	if resp.StatusCode < 400 {
+		return false
+	}
+
+	var errResp map[string]string
+
+	decoder := json.NewDecoder(resp.Body)
+	err := decoder.Decode(&errResp)
+	if err != nil {
+		return false
+	}
+
+	return errResp["error"] == "access_token_expired"
 }
 
 // Refresh the access token
 // If refresh token is available (ie. constructed with UaaPasswordGrant() or UaaSession()),
 // a refresh grant will be used.
 // Otherwise, client credential grant will be used to retrieve a new access token.
-func (a *Uaa) Refresh() {
-	panic("Not implemented yet")
+func (a *Uaa) Refresh() error {
+	if a.RefreshToken == "" {
+		a.AccessToken = ""
+
+		return a.Login()
+	}
+
+	accessToken, refreshToken, _ := a.UaaClient.RefreshTokenGrant(a.ClientId, a.ClientSecret, a.RefreshToken)
+
+	a.AccessToken = accessToken
+	a.RefreshToken = refreshToken
+
+	return nil
 }
 
 // Invalidate the access and refresh tokens on the UAA server
@@ -55,65 +101,21 @@ func (a *Uaa) Logout() {
 //
 // Login will be a no-op if the AccessToken is not-empty when invoked.
 func (a *Uaa) Login() error {
-	var values url.Values
+	if a.AccessToken != "" {
+		return nil
+	}
+
+	var accessToken string
+	var refreshToken string
+
 	if a.Username == "" {
-		values = url.Values{
-			"grant_type":    {"client_credentials"},
-			"response_type": {"token"},
-			"client_id":     {a.ClientId},
-			"client_secret": {a.ClientSecret},
-		}
+		accessToken, _ = a.UaaClient.ClientCredentialGrant(a.ClientId, a.ClientSecret)
 	} else {
-		values = url.Values{
-			"grant_type":    {"password"},
-			"response_type": {"token"},
-			"username":      {a.Username},
-			"password":      {a.Password},
-			"client_id":     {a.ClientId},
-			"client_secret": {a.ClientSecret},
-		}
+		accessToken, refreshToken, _ = a.UaaClient.PasswordGrant(a.ClientId, a.ClientSecret, a.Username, a.Password)
 	}
 
-	request, _ := http.NewRequest("POST", a.AuthUrl+"/oauth/token", bytes.NewBufferString(values.Encode()))
-	request.Header.Add("Accept", "application/json")
-	request.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	a.AccessToken = accessToken
+	a.RefreshToken = refreshToken
 
-	response, _ := a.ApiClient.Do(request)
-
-	var token struct {
-		AccessToken  string `json:"access_token"`
-		RefreshToken string `json:"refresh_token"`
-		TokenType    string `json:"token_type"`
-	}
-	decoder := json.NewDecoder(response.Body)
-	_ = decoder.Decode(&token)
-
-	a.AccessToken = token.AccessToken
-	a.RefreshToken = token.RefreshToken
 	return nil
-}
-
-// Provides a constructor for a UAA authentication strategy using password grant
-func UaaPasswordGrant(clientId, clientSecret, username, password string) Method {
-	return func(s *server.Server) Auth {
-		panic("Not implemented")
-	}
-}
-
-// UaaClientCredentialGrant provides a constructor for a UAA authentication strategy
-// using client credential grant.
-func UaaClientCredentialGrant(clientId, clientSecret string) Method {
-	return func(s *server.Server) Auth {
-		panic("Not implemented yet")
-	}
-}
-
-// Provides a constructor for a UAA authentication strategy using existing tokens
-//
-// Only use this for a sessions created with password grant
-// For existing sessions created with a client credential grant, use UaaClient()
-func UaaSession(clientId, clientSecret, accessToken, refreshToken string) Method {
-	return func(s *server.Server) Auth {
-		panic("Not implemented")
-	}
 }

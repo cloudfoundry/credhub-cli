@@ -15,16 +15,16 @@ import (
 //
 // Use New() to construct a new CredHub object, which can then interact with the CredHub api.
 type CredHub struct {
-	// Provides server information and http.Client for unauthenticated requests to the CredHub server
+	// Server provides the connection details for the CredHub server
 	*server.Server
 
-	// Provides http.Client-like method for authenticated requests to the CredHub server
+	// Auth provides http.Client-like Do method for authenticated requests to the CredHub server
 	// Can be typecast to a specific Auth type to get additional information and functionality.
 	// eg. auth.Uaa provides Logout(), Refresh(), AccessToken and RefreshToken
 	auth.Auth
 }
 
-// Sends an authenticated request to the CredHub server.
+// Request sends an authenticated request to the CredHub server.
 //
 // The pathStr should include the full path (eg. /api/v1/data) and any query parameters.
 // The request body should be marshallable to JSON, but can be left nil for GET requests.
@@ -50,7 +50,7 @@ func (ch *CredHub) Request(method string, pathStr string, body interface{}) (*ht
 	return ch.Auth.Do(req)
 }
 
-// Creates a new CredHub API client with the provided server credentials and authentication method.
+// New creates a new CredHub API client with the provided server credentials and authentication method.
 // See the auth package for supported authentication methods.
 func New(server *server.Server, authMethod auth.Method) *CredHub {
 	return &CredHub{
