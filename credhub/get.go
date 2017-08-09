@@ -22,7 +22,7 @@ func (ch *CredHub) GetAll(name string) ([]credentials.Credential, error) {
 func (ch *CredHub) Get(name string) (credentials.Credential, error) {
 	var cred credentials.Credential
 
-	resp, err := ch.Request(http.MethodGet, ch.ApiUrl+"/api/v1/data?name="+name, nil)
+	resp, err := ch.Request(http.MethodGet, "/api/v1/data?name="+name, nil)
 
 	if err != nil {
 		return cred, err

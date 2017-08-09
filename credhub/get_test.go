@@ -38,7 +38,7 @@ var _ = Describe("Get", func() {
 			}
 			cred, err = ch.Get("/example-password")
 			urlPath := dummy.Request.URL.Path
-			Expect(urlPath).To(ContainSubstring("http://example.com/api/v1/data?name=/example-password"))
+			Expect(urlPath).To(Equal("/api/v1/data?name=/example-password"))
 		})
 
 		Context("when successful", func() {
