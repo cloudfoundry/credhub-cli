@@ -15,7 +15,7 @@ import (
 
 var _ = Describe("Get", func() {
 	Describe("Get()", func() {
-		var dummy dummyAuth
+		var dummy DummyAuth
 		var cred credentials.Credential
 		var err error
 		var serv server.Server
@@ -28,7 +28,7 @@ var _ = Describe("Get", func() {
 		})
 
 		It("requests the credential by name", func() {
-			dummy = dummyAuth{Response: &http.Response{
+			dummy = DummyAuth{Response: &http.Response{
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
 
@@ -50,7 +50,7 @@ var _ = Describe("Get", func() {
       "value": "some-password",
       "version_created_at": "2017-01-05T01:01:01Z"
     }`
-				dummy = dummyAuth{Response: &http.Response{
+				dummy = DummyAuth{Response: &http.Response{
 					Body: ioutil.NopCloser(bytes.NewBufferString(responseString)),
 				}}
 
@@ -70,7 +70,7 @@ var _ = Describe("Get", func() {
 
 		Context("when request fails", func() {
 			It("returns an error", func() {
-				dummy = dummyAuth{Error: errors.New("Network error occurred")}
+				dummy = DummyAuth{Error: errors.New("Network error occurred")}
 				ch := CredHub{
 					Server: &serv,
 					Auth:   &dummy,
@@ -83,7 +83,7 @@ var _ = Describe("Get", func() {
 
 		Context("when response body cannot be unmarshalled", func() {
 			It("returns an error", func() {
-				dummy = dummyAuth{Response: &http.Response{
+				dummy = DummyAuth{Response: &http.Response{
 					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
 				}}
 
