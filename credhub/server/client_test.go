@@ -23,7 +23,7 @@ var _ = Describe("Client()", func() {
 		})
 
 		Specify("when CaCerts are invalid", func() {
-			fixturePath := "./servertest/"
+			fixturePath := "./serverfakes/"
 			caCertFiles := []string{
 				"auth-tls-ca.pem",
 				"server-tls-ca.pem",
@@ -64,7 +64,7 @@ var _ = Describe("Client()", func() {
 
 		Context("With CaCerts", func() {
 			It("should return a http.Client with tls.Config with RootCAs", func() {
-				fixturePath := "./servertest/"
+				fixturePath := "./serverfakes/"
 				caCertFiles := []string{
 					"auth-tls-ca.pem",
 					"server-tls-ca.pem",

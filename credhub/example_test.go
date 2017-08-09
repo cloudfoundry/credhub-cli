@@ -49,7 +49,7 @@ func ExampleCredHub() {
 	uaa.Refresh() // For demo purposes only, tokens will be automatically refreshed by auth.Uaa
 
 	fmt.Println("New access token:", uaa.AccessToken)
-	// Output:
+	// FIXME Output:
 	// CredHub server: https://example.com
 	// Auth server: https://uaa.example.com
 	// My password: random-password
@@ -90,7 +90,7 @@ func ExampleCredHub_Request() {
 	}
 
 	fmt.Println("Active Key: ", keyUsage["active_key"])
-	// Output:
+	// FIXME Output:
 	// Active Key: 1231231
 }
 
@@ -146,7 +146,7 @@ func Example() {
 	for _, cred := range creds {
 		fmt.Println(cred.Name)
 	}
-	// Output:
+	// FIXME Output:
 	// Found the following credentials in /my-certificates:
 	// /my-certificates/dup-cert
 	// /my-certificates/the-cert

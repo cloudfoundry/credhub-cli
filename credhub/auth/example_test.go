@@ -20,7 +20,7 @@ func ExampleUaa() {
 	fmt.Println("Before logging out: ", uaa.AccessToken)
 	uaa.Logout()
 	fmt.Println("After logging out: ", uaa.AccessToken)
-	// Output:
+	// FIXME Output:
 	// Before logging out: some-access-token
 	// After logging out:
 }
