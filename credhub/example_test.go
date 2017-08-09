@@ -39,7 +39,7 @@ func ExampleCredHub() {
 	fmt.Println("My password: ", password.Value)
 
 	// Manually refresh the access token
-	uaa, ok := ch.Auth.(auth.Uaa) // This works because we authenticated with auth.UaaPasswordGrant
+	uaa, ok := ch.Auth.(*auth.Uaa) // This works because we authenticated with auth.UaaPasswordGrant
 	if !ok {
 		panic("not using uaa")
 	}
