@@ -21,23 +21,8 @@ func (ch *CredHub) GetAll(name string) ([]credentials.Credential, error) {
 // Returns a credential by name.
 func (ch *CredHub) Get(name string) (credentials.Credential, error) {
 	var cred credentials.Credential
-
-	resp, err := ch.Request(http.MethodGet, "/api/v1/data?name="+name, nil)
-
-	if err != nil {
-		return cred, err
-	}
-
-	defer resp.Body.Close()
-	body, _ := ioutil.ReadAll(resp.Body)
-
-	err = json.Unmarshal(body, &cred)
-
-	if err != nil {
-		return cred, err
-	}
-
-	return cred, nil
+	err := ch.getCredential(name, &cred)
+	return cred, err
 }
 
 // Returns a Value credential by name.
@@ -52,7 +37,9 @@ func (ch *CredHub) GetJSON(name string) (credentials.JSON, error) {
 
 // Returns a Password credential by name.
 func (ch *CredHub) GetPassword(name string) (credentials.Password, error) {
-	panic("Not implemented yet")
+	var cred credentials.Password
+	err := ch.getCredential(name, &cred)
+	return cred, err
 }
 
 // Returns a User credential by name.
@@ -73,4 +60,23 @@ func (ch *CredHub) GetRSA(name string) (credentials.RSA, error) {
 // Returns an SSH credential by name.
 func (ch *CredHub) GetSSH(name string) (credentials.SSH, error) {
 	panic("Not implemented")
+}
+
+func (ch *CredHub) getCredential(name string, cred interface{}) error {
+	resp, err := ch.Request(http.MethodGet, "/api/v1/data?name="+name, nil)
+
+	if err != nil {
+		return err
+	}
+
+	defer resp.Body.Close()
+	body, _ := ioutil.ReadAll(resp.Body)
+
+	err = json.Unmarshal(body, &cred)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
