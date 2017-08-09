@@ -109,7 +109,7 @@ var _ = Describe("Get", func() {
 				Server: &serv,
 				Auth:   &dummy,
 			}
-			ch.Get("/example-password")
+			ch.GetPassword("/example-password")
 			urlPath := dummy.Request.URL.Path
 			Expect(urlPath).To(Equal("/api/v1/data?name=/example-password"))
 		})
