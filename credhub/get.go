@@ -49,7 +49,9 @@ func (ch *CredHub) GetUser(name string) (credentials.User, error) {
 
 // Returns a Certificate credential by name.
 func (ch *CredHub) GetCertificate(name string) (credentials.Certificate, error) {
-	panic("Not implemented")
+	var cred credentials.Certificate
+	err := ch.getCredential(name, &cred)
+	return cred, err
 }
 
 // Returns an RSA credential by name.
