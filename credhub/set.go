@@ -1,9 +1,9 @@
 package credhub
 
 import (
-	"net/http"
 	"encoding/json"
 	"io/ioutil"
+	"net/http"
 
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials"
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials/values"
@@ -21,7 +21,10 @@ func (ch *CredHub) SetJSON(name string, value values.JSON, overwrite bool) (cred
 
 // Sets a Password credential with a user-provided value.
 func (ch *CredHub) SetPassword(name string, value values.Password, overwrite bool) (credentials.Password, error) {
-	panic("Not implemented")
+	var cred credentials.Password
+	err := ch.setCredential(name, "password", value, overwrite, &cred)
+
+	return cred, err
 }
 
 // Sets a User credential with a user-provided value.
@@ -32,26 +35,9 @@ func (ch *CredHub) SetUser(name string, value values.User, overwrite bool) (cred
 // Sets a Certificate credential with a user-provided value.
 func (ch *CredHub) SetCertificate(name string, value values.Certificate, overwrite bool) (credentials.Certificate, error) {
 	var cred credentials.Certificate
+	err := ch.setCredential(name, "certificate", value, overwrite, &cred)
 
-	requestBody := map[string]interface{}{}
-	requestBody["name"] = name
-	requestBody["type"] = "certificate"
-	requestBody["value"] = value
-	resp, err := ch.Request(http.MethodPut, "/api/v1/data", requestBody)
-
-	if err != nil {
-		return cred, err
-	}
-
-	defer resp.Body.Close()
-	body, _ := ioutil.ReadAll(resp.Body)
-	err = json.Unmarshal(body, &cred)
-
-	if err != nil {
-		return cred, err
-	}
-
-	return cred, nil
+	return cred, err
 }
 
 // Sets an RSA credential with a user-provided value.
@@ -62,4 +48,26 @@ func (ch *CredHub) SetRSA(name string, value values.RSA, overwrite bool) (creden
 // Sets an SSH credential with a user-provided value.
 func (ch *CredHub) SetSSH(name string, value values.SSH, overwrite bool) (credentials.SSH, error) {
 	panic("Not implemented")
+}
+
+func (ch *CredHub) setCredential(name, credType string, value interface{}, overwrite bool, cred interface{}) error {
+	requestBody := map[string]interface{}{}
+	requestBody["name"] = name
+	requestBody["type"] = credType
+	requestBody["value"] = value
+	resp, err := ch.Request(http.MethodPut, "/api/v1/data", requestBody)
+
+	if err != nil {
+		return err
+	}
+
+	defer resp.Body.Close()
+	body, _ := ioutil.ReadAll(resp.Body)
+	err = json.Unmarshal(body, &cred)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

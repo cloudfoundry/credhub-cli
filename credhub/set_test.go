@@ -24,7 +24,7 @@ var _ = Describe("Set", func() {
 		}
 	})
 
-	Describe("Set()", func() {
+	Describe("SetCertificate()", func() {
 		It("requests to set the certificate", func() {
 			dummy = DummyAuth{Response: &http.Response{
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
@@ -116,6 +116,96 @@ var _ = Describe("Set", func() {
 					Ca: "some-ca",
 				}
 				_, err := ch.SetCertificate("/example-certificate", certificate, false)
+
+				Expect(err).To(HaveOccurred())
+			})
+		})
+	})
+
+	Describe("SetPassword()", func() {
+		It("requests to set the password", func() {
+			dummy = DummyAuth{Response: &http.Response{
+				Body: ioutil.NopCloser(bytes.NewBufferString("")),
+			}}
+
+			ch := CredHub{
+				Server: &serv,
+				Auth:   &dummy,
+			}
+
+			password := values.Password("some-password")
+
+			ch.SetPassword("/example-password", password, false)
+
+			urlPath := dummy.Request.URL.Path
+			Expect(urlPath).To(Equal("/api/v1/data"))
+			Expect(dummy.Request.Method).To(Equal(http.MethodPut))
+
+			var requestBody map[string]interface{}
+			body, _ := ioutil.ReadAll(dummy.Request.Body)
+			json.Unmarshal(body, &requestBody)
+
+			Expect(requestBody["name"]).To(Equal("/example-password"))
+			Expect(requestBody["type"]).To(Equal("password"))
+			Expect(requestBody["value"]).To(BeEquivalentTo("some-password"))
+		})
+
+		Context("when successful", func() {
+			It("returns the credential that has been set", func() {
+				dummy = DummyAuth{Response: &http.Response{
+					Body: ioutil.NopCloser(bytes.NewBufferString(`{
+		  "id": "some-id",
+		  "name": "/example-password",
+		  "type": "password",
+		  "value": "some-password",
+		  "version_created_at": "2017-01-01T04:07:18Z"
+		}`)),
+				}}
+
+				ch := CredHub{
+					Server: &serv,
+					Auth:   &dummy,
+				}
+
+				password := values.Password("some-password")
+
+				cred, _ := ch.SetPassword("/example-password", password, false)
+
+				Expect(cred.Name).To(Equal("/example-password"))
+				Expect(cred.Type).To(Equal("password"))
+
+				Expect(cred.Value).To(BeEquivalentTo("some-password"))
+
+			})
+		})
+		Context("when request fails", func() {
+			It("returns an error", func() {
+				dummy = DummyAuth{Error: errors.New("Network error occurred")}
+				ch := CredHub{
+					Server: &serv,
+					Auth:   &dummy,
+				}
+				password := values.Password("some-password")
+
+				_, err := ch.SetPassword("/example-password", password, false)
+
+				Expect(err).To(HaveOccurred())
+			})
+		})
+
+		Context("when response body cannot be unmarshalled", func() {
+			It("returns an error", func() {
+				dummy = DummyAuth{Response: &http.Response{
+					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
+				}}
+
+				ch := CredHub{
+					Server: &serv,
+					Auth:   &dummy,
+				}
+				password := values.Password("some-password")
+
+				_, err := ch.SetPassword("/example-password", password, false)
 
 				Expect(err).To(HaveOccurred())
 			})
