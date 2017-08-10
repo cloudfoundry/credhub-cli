@@ -56,8 +56,6 @@ var _ = Describe("Generate", func() {
 			It("returns the generated certificate", func() {
 				dummy := DummyAuth{Response: &http.Response{
 					Body: ioutil.NopCloser(bytes.NewBufferString(`{
-  "data": [
-    {
       "id": "some-id",
       "name": "/example-certificate",
       "type": "certificate",
@@ -67,25 +65,19 @@ var _ = Describe("Generate", func() {
         "private_key": "-----BEGIN RSA PRIVATE KEY-----\n...\n-----END RSA PRIVATE KEY-----"
       },
       "version_created_at": "2017-01-01T04:07:18Z"
-    }
-  ]
 }`)),
 				}}
 
-				sserv := server.Server{
-					ApiUrl:             "http://example.com",
-					InsecureSkipVerify: true,
-				}
-
 				ch := CredHub{
-					Server: &sserv,
+					Server: &serv,
 					Auth:   &dummy,
 				}
 				cert := generate.Certificate{
 					Ca: "some-ca",
 				}
 
-				generatedCert, _ := ch.GenerateCertificate("/example-certificate", cert, false)
+				generatedCert, err := ch.GenerateCertificate("/example-certificate", cert, false)
+				Expect(err).ToNot(HaveOccurred())
 				Expect(generatedCert.Id).To(Equal("some-id"))
 				Expect(generatedCert.Name).To(Equal("/example-certificate"))
 				Expect(generatedCert.Value.Ca).To(Equal("some-ca"))
@@ -136,27 +128,102 @@ var _ = Describe("Generate", func() {
 			})
 
 		})
+	})
 
-		Context("when response body does not contain a certificate", func() {
+	Describe("GeneratePassword()", func() {
+		It("requests to generate the password", func() {
+			dummy := DummyAuth{Response: &http.Response{
+				Body: ioutil.NopCloser(bytes.NewBufferString("")),
+			}}
 
+			ch := CredHub{
+				Server: &serv,
+				Auth:   &dummy,
+			}
+			cert := generate.Password{
+				Length: 12,
+			}
+			ch.GeneratePassword("/example-password", cert, false)
+			urlPath := dummy.Request.URL.Path
+			Expect(urlPath).To(Equal("/api/v1/data"))
+			Expect(dummy.Request.Method).To(Equal(http.MethodPost))
+
+			var requestBody map[string]interface{}
+			body, _ := ioutil.ReadAll(dummy.Request.Body)
+			json.Unmarshal(body, &requestBody)
+
+			Expect(requestBody["name"]).To(Equal("/example-password"))
+			Expect(requestBody["type"]).To(Equal("password"))
+			Expect(requestBody["parameters"].(map[string]interface{})["length"]).To(BeEquivalentTo(12))
+		})
+
+		Context("when successful", func() {
+			It("returns the generated password", func() {
+				dummy := DummyAuth{Response: &http.Response{
+					Body: ioutil.NopCloser(bytes.NewBufferString(`{
+	      "id": "some-id",
+	      "name": "/example-password",
+	      "type": "password",
+	      "value": "some-password",
+	      "version_created_at": "2017-01-01T04:07:18Z"
+	}`)),
+				}}
+
+				sserv := server.Server{
+					ApiUrl:             "http://example.com",
+					InsecureSkipVerify: true,
+				}
+
+				ch := CredHub{
+					Server: &sserv,
+					Auth:   &dummy,
+				}
+
+				p := generate.Password{
+					Length: 12,
+				}
+
+				generatedCert, err := ch.GeneratePassword("/example-password", p, false)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(generatedCert.Id).To(Equal("some-id"))
+				Expect(generatedCert.Type).To(Equal("password"))
+				Expect(generatedCert.Name).To(Equal("/example-password"))
+				Expect(generatedCert.Value).To(BeEquivalentTo("some-password"))
+			})
+		})
+
+		Context("when request fails", func() {
+			var err error
+			It("returns an error", func() {
+				networkError := errors.New("Network error occurred")
+				dummy := DummyAuth{Error: networkError}
+				ch := CredHub{
+					Server: &serv,
+					Auth:   &dummy,
+				}
+
+				_, err = ch.GeneratePassword("/example-password", generate.Password{}, false)
+
+				Expect(err).To(HaveOccurred())
+			})
+		})
+
+		Context("when response body cannot be unmarshalled", func() {
 			It("returns an error", func() {
 
 				dummy := DummyAuth{Response: &http.Response{
-					Body: ioutil.NopCloser(bytes.NewBufferString(`{"data":[]}`)),
+					Body: ioutil.NopCloser(bytes.NewBufferString("invalid-response")),
 				}}
 				ch := CredHub{
 					Server: &serv,
 					Auth:   &dummy,
 				}
 
-				cert := generate.Certificate{
-					Ca: "some-ca",
-				}
-
-				_, err := ch.GenerateCertificate("/example-certificate", cert, false)
+				_, err := ch.GeneratePassword("/example-password", generate.Password{}, false)
 
 				Expect(err).To(HaveOccurred())
 			})
+
 		})
 	})
 })

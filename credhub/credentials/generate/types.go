@@ -2,7 +2,7 @@
 package generate
 
 type Password struct {
-	Length         int
+	Length         int `json:"length"`
 	IncludeSpecial bool
 	ExcludeNumber  bool
 	ExcludeUpper   bool

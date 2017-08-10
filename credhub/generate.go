@@ -2,7 +2,6 @@ package credhub
 
 import (
 	"encoding/json"
-	"errors"
 	"io/ioutil"
 	"net/http"
 
@@ -12,7 +11,9 @@ import (
 
 // Generates a password credential based on the provided parameters.
 func (ch *CredHub) GeneratePassword(name string, gen generate.Password, overwrite bool) (credentials.Password, error) {
-	panic("Not implemented")
+	var cred credentials.Password
+	err := ch.generateCredential(name, "password", gen, overwrite, &cred)
+	return cred, err
 }
 
 // Generates a user credential based on the provided parameters.
@@ -23,32 +24,8 @@ func (ch *CredHub) GenerateUser(name string, gen generate.User, overwrite bool) 
 // Generates a user credential based on the provided parameters.
 func (ch *CredHub) GenerateCertificate(name string, gen generate.Certificate, overwrite bool) (credentials.Certificate, error) {
 	var cred credentials.Certificate
-
-	requestBody := map[string]interface{}{}
-	requestBody["name"] = name
-	requestBody["type"] = "certificate"
-	requestBody["parameters"] = gen
-	resp, err := ch.Request(http.MethodPost, "/api/v1/data", requestBody)
-
-	if err != nil {
-		return cred, err
-	}
-	var responseBody map[string]([]credentials.Certificate)
-
-	defer resp.Body.Close()
-	bodyResp, _ := ioutil.ReadAll(resp.Body)
-
-	err = json.Unmarshal(bodyResp, &responseBody)
-	if err != nil {
-		return cred, err
-	}
-
-	if len(responseBody["data"]) < 1 {
-		return cred, errors.New("Could not generate credential")
-	}
-
-	cred = responseBody["data"][0]
-	return cred, nil
+	err := ch.generateCredential(name, "certificate", gen, overwrite, &cred)
+	return cred, err
 }
 
 // Generates an RSA credential based on the provided parameters.
@@ -59,4 +36,25 @@ func (ch *CredHub) GenerateRSA(name string, gen generate.RSA, overwrite bool) (c
 // Generates an SSH credential based on the provided parameters.
 func (ch *CredHub) GenerateSSH(name string, gen generate.SSH, overwrite bool) (credentials.SSH, error) {
 	panic("Not implemented")
+}
+
+func (ch *CredHub) generateCredential(name, credType string, gen interface{}, overwrite bool, cred interface{}) error {
+	requestBody := map[string]interface{}{}
+	requestBody["name"] = name
+	requestBody["type"] = credType
+	requestBody["parameters"] = gen
+	resp, err := ch.Request(http.MethodPost, "/api/v1/data", requestBody)
+
+	if err != nil {
+		return err
+	}
+
+	defer resp.Body.Close()
+	bodyResp, _ := ioutil.ReadAll(resp.Body)
+
+	err = json.Unmarshal(bodyResp, &cred)
+	if err != nil {
+		return err
+	}
+	return nil
 }
