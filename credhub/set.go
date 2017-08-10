@@ -1,6 +1,10 @@
 package credhub
 
 import (
+	"net/http"
+	"encoding/json"
+	"io/ioutil"
+
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials"
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials/values"
 )
@@ -27,7 +31,27 @@ func (ch *CredHub) SetUser(name string, value values.User, overwrite bool) (cred
 
 // Sets a Certificate credential with a user-provided value.
 func (ch *CredHub) SetCertificate(name string, value values.Certificate, overwrite bool) (credentials.Certificate, error) {
-	panic("Not implemented")
+	var cred credentials.Certificate
+
+	requestBody := map[string]interface{}{}
+	requestBody["name"] = name
+	requestBody["type"] = "certificate"
+	requestBody["value"] = value
+	resp, err := ch.Request(http.MethodPut, "/api/v1/data", requestBody)
+
+	if err != nil {
+		return cred, err
+	}
+
+	defer resp.Body.Close()
+	body, _ := ioutil.ReadAll(resp.Body)
+	err = json.Unmarshal(body, &cred)
+
+	if err != nil {
+		return cred, err
+	}
+
+	return cred, nil
 }
 
 // Sets an RSA credential with a user-provided value.
