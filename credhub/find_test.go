@@ -40,6 +40,7 @@ var _ = Describe("Find", func() {
 			creds, err = ch.FindByPath("/some/example/path")
 			urlPath := dummy.Request.URL.Path
 			Expect(urlPath).To(Equal("/api/v1/data?path=/some/example/path"))
+			Expect(dummy.Request.Method).To(Equal(http.MethodGet))
 		})
 
 		Context("when successful", func() {

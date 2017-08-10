@@ -40,6 +40,7 @@ var _ = Describe("Get", func() {
 			ch.Get("/example-password")
 			urlPath := dummy.Request.URL.Path
 			Expect(urlPath).To(Equal("/api/v1/data?name=/example-password"))
+			Expect(dummy.Request.Method).To(Equal(http.MethodGet))
 		})
 
 		Context("when successful", func() {
@@ -112,6 +113,7 @@ var _ = Describe("Get", func() {
 			ch.GetPassword("/example-password")
 			urlPath := dummy.Request.URL.Path
 			Expect(urlPath).To(Equal("/api/v1/data?name=/example-password"))
+			Expect(dummy.Request.Method).To(Equal(http.MethodGet))
 		})
 
 		Context("when successful", func() {
@@ -181,6 +183,7 @@ var _ = Describe("Get", func() {
 			ch.GetCertificate("/example-certificate")
 			urlPath := dummy.Request.URL.Path
 			Expect(urlPath).To(Equal("/api/v1/data?name=/example-certificate"))
+			Expect(dummy.Request.Method).To(Equal(http.MethodGet))
 		})
 
 		Context("when successful", func() {
