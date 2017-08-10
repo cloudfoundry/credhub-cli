@@ -15,20 +15,20 @@ import (
 
 var _ = Describe("Api", func() {
 	Context("New()", func() {
-		It("should assign Server and Auth", func() {
-			dummy := func(s *server.Server) auth.Auth {
-				return &DummyAuth{Server: s}
+		It("should assign Config and Auth", func() {
+			dummy := func(config *server.Config) auth.Auth {
+				return &DummyAuth{Config: config}
 			}
-			s := &server.Server{ApiUrl: "http://example.com"}
+			config := &server.Config{ApiUrl: "http://example.com"}
 
-			ch := New(s, dummy)
+			ch := New(config, dummy)
 
-			Expect(ch.Server).To(BeIdenticalTo(s))
+			Expect(ch.Config).To(BeIdenticalTo(config))
 
 			da, ok := ch.Auth.(*DummyAuth)
 
 			Expect(ok).To(BeTrue())
-			Expect(da.Server).To(BeIdenticalTo(s))
+			Expect(da.Config).To(BeIdenticalTo(config))
 		})
 	})
 
@@ -41,7 +41,7 @@ var _ = Describe("Api", func() {
 		BeforeEach(func() {
 			mockAuth = &DummyAuth{}
 			ch = &CredHub{
-				Server: &server.Server{ApiUrl: "http://example.com/"},
+				Config: &server.Config{ApiUrl: "http://example.com/"},
 				Auth:   mockAuth,
 			}
 		})

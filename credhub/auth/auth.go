@@ -14,6 +14,6 @@ type Auth interface {
 
 // Method is used to select an authentication strategy for CredHub.New()
 //
-// The server.Server provided to credhub.New() will be given to Method to construct
+// The server.Config provided to credhub.New() will be given to Method to construct
 // the specified auth strategy.
-type Method func(*server.Server) Auth
+type Method func(*server.Config) Auth

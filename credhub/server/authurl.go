@@ -8,8 +8,8 @@ import (
 )
 
 // Provides the authentication server's URL
-func (s *Server) AuthUrl() (string, error) {
-	info, err := s.info()
+func (c *Config) AuthUrl() (string, error) {
+	info, err := c.info()
 	if err != nil {
 		return "", err
 	}
@@ -22,20 +22,20 @@ func (s *Server) AuthUrl() (string, error) {
 	return authUrl, nil
 }
 
-func (s *Server) request(method string, path string, body io.Reader) (*http.Response, error) {
-	client, err := s.Client()
+func (c *Config) request(method string, path string, body io.Reader) (*http.Response, error) {
+	client, err := c.Client()
 	if err != nil {
 		return nil, err
 	}
 
-	request, _ := http.NewRequest(method, s.ApiUrl+path, body)
+	request, _ := http.NewRequest(method, c.ApiUrl+path, body)
 
 	return client.Do(request)
 }
 
-func (s *Server) info() (info, error) {
+func (c *Config) info() (info, error) {
 	var i info
-	response, err := s.request("GET", "/info", nil)
+	response, err := c.request("GET", "/info", nil)
 	if err != nil {
 		return i, err
 	}

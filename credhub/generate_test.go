@@ -18,9 +18,10 @@ import (
 )
 
 var _ = Describe("Generate", func() {
-	var serv server.Server
+	var config server.Config
+
 	BeforeEach(func() {
-		serv = server.Server{
+		config = server.Config{
 			ApiUrl:             "http://example.com",
 			InsecureSkipVerify: true,
 		}
@@ -32,7 +33,7 @@ var _ = Describe("Generate", func() {
 			}}
 
 			ch := CredHub{
-				Server: &serv,
+				Config: &config,
 				Auth:   &dummy,
 			}
 			cert := generate.Certificate{
@@ -69,7 +70,7 @@ var _ = Describe("Generate", func() {
 				}}
 
 				ch := CredHub{
-					Server: &serv,
+					Config: &config,
 					Auth:   &dummy,
 				}
 				cert := generate.Certificate{
@@ -93,7 +94,7 @@ var _ = Describe("Generate", func() {
 				networkError := errors.New("Network error occurred")
 				dummy := DummyAuth{Error: networkError}
 				ch := CredHub{
-					Server: &serv,
+					Config: &config,
 					Auth:   &dummy,
 				}
 
@@ -114,7 +115,7 @@ var _ = Describe("Generate", func() {
 					Body: ioutil.NopCloser(bytes.NewBufferString("invalid-response")),
 				}}
 				ch := CredHub{
-					Server: &serv,
+					Config: &config,
 					Auth:   &dummy,
 				}
 
@@ -137,7 +138,7 @@ var _ = Describe("Generate", func() {
 			}}
 
 			ch := CredHub{
-				Server: &serv,
+				Config: &config,
 				Auth:   &dummy,
 			}
 			cert := generate.Password{
@@ -169,13 +170,13 @@ var _ = Describe("Generate", func() {
 	}`)),
 				}}
 
-				sserv := server.Server{
+				config := server.Config{
 					ApiUrl:             "http://example.com",
 					InsecureSkipVerify: true,
 				}
 
 				ch := CredHub{
-					Server: &sserv,
+					Config: &config,
 					Auth:   &dummy,
 				}
 
@@ -198,7 +199,7 @@ var _ = Describe("Generate", func() {
 				networkError := errors.New("Network error occurred")
 				dummy := DummyAuth{Error: networkError}
 				ch := CredHub{
-					Server: &serv,
+					Config: &config,
 					Auth:   &dummy,
 				}
 
@@ -215,7 +216,7 @@ var _ = Describe("Generate", func() {
 					Body: ioutil.NopCloser(bytes.NewBufferString("invalid-response")),
 				}}
 				ch := CredHub{
-					Server: &serv,
+					Config: &config,
 					Auth:   &dummy,
 				}
 

@@ -16,10 +16,10 @@ import (
 var _ = Describe("Get", func() {
 	var dummy DummyAuth
 	var err error
-	var serv server.Server
+	var config server.Config
 
 	BeforeEach(func() {
-		serv = server.Server{
+		config = server.Config{
 			ApiUrl:             "http://example.com",
 			InsecureSkipVerify: true,
 		}
@@ -33,7 +33,7 @@ var _ = Describe("Get", func() {
 			}}
 
 			ch := CredHub{
-				Server: &serv,
+				Config: &config,
 				Auth:   &dummy,
 			}
 
@@ -57,7 +57,7 @@ var _ = Describe("Get", func() {
 				}}
 
 				ch := CredHub{
-					Server: &serv,
+					Config: &config,
 					Auth:   &dummy,
 				}
 				cred, err = ch.Get("/example-password")
@@ -74,7 +74,7 @@ var _ = Describe("Get", func() {
 			It("returns an error", func() {
 				dummy = DummyAuth{Error: errors.New("Network error occurred")}
 				ch := CredHub{
-					Server: &serv,
+					Config: &config,
 					Auth:   &dummy,
 				}
 				cred, err = ch.Get("/example-password")
@@ -90,7 +90,7 @@ var _ = Describe("Get", func() {
 				}}
 
 				ch := CredHub{
-					Server: &serv,
+					Config: &config,
 					Auth:   &dummy,
 				}
 				cred, err = ch.Get("/example-password")
@@ -107,7 +107,7 @@ var _ = Describe("Get", func() {
 			}}
 
 			ch := CredHub{
-				Server: &serv,
+				Config: &config,
 				Auth:   &dummy,
 			}
 			ch.GetPassword("/example-password")
@@ -130,7 +130,7 @@ var _ = Describe("Get", func() {
 				}}
 
 				ch := CredHub{
-					Server: &serv,
+					Config: &config,
 					Auth:   &dummy,
 				}
 
@@ -145,7 +145,7 @@ var _ = Describe("Get", func() {
 				networkError := errors.New("Network error occurred")
 				dummy = DummyAuth{Error: networkError}
 				ch := CredHub{
-					Server: &serv,
+					Config: &config,
 					Auth:   &dummy,
 				}
 				_, err = ch.GetPassword("/example-password")
@@ -160,7 +160,7 @@ var _ = Describe("Get", func() {
 					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
 				}}
 				ch := CredHub{
-					Server: &serv,
+					Config: &config,
 					Auth:   &dummy,
 				}
 				_, err := ch.GetPassword("/example-cred")
@@ -177,7 +177,7 @@ var _ = Describe("Get", func() {
 			}}
 
 			ch := CredHub{
-				Server: &serv,
+				Config: &config,
 				Auth:   &dummy,
 			}
 			ch.GetCertificate("/example-certificate")
@@ -204,7 +204,7 @@ var _ = Describe("Get", func() {
 				}}
 
 				ch := CredHub{
-					Server: &serv,
+					Config: &config,
 					Auth:   &dummy,
 				}
 
@@ -222,7 +222,7 @@ var _ = Describe("Get", func() {
 				networkError := errors.New("Network error occurred")
 				dummy = DummyAuth{Error: networkError}
 				ch := CredHub{
-					Server: &serv,
+					Config: &config,
 					Auth:   &dummy,
 				}
 				_, err = ch.GetCertificate("/example-certificate")
@@ -237,7 +237,7 @@ var _ = Describe("Get", func() {
 					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
 				}}
 				ch := CredHub{
-					Server: &serv,
+					Config: &config,
 					Auth:   &dummy,
 				}
 				_, err := ch.GetCertificate("/example-cred")

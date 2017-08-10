@@ -29,9 +29,9 @@ var _ = Describe("AuthUrl()", func() {
 		}))
 		defer testServer.Close()
 
-		server := Server{ApiUrl: testServer.URL}
+		config := Config{ApiUrl: testServer.URL}
 
-		authUrl, err := server.AuthUrl()
+		authUrl, err := config.AuthUrl()
 
 		Expect(authUrl).To(Equal("https://uaa.example.com:8443"))
 		Expect(err).To(BeNil())
@@ -39,17 +39,17 @@ var _ = Describe("AuthUrl()", func() {
 
 	Context("Errors", func() {
 		Specify("when ApiUrl is invalid", func() {
-			server := Server{ApiUrl: "://"}
+			config := Config{ApiUrl: "://"}
 
-			_, err := server.AuthUrl()
+			_, err := config.AuthUrl()
 
 			Expect(err).ToNot(BeNil())
 		})
 
 		Specify("when ApiUrl is inaccessible", func() {
-			server := Server{ApiUrl: "http://localhost:1"}
+			config := Config{ApiUrl: "http://localhost:1"}
 
-			_, err := server.AuthUrl()
+			_, err := config.AuthUrl()
 
 			Expect(err).ToNot(BeNil())
 		})
@@ -62,9 +62,9 @@ var _ = Describe("AuthUrl()", func() {
 			}))
 			defer testServer.Close()
 
-			server := Server{ApiUrl: testServer.URL}
+			config := Config{ApiUrl: testServer.URL}
 
-			_, err := server.AuthUrl()
+			_, err := config.AuthUrl()
 
 			Expect(err).ToNot(BeNil())
 		})
@@ -77,9 +77,9 @@ var _ = Describe("AuthUrl()", func() {
 			}))
 			defer testServer.Close()
 
-			server := Server{ApiUrl: testServer.URL}
+			config := Config{ApiUrl: testServer.URL}
 
-			_, err := server.AuthUrl()
+			_, err := config.AuthUrl()
 
 			Expect(err).ToNot(BeNil())
 		})

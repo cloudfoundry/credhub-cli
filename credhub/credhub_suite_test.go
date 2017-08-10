@@ -19,7 +19,7 @@ func TestCredhub(t *testing.T) {
 }
 
 type DummyAuth struct {
-	Server   *server.Server
+	Config   *server.Config
 	Request  *http.Request
 	Response *http.Response
 	Error    error

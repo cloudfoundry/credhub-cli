@@ -17,12 +17,12 @@ import (
 var _ = Describe("Find", func() {
 	Describe("FindByPath()", func() {
 		var dummy DummyAuth
-		var serv server.Server
+		var config server.Config
 		var creds []credentials.Base
 		var err error
 
 		BeforeEach(func() {
-			serv = server.Server{
+			config = server.Config{
 				ApiUrl:             "http://example.com",
 				InsecureSkipVerify: true,
 			}
@@ -34,7 +34,7 @@ var _ = Describe("Find", func() {
 			}}
 
 			ch := CredHub{
-				Server: &serv,
+				Config: &config,
 				Auth:   &dummy,
 			}
 			creds, err = ch.FindByPath("/some/example/path")
@@ -62,7 +62,7 @@ var _ = Describe("Find", func() {
 				}}
 
 				ch := CredHub{
-					Server: &serv,
+					Config: &config,
 					Auth:   &dummy,
 				}
 				creds, err = ch.FindByPath("/some/example/path")
@@ -80,7 +80,7 @@ var _ = Describe("Find", func() {
 				dummy = DummyAuth{Error: errors.New("Network error occurred")}
 
 				ch := CredHub{
-					Server: &serv,
+					Config: &config,
 					Auth:   &dummy,
 				}
 
@@ -97,7 +97,7 @@ var _ = Describe("Find", func() {
 				}}
 
 				ch := CredHub{
-					Server: &serv,
+					Config: &config,
 					Auth:   &dummy,
 				}
 				creds, err = ch.FindByPath("/some/example/path")

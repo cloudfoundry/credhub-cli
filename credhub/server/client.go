@@ -10,36 +10,36 @@ import (
 )
 
 // Provides an unauthenticated http.Client to the CredHub server
-func (s *Server) Client() (*http.Client, error) {
-	parsedUrl, err := url.Parse(s.ApiUrl)
+func (c *Config) Client() (*http.Client, error) {
+	parsedUrl, err := url.Parse(c.ApiUrl)
 	if err != nil {
 		return nil, err
 	}
 
 	if parsedUrl.Scheme == "https" {
-		return s.httpsClient()
+		return c.httpsClient()
 	} else {
-		return s.httpClient()
+		return c.httpClient()
 	}
 }
 
-func (s *Server) httpClient() (*http.Client, error) {
+func (c *Config) httpClient() (*http.Client, error) {
 	return &http.Client{
 		Timeout: time.Second * 45,
 	}, nil
 }
 
-func (s *Server) httpsClient() (*http.Client, error) {
-	client, _ := s.httpClient()
+func (c *Config) httpsClient() (*http.Client, error) {
+	client, _ := c.httpClient()
 
-	rootCAs, err := s.certPool()
+	rootCAs, err := c.certPool()
 	if err != nil {
 		return nil, err
 	}
 
 	client.Transport = &http.Transport{
 		TLSClientConfig: &tls.Config{
-			InsecureSkipVerify:       s.InsecureSkipVerify,
+			InsecureSkipVerify:       c.InsecureSkipVerify,
 			PreferServerCipherSuites: true,
 			RootCAs:                  rootCAs,
 		},
@@ -48,10 +48,10 @@ func (s *Server) httpsClient() (*http.Client, error) {
 	return client, nil
 }
 
-func (s *Server) certPool() (*x509.CertPool, error) {
+func (c *Config) certPool() (*x509.CertPool, error) {
 	certPool := x509.NewCertPool()
 
-	for _, cert := range s.CaCerts {
+	for _, cert := range c.CaCerts {
 		ok := certPool.AppendCertsFromPEM([]byte(cert))
 		if !ok {
 			return nil, errors.New("Invalid certificate")

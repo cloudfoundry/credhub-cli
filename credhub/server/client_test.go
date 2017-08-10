@@ -15,9 +15,9 @@ import (
 var _ = Describe("Client()", func() {
 	Context("Errors", func() {
 		Specify("when ApiUrl is invalid", func() {
-			server := Server{ApiUrl: "://"}
+			config := Config{ApiUrl: "://"}
 
-			_, err := server.Client()
+			_, err := config.Client()
 
 			Expect(err).ToNot(BeNil())
 		})
@@ -40,9 +40,9 @@ var _ = Describe("Client()", func() {
 			}
 			caCerts = append(caCerts, "invalid certificate")
 
-			server := Server{ApiUrl: "https://example.com", CaCerts: caCerts}
+			config := Config{ApiUrl: "https://example.com", CaCerts: caCerts}
 
-			_, err := server.Client()
+			_, err := config.Client()
 
 			Expect(err).ToNot(BeNil())
 		})
@@ -50,9 +50,9 @@ var _ = Describe("Client()", func() {
 
 	Context("Given HTTP ApiUrl", func() {
 		It("should return a simple http.Client", func() {
-			server := Server{ApiUrl: "http://example.com"}
+			config := Config{ApiUrl: "http://example.com"}
 
-			client, err := server.Client()
+			client, err := config.Client()
 
 			Expect(err).To(BeNil())
 			Expect(client.Transport).To(BeNil())
@@ -82,9 +82,9 @@ var _ = Describe("Client()", func() {
 					expectedRootCAs.AppendCertsFromPEM(caCertBytes)
 				}
 
-				server := Server{ApiUrl: "https://example.com", CaCerts: caCerts}
+				config := Config{ApiUrl: "https://example.com", CaCerts: caCerts}
 
-				client, err := server.Client()
+				client, err := config.Client()
 
 				Expect(err).To(BeNil())
 
@@ -101,9 +101,9 @@ var _ = Describe("Client()", func() {
 
 		Context("With InsecureSkipVerify", func() {
 			It("should return a http.Client with tls.Config without RootCAs", func() {
-				server := Server{ApiUrl: "https://example.com", InsecureSkipVerify: true}
+				config := Config{ApiUrl: "https://example.com", InsecureSkipVerify: true}
 
-				client, err := server.Client()
+				client, err := config.Client()
 
 				Expect(err).To(BeNil())
 

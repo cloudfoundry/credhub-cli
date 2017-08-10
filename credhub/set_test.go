@@ -15,10 +15,10 @@ import (
 )
 
 var _ = Describe("Set", func() {
-	var serv server.Server
+	var config server.Config
 	var dummy DummyAuth
 	BeforeEach(func() {
-		serv = server.Server{
+		config = server.Config{
 			ApiUrl:             "http://example.com",
 			InsecureSkipVerify: true,
 		}
@@ -31,7 +31,7 @@ var _ = Describe("Set", func() {
 			}}
 
 			ch := CredHub{
-				Server: &serv,
+				Config: &config,
 				Auth:   &dummy,
 			}
 
@@ -70,7 +70,7 @@ var _ = Describe("Set", func() {
 				}}
 
 				ch := CredHub{
-					Server: &serv,
+					Config: &config,
 					Auth:   &dummy,
 				}
 
@@ -90,7 +90,7 @@ var _ = Describe("Set", func() {
 			It("returns an error", func() {
 				dummy = DummyAuth{Error: errors.New("Network error occurred")}
 				ch := CredHub{
-					Server: &serv,
+					Config: &config,
 					Auth:   &dummy,
 				}
 				certificate := values.Certificate{
@@ -109,7 +109,7 @@ var _ = Describe("Set", func() {
 				}}
 
 				ch := CredHub{
-					Server: &serv,
+					Config: &config,
 					Auth:   &dummy,
 				}
 				certificate := values.Certificate{
@@ -129,7 +129,7 @@ var _ = Describe("Set", func() {
 			}}
 
 			ch := CredHub{
-				Server: &serv,
+				Config: &config,
 				Auth:   &dummy,
 			}
 
@@ -163,7 +163,7 @@ var _ = Describe("Set", func() {
 				}}
 
 				ch := CredHub{
-					Server: &serv,
+					Config: &config,
 					Auth:   &dummy,
 				}
 
@@ -182,7 +182,7 @@ var _ = Describe("Set", func() {
 			It("returns an error", func() {
 				dummy = DummyAuth{Error: errors.New("Network error occurred")}
 				ch := CredHub{
-					Server: &serv,
+					Config: &config,
 					Auth:   &dummy,
 				}
 				password := values.Password("some-password")
@@ -200,7 +200,7 @@ var _ = Describe("Set", func() {
 				}}
 
 				ch := CredHub{
-					Server: &serv,
+					Config: &config,
 					Auth:   &dummy,
 				}
 				password := values.Password("some-password")
