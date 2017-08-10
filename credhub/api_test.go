@@ -16,7 +16,7 @@ import (
 var _ = Describe("Api", func() {
 	Context("New()", func() {
 		It("should assign Config and Auth", func() {
-			dummy := func(config *server.Config) auth.Auth {
+			dummy := func(config auth.ServerConfig) auth.Auth {
 				return &DummyAuth{Config: config}
 			}
 			config := &server.Config{ApiUrl: "http://example.com"}

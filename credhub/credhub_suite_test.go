@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/auth"
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub/server"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
@@ -19,7 +18,7 @@ func TestCredhub(t *testing.T) {
 }
 
 type DummyAuth struct {
-	Config   *server.Config
+	Config   auth.ServerConfig
 	Request  *http.Request
 	Response *http.Response
 	Error    error

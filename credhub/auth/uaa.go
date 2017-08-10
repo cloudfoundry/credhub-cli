@@ -22,10 +22,6 @@ type Uaa struct {
 	UaaClient    UaaClient
 }
 
-type HttpClient interface {
-	Do(*http.Request) (*http.Response, error)
-}
-
 type UaaClient interface {
 	ClientCredentialGrant(clientId, clientSecret string) (string, error)
 	PasswordGrant(clientId, clientSecret, username, password string) (string, string, error)
