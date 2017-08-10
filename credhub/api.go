@@ -55,6 +55,6 @@ func (ch *CredHub) Request(method string, pathStr string, body interface{}) (*ht
 func New(conf *server.Config, authMethod auth.Method) *CredHub {
 	return &CredHub{
 		Config: conf,
-		Auth:   authMethod(server),
+		Auth:   authMethod(conf),
 	}
 }
