@@ -30,7 +30,7 @@ type Certificate struct {
 	AlternativeName  []string
 	KeyUsage         []string
 	ExtendedKeyUsage []string
-	Ca               string
+	Ca               string `json:"ca"`
 	IsCA             bool
 	SelfSign         bool
 }
