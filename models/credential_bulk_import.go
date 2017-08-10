@@ -98,7 +98,7 @@ func unpackArray(array []interface{}) []interface{} {
 }
 
 func hasCredentialTag(data []byte) bool {
-	hasCredentialTag, _ := regexp.Match("^(?:---[ \\n])?credentials:[^\\w]*", data)
+	hasCredentialTag, _ := regexp.Match("^(?:---[ \\n]+)?credentials:[^\\w]*", data)
 
 	return hasCredentialTag
 }

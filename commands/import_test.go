@@ -126,6 +126,60 @@ Failed to set: 0
 		})
 	})
 
+	Describe("when the yaml file starts with --- and spaces for Iryna", func() {
+		It("sets all the credentials", func() {
+			setUpImportRequests()
+
+			session := runCommand("import", "-f", "../test/test_import_file_with_document_end_and_spaces.yml")
+
+			Eventually(session).Should(Exit(0))
+
+			Eventually(session.Out).Should(Say(`name: /test/password
+type: password
+value: test-password-value`))
+			Eventually(session.Out).Should(Say(`name: /test/value
+type: value
+value: test-value`))
+			Eventually(session.Out).Should(Say(`name: /test/certificate
+type: certificate
+value:
+  ca: ca-certificate
+  certificate: certificate
+  private_key: private-key`))
+			Eventually(session.Out).Should(Say(`name: /test/rsa
+type: rsa
+value:
+  private_key: private-key
+  public_key: public-key`))
+			Eventually(session.Out).Should(Say(`name: /test/ssh
+type: ssh
+value:
+  private_key: private-key
+  public_key: ssh-public-key`))
+			Eventually(session.Out).Should(Say(`name: /test/user
+type: user
+value:
+  password: test-user-password
+  password_hash: P455W0rd-H45H
+  username: covfefe`))
+			Eventually(session.Out).Should(Say(`name: /test/json
+type: json
+value:
+  "1": key is not a string
+  "3.14": pi
+  arbitrary_object:
+    nested_array:
+    - array_val1
+    - array_object_subvalue: covfefe
+  "true": key is a bool
+`))
+			Eventually(session.Out).Should(Say(`Import complete.
+Successfully set: 7
+Failed to set: 0
+`))
+		})
+	})
+
 	Describe("when importing file with no name specified", func() {
 		It("passes through the server error", func() {
 			jsonBody := `{"type":"password","value":"test-password","overwrite":true}`
