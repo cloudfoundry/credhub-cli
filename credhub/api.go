@@ -8,20 +8,43 @@ import (
 	"net/url"
 
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/auth"
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub/server"
 )
+
+// CredHub server
+type Config struct {
+	// Url to CredHub server
+	ApiUrl string
+
+	// CA Certs in PEM format
+	CaCerts []string
+
+	// Skip certificate verification
+	InsecureSkipVerify bool
+}
 
 // CredHub client to access CredHub APIs.
 //
 // Use New() to construct a new CredHub object, which can then interact with the CredHub api.
 type CredHub struct {
 	// Config provides the connection details for the CredHub server
-	*server.Config
+	*Config
 
 	// Auth provides http.Client-like Do method for authenticated requests to the CredHub server
 	// Can be typecast to a specific Auth type to get additional information and functionality.
 	// eg. auth.Uaa provides Logout(), Refresh(), AccessToken and RefreshToken
 	auth.Auth
+}
+
+// New creates a new CredHub API client with the provided server credentials and authentication method.
+// See the auth package for supported authentication methods.
+func New(conf *Config, authMethod auth.Method) *CredHub {
+	credhub := &CredHub{
+		Config: conf,
+	}
+
+	credhub.Auth = authMethod(credhub)
+
+	return credhub
 }
 
 // Request sends an authenticated request to the CredHub server.
@@ -50,13 +73,4 @@ func (ch *CredHub) Request(method string, pathStr string, body interface{}) (*ht
 	req.Header.Set("Content-Type", "application/json")
 
 	return ch.Auth.Do(req)
-}
-
-// New creates a new CredHub API client with the provided server credentials and authentication method.
-// See the auth package for supported authentication methods.
-func New(conf *server.Config, authMethod auth.Method) *CredHub {
-	return &CredHub{
-		Config: conf,
-		Auth:   authMethod(conf),
-	}
 }

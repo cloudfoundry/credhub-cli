@@ -1,29 +1,31 @@
-package server_test
+package credhub_test
 
 import (
-	"crypto/x509"
 	"io/ioutil"
 	"net/http"
-	"time"
-
-	. "github.com/cloudfoundry-incubator/credhub-cli/credhub/server"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+
+	"time"
+
+	"crypto/x509"
+
+	"github.com/cloudfoundry-incubator/credhub-cli/credhub"
+	"github.com/cloudfoundry-incubator/credhub-cli/credhub/auth"
 )
 
 var _ = Describe("Client()", func() {
+
 	Context("Errors", func() {
 		Specify("when ApiUrl is invalid", func() {
-			config := Config{ApiUrl: "://"}
-
-			_, err := config.Client()
-
+			ch := credhubFromConfig(credhub.Config{ApiUrl: "://"})
+			_, err := ch.Client()
 			Expect(err).ToNot(BeNil())
 		})
 
 		Specify("when CaCerts are invalid", func() {
-			fixturePath := "./serverfakes/"
+			fixturePath := "./fixtures/"
 			caCertFiles := []string{
 				"auth-tls-ca.pem",
 				"server-tls-ca.pem",
@@ -40,19 +42,16 @@ var _ = Describe("Client()", func() {
 			}
 			caCerts = append(caCerts, "invalid certificate")
 
-			config := Config{ApiUrl: "https://example.com", CaCerts: caCerts}
-
-			_, err := config.Client()
-
+			ch := credhubFromConfig(credhub.Config{ApiUrl: "https://example.com", CaCerts: caCerts})
+			_, err := ch.Client()
 			Expect(err).ToNot(BeNil())
 		})
 	})
 
 	Context("Given HTTP ApiUrl", func() {
 		It("should return a simple http.Client", func() {
-			config := Config{ApiUrl: "http://example.com"}
-
-			client, err := config.Client()
+			ch := credhubFromConfig(credhub.Config{ApiUrl: "http://example.com"})
+			client, err := ch.Client()
 
 			Expect(err).To(BeNil())
 			Expect(client.Transport).To(BeNil())
@@ -64,7 +63,7 @@ var _ = Describe("Client()", func() {
 
 		Context("With CaCerts", func() {
 			It("should return a http.Client with tls.Config with RootCAs", func() {
-				fixturePath := "./serverfakes/"
+				fixturePath := "./fixtures/"
 				caCertFiles := []string{
 					"auth-tls-ca.pem",
 					"server-tls-ca.pem",
@@ -82,9 +81,8 @@ var _ = Describe("Client()", func() {
 					expectedRootCAs.AppendCertsFromPEM(caCertBytes)
 				}
 
-				config := Config{ApiUrl: "https://example.com", CaCerts: caCerts}
-
-				client, err := config.Client()
+				ch := credhubFromConfig(credhub.Config{ApiUrl: "https://example.com", CaCerts: caCerts})
+				client, err := ch.Client()
 
 				Expect(err).To(BeNil())
 
@@ -101,9 +99,8 @@ var _ = Describe("Client()", func() {
 
 		Context("With InsecureSkipVerify", func() {
 			It("should return a http.Client with tls.Config without RootCAs", func() {
-				config := Config{ApiUrl: "https://example.com", InsecureSkipVerify: true}
-
-				client, err := config.Client()
+				ch := credhubFromConfig(credhub.Config{ApiUrl: "https://example.com", InsecureSkipVerify: true})
+				client, err := ch.Client()
 
 				Expect(err).To(BeNil())
 
@@ -119,3 +116,11 @@ var _ = Describe("Client()", func() {
 
 	})
 })
+
+func credhubFromConfig(config credhub.Config) *credhub.CredHub {
+	return credhub.New(&config, noopAuth)
+}
+
+func noopAuth(auth.ServerConfig) auth.Auth {
+	return nil
+}

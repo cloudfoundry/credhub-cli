@@ -1,10 +1,10 @@
-package server_test
+package credhub_test
 
 import (
+	. "github.com/cloudfoundry-incubator/credhub-cli/credhub"
+
 	"net/http"
 	"net/http/httptest"
-
-	. "github.com/cloudfoundry-incubator/credhub-cli/credhub/server"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -29,27 +29,26 @@ var _ = Describe("AuthUrl()", func() {
 		}))
 		defer testServer.Close()
 
-		config := Config{ApiUrl: testServer.URL}
+		ch := credhubFromConfig(Config{ApiUrl: testServer.URL})
 
-		authUrl, err := config.AuthUrl()
-
+		authUrl, err := ch.AuthUrl()
 		Expect(authUrl).To(Equal("https://uaa.example.com:8443"))
 		Expect(err).To(BeNil())
 	})
 
 	Context("Errors", func() {
 		Specify("when ApiUrl is invalid", func() {
-			config := Config{ApiUrl: "://"}
+			ch := credhubFromConfig(Config{ApiUrl: "://"})
 
-			_, err := config.AuthUrl()
+			_, err := ch.AuthUrl()
 
 			Expect(err).ToNot(BeNil())
 		})
 
 		Specify("when ApiUrl is inaccessible", func() {
-			config := Config{ApiUrl: "http://localhost:1"}
+			ch := credhubFromConfig(Config{ApiUrl: "http://localhost:1"})
 
-			_, err := config.AuthUrl()
+			_, err := ch.AuthUrl()
 
 			Expect(err).ToNot(BeNil())
 		})
@@ -62,9 +61,9 @@ var _ = Describe("AuthUrl()", func() {
 			}))
 			defer testServer.Close()
 
-			config := Config{ApiUrl: testServer.URL}
+			ch := credhubFromConfig(Config{ApiUrl: testServer.URL})
 
-			_, err := config.AuthUrl()
+			_, err := ch.AuthUrl()
 
 			Expect(err).ToNot(BeNil())
 		})
@@ -77,9 +76,8 @@ var _ = Describe("AuthUrl()", func() {
 			}))
 			defer testServer.Close()
 
-			config := Config{ApiUrl: testServer.URL}
-
-			_, err := config.AuthUrl()
+			ch := credhubFromConfig(Config{ApiUrl: testServer.URL})
+			_, err := ch.AuthUrl()
 
 			Expect(err).ToNot(BeNil())
 		})

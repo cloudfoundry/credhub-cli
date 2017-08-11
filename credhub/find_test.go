@@ -8,7 +8,6 @@ import (
 
 	. "github.com/cloudfoundry-incubator/credhub-cli/credhub"
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials"
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub/server"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -17,12 +16,12 @@ import (
 var _ = Describe("Find", func() {
 	Describe("FindByPath()", func() {
 		var dummy DummyAuth
-		var config server.Config
+		var config Config
 		var creds []credentials.Base
 		var err error
 
 		BeforeEach(func() {
-			config = server.Config{
+			config = Config{
 				ApiUrl:             "http://example.com",
 				InsecureSkipVerify: true,
 			}

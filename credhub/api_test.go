@@ -7,7 +7,6 @@ import (
 
 	. "github.com/cloudfoundry-incubator/credhub-cli/credhub"
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/auth"
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub/server"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -19,7 +18,7 @@ var _ = Describe("Api", func() {
 			dummy := func(config auth.ServerConfig) auth.Auth {
 				return &DummyAuth{Config: config}
 			}
-			config := &server.Config{ApiUrl: "http://example.com"}
+			config := &Config{ApiUrl: "http://example.com"}
 
 			ch := New(config, dummy)
 
@@ -28,7 +27,7 @@ var _ = Describe("Api", func() {
 			da, ok := ch.Auth.(*DummyAuth)
 
 			Expect(ok).To(BeTrue())
-			Expect(da.Config).To(BeIdenticalTo(config))
+			Expect(da.Config).To(BeIdenticalTo(ch))
 		})
 	})
 
@@ -41,7 +40,7 @@ var _ = Describe("Api", func() {
 		BeforeEach(func() {
 			mockAuth = &DummyAuth{}
 			ch = &CredHub{
-				Config: &server.Config{ApiUrl: "http://example.com/"},
+				Config: &Config{ApiUrl: "http://example.com/"},
 				Auth:   mockAuth,
 			}
 		})

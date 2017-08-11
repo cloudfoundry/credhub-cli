@@ -1,27 +1,24 @@
 package credhub_test
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
+	"io/ioutil"
 	"net/http"
 
-	. "github.com/cloudfoundry-incubator/credhub-cli/credhub"
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub/server"
-
-	"bytes"
-	"io/ioutil"
-
-	"encoding/json"
-
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials/generate"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+
+	. "github.com/cloudfoundry-incubator/credhub-cli/credhub"
+	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials/generate"
 )
 
 var _ = Describe("Generate", func() {
-	var config server.Config
+	var config Config
 
 	BeforeEach(func() {
-		config = server.Config{
+		config = Config{
 			ApiUrl:             "http://example.com",
 			InsecureSkipVerify: true,
 		}
@@ -173,7 +170,7 @@ var _ = Describe("Generate", func() {
 	}`)),
 				}}
 
-				config := server.Config{
+				config := Config{
 					ApiUrl:             "http://example.com",
 					InsecureSkipVerify: true,
 				}

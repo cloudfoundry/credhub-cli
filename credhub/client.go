@@ -1,4 +1,4 @@
-package server
+package credhub
 
 import (
 	"crypto/tls"
@@ -10,7 +10,7 @@ import (
 )
 
 // Provides an unauthenticated http.Client to the CredHub server
-func (c *Config) Client() (*http.Client, error) {
+func (c *CredHub) Client() (*http.Client, error) {
 	parsedUrl, err := url.Parse(c.ApiUrl)
 	if err != nil {
 		return nil, err
@@ -23,13 +23,13 @@ func (c *Config) Client() (*http.Client, error) {
 	}
 }
 
-func (c *Config) httpClient() (*http.Client, error) {
+func (c *CredHub) httpClient() (*http.Client, error) {
 	return &http.Client{
 		Timeout: time.Second * 45,
 	}, nil
 }
 
-func (c *Config) httpsClient() (*http.Client, error) {
+func (c *CredHub) httpsClient() (*http.Client, error) {
 	client, _ := c.httpClient()
 
 	rootCAs, err := c.certPool()
@@ -48,7 +48,7 @@ func (c *Config) httpsClient() (*http.Client, error) {
 	return client, nil
 }
 
-func (c *Config) certPool() (*x509.CertPool, error) {
+func (c *CredHub) certPool() (*x509.CertPool, error) {
 	certPool := x509.NewCertPool()
 
 	for _, cert := range c.CaCerts {

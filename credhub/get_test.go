@@ -6,20 +6,20 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	. "github.com/cloudfoundry-incubator/credhub-cli/credhub"
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials"
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub/server"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+
+	. "github.com/cloudfoundry-incubator/credhub-cli/credhub"
+	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials"
 )
 
 var _ = Describe("Get", func() {
 	var dummy DummyAuth
 	var err error
-	var config server.Config
+	var config Config
 
 	BeforeEach(func() {
-		config = server.Config{
+		config = Config{
 			ApiUrl:             "http://example.com",
 			InsecureSkipVerify: true,
 		}

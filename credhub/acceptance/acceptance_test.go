@@ -6,7 +6,6 @@ import (
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/auth"
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials/generate"
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials/values"
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub/server"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -14,7 +13,7 @@ import (
 var _ = Describe("CredHub", func() {
 
 	It("generates a password", func() {
-		config := server.Config{
+		config := Config{
 			ApiUrl:             "https://localhost:9000",
 			InsecureSkipVerify: true,
 		}
@@ -30,7 +29,7 @@ var _ = Describe("CredHub", func() {
 	})
 
 	It("sets a password", func() {
-		config := server.Config{
+		config := Config{
 			ApiUrl:             "https://localhost:9000",
 			InsecureSkipVerify: true,
 		}

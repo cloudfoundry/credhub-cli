@@ -1,4 +1,4 @@
-package server
+package credhub
 
 import (
 	"encoding/json"
@@ -8,7 +8,7 @@ import (
 )
 
 // Provides the authentication server's URL
-func (c *Config) AuthUrl() (string, error) {
+func (c *CredHub) AuthUrl() (string, error) {
 	info, err := c.info()
 	if err != nil {
 		return "", err
@@ -22,7 +22,7 @@ func (c *Config) AuthUrl() (string, error) {
 	return authUrl, nil
 }
 
-func (c *Config) request(method string, path string, body io.Reader) (*http.Response, error) {
+func (c *CredHub) request(method string, path string, body io.Reader) (*http.Response, error) {
 	client, err := c.Client()
 	if err != nil {
 		return nil, err
@@ -33,7 +33,7 @@ func (c *Config) request(method string, path string, body io.Reader) (*http.Resp
 	return client.Do(request)
 }
 
-func (c *Config) info() (info, error) {
+func (c *CredHub) info() (info, error) {
 	var i info
 	response, err := c.request("GET", "/info", nil)
 	if err != nil {

@@ -7,14 +7,13 @@ import (
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub"
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/auth"
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials/generate"
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub/server"
 )
 
 func ExampleCredHub() {
 	return
 
 	// Use a CredHub server on "https://example.com" using UAA password grant
-	server := server.Config{
+	server := credhub.Config{
 		ApiUrl:             "https://example.com",
 		InsecureSkipVerify: true,
 	}
@@ -60,7 +59,7 @@ func ExampleCredHub() {
 func ExampleNew() {
 	return
 
-	server := server.Config{
+	server := credhub.Config{
 		ApiUrl:             "https://example.com",
 		InsecureSkipVerify: true,
 	}
@@ -99,7 +98,7 @@ func Example() {
 
 	// CredHub server at https://example.com, using UAA Password grant
 	ch := credhub.New(
-		&server.Config{
+		&credhub.Config{
 			ApiUrl:  "https://example.com",
 			CaCerts: []string{"--- BEGIN ---\nroot-certificate\n--- END ---"},
 		},
