@@ -43,6 +43,7 @@ func (ch *CredHub) generateCredential(name, credType string, gen interface{}, ov
 	requestBody["name"] = name
 	requestBody["type"] = credType
 	requestBody["parameters"] = gen
+	requestBody["overwrite"] = overwrite
 	resp, err := ch.Request(http.MethodPost, "/api/v1/data", requestBody)
 
 	if err != nil {
@@ -50,6 +51,7 @@ func (ch *CredHub) generateCredential(name, credType string, gen interface{}, ov
 	}
 
 	defer resp.Body.Close()
+
 	bodyResp, _ := ioutil.ReadAll(resp.Body)
 
 	err = json.Unmarshal(bodyResp, &cred)

@@ -2,11 +2,11 @@
 package generate
 
 type Password struct {
-	Length         int `json:"length"`
-	IncludeSpecial bool
-	ExcludeNumber  bool
-	ExcludeUpper   bool
-	ExcludeLower   bool
+	Length         int  `json:"length,omitempty"`
+	IncludeSpecial bool `json:"include_special,omitempty"`
+	ExcludeNumber  bool `json:"exclude_number,omitempty"`
+	ExcludeUpper   bool `json:"exclude_upper,omitempty"`
+	ExcludeLower   bool `json:"exclude_lower,omitempty"`
 }
 
 type User struct {

@@ -41,11 +41,13 @@ func (ch *CredHub) Request(method string, pathStr string, body interface{}) (*ht
 	if err != nil {
 		return nil, err
 	}
-
 	req, err := http.NewRequest(method, url.String(), bytes.NewReader(jsonBody))
+
 	if err != nil {
 		return nil, err
 	}
+
+	req.Header.Set("Content-Type", "application/json")
 
 	return ch.Auth.Do(req)
 }

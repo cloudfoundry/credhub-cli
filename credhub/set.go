@@ -55,6 +55,7 @@ func (ch *CredHub) setCredential(name, credType string, value interface{}, overw
 	requestBody["name"] = name
 	requestBody["type"] = credType
 	requestBody["value"] = value
+	requestBody["overwrite"] = overwrite
 	resp, err := ch.Request(http.MethodPut, "/api/v1/data", requestBody)
 
 	if err != nil {

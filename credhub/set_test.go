@@ -38,7 +38,7 @@ var _ = Describe("Set", func() {
 			certificate := values.Certificate{
 				Ca: "some-ca",
 			}
-			ch.SetCertificate("/example-certificate", certificate, false)
+			ch.SetCertificate("/example-certificate", certificate, true)
 
 			urlPath := dummy.Request.URL.Path
 			Expect(urlPath).To(Equal("/api/v1/data"))
@@ -50,6 +50,8 @@ var _ = Describe("Set", func() {
 
 			Expect(requestBody["name"]).To(Equal("/example-certificate"))
 			Expect(requestBody["type"]).To(Equal("certificate"))
+			Expect(requestBody["overwrite"]).To(BeTrue())
+
 			Expect(requestBody["value"].(map[string]interface{})["ca"]).To(Equal("some-ca"))
 		})
 
@@ -148,6 +150,7 @@ var _ = Describe("Set", func() {
 			Expect(requestBody["name"]).To(Equal("/example-password"))
 			Expect(requestBody["type"]).To(Equal("password"))
 			Expect(requestBody["value"]).To(BeEquivalentTo("some-password"))
+			Expect(requestBody["overwrite"]).To(BeFalse())
 		})
 
 		Context("when successful", func() {

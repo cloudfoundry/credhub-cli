@@ -50,6 +50,7 @@ var _ = Describe("Generate", func() {
 
 			Expect(requestBody["name"]).To(Equal("/example-certificate"))
 			Expect(requestBody["type"]).To(Equal("certificate"))
+			Expect(requestBody["overwrite"]).To(BeFalse())
 			Expect(requestBody["parameters"].(map[string]interface{})["ca"]).To(Equal("some-ca"))
 		})
 
@@ -144,9 +145,10 @@ var _ = Describe("Generate", func() {
 			cert := generate.Password{
 				Length: 12,
 			}
-			ch.GeneratePassword("/example-password", cert, false)
+			ch.GeneratePassword("/example-password", cert, true)
 			urlPath := dummy.Request.URL.Path
 			Expect(urlPath).To(Equal("/api/v1/data"))
+
 			Expect(dummy.Request.Method).To(Equal(http.MethodPost))
 
 			var requestBody map[string]interface{}
@@ -155,6 +157,7 @@ var _ = Describe("Generate", func() {
 
 			Expect(requestBody["name"]).To(Equal("/example-password"))
 			Expect(requestBody["type"]).To(Equal("password"))
+			Expect(requestBody["overwrite"]).To(BeTrue())
 			Expect(requestBody["parameters"].(map[string]interface{})["length"]).To(BeEquivalentTo(12))
 		})
 
