@@ -12,7 +12,7 @@ func MutualTlsCertificate(certificate string) Method {
 // Provides a constructor for a UAA authentication strategy using password grant
 func UaaPasswordGrant(clientId, clientSecret, username, password string) Method {
 	return func(config ServerConfig) Auth {
-		httpClient, _ := config.Client()
+		httpClient := config.Client()
 		authUrl, _ := config.AuthUrl()
 		uaaClient := uaa.Client{
 			AuthUrl: authUrl,

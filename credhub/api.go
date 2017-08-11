@@ -8,6 +8,12 @@ import (
 	"net/http"
 	"net/url"
 
+	"crypto/x509"
+	"errors"
+
+	"crypto/tls"
+	"time"
+
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/auth"
 )
 
@@ -35,7 +41,8 @@ type CredHub struct {
 	// eg. auth.Uaa provides Logout(), Refresh(), AccessToken and RefreshToken
 	auth.Auth
 
-	baseURL *url.URL
+	baseURL       *url.URL
+	defaultClient *http.Client
 }
 
 // New creates a new CredHub API client with the provided server credentials and authentication method.
@@ -51,6 +58,20 @@ func New(conf *Config, authMethod auth.Method) (*CredHub, error) {
 		baseURL: baseURL,
 	}
 
+	if credhub.baseURL.Scheme == "https" {
+		certPool := x509.NewCertPool()
+
+		for _, cert := range conf.CaCerts {
+			ok := certPool.AppendCertsFromPEM([]byte(cert))
+			if !ok {
+				return nil, errors.New("Ca Certs contains an invalid certificate")
+			}
+		}
+
+		credhub.defaultClient = httpsClient(conf.InsecureSkipVerify, certPool)
+	} else {
+		credhub.defaultClient = httpClient()
+	}
 	credhub.Auth = authMethod(credhub)
 
 	return credhub, nil
@@ -85,10 +106,7 @@ func (c *CredHub) Request(method string, pathStr string, body interface{}) (*htt
 }
 
 func (c *CredHub) request(method string, path string, body io.Reader) (*http.Response, error) {
-	client, err := c.Client()
-	if err != nil {
-		return nil, err
-	}
+	client := c.Client()
 
 	url := *c.baseURL // clone
 	url.Path = path
@@ -96,4 +114,24 @@ func (c *CredHub) request(method string, path string, body io.Reader) (*http.Res
 	request, _ := http.NewRequest(method, url.String(), body)
 
 	return client.Do(request)
+}
+
+func httpClient() *http.Client {
+	return &http.Client{
+		Timeout: time.Second * 45,
+	}
+}
+
+func httpsClient(insecureSkipVerify bool, rootCAs *x509.CertPool) *http.Client {
+	client := httpClient()
+
+	client.Transport = &http.Transport{
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify:       insecureSkipVerify,
+			PreferServerCipherSuites: true,
+			RootCAs:                  rootCAs,
+		},
+	}
+
+	return client
 }

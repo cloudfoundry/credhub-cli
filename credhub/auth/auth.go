@@ -12,7 +12,7 @@ type Auth interface {
 
 type ServerConfig interface {
 	AuthUrl() (string, error)
-	Client() (*http.Client, error)
+	Client() *http.Client
 }
 
 type HttpClient interface {

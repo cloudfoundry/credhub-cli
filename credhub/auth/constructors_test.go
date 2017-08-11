@@ -14,8 +14,8 @@ func (d *DummyServerConfig) AuthUrl() (string, error) {
 	return "http://example.com/auth/url", nil
 }
 
-func (d *DummyServerConfig) Client() (*http.Client, error) {
-	return http.DefaultClient, nil
+func (d *DummyServerConfig) Client() *http.Client {
+	return http.DefaultClient
 }
 
 var _ = Describe("Constructors", func() {
@@ -29,7 +29,7 @@ var _ = Describe("Constructors", func() {
 			Expect(auth.Username).To(Equal("some-username"))
 			Expect(auth.Password).To(Equal("some-password"))
 			Expect(auth.UaaClient.(*uaa.Client).AuthUrl).To(Equal("http://example.com/auth/url"))
-			client, _ := config.Client()
+			client := config.Client()
 			Expect(auth.UaaClient.(*uaa.Client).Client).To(BeIdenticalTo(client))
 			Expect(auth.ApiClient).To(BeIdenticalTo(client))
 		})

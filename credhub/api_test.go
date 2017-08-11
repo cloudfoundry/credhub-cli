@@ -41,6 +41,27 @@ var _ = Describe("Api", func() {
 
 		})
 
+		It("returns an error when CaCerts are invalid", func() {
+			fixturePath := "./fixtures/"
+			caCertFiles := []string{
+				"auth-tls-ca.pem",
+				"server-tls-ca.pem",
+				"extra-ca.pem",
+			}
+			var caCerts []string
+			for _, caCertFile := range caCertFiles {
+				caCertBytes, err := ioutil.ReadFile(fixturePath + caCertFile)
+				if err != nil {
+					Fail("Couldn't read certificate " + caCertFile + ": " + err.Error())
+				}
+
+				caCerts = append(caCerts, string(caCertBytes))
+			}
+			caCerts = append(caCerts, "invalid certificate")
+
+			_, err := New(&Config{ApiUrl: "https://example.com", CaCerts: caCerts}, noopAuth)
+			Expect(err).To(HaveOccurred())
+		})
 	})
 
 	Context("Request()", func() {

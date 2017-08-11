@@ -3,14 +3,15 @@ package acceptance_test
 import (
 	. "github.com/cloudfoundry-incubator/credhub-cli/credhub"
 
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/auth"
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials/generate"
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials/values"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("CredHub", func() {
+var _ = Describe("CredHub API Acceptance", func() {
 
 	It("generates a password", func() {
 		config := Config{
