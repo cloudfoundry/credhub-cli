@@ -4,6 +4,7 @@ package credhub
 import (
 	"bytes"
 	"encoding/json"
+	"io"
 	"net/http"
 	"net/url"
 
@@ -73,4 +74,15 @@ func (ch *CredHub) Request(method string, pathStr string, body interface{}) (*ht
 	req.Header.Set("Content-Type", "application/json")
 
 	return ch.Auth.Do(req)
+}
+
+func (c *CredHub) request(method string, path string, body io.Reader) (*http.Response, error) {
+	client, err := c.Client()
+	if err != nil {
+		return nil, err
+	}
+
+	request, _ := http.NewRequest(method, c.ApiUrl+path, body)
+
+	return client.Do(request)
 }
