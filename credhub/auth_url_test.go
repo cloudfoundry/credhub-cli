@@ -12,13 +12,6 @@ import (
 
 var _ = Describe("AuthUrl()", func() {
 	Context("Errors", func() {
-		Specify("when ApiUrl is invalid", func() {
-			ch := credhubFromConfig(Config{ApiUrl: "://"})
-
-			_, err := ch.AuthUrl()
-
-			Expect(err).ToNot(BeNil())
-		})
 
 		Specify("when ApiUrl is inaccessible", func() {
 			ch := credhubFromConfig(Config{ApiUrl: "http://localhost:1"})

@@ -34,18 +34,26 @@ type CredHub struct {
 	// Can be typecast to a specific Auth type to get additional information and functionality.
 	// eg. auth.Uaa provides Logout(), Refresh(), AccessToken and RefreshToken
 	auth.Auth
+
+	baseURL *url.URL
 }
 
 // New creates a new CredHub API client with the provided server credentials and authentication method.
 // See the auth package for supported authentication methods.
-func New(conf *Config, authMethod auth.Method) *CredHub {
+func New(conf *Config, authMethod auth.Method) (*CredHub, error) {
+	baseURL, err := url.Parse(conf.ApiUrl)
+	if err != nil {
+		return nil, err
+	}
+
 	credhub := &CredHub{
-		Config: conf,
+		Config:  conf,
+		baseURL: baseURL,
 	}
 
 	credhub.Auth = authMethod(credhub)
 
-	return credhub
+	return credhub, nil
 }
 
 // Request sends an authenticated request to the CredHub server.
@@ -57,8 +65,8 @@ func New(conf *Config, authMethod auth.Method) *CredHub {
 //
 // Use Request() directly to access the CredHub server if an appropriate helper method is not available.
 // For unauthenticated requests (eg. /health), use Config.Client() instead.
-func (ch *CredHub) Request(method string, pathStr string, body interface{}) (*http.Response, error) {
-	url, _ := url.Parse(ch.Config.ApiUrl)
+func (c *CredHub) Request(method string, pathStr string, body interface{}) (*http.Response, error) {
+	url := *c.baseURL // clone
 	url.Path = pathStr
 
 	jsonBody, err := json.Marshal(body)
@@ -73,7 +81,7 @@ func (ch *CredHub) Request(method string, pathStr string, body interface{}) (*ht
 
 	req.Header.Set("Content-Type", "application/json")
 
-	return ch.Auth.Do(req)
+	return c.Auth.Do(req)
 }
 
 func (c *CredHub) request(method string, path string, body io.Reader) (*http.Response, error) {
@@ -82,7 +90,10 @@ func (c *CredHub) request(method string, path string, body io.Reader) (*http.Res
 		return nil, err
 	}
 
-	request, _ := http.NewRequest(method, c.ApiUrl+path, body)
+	url := *c.baseURL // clone
+	url.Path = path
+
+	request, _ := http.NewRequest(method, url.String(), body)
 
 	return client.Do(request)
 }

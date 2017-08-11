@@ -17,8 +17,11 @@ var _ = Describe("CredHub", func() {
 			ApiUrl:             "https://localhost:9000",
 			InsecureSkipVerify: true,
 		}
+
 		method := auth.UaaPasswordGrant("credhub_cli", "", "credhub", "password")
-		ch := New(&config, method)
+		ch, err := New(&config, method)
+
+		Expect(err).ToNot(HaveOccurred())
 
 		password, err := ch.GeneratePassword("/example-password", generate.Password{
 			Length: 10,
@@ -34,7 +37,9 @@ var _ = Describe("CredHub", func() {
 			InsecureSkipVerify: true,
 		}
 		method := auth.UaaPasswordGrant("credhub_cli", "", "credhub", "password")
-		ch := New(&config, method)
+
+		ch, err := New(&config, method)
+		Expect(err).ToNot(HaveOccurred())
 
 		password, err := ch.SetPassword("/example-password", values.Password("some-password"), true)
 		Expect(err).ToNot(HaveOccurred())

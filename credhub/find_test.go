@@ -7,36 +7,25 @@ import (
 	"net/http"
 
 	. "github.com/cloudfoundry-incubator/credhub-cli/credhub"
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Find", func() {
+	config := Config{
+		ApiUrl:             "http://example.com",
+		InsecureSkipVerify: true,
+	}
+
 	Describe("FindByPath()", func() {
-		var dummy DummyAuth
-		var config Config
-		var creds []credentials.Base
-		var err error
-
-		BeforeEach(func() {
-			config = Config{
-				ApiUrl:             "http://example.com",
-				InsecureSkipVerify: true,
-			}
-		})
-
 		It("requests credentials for a specified path", func() {
-			dummy = DummyAuth{Response: &http.Response{
+			dummy := &DummyAuth{Response: &http.Response{
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
 
-			ch := CredHub{
-				Config: &config,
-				Auth:   &dummy,
-			}
-			creds, err = ch.FindByPath("/some/example/path")
+			ch := credhubWithAuth(config, dummy)
+			ch.FindByPath("/some/example/path")
 			urlPath := dummy.Request.URL.Path
 			Expect(urlPath).To(Equal("/api/v1/data?path=/some/example/path"))
 			Expect(dummy.Request.Method).To(Equal(http.MethodGet))
@@ -56,16 +45,14 @@ var _ = Describe("Find", func() {
     }
   ]
 }`
-				dummy = DummyAuth{Response: &http.Response{
+				dummy := &DummyAuth{Response: &http.Response{
 					Body: ioutil.NopCloser(bytes.NewBufferString(expectedResponse)),
 				}}
 
-				ch := CredHub{
-					Config: &config,
-					Auth:   &dummy,
-				}
-				creds, err = ch.FindByPath("/some/example/path")
+				ch := credhubWithAuth(config, dummy)
+				creds, err := ch.FindByPath("/some/example/path")
 
+				Expect(err).ToNot(HaveOccurred())
 				Expect(creds[0].Name).To(Equal("/some/example/path/example-cred-0"))
 				Expect(creds[0].VersionCreatedAt).To(Equal("2017-05-09T21:09:26Z"))
 				Expect(creds[1].Name).To(Equal("/some/example/path/example-cred-1"))
@@ -76,14 +63,11 @@ var _ = Describe("Find", func() {
 
 		Context("when request fails", func() {
 			It("returns an error", func() {
-				dummy = DummyAuth{Error: errors.New("Network error occurred")}
+				dummy := &DummyAuth{Error: errors.New("Network error occurred")}
 
-				ch := CredHub{
-					Config: &config,
-					Auth:   &dummy,
-				}
+				ch := credhubWithAuth(config, dummy)
 
-				creds, err = ch.FindByPath("/some/example/path")
+				_, err := ch.FindByPath("/some/example/path")
 
 				Expect(err).To(HaveOccurred())
 			})
@@ -91,16 +75,12 @@ var _ = Describe("Find", func() {
 
 		Context("when response body cannot be unmarshalled", func() {
 			It("returns an error", func() {
-				dummy = DummyAuth{Response: &http.Response{
+				dummy := &DummyAuth{Response: &http.Response{
 					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
 				}}
 
-				ch := CredHub{
-					Config: &config,
-					Auth:   &dummy,
-				}
-				creds, err = ch.FindByPath("/some/example/path")
-
+				ch := credhubWithAuth(config, dummy)
+				_, err := ch.FindByPath("/some/example/path")
 				Expect(err).To(HaveOccurred())
 			})
 		})

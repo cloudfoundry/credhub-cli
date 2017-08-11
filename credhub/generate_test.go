@@ -15,24 +15,18 @@ import (
 )
 
 var _ = Describe("Generate", func() {
-	var config Config
+	config := Config{
+		ApiUrl:             "http://example.com",
+		InsecureSkipVerify: true,
+	}
 
-	BeforeEach(func() {
-		config = Config{
-			ApiUrl:             "http://example.com",
-			InsecureSkipVerify: true,
-		}
-	})
 	Describe("GenerateCertificate()", func() {
 		It("requests to generate the certificate", func() {
-			dummy := DummyAuth{Response: &http.Response{
+			dummy := &DummyAuth{Response: &http.Response{
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
 
-			ch := CredHub{
-				Config: &config,
-				Auth:   &dummy,
-			}
+			ch := credhubWithAuth(config, dummy)
 			cert := generate.Certificate{
 				Ca: "some-ca",
 			}
@@ -53,7 +47,7 @@ var _ = Describe("Generate", func() {
 
 		Context("when successful", func() {
 			It("returns the generated certificate", func() {
-				dummy := DummyAuth{Response: &http.Response{
+				dummy := &DummyAuth{Response: &http.Response{
 					Body: ioutil.NopCloser(bytes.NewBufferString(`{
       "id": "some-id",
       "name": "/example-certificate",
@@ -67,10 +61,7 @@ var _ = Describe("Generate", func() {
 }`)),
 				}}
 
-				ch := CredHub{
-					Config: &config,
-					Auth:   &dummy,
-				}
+				ch := credhubWithAuth(config, dummy)
 				cert := generate.Certificate{
 					Ca: "some-ca",
 				}
@@ -90,11 +81,8 @@ var _ = Describe("Generate", func() {
 			var err error
 			It("returns an error", func() {
 				networkError := errors.New("Network error occurred")
-				dummy := DummyAuth{Error: networkError}
-				ch := CredHub{
-					Config: &config,
-					Auth:   &dummy,
-				}
+				dummy := &DummyAuth{Error: networkError}
+				ch := credhubWithAuth(config, dummy)
 
 				cert := generate.Certificate{
 					Ca: "some-ca",
@@ -109,13 +97,10 @@ var _ = Describe("Generate", func() {
 		Context("when response body cannot be unmarshalled", func() {
 			It("returns an error", func() {
 
-				dummy := DummyAuth{Response: &http.Response{
+				dummy := &DummyAuth{Response: &http.Response{
 					Body: ioutil.NopCloser(bytes.NewBufferString("invalid-response")),
 				}}
-				ch := CredHub{
-					Config: &config,
-					Auth:   &dummy,
-				}
+				ch := credhubWithAuth(config, dummy)
 
 				cert := generate.Certificate{
 					Ca: "some-ca",
@@ -131,14 +116,11 @@ var _ = Describe("Generate", func() {
 
 	Describe("GeneratePassword()", func() {
 		It("requests to generate the password", func() {
-			dummy := DummyAuth{Response: &http.Response{
+			dummy := &DummyAuth{Response: &http.Response{
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
 
-			ch := CredHub{
-				Config: &config,
-				Auth:   &dummy,
-			}
+			ch := credhubWithAuth(config, dummy)
 			cert := generate.Password{
 				Length: 12,
 			}
@@ -160,7 +142,7 @@ var _ = Describe("Generate", func() {
 
 		Context("when successful", func() {
 			It("returns the generated password", func() {
-				dummy := DummyAuth{Response: &http.Response{
+				dummy := &DummyAuth{Response: &http.Response{
 					Body: ioutil.NopCloser(bytes.NewBufferString(`{
 	      "id": "some-id",
 	      "name": "/example-password",
@@ -175,10 +157,7 @@ var _ = Describe("Generate", func() {
 					InsecureSkipVerify: true,
 				}
 
-				ch := CredHub{
-					Config: &config,
-					Auth:   &dummy,
-				}
+				ch := credhubWithAuth(config, dummy)
 
 				p := generate.Password{
 					Length: 12,
@@ -197,11 +176,8 @@ var _ = Describe("Generate", func() {
 			var err error
 			It("returns an error", func() {
 				networkError := errors.New("Network error occurred")
-				dummy := DummyAuth{Error: networkError}
-				ch := CredHub{
-					Config: &config,
-					Auth:   &dummy,
-				}
+				dummy := &DummyAuth{Error: networkError}
+				ch := credhubWithAuth(config, dummy)
 
 				_, err = ch.GeneratePassword("/example-password", generate.Password{}, false)
 
@@ -212,13 +188,10 @@ var _ = Describe("Generate", func() {
 		Context("when response body cannot be unmarshalled", func() {
 			It("returns an error", func() {
 
-				dummy := DummyAuth{Response: &http.Response{
+				dummy := &DummyAuth{Response: &http.Response{
 					Body: ioutil.NopCloser(bytes.NewBufferString("invalid-response")),
 				}}
-				ch := CredHub{
-					Config: &config,
-					Auth:   &dummy,
-				}
+				ch := credhubWithAuth(config, dummy)
 
 				_, err := ch.GeneratePassword("/example-password", generate.Password{}, false)
 

@@ -5,18 +5,12 @@ import (
 	"crypto/x509"
 	"errors"
 	"net/http"
-	"net/url"
 	"time"
 )
 
 // Provides an unauthenticated http.Client to the CredHub server
 func (c *CredHub) Client() (*http.Client, error) {
-	parsedUrl, err := url.Parse(c.ApiUrl)
-	if err != nil {
-		return nil, err
-	}
-
-	if parsedUrl.Scheme == "https" {
+	if c.baseURL.Scheme == "https" {
 		return c.httpsClient()
 	} else {
 		return c.httpClient()

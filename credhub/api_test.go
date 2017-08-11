@@ -14,14 +14,16 @@ import (
 
 var _ = Describe("Api", func() {
 	Context("New()", func() {
+		dummy := func(config auth.ServerConfig) auth.Auth {
+			return &DummyAuth{Config: config}
+		}
+
 		It("should assign Config and Auth", func() {
-			dummy := func(config auth.ServerConfig) auth.Auth {
-				return &DummyAuth{Config: config}
-			}
 			config := &Config{ApiUrl: "http://example.com"}
 
-			ch := New(config, dummy)
+			ch, err := New(config, dummy)
 
+			Expect(err).ToNot(HaveOccurred())
 			Expect(ch.Config).To(BeIdenticalTo(config))
 
 			da, ok := ch.Auth.(*DummyAuth)
@@ -29,6 +31,16 @@ var _ = Describe("Api", func() {
 			Expect(ok).To(BeTrue())
 			Expect(da.Config).To(BeIdenticalTo(ch))
 		})
+
+		It("returns an error when the ApiUrl is invalid", func() {
+			config := &Config{ApiUrl: "://example.com"}
+
+			ch, err := New(config, dummy)
+			Expect(err).To(HaveOccurred())
+			Expect(ch).To(BeNil())
+
+		})
+
 	})
 
 	Context("Request()", func() {
@@ -39,10 +51,7 @@ var _ = Describe("Api", func() {
 
 		BeforeEach(func() {
 			mockAuth = &DummyAuth{}
-			ch = &CredHub{
-				Config: &Config{ApiUrl: "http://example.com/"},
-				Auth:   mockAuth,
-			}
+			ch = credhubWithAuth(Config{ApiUrl: "http://example.com/"}, mockAuth)
 		})
 
 		It("should send the requested using the provided auth to the ApiUrl", func() {
@@ -79,3 +88,25 @@ var _ = Describe("Api", func() {
 		})
 	})
 })
+
+func credhubFromConfig(config Config) *CredHub {
+	c, err := New(&config, noopAuth)
+
+	ExpectWithOffset(1, err).ToNot(HaveOccurred())
+
+	return c
+}
+
+func credhubWithAuth(config Config, authentication auth.Auth) *CredHub {
+	c, err := New(&config, func(auth.ServerConfig) auth.Auth {
+		return authentication
+	})
+
+	ExpectWithOffset(1, err).ToNot(HaveOccurred())
+
+	return c
+}
+
+func noopAuth(auth.ServerConfig) auth.Auth {
+	return nil
+}

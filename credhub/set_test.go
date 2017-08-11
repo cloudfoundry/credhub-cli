@@ -15,25 +15,19 @@ import (
 )
 
 var _ = Describe("Set", func() {
-	var config Config
-	var dummy DummyAuth
-	BeforeEach(func() {
-		config = Config{
-			ApiUrl:             "http://example.com",
-			InsecureSkipVerify: true,
-		}
-	})
+
+	config := Config{
+		ApiUrl:             "http://example.com",
+		InsecureSkipVerify: true,
+	}
 
 	Describe("SetCertificate()", func() {
 		It("requests to set the certificate", func() {
-			dummy = DummyAuth{Response: &http.Response{
+			dummy := &DummyAuth{Response: &http.Response{
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
 
-			ch := CredHub{
-				Config: &config,
-				Auth:   &dummy,
-			}
+			ch := credhubWithAuth(config, dummy)
 
 			certificate := values.Certificate{
 				Ca: "some-ca",
@@ -57,7 +51,7 @@ var _ = Describe("Set", func() {
 
 		Context("when successful", func() {
 			It("returns the credential that has been set", func() {
-				dummy = DummyAuth{Response: &http.Response{
+				dummy := &DummyAuth{Response: &http.Response{
 					Body: ioutil.NopCloser(bytes.NewBufferString(`{
 		  "id": "some-id",
 		  "name": "/example-certificate",
@@ -71,10 +65,7 @@ var _ = Describe("Set", func() {
 		}`)),
 				}}
 
-				ch := CredHub{
-					Config: &config,
-					Auth:   &dummy,
-				}
+				ch := credhubWithAuth(config, dummy)
 
 				certificate := values.Certificate{
 					Certificate: "some-cert",
@@ -90,11 +81,8 @@ var _ = Describe("Set", func() {
 		})
 		Context("when request fails", func() {
 			It("returns an error", func() {
-				dummy = DummyAuth{Error: errors.New("Network error occurred")}
-				ch := CredHub{
-					Config: &config,
-					Auth:   &dummy,
-				}
+				dummy := &DummyAuth{Error: errors.New("Network error occurred")}
+				ch := credhubWithAuth(config, dummy)
 				certificate := values.Certificate{
 					Ca: "some-ca",
 				}
@@ -106,14 +94,10 @@ var _ = Describe("Set", func() {
 
 		Context("when response body cannot be unmarshalled", func() {
 			It("returns an error", func() {
-				dummy = DummyAuth{Response: &http.Response{
+				dummy := &DummyAuth{Response: &http.Response{
 					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
 				}}
-
-				ch := CredHub{
-					Config: &config,
-					Auth:   &dummy,
-				}
+				ch := credhubWithAuth(config, dummy)
 				certificate := values.Certificate{
 					Ca: "some-ca",
 				}
@@ -126,15 +110,11 @@ var _ = Describe("Set", func() {
 
 	Describe("SetPassword()", func() {
 		It("requests to set the password", func() {
-			dummy = DummyAuth{Response: &http.Response{
+			dummy := &DummyAuth{Response: &http.Response{
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
 
-			ch := CredHub{
-				Config: &config,
-				Auth:   &dummy,
-			}
-
+			ch := credhubWithAuth(config, dummy)
 			password := values.Password("some-password")
 
 			ch.SetPassword("/example-password", password, false)
@@ -155,7 +135,7 @@ var _ = Describe("Set", func() {
 
 		Context("when successful", func() {
 			It("returns the credential that has been set", func() {
-				dummy = DummyAuth{Response: &http.Response{
+				dummy := &DummyAuth{Response: &http.Response{
 					Body: ioutil.NopCloser(bytes.NewBufferString(`{
 		  "id": "some-id",
 		  "name": "/example-password",
@@ -165,10 +145,7 @@ var _ = Describe("Set", func() {
 		}`)),
 				}}
 
-				ch := CredHub{
-					Config: &config,
-					Auth:   &dummy,
-				}
+				ch := credhubWithAuth(config, dummy)
 
 				password := values.Password("some-password")
 
@@ -183,11 +160,8 @@ var _ = Describe("Set", func() {
 		})
 		Context("when request fails", func() {
 			It("returns an error", func() {
-				dummy = DummyAuth{Error: errors.New("Network error occurred")}
-				ch := CredHub{
-					Config: &config,
-					Auth:   &dummy,
-				}
+				dummy := &DummyAuth{Error: errors.New("Network error occurred")}
+				ch := credhubWithAuth(config, dummy)
 				password := values.Password("some-password")
 
 				_, err := ch.SetPassword("/example-password", password, false)
@@ -198,14 +172,11 @@ var _ = Describe("Set", func() {
 
 		Context("when response body cannot be unmarshalled", func() {
 			It("returns an error", func() {
-				dummy = DummyAuth{Response: &http.Response{
+				dummy := &DummyAuth{Response: &http.Response{
 					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
 				}}
 
-				ch := CredHub{
-					Config: &config,
-					Auth:   &dummy,
-				}
+				ch := credhubWithAuth(config, dummy)
 				password := values.Password("some-password")
 
 				_, err := ch.SetPassword("/example-password", password, false)

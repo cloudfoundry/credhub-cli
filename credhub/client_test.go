@@ -12,18 +12,11 @@ import (
 	"crypto/x509"
 
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub"
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub/auth"
 )
 
 var _ = Describe("Client()", func() {
 
 	Context("Errors", func() {
-		Specify("when ApiUrl is invalid", func() {
-			ch := credhubFromConfig(credhub.Config{ApiUrl: "://"})
-			_, err := ch.Client()
-			Expect(err).ToNot(BeNil())
-		})
-
 		Specify("when CaCerts are invalid", func() {
 			fixturePath := "./fixtures/"
 			caCertFiles := []string{
@@ -116,11 +109,3 @@ var _ = Describe("Client()", func() {
 
 	})
 })
-
-func credhubFromConfig(config credhub.Config) *credhub.CredHub {
-	return credhub.New(&config, noopAuth)
-}
-
-func noopAuth(auth.ServerConfig) auth.Auth {
-	return nil
-}
