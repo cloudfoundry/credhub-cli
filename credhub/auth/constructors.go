@@ -3,14 +3,14 @@ package auth
 import "github.com/cloudfoundry-incubator/credhub-cli/credhub/auth/uaa"
 
 // Provides a constructor for MutualTls authentication strategy
-func MutualTlsCertificate(certificate string) Method {
+func MutualTlsCertificate(certificate string) Builder {
 	return func(config ServerConfig) Auth {
 		panic("Not implemented")
 	}
 }
 
 // Provides a constructor for a UAA authentication strategy using password grant
-func UaaPasswordGrant(clientId, clientSecret, username, password string) Method {
+func UaaPasswordGrant(clientId, clientSecret, username, password string) Builder {
 	return func(config ServerConfig) Auth {
 		httpClient := config.Client()
 		authUrl, _ := config.AuthUrl()
@@ -31,7 +31,7 @@ func UaaPasswordGrant(clientId, clientSecret, username, password string) Method 
 
 // UaaClientCredentialGrant provides a constructor for a UAA authentication strategy
 // using client credential grant.
-func UaaClientCredentialGrant(clientId, clientSecret string) Method {
+func UaaClientCredentialGrant(clientId, clientSecret string) Builder {
 	return func(config ServerConfig) Auth {
 		panic("Not implemented yet")
 	}
@@ -41,7 +41,7 @@ func UaaClientCredentialGrant(clientId, clientSecret string) Method {
 //
 // Only use this for a sessions created with password grant
 // For existing sessions created with a client credential grant, use UaaClient()
-func UaaSession(clientId, clientSecret, accessToken, refreshToken string) Method {
+func UaaSession(clientId, clientSecret, accessToken, refreshToken string) Builder {
 	return func(config ServerConfig) Auth {
 		panic("Not implemented")
 	}

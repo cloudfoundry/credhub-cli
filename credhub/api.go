@@ -37,7 +37,7 @@ type CredHub struct {
 	// Skip certificate verification
 	insecureSkipVerify bool
 
-	authMethod auth.Method
+	authBuilder auth.Builder
 }
 
 // New creates a new CredHub API client with the provided server credentials and authentication method.
@@ -66,18 +66,27 @@ func New(addr string, options ...func(*CredHub) error) (*CredHub, error) {
 		credhub.defaultClient = httpClient()
 	}
 
-	if credhub.authMethod != nil {
-		credhub.Auth = credhub.authMethod(credhub)
-	} else {
-		credhub.Auth = credhub.defaultClient
+	if credhub.Auth == nil {
+		if credhub.authBuilder != nil {
+			credhub.Auth = credhub.authBuilder(credhub)
+		} else {
+			credhub.Auth = credhub.defaultClient
+		}
 	}
 
 	return credhub, nil
 }
 
-func Auth(method auth.Method) func(*CredHub) error {
+func AuthBuilder(method auth.Builder) func(*CredHub) error {
 	return func(c *CredHub) error {
-		c.authMethod = method
+		c.authBuilder = method
+		return nil
+	}
+}
+
+func Auth(auth auth.Auth) func(*CredHub) error {
+	return func(c *CredHub) error {
+		c.Auth = auth
 		return nil
 	}
 }

@@ -14,19 +14,54 @@ import (
 
 var _ = Describe("Api", func() {
 	Context("New()", func() {
-		dummy := func(config auth.ServerConfig) auth.Auth {
-			return &DummyAuth{Config: config}
-		}
-
-		It("should assign the Auth", func() {
-			ch, err := New("http://example.com", Auth(dummy))
-
+		It("sets Auth to some default value", func() {
+			ch, err := New("http://example.com")
 			Expect(err).ToNot(HaveOccurred())
+			Expect(ch.Auth).ToNot(BeNil())
+		})
 
-			da, ok := ch.Auth.(*DummyAuth)
+		Context("when the Auth option is used", func() {
+			It("sets the Auth", func() {
+				expectedAuth := &DummyAuth{}
+				ch, err := New("http://example.com", Auth(expectedAuth))
 
-			Expect(ok).To(BeTrue())
-			Expect(da.Config).To(BeIdenticalTo(ch))
+				Expect(err).ToNot(HaveOccurred())
+
+				auth, ok := ch.Auth.(*DummyAuth)
+
+				Expect(ok).To(BeTrue())
+				Expect(auth).To(BeIdenticalTo(expectedAuth))
+			})
+
+			It("ignores the auth builder option", func() {
+				builderCalled := false
+				builder := func(config auth.ServerConfig) auth.Auth {
+					builderCalled = true
+					return nil
+				}
+
+				_, err := New("http://example.com", Auth(&DummyAuth{}), AuthBuilder(builder))
+
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(builderCalled).To(BeFalse())
+			})
+		})
+
+		Context("when the auth builder is used", func() {
+			It("invokes the auth builder", func() {
+				dummyBuilder := func(config auth.ServerConfig) auth.Auth {
+					return &DummyAuth{Config: config}
+				}
+
+				ch, err := New("http://example.com", AuthBuilder(dummyBuilder))
+				Expect(err).ToNot(HaveOccurred())
+
+				da, ok := ch.Auth.(*DummyAuth)
+
+				Expect(ok).To(BeTrue())
+				Expect(da.Config).To(BeIdenticalTo(ch))
+			})
 		})
 
 		It("returns an error when the ApiURL is invalid", func() {
@@ -67,7 +102,7 @@ var _ = Describe("Api", func() {
 
 		BeforeEach(func() {
 			mockAuth = &DummyAuth{}
-			ch, _ = New("http://example.com/", Auth(authMethod(mockAuth)))
+			ch, _ = New("http://example.com/", Auth(mockAuth))
 		})
 
 		It("should send the requested using the provided auth to the ApiURL", func() {
@@ -104,9 +139,3 @@ var _ = Describe("Api", func() {
 		})
 	})
 })
-
-func authMethod(authentication auth.Auth) auth.Method {
-	return func(auth.ServerConfig) auth.Auth {
-		return authentication
-	}
-}

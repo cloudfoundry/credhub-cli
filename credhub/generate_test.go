@@ -22,7 +22,7 @@ var _ = Describe("Generate", func() {
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
 
-			ch, _ := New("https://example.com", Auth(authMethod(dummy)))
+			ch, _ := New("https://example.com", Auth(dummy))
 
 			cert := generate.Certificate{
 				Ca: "some-ca",
@@ -58,7 +58,7 @@ var _ = Describe("Generate", func() {
 }`)),
 				}}
 
-				ch, _ := New("https://example.com", Auth(authMethod(dummy)))
+				ch, _ := New("https://example.com", Auth(dummy))
 
 				cert := generate.Certificate{
 					Ca: "some-ca",
@@ -80,7 +80,7 @@ var _ = Describe("Generate", func() {
 			It("returns an error", func() {
 				networkError := errors.New("Network error occurred")
 				dummy := &DummyAuth{Error: networkError}
-				ch, _ := New("https://example.com", Auth(authMethod(dummy)))
+				ch, _ := New("https://example.com", Auth(dummy))
 
 				cert := generate.Certificate{
 					Ca: "some-ca",
@@ -98,7 +98,7 @@ var _ = Describe("Generate", func() {
 				dummy := &DummyAuth{Response: &http.Response{
 					Body: ioutil.NopCloser(bytes.NewBufferString("invalid-response")),
 				}}
-				ch, _ := New("https://example.com", Auth(authMethod(dummy)))
+				ch, _ := New("https://example.com", Auth(dummy))
 
 				cert := generate.Certificate{
 					Ca: "some-ca",
@@ -118,7 +118,7 @@ var _ = Describe("Generate", func() {
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
 
-			ch, _ := New("https://example.com", Auth(authMethod(dummy)))
+			ch, _ := New("https://example.com", Auth(dummy))
 
 			cert := generate.Password{
 				Length: 12,
@@ -151,7 +151,7 @@ var _ = Describe("Generate", func() {
 	}`)),
 				}}
 
-				ch, _ := New("https://example.com", Auth(authMethod(dummy)))
+				ch, _ := New("https://example.com", Auth(dummy))
 
 				p := generate.Password{
 					Length: 12,
@@ -171,7 +171,7 @@ var _ = Describe("Generate", func() {
 			It("returns an error", func() {
 				networkError := errors.New("Network error occurred")
 				dummy := &DummyAuth{Error: networkError}
-				ch, _ := New("https://example.com", Auth(authMethod(dummy)))
+				ch, _ := New("https://example.com", Auth(dummy))
 
 				_, err = ch.GeneratePassword("/example-password", generate.Password{}, false)
 
@@ -185,7 +185,7 @@ var _ = Describe("Generate", func() {
 				dummy := &DummyAuth{Response: &http.Response{
 					Body: ioutil.NopCloser(bytes.NewBufferString("invalid-response")),
 				}}
-				ch, _ := New("https://example.com", Auth(authMethod(dummy)))
+				ch, _ := New("https://example.com", Auth(dummy))
 
 				_, err := ch.GeneratePassword("/example-password", generate.Password{}, false)
 

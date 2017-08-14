@@ -15,12 +15,8 @@ type ServerConfig interface {
 	Client() *http.Client
 }
 
-type HttpClient interface {
-	Do(*http.Request) (*http.Response, error)
-}
-
-// Method is used to select an authentication strategy for CredHub.New()
+// Builder is used to select an authentication strategy for CredHub.New()
 //
-// The server.Config provided to credhub.New() will be given to Method to construct
+// The ServerConfig provided to credhub.New() will be given to Builder to construct
 // the specified auth strategy.
-type Method func(config ServerConfig) Auth
+type Builder func(config ServerConfig) Auth

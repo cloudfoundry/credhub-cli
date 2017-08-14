@@ -9,9 +9,9 @@ import (
 
 // UAA authentication strategy
 //
-// Fields will be filled in based on Method used to construct strategy.
+// Fields will be filled in based on Builder used to construct strategy.
 //
-// When a UAA auth.Method (eg. UaaPasswordGrant()) is provided to credhub.New(),
+// When a UAA auth.Builder (eg. UaaPasswordGrant()) is provided to credhub.New(),
 // CredHub will use this Uaa.Do() to send authenticated requests to CredHub.
 type Uaa struct {
 	AccessToken  string
@@ -22,6 +22,10 @@ type Uaa struct {
 	ClientSecret string
 	ApiClient    HttpClient
 	UaaClient    UaaClient
+}
+
+type HttpClient interface {
+	Do(*http.Request) (*http.Response, error)
 }
 
 type UaaClient interface {

@@ -19,7 +19,7 @@ var _ = Describe("CredHub API Acceptance", func() {
 		var err error
 		ch, err = New("https://localhost:9000",
 			SkipTLSValidation(),
-			Auth(auth.UaaPasswordGrant("credhub_cli", "", "credhub", "password")))
+			AuthBuilder(auth.UaaPasswordGrant("credhub_cli", "", "credhub", "password")))
 
 		Expect(err).ToNot(HaveOccurred())
 	})

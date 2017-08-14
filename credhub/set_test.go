@@ -22,7 +22,7 @@ var _ = Describe("Set", func() {
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
 
-			ch, _ := New("https://example.com", Auth(authMethod(dummy)))
+			ch, _ := New("https://example.com", Auth(dummy))
 
 			certificate := values.Certificate{
 				Ca: "some-ca",
@@ -60,7 +60,7 @@ var _ = Describe("Set", func() {
 		}`)),
 				}}
 
-				ch, _ := New("https://example.com", Auth(authMethod(dummy)))
+				ch, _ := New("https://example.com", Auth(dummy))
 
 				certificate := values.Certificate{
 					Certificate: "some-cert",
@@ -77,7 +77,7 @@ var _ = Describe("Set", func() {
 		Context("when request fails", func() {
 			It("returns an error", func() {
 				dummy := &DummyAuth{Error: errors.New("Network error occurred")}
-				ch, _ := New("https://example.com", Auth(authMethod(dummy)))
+				ch, _ := New("https://example.com", Auth(dummy))
 				certificate := values.Certificate{
 					Ca: "some-ca",
 				}
@@ -92,7 +92,7 @@ var _ = Describe("Set", func() {
 				dummy := &DummyAuth{Response: &http.Response{
 					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
 				}}
-				ch, _ := New("https://example.com", Auth(authMethod(dummy)))
+				ch, _ := New("https://example.com", Auth(dummy))
 				certificate := values.Certificate{
 					Ca: "some-ca",
 				}
@@ -109,7 +109,7 @@ var _ = Describe("Set", func() {
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
 
-			ch, _ := New("https://example.com", Auth(authMethod(dummy)))
+			ch, _ := New("https://example.com", Auth(dummy))
 			password := values.Password("some-password")
 
 			ch.SetPassword("/example-password", password, false)
@@ -140,7 +140,7 @@ var _ = Describe("Set", func() {
 		}`)),
 				}}
 
-				ch, _ := New("https://example.com", Auth(authMethod(dummy)))
+				ch, _ := New("https://example.com", Auth(dummy))
 
 				password := values.Password("some-password")
 
@@ -156,7 +156,7 @@ var _ = Describe("Set", func() {
 		Context("when request fails", func() {
 			It("returns an error", func() {
 				dummy := &DummyAuth{Error: errors.New("Network error occurred")}
-				ch, _ := New("https://example.com", Auth(authMethod(dummy)))
+				ch, _ := New("https://example.com", Auth(dummy))
 				password := values.Password("some-password")
 
 				_, err := ch.SetPassword("/example-password", password, false)
@@ -171,7 +171,7 @@ var _ = Describe("Set", func() {
 					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
 				}}
 
-				ch, _ := New("https://example.com", Auth(authMethod(dummy)))
+				ch, _ := New("https://example.com", Auth(dummy))
 				password := values.Password("some-password")
 
 				_, err := ch.SetPassword("/example-password", password, false)

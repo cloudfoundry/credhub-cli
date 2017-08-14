@@ -15,7 +15,7 @@ func ExampleCredHub() {
 	// Use a CredHub server on "https://example.com" using UAA password grant
 
 	authOption := auth.UaaPasswordGrant("credhub_cli", "", "username", "password")
-	ch, err := credhub.New("https://example.com", credhub.SkipTLSValidation(), credhub.Auth(authOption))
+	ch, err := credhub.New("https://example.com", credhub.SkipTLSValidation(), credhub.AuthBuilder(authOption))
 
 	if err != nil {
 		panic("credhub client configured incorrectly: " + err.Error())
@@ -60,7 +60,7 @@ func ExampleNew() {
 	return
 
 	authOption := auth.UaaClientCredentialGrant("client-id", "client-secret")
-	ch, _ := credhub.New("https://example.com", credhub.SkipTLSValidation(), credhub.Auth(authOption))
+	ch, _ := credhub.New("https://example.com", credhub.SkipTLSValidation(), credhub.AuthBuilder(authOption))
 
 	fmt.Println("Connected to ", ch.ApiURL)
 }
@@ -95,7 +95,7 @@ func Example() {
 	authOption := auth.UaaPasswordGrant("credhub_cli", "", "username", "password")
 	ch, err := credhub.New("https://example.com",
 		credhub.CACerts([]string{"--- BEGIN ---\nroot-certificate\n--- END ---"}),
-		credhub.Auth(authOption))
+		credhub.AuthBuilder(authOption))
 
 	// We'll be working with a certificate stored at "/my-certificates/the-cert"
 	path := "/my-certificates/"

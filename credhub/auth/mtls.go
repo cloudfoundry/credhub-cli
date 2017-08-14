@@ -6,7 +6,7 @@ import (
 
 // Mutual TLS authentication strategy
 //
-// When a MutualTls auth.Method (eg. MutualTlsCertificate()) is provided to credhub.New(),
+// When a MutualTls auth.Builder (eg. MutualTlsCertificate()) is provided to credhub.New(),
 // CredHub will use this MutualTls.Do() to send authenticated requests to CredHub.
 type MutualTls struct {
 	Certificate string

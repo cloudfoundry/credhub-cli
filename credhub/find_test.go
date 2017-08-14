@@ -20,7 +20,7 @@ var _ = Describe("Find", func() {
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
 
-			ch, _ := New("https://example.com", Auth(authMethod(dummy)))
+			ch, _ := New("https://example.com", Auth(dummy))
 
 			ch.FindByPath("/some/example/path")
 			urlPath := dummy.Request.URL.Path
@@ -46,7 +46,7 @@ var _ = Describe("Find", func() {
 					Body: ioutil.NopCloser(bytes.NewBufferString(expectedResponse)),
 				}}
 
-				ch, _ := New("https://example.com", Auth(authMethod(dummy)))
+				ch, _ := New("https://example.com", Auth(dummy))
 
 				creds, err := ch.FindByPath("/some/example/path")
 
@@ -63,7 +63,7 @@ var _ = Describe("Find", func() {
 			It("returns an error", func() {
 				dummy := &DummyAuth{Error: errors.New("Network error occurred")}
 
-				ch, _ := New("https://example.com", Auth(authMethod(dummy)))
+				ch, _ := New("https://example.com", Auth(dummy))
 
 				_, err := ch.FindByPath("/some/example/path")
 
@@ -77,7 +77,7 @@ var _ = Describe("Find", func() {
 					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
 				}}
 
-				ch, _ := New("https://example.com", Auth(authMethod(dummy)))
+				ch, _ := New("https://example.com", Auth(dummy))
 
 				_, err := ch.FindByPath("/some/example/path")
 				Expect(err).To(HaveOccurred())
