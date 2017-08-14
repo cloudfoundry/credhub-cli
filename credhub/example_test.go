@@ -43,11 +43,11 @@ func ExampleCredHub() {
 		panic("not using uaa")
 	}
 
-	fmt.Println("Old access token: ", uaa.AccessToken)
+	fmt.Println("Old access token: ", uaa.AccessToken())
 
 	uaa.Refresh() // For demo purposes only, tokens will be automatically refreshed by auth.OAuthStrategy
 
-	fmt.Println("New access token:", uaa.AccessToken)
+	fmt.Println("New access token:", uaa.AccessToken())
 	// FIXME Output:
 	// CredHub server: https://example.com
 	// Auth server: https://uaa.example.com

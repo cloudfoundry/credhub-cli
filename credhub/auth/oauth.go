@@ -5,14 +5,18 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"sync"
 )
 
 // OAuth authentication strategy
 //
 // Fields will be filled in based on Builder used to construct strategy.
 type OAuthStrategy struct {
-	AccessToken  string
-	RefreshToken string
+	accessToken  string
+	refreshToken string
+
+	mu sync.RWMutex // guards AccessToken & Refresh Token
+
 	Username     string
 	Password     string
 	ClientId     string
@@ -38,7 +42,7 @@ type OAuthClient interface {
 func (a *OAuthStrategy) Do(req *http.Request) (*http.Response, error) {
 	a.Login()
 
-	req.Header.Set("Authorization", "Bearer "+a.AccessToken)
+	req.Header.Set("Authorization", "Bearer "+a.AccessToken())
 	resp, err := a.ApiClient.Do(req)
 
 	if err != nil {
@@ -49,7 +53,7 @@ func (a *OAuthStrategy) Do(req *http.Request) (*http.Response, error) {
 
 	if err == nil && expired {
 		a.Refresh()
-		req.Header.Set("Authorization", "Bearer "+a.AccessToken)
+		req.Header.Set("Authorization", "Bearer "+a.AccessToken())
 		resp, err = a.ApiClient.Do(req)
 	}
 
@@ -61,20 +65,18 @@ func (a *OAuthStrategy) Do(req *http.Request) (*http.Response, error) {
 // a refresh grant will be used.
 // Otherwise, client_credentials grant type will be used to retrieve a new access token.
 func (a *OAuthStrategy) Refresh() error {
-	if a.RefreshToken == "" {
-		a.AccessToken = ""
-
-		return a.Login()
+	refreshToken := a.RefreshToken()
+	if refreshToken == "" {
+		return a.requestToken()
 	}
 
-	accessToken, refreshToken, err := a.OAuthClient.RefreshTokenGrant(a.ClientId, a.ClientSecret, a.RefreshToken)
+	accessToken, refreshToken, err := a.OAuthClient.RefreshTokenGrant(a.ClientId, a.ClientSecret, refreshToken)
 
 	if err != nil {
 		return err
 	}
 
-	a.AccessToken = accessToken
-	a.RefreshToken = refreshToken
+	a.SetTokens(accessToken, refreshToken)
 
 	return nil
 }
@@ -93,10 +95,14 @@ func (a *OAuthStrategy) Logout() {
 //
 // Login will be a no-op if the AccessToken is not-empty when invoked.
 func (a *OAuthStrategy) Login() error {
-	if a.AccessToken != "" {
+	if a.AccessToken() != "" {
 		return nil
 	}
 
+	return a.requestToken()
+}
+
+func (a *OAuthStrategy) requestToken() error {
 	var accessToken string
 	var refreshToken string
 	var err error
@@ -111,10 +117,31 @@ func (a *OAuthStrategy) Login() error {
 		return err
 	}
 
-	a.AccessToken = accessToken
-	a.RefreshToken = refreshToken
+	a.SetTokens(accessToken, refreshToken)
 
 	return nil
+}
+
+func (a *OAuthStrategy) AccessToken() string {
+	a.mu.RLock()
+	defer a.mu.RUnlock()
+
+	return a.accessToken
+}
+
+func (a *OAuthStrategy) RefreshToken() string {
+	a.mu.RLock()
+	defer a.mu.RUnlock()
+
+	return a.refreshToken
+}
+
+func (a *OAuthStrategy) SetTokens(access, refresh string) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+
+	a.accessToken = access
+	a.refreshToken = refresh
 }
 
 func tokenExpired(resp *http.Response) (bool, error) {

@@ -7,7 +7,6 @@ import (
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/auth"
 )
 
-// TODO: Consider adding mutex to read/write tokens
 func ExampleOAuth() {
 	return
 
@@ -18,9 +17,9 @@ func ExampleOAuth() {
 		panic("Not using UAA")
 	}
 
-	fmt.Println("Before logging out: ", oauth.AccessToken)
+	fmt.Println("Before logging out: ", oauth.AccessToken())
 	oauth.Logout()
-	fmt.Println("After logging out: ", oauth.AccessToken)
+	fmt.Println("After logging out: ", oauth.AccessToken())
 	// FIXME Output:
 	// Before logging out: some-access-token
 	// After logging out:
