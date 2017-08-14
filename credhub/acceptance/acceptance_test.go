@@ -6,20 +6,19 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub/auth"
+	"github.com/cloudfoundry-incubator/credhub-cli/credhub/auth/uaa"
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials/generate"
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials/values"
 )
 
 var _ = Describe("CredHub API Acceptance", func() {
-
 	var ch *CredHub
 
 	BeforeEach(func() {
 		var err error
 		ch, err = New("https://localhost:9000",
 			SkipTLSValidation(),
-			AuthBuilder(auth.UaaPasswordGrant("credhub_cli", "", "credhub", "password")))
+			AuthBuilder(uaa.PasswordGrantBuilder("credhub_cli", "", "credhub", "password")))
 
 		Expect(err).ToNot(HaveOccurred())
 	})

@@ -7,6 +7,7 @@ import (
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub"
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/auth"
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials/generate"
+	"github.com/cloudfoundry-incubator/credhub-cli/credhub/auth/uaa"
 )
 
 func ExampleCredHub() {
@@ -14,7 +15,7 @@ func ExampleCredHub() {
 
 	// Use a CredHub server on "https://example.com" using UAA password grant
 
-	authOption := auth.UaaPasswordGrant("credhub_cli", "", "username", "password")
+	authOption := uaa.PasswordGrantBuilder("credhub_cli", "", "username", "password")
 	ch, err := credhub.New("https://example.com", credhub.SkipTLSValidation(), credhub.AuthBuilder(authOption))
 
 	if err != nil {
@@ -59,7 +60,7 @@ func ExampleCredHub() {
 func ExampleNew() {
 	return
 
-	authOption := auth.UaaClientCredentialGrant("client-id", "client-secret")
+	authOption := uaa.ClientCredentialsGrantBuilder("client-id", "client-secret")
 	ch, _ := credhub.New("https://example.com", credhub.SkipTLSValidation(), credhub.AuthBuilder(authOption))
 
 	fmt.Println("Connected to ", ch.ApiURL)
@@ -92,7 +93,7 @@ func Example() {
 	return
 
 	// CredHub server at https://example.com, using UAA Password grant
-	authOption := auth.UaaPasswordGrant("credhub_cli", "", "username", "password")
+	authOption := uaa.PasswordGrantBuilder("credhub_cli", "", "username", "password")
 	ch, err := credhub.New("https://example.com",
 		credhub.CACerts([]string{"--- BEGIN ---\nroot-certificate\n--- END ---"}),
 		credhub.AuthBuilder(authOption))
