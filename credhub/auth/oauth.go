@@ -40,7 +40,9 @@ type OAuthClient interface {
 //
 // Will automatically refresh the access token and retry the request if the token has expired.
 func (a *OAuthStrategy) Do(req *http.Request) (*http.Response, error) {
-	a.Login()
+	if err := a.Login(); err != nil {
+		return nil, err
+	}
 
 	req.Header.Set("Authorization", "Bearer "+a.AccessToken())
 	resp, err := a.ApiClient.Do(req)
@@ -51,13 +53,16 @@ func (a *OAuthStrategy) Do(req *http.Request) (*http.Response, error) {
 
 	expired, err := tokenExpired(resp)
 
-	if err == nil && expired {
-		a.Refresh()
-		req.Header.Set("Authorization", "Bearer "+a.AccessToken())
-		resp, err = a.ApiClient.Do(req)
+	if err != nil || !expired {
+		return resp, err
 	}
 
-	return resp, err
+	if err := a.Refresh(); err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("Authorization", "Bearer "+a.AccessToken())
+	return a.ApiClient.Do(req)
 }
 
 // Refresh the access token

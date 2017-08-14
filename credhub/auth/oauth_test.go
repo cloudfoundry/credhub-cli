@@ -57,7 +57,7 @@ var _ = Describe("OAuthStrategy", func() {
 
 				dc := &DummyClient{Response: &http.Response{}, Error: nil}
 
-				uaa := auth.OAuthStrategy{
+				oauth := auth.OAuthStrategy{
 					OAuthClient:  mockUaaClient,
 					ApiClient:    dc,
 					ClientId:     "client-id",
@@ -68,12 +68,30 @@ var _ = Describe("OAuthStrategy", func() {
 
 				request, _ := http.NewRequest("GET", "https://some-endpoint.com/path/", nil)
 
-				uaa.Do(request)
+				oauth.Do(request)
 
 				Expect(dc.Request.Header.Get("Authorization")).To(Equal("Bearer new-access-token"))
-				Expect(uaa.AccessToken()).To(Equal("new-access-token"))
-				Expect(uaa.RefreshToken()).To(Equal("new-refresh-token"))
+				Expect(oauth.AccessToken()).To(Equal("new-access-token"))
+				Expect(oauth.RefreshToken()).To(Equal("new-refresh-token"))
 			})
+
+			Context("when fetching token fails", func() {
+				It("returns an error", func() {
+					mockUaaClient.Error = errors.New("failed to login")
+					oauth := auth.OAuthStrategy{
+						OAuthClient:  mockUaaClient,
+						ClientId:     "client-id",
+						ClientSecret: "client-secret",
+						Username:     "user-name",
+						Password:     "user-password",
+					}
+					request, _ := http.NewRequest("GET", "https://some-endpoint.com/path/", nil)
+
+					_, err := oauth.Do(request)
+					Expect(err).To(MatchError("failed to login"))
+				})
+			})
+
 		})
 
 		Context("when the access token has expired", func() {
@@ -116,6 +134,31 @@ var _ = Describe("OAuthStrategy", func() {
 
 				Expect(err).ToNot(HaveOccurred())
 				Expect(string(body)).To(Equal("Success!"))
+			})
+
+			Context("when refreshing token fails", func() {
+				It("returns an error", func() {
+					mockUaaClient.Error = errors.New("failed to refresh")
+					fhc := &authfakes.FakeHttpClient{}
+					fhc.DoReturns(&http.Response{
+						StatusCode: 573,
+						Body:       ioutil.NopCloser(strings.NewReader(`{"error": "access_token_expired"}`)),
+					}, nil)
+					oauth := auth.OAuthStrategy{
+						OAuthClient:  mockUaaClient,
+						ApiClient:    fhc,
+						ClientId:     "client-id",
+						ClientSecret: "client-secret",
+						Username:     "user-name",
+						Password:     "user-password",
+					}
+					oauth.SetTokens("some-access-token", "some-refresh-token")
+					request, _ := http.NewRequest("GET", "https://some-endpoint.com/path/", nil)
+
+					_, err := oauth.Do(request)
+
+					Expect(err).To(MatchError("failed to refresh"))
+				})
 			})
 		})
 
