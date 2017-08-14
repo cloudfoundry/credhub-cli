@@ -15,11 +15,11 @@ import (
 
 var _ = Describe("Uaa", func() {
 	var (
-		dummyUaa *dummyUaaClient
+		mockUaaClient *dummyUaaClient
 	)
 
 	BeforeEach(func() {
-		dummyUaa = &dummyUaaClient{}
+		mockUaaClient = &dummyUaaClient{}
 	})
 
 	Context("Do()", func() {
@@ -32,7 +32,7 @@ var _ = Describe("Uaa", func() {
 			uaa := auth.Uaa{
 				AccessToken: "some-access-token",
 				ApiClient:   dc,
-				UaaClient:   dummyUaa,
+				UaaClient:   mockUaaClient,
 			}
 
 			request, _ := http.NewRequest("GET", "https://some-endpoint.com/path/", nil)
@@ -51,13 +51,13 @@ var _ = Describe("Uaa", func() {
 
 		Context("when there is no access token", func() {
 			It("should request an access token", func() {
-				dummyUaa.NewAccessToken = "new-access-token"
-				dummyUaa.NewRefreshToken = "new-refresh-token"
+				mockUaaClient.NewAccessToken = "new-access-token"
+				mockUaaClient.NewRefreshToken = "new-refresh-token"
 
 				dc := &DummyClient{Response: &http.Response{}, Error: nil}
 
 				uaa := auth.Uaa{
-					UaaClient:    dummyUaa,
+					UaaClient:    mockUaaClient,
 					ApiClient:    dc,
 					ClientId:     "client-id",
 					ClientSecret: "client-secret",
@@ -89,8 +89,8 @@ var _ = Describe("Uaa", func() {
 					return resp, nil
 				}
 
-				dummyUaa.NewAccessToken = "new-access-token"
-				dummyUaa.NewRefreshToken = "new-refresh-token"
+				mockUaaClient.NewAccessToken = "new-access-token"
+				mockUaaClient.NewRefreshToken = "new-refresh-token"
 
 				uaa := auth.Uaa{
 					AccessToken:  "old-access-token",
@@ -98,7 +98,7 @@ var _ = Describe("Uaa", func() {
 					ClientId:     "client-id",
 					ClientSecret: "client-secret",
 					ApiClient:    fhc,
-					UaaClient:    dummyUaa,
+					UaaClient:    mockUaaClient,
 				}
 
 				request, _ := http.NewRequest("GET", "https://some-endpoint.com/path/", nil)
@@ -107,9 +107,9 @@ var _ = Describe("Uaa", func() {
 
 				Expect(err).ToNot(HaveOccurred())
 
-				Expect(dummyUaa.ClientId).To(Equal("client-id"))
-				Expect(dummyUaa.ClientSecret).To(Equal("client-secret"))
-				Expect(dummyUaa.RefreshToken).To(Equal("old-refresh-token"))
+				Expect(mockUaaClient.ClientId).To(Equal("client-id"))
+				Expect(mockUaaClient.ClientSecret).To(Equal("client-secret"))
+				Expect(mockUaaClient.RefreshToken).To(Equal("old-refresh-token"))
 
 				body, err := ioutil.ReadAll(response.Body)
 
@@ -134,7 +134,7 @@ var _ = Describe("Uaa", func() {
 					ClientId:     "client-id",
 					ClientSecret: "client-secret",
 					ApiClient:    fhc,
-					UaaClient:    dummyUaa,
+					UaaClient:    mockUaaClient,
 				}
 
 				request, _ := http.NewRequest("GET", "https://some-endpoint.com/path/", nil)
@@ -154,8 +154,8 @@ var _ = Describe("Uaa", func() {
 
 	Context("Refresh()", func() {
 		BeforeEach(func() {
-			dummyUaa.NewAccessToken = "new-access-token"
-			dummyUaa.NewRefreshToken = "new-refresh-token"
+			mockUaaClient.NewAccessToken = "new-access-token"
+			mockUaaClient.NewRefreshToken = "new-refresh-token"
 		})
 
 		Context("with a refresh token", func() {
@@ -164,17 +164,35 @@ var _ = Describe("Uaa", func() {
 					ClientId:     "client-id",
 					ClientSecret: "client-secret",
 					RefreshToken: "some-refresh-token",
-					UaaClient:    dummyUaa,
+					UaaClient:    mockUaaClient,
 				}
 
 				uaa.Refresh()
 
-				Expect(dummyUaa.ClientId).To(Equal("client-id"))
-				Expect(dummyUaa.ClientSecret).To(Equal("client-secret"))
-				Expect(dummyUaa.RefreshToken).To(Equal("some-refresh-token"))
+				Expect(mockUaaClient.ClientId).To(Equal("client-id"))
+				Expect(mockUaaClient.ClientSecret).To(Equal("client-secret"))
+				Expect(mockUaaClient.RefreshToken).To(Equal("some-refresh-token"))
 
 				Expect(uaa.AccessToken).To(Equal("new-access-token"))
 				Expect(uaa.RefreshToken).To(Equal("new-refresh-token"))
+			})
+
+			Context("when the refresh token grant fails", func() {
+				It("returns an error", func() {
+					mockUaaClient.Error = errors.New("refresh token grant failed")
+
+					uaa := auth.Uaa{
+						ClientId:     "client-id",
+						ClientSecret: "client-secret",
+						RefreshToken: "some-refresh-token",
+						UaaClient:    mockUaaClient,
+					}
+
+					err := uaa.Refresh()
+
+					Expect(err).To(MatchError("refresh token grant failed"))
+
+				})
 			})
 		})
 
@@ -186,46 +204,78 @@ var _ = Describe("Uaa", func() {
 						ClientSecret: "client-secret",
 						Username:     "user-name",
 						Password:     "user-password",
-						UaaClient:    dummyUaa,
+						UaaClient:    mockUaaClient,
 					}
 
 					uaa.Refresh()
 
-					Expect(dummyUaa.ClientId).To(Equal("client-id"))
-					Expect(dummyUaa.ClientSecret).To(Equal("client-secret"))
-					Expect(dummyUaa.Username).To(Equal("user-name"))
-					Expect(dummyUaa.Password).To(Equal("user-password"))
+					Expect(mockUaaClient.ClientId).To(Equal("client-id"))
+					Expect(mockUaaClient.ClientSecret).To(Equal("client-secret"))
+					Expect(mockUaaClient.Username).To(Equal("user-name"))
+					Expect(mockUaaClient.Password).To(Equal("user-password"))
 
 					Expect(uaa.AccessToken).To(Equal("new-access-token"))
 					Expect(uaa.RefreshToken).To(Equal("new-refresh-token"))
 				})
 
-			})
+				It("when performing the password grant returns an error", func() {
+					mockUaaClient.Error = errors.New("password grant error")
 
-			Context("with client credentials", func() {
-				It("should make a password grant request", func() {
 					uaa := auth.Uaa{
 						ClientId:     "client-id",
 						ClientSecret: "client-secret",
-						UaaClient:    dummyUaa,
+						Username:     "user-name",
+						Password:     "user-password",
+						UaaClient:    mockUaaClient,
+					}
+
+					err := uaa.Refresh()
+					Expect(err).To(MatchError("password grant error"))
+				})
+			})
+
+			Context("with client credentials", func() {
+				It("should make a client credentials grant request", func() {
+					uaa := auth.Uaa{
+						ClientId:     "client-id",
+						ClientSecret: "client-secret",
+						UaaClient:    mockUaaClient,
 					}
 
 					uaa.Refresh()
 
-					Expect(dummyUaa.ClientId).To(Equal("client-id"))
-					Expect(dummyUaa.ClientSecret).To(Equal("client-secret"))
+					Expect(mockUaaClient.ClientId).To(Equal("client-id"))
+					Expect(mockUaaClient.ClientSecret).To(Equal("client-secret"))
 
 					Expect(uaa.AccessToken).To(Equal("new-access-token"))
 					Expect(uaa.RefreshToken).To(BeEmpty())
 				})
+
+				Context("when the client credentials grant fails", func() {
+					It("returns an error", func() {
+						mockUaaClient.Error = errors.New("client credentials grant failed")
+
+						uaa := auth.Uaa{
+							ClientId:     "client-id",
+							ClientSecret: "client-secret",
+							UaaClient:    mockUaaClient,
+						}
+
+						err := uaa.Refresh()
+
+						Expect(err).To(MatchError("client credentials grant failed"))
+
+					})
+				})
+
 			})
 		})
 	})
 
 	Context("Login()", func() {
 		BeforeEach(func() {
-			dummyUaa.NewAccessToken = "new-access-token"
-			dummyUaa.NewRefreshToken = "new-refresh-token"
+			mockUaaClient.NewAccessToken = "new-access-token"
+			mockUaaClient.NewRefreshToken = "new-refresh-token"
 		})
 
 		Context("when there is already an access token", func() {
@@ -247,37 +297,71 @@ var _ = Describe("Uaa", func() {
 					ClientSecret: "client-secret",
 					Username:     "user-name",
 					Password:     "user-password",
-					UaaClient:    dummyUaa,
+					UaaClient:    mockUaaClient,
 				}
 
 				uaa.Refresh()
 
-				Expect(dummyUaa.ClientId).To(Equal("client-id"))
-				Expect(dummyUaa.ClientSecret).To(Equal("client-secret"))
-				Expect(dummyUaa.Username).To(Equal("user-name"))
-				Expect(dummyUaa.Password).To(Equal("user-password"))
+				Expect(mockUaaClient.ClientId).To(Equal("client-id"))
+				Expect(mockUaaClient.ClientSecret).To(Equal("client-secret"))
+				Expect(mockUaaClient.Username).To(Equal("user-name"))
+				Expect(mockUaaClient.Password).To(Equal("user-password"))
 
 				Expect(uaa.AccessToken).To(Equal("new-access-token"))
 				Expect(uaa.RefreshToken).To(Equal("new-refresh-token"))
 			})
 
+			Context("when the refresh token grant fails", func() {
+				It("returns an error", func() {
+					mockUaaClient.Error = errors.New("refresh token grant failed")
+
+					uaa := auth.Uaa{
+						ClientId:     "client-id",
+						ClientSecret: "client-secret",
+						RefreshToken: "some-refresh-token",
+						UaaClient:    mockUaaClient,
+					}
+
+					err := uaa.Refresh()
+
+					Expect(err).To(MatchError("refresh token grant failed"))
+
+				})
+			})
 		})
 
 		Context("with client credentials", func() {
-			It("should make a password grant request", func() {
+			It("should make a client credentials grant request", func() {
 				uaa := auth.Uaa{
 					ClientId:     "client-id",
 					ClientSecret: "client-secret",
-					UaaClient:    dummyUaa,
+					UaaClient:    mockUaaClient,
 				}
 
 				uaa.Refresh()
 
-				Expect(dummyUaa.ClientId).To(Equal("client-id"))
-				Expect(dummyUaa.ClientSecret).To(Equal("client-secret"))
+				Expect(mockUaaClient.ClientId).To(Equal("client-id"))
+				Expect(mockUaaClient.ClientSecret).To(Equal("client-secret"))
 
 				Expect(uaa.AccessToken).To(Equal("new-access-token"))
 				Expect(uaa.RefreshToken).To(BeEmpty())
+			})
+
+			Context("when the client credentials grant fails", func() {
+				It("returns an error", func() {
+					mockUaaClient.Error = errors.New("client credentials grant failed")
+
+					uaa := auth.Uaa{
+						ClientId:     "client-id",
+						ClientSecret: "client-secret",
+						UaaClient:    mockUaaClient,
+					}
+
+					err := uaa.Refresh()
+
+					Expect(err).To(MatchError("client credentials grant failed"))
+
+				})
 			})
 		})
 	})

@@ -96,7 +96,11 @@ func (a *Uaa) Refresh() error {
 		return a.Login()
 	}
 
-	accessToken, refreshToken, _ := a.UaaClient.RefreshTokenGrant(a.ClientId, a.ClientSecret, a.RefreshToken)
+	accessToken, refreshToken, err := a.UaaClient.RefreshTokenGrant(a.ClientId, a.ClientSecret, a.RefreshToken)
+
+	if err != nil {
+		return err
+	}
 
 	a.AccessToken = accessToken
 	a.RefreshToken = refreshToken
@@ -124,11 +128,16 @@ func (a *Uaa) Login() error {
 
 	var accessToken string
 	var refreshToken string
+	var err error
 
 	if a.Username == "" {
-		accessToken, _ = a.UaaClient.ClientCredentialGrant(a.ClientId, a.ClientSecret)
+		accessToken, err = a.UaaClient.ClientCredentialGrant(a.ClientId, a.ClientSecret)
 	} else {
-		accessToken, refreshToken, _ = a.UaaClient.PasswordGrant(a.ClientId, a.ClientSecret, a.Username, a.Password)
+		accessToken, refreshToken, err = a.UaaClient.PasswordGrant(a.ClientId, a.ClientSecret, a.Username, a.Password)
+	}
+
+	if err != nil {
+		return err
 	}
 
 	a.AccessToken = accessToken
