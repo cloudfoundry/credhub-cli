@@ -1,7 +1,9 @@
 package auth
 
 import (
+	"bytes"
 	"encoding/json"
+	"io/ioutil"
 	"net/http"
 )
 
@@ -38,9 +40,14 @@ func (a *Uaa) Do(req *http.Request) (*http.Response, error) {
 	req.Header.Set("Authorization", "Bearer "+a.AccessToken)
 	resp, err := a.ApiClient.Do(req)
 
-	if err == nil && tokenExpired(resp) {
-		a.Refresh()
+	if err != nil {
+		return resp, err
+	}
 
+	expired, err := tokenExpired(resp)
+
+	if err == nil && expired {
+		a.Refresh()
 		req.Header.Set("Authorization", "Bearer "+a.AccessToken)
 		resp, err = a.ApiClient.Do(req)
 	}
@@ -48,20 +55,30 @@ func (a *Uaa) Do(req *http.Request) (*http.Response, error) {
 	return resp, err
 }
 
-func tokenExpired(resp *http.Response) bool {
+func tokenExpired(resp *http.Response) (bool, error) {
 	if resp.StatusCode < 400 {
-		return false
+		return false, nil
 	}
 
 	var errResp map[string]string
+	buf, err := ioutil.ReadAll(resp.Body)
 
-	decoder := json.NewDecoder(resp.Body)
-	err := decoder.Decode(&errResp)
 	if err != nil {
-		return false
+		return false, err
 	}
 
-	return errResp["error"] == "access_token_expired"
+	resp.Body = ioutil.NopCloser(bytes.NewBuffer(buf))
+
+	decoder := json.NewDecoder(bytes.NewBuffer(buf))
+	err = decoder.Decode(&errResp)
+
+	if err != nil {
+		// Since we fail to decode the error response
+		// we cannot ensure that the token is invalid
+		return false, nil
+	}
+
+	return errResp["error"] == "access_token_expired", nil
 }
 
 // Refresh the access token

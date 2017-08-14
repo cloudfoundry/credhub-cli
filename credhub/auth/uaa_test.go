@@ -24,7 +24,7 @@ var _ = Describe("Uaa", func() {
 
 	Context("Do()", func() {
 		It("should add the bearer token to the request header", func() {
-			expectedResponse := &http.Response{StatusCode: 539}
+			expectedResponse := &http.Response{StatusCode: 539, Body: ioutil.NopCloser(strings.NewReader(""))}
 			expectedError := errors.New("some error")
 
 			dc := &DummyClient{Response: expectedResponse, Error: expectedError}
@@ -117,6 +117,39 @@ var _ = Describe("Uaa", func() {
 				Expect(string(body)).To(Equal("Success!"))
 			})
 		})
+
+		Context("when a non-auth error has occurred", func() {
+			It("should forward the response untouched", func() {
+				fhc := &authfakes.FakeHttpClient{}
+				fhc.DoStub = func(req *http.Request) (*http.Response, error) {
+					resp := &http.Response{}
+					resp.StatusCode = 573
+					resp.Body = ioutil.NopCloser(strings.NewReader(`{"error": "some other error"}`))
+					return resp, nil
+				}
+
+				uaa := auth.Uaa{
+					AccessToken:  "old-access-token",
+					RefreshToken: "old-refresh-token",
+					ClientId:     "client-id",
+					ClientSecret: "client-secret",
+					ApiClient:    fhc,
+					UaaClient:    dummyUaa,
+				}
+
+				request, _ := http.NewRequest("GET", "https://some-endpoint.com/path/", nil)
+
+				response, err := uaa.Do(request)
+
+				Expect(err).ToNot(HaveOccurred())
+
+				body, err := ioutil.ReadAll(response.Body)
+
+				Expect(err).ToNot(HaveOccurred())
+				Expect(body).To(MatchJSON(`{"error": "some other error"}`))
+			})
+		})
+
 	})
 
 	Context("Refresh()", func() {
