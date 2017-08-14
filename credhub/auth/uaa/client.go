@@ -13,6 +13,12 @@ type Client struct {
 	Client  *http.Client
 }
 
+type token struct {
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
+	TokenType    string `json:"token_type"`
+}
+
 // ClientCredentialGrant requests a token using client credential grant
 func (u *Client) ClientCredentialGrant(clientId, clientSecret string) (string, error) {
 	values := url.Values{
@@ -22,9 +28,9 @@ func (u *Client) ClientCredentialGrant(clientId, clientSecret string) (string, e
 		"client_secret": {clientSecret},
 	}
 
-	token, _ := u.TokenGrantRequest(values)
+	token, err := u.tokenGrantRequest(values)
 
-	return token.AccessToken, nil
+	return token.AccessToken, err
 }
 
 // ClientCredentialGrant requests an access token and refresh token using password grant
@@ -38,9 +44,9 @@ func (u *Client) PasswordGrant(clientId, clientSecret, username, password string
 		"client_secret": {clientSecret},
 	}
 
-	token, _ := u.TokenGrantRequest(values)
+	token, err := u.tokenGrantRequest(values)
 
-	return token.AccessToken, token.RefreshToken, nil
+	return token.AccessToken, token.RefreshToken, err
 }
 
 // RefreshTokenGrant requests a new access token and refresh token using refresh token grant
@@ -53,24 +59,31 @@ func (u *Client) RefreshTokenGrant(clientId, clientSecret, refreshToken string) 
 		"refresh_token": {refreshToken},
 	}
 
-	token, _ := u.TokenGrantRequest(values)
+	token, err := u.tokenGrantRequest(values)
 
-	return token.AccessToken, token.RefreshToken, nil
+	return token.AccessToken, token.RefreshToken, err
 }
 
 // TokenGrantRequest requests a new token with the given request headers
-func (u *Client) TokenGrantRequest(headers url.Values) (Token, error) {
+func (u *Client) tokenGrantRequest(headers url.Values) (token, error) {
 	request, _ := http.NewRequest("POST", u.AuthUrl+"/oauth/token", bytes.NewBufferString(headers.Encode()))
 	request.Header.Add("Accept", "application/json")
 	request.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
-	response, _ := u.Client.Do(request)
+	response, err := u.Client.Do(request)
 
-	var token Token
+	var t token
+
+	if err != nil {
+		return t, err
+	}
+
+	defer response.Body.Close()
+
 	decoder := json.NewDecoder(response.Body)
-	_ = decoder.Decode(&token)
+	err = decoder.Decode(&t)
 
-	return token, nil
+	return t, err
 }
 
 // RevokeToken revokes the given access token

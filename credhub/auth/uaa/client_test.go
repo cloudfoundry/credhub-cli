@@ -7,6 +7,7 @@ import (
 	. "github.com/cloudfoundry-incubator/credhub-cli/credhub/auth/uaa"
 
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 )
 
@@ -40,7 +41,7 @@ var _ = Describe("Client", func() {
 
 			accessToken, err := client.ClientCredentialGrant("client-id", "client-secret")
 
-			Expect(err).To(BeNil())
+			Expect(err).ToNot(HaveOccurred())
 			Expect(accessToken).To(Equal("access-token"))
 		})
 	})
@@ -119,4 +120,69 @@ var _ = Describe("Client", func() {
 			Expect(refreshToken).To(Equal("new-refresh-token"))
 		})
 	})
+
+	DescribeTable("unable to complete the request",
+		func(performAction func(*Client) error) {
+			uaaServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				// Kill the connection without returning a status code
+				hj, _ := w.(http.Hijacker)
+				conn, _, _ := hj.Hijack()
+				conn.Close()
+			}))
+
+			defer uaaServer.Close()
+
+			client := &Client{
+				AuthUrl: uaaServer.URL,
+				Client:  http.DefaultClient,
+			}
+
+			err := performAction(client)
+
+			Expect(err).To(HaveOccurred())
+		},
+		Entry("client credentials", func(c *Client) error {
+			_, err := c.ClientCredentialGrant("client-id", "client-secret")
+			return err
+		}),
+		Entry("password grant", func(c *Client) error {
+			_, _, err := c.PasswordGrant("some-client-id", "some-client-secret", "username", "password")
+			return err
+		}),
+		Entry("refresh token grant", func(c *Client) error {
+			_, _, err := c.RefreshTokenGrant("client-id", "client-secret", "some-refresh-token")
+			return err
+		}),
+	)
+
+	DescribeTable("response body is invalid",
+		func(performAction func(*Client) error) {
+			uaaServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Write([]byte(`{`))
+			}))
+
+			defer uaaServer.Close()
+
+			client := &Client{
+				AuthUrl: uaaServer.URL,
+				Client:  http.DefaultClient,
+			}
+
+			err := performAction(client)
+			Expect(err).To(HaveOccurred())
+		},
+
+		Entry("client credentials", func(c *Client) error {
+			_, err := c.ClientCredentialGrant("client-id", "client-secret")
+			return err
+		}),
+		Entry("password grant", func(c *Client) error {
+			_, _, err := c.PasswordGrant("some-client-id", "some-client-secret", "username", "password")
+			return err
+		}),
+		Entry("refresh token grant", func(c *Client) error {
+			_, _, err := c.RefreshTokenGrant("client-id", "client-secret", "some-refresh-token")
+			return err
+		}),
+	)
 })
