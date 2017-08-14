@@ -13,10 +13,6 @@ import (
 )
 
 var _ = Describe("Get", func() {
-	config := Config{
-		ApiUrl:             "http://example.com",
-		InsecureSkipVerify: true,
-	}
 
 	Describe("Get()", func() {
 		It("requests the credential by name", func() {
@@ -24,7 +20,7 @@ var _ = Describe("Get", func() {
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
 
-			ch := credhubWithAuth(config, dummy)
+			ch, _ := New("https://example.com", Auth(authMethod(dummy)))
 
 			ch.Get("/example-password")
 			urlPath := dummy.Request.URL.Path
@@ -45,7 +41,7 @@ var _ = Describe("Get", func() {
 					Body: ioutil.NopCloser(bytes.NewBufferString(responseString)),
 				}}
 
-				ch := credhubWithAuth(config, dummy)
+				ch, _ := New("https://example.com", Auth(authMethod(dummy)))
 
 				cred, err := ch.Get("/example-password")
 				Expect(err).To(BeNil())
@@ -60,7 +56,7 @@ var _ = Describe("Get", func() {
 		Context("when request fails", func() {
 			It("returns an error", func() {
 				dummy := &DummyAuth{Error: errors.New("Network error occurred")}
-				ch := credhubWithAuth(config, dummy)
+				ch, _ := New("https://example.com", Auth(authMethod(dummy)))
 				_, err := ch.Get("/example-password")
 				Expect(err).To(HaveOccurred())
 			})
@@ -72,7 +68,7 @@ var _ = Describe("Get", func() {
 					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
 				}}
 
-				ch := credhubWithAuth(config, dummy)
+				ch, _ := New("https://example.com", Auth(authMethod(dummy)))
 				_, err := ch.Get("/example-password")
 
 				Expect(err).To(HaveOccurred())
@@ -86,7 +82,7 @@ var _ = Describe("Get", func() {
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
 
-			ch := credhubWithAuth(config, dummy)
+			ch, _ := New("https://example.com", Auth(authMethod(dummy)))
 			ch.GetPassword("/example-password")
 			urlPath := dummy.Request.URL.Path
 			Expect(urlPath).To(Equal("/api/v1/data?name=/example-password"))
@@ -106,7 +102,7 @@ var _ = Describe("Get", func() {
 					Body: ioutil.NopCloser(bytes.NewBufferString(responseString)),
 				}}
 
-				ch := credhubWithAuth(config, dummy)
+				ch, _ := New("https://example.com", Auth(authMethod(dummy)))
 				cred, err := ch.GetPassword("/example-password")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(cred.Value).To(BeEquivalentTo("some-password"))
@@ -117,7 +113,7 @@ var _ = Describe("Get", func() {
 			It("returns an error", func() {
 				networkError := errors.New("Network error occurred")
 				dummy := &DummyAuth{Error: networkError}
-				ch := credhubWithAuth(config, dummy)
+				ch, _ := New("https://example.com", Auth(authMethod(dummy)))
 				_, err := ch.GetPassword("/example-password")
 
 				Expect(err).To(Equal(networkError))
@@ -129,7 +125,7 @@ var _ = Describe("Get", func() {
 				dummy := &DummyAuth{Response: &http.Response{
 					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
 				}}
-				ch := credhubWithAuth(config, dummy)
+				ch, _ := New("https://example.com", Auth(authMethod(dummy)))
 				_, err := ch.GetPassword("/example-cred")
 
 				Expect(err).To(HaveOccurred())
@@ -143,7 +139,7 @@ var _ = Describe("Get", func() {
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
 
-			ch := credhubWithAuth(config, dummy)
+			ch, _ := New("https://example.com", Auth(authMethod(dummy)))
 			ch.GetCertificate("/example-certificate")
 			urlPath := dummy.Request.URL.Path
 			Expect(urlPath).To(Equal("/api/v1/data?name=/example-certificate"))
@@ -167,7 +163,7 @@ var _ = Describe("Get", func() {
 					Body: ioutil.NopCloser(bytes.NewBufferString(responseString)),
 				}}
 
-				ch := credhubWithAuth(config, dummy)
+				ch, _ := New("https://example.com", Auth(authMethod(dummy)))
 
 				cred, err := ch.GetCertificate("/example-certificate")
 				Expect(err).ToNot(HaveOccurred())
@@ -182,7 +178,7 @@ var _ = Describe("Get", func() {
 			It("returns an error", func() {
 				networkError := errors.New("Network error occurred")
 				dummy := &DummyAuth{Error: networkError}
-				ch := credhubWithAuth(config, dummy)
+				ch, _ := New("https://example.com", Auth(authMethod(dummy)))
 				_, err := ch.GetCertificate("/example-certificate")
 				Expect(err).To(Equal(networkError))
 			})
@@ -193,7 +189,7 @@ var _ = Describe("Get", func() {
 				dummy := &DummyAuth{Response: &http.Response{
 					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
 				}}
-				ch := credhubWithAuth(config, dummy)
+				ch, _ := New("https://example.com", Auth(authMethod(dummy)))
 				_, err := ch.GetCertificate("/example-cred")
 
 				Expect(err).To(HaveOccurred())

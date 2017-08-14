@@ -16,18 +16,13 @@ import (
 
 var _ = Describe("Set", func() {
 
-	config := Config{
-		ApiUrl:             "http://example.com",
-		InsecureSkipVerify: true,
-	}
-
 	Describe("SetCertificate()", func() {
 		It("requests to set the certificate", func() {
 			dummy := &DummyAuth{Response: &http.Response{
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
 
-			ch := credhubWithAuth(config, dummy)
+			ch, _ := New("https://example.com", Auth(authMethod(dummy)))
 
 			certificate := values.Certificate{
 				Ca: "some-ca",
@@ -65,7 +60,7 @@ var _ = Describe("Set", func() {
 		}`)),
 				}}
 
-				ch := credhubWithAuth(config, dummy)
+				ch, _ := New("https://example.com", Auth(authMethod(dummy)))
 
 				certificate := values.Certificate{
 					Certificate: "some-cert",
@@ -82,7 +77,7 @@ var _ = Describe("Set", func() {
 		Context("when request fails", func() {
 			It("returns an error", func() {
 				dummy := &DummyAuth{Error: errors.New("Network error occurred")}
-				ch := credhubWithAuth(config, dummy)
+				ch, _ := New("https://example.com", Auth(authMethod(dummy)))
 				certificate := values.Certificate{
 					Ca: "some-ca",
 				}
@@ -97,7 +92,7 @@ var _ = Describe("Set", func() {
 				dummy := &DummyAuth{Response: &http.Response{
 					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
 				}}
-				ch := credhubWithAuth(config, dummy)
+				ch, _ := New("https://example.com", Auth(authMethod(dummy)))
 				certificate := values.Certificate{
 					Ca: "some-ca",
 				}
@@ -114,7 +109,7 @@ var _ = Describe("Set", func() {
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
 
-			ch := credhubWithAuth(config, dummy)
+			ch, _ := New("https://example.com", Auth(authMethod(dummy)))
 			password := values.Password("some-password")
 
 			ch.SetPassword("/example-password", password, false)
@@ -145,7 +140,7 @@ var _ = Describe("Set", func() {
 		}`)),
 				}}
 
-				ch := credhubWithAuth(config, dummy)
+				ch, _ := New("https://example.com", Auth(authMethod(dummy)))
 
 				password := values.Password("some-password")
 
@@ -161,7 +156,7 @@ var _ = Describe("Set", func() {
 		Context("when request fails", func() {
 			It("returns an error", func() {
 				dummy := &DummyAuth{Error: errors.New("Network error occurred")}
-				ch := credhubWithAuth(config, dummy)
+				ch, _ := New("https://example.com", Auth(authMethod(dummy)))
 				password := values.Password("some-password")
 
 				_, err := ch.SetPassword("/example-password", password, false)
@@ -176,7 +171,7 @@ var _ = Describe("Set", func() {
 					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
 				}}
 
-				ch := credhubWithAuth(config, dummy)
+				ch, _ := New("https://example.com", Auth(authMethod(dummy)))
 				password := values.Password("some-password")
 
 				_, err := ch.SetPassword("/example-password", password, false)

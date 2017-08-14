@@ -30,7 +30,7 @@ var _ = Describe("Info()", func() {
 
 		defer testServer.Close()
 
-		ch := credhubFromConfig(Config{ApiUrl: testServer.URL})
+		ch, _ := New(testServer.URL)
 
 		info, err := ch.Info()
 		Expect(err).To(BeNil())
@@ -50,7 +50,7 @@ var _ = Describe("Info()", func() {
 
 			defer testServer.Close()
 
-			ch := credhubFromConfig(Config{ApiUrl: testServer.URL})
+			ch, _ := New(testServer.URL)
 
 			info, err := ch.Info()
 

@@ -13,11 +13,9 @@ import (
 var _ = Describe("AuthUrl()", func() {
 	Context("Errors", func() {
 
-		Specify("when ApiUrl is inaccessible", func() {
-			ch := credhubFromConfig(Config{ApiUrl: "http://localhost:1"})
-
+		Specify("when ApiURL is inaccessible", func() {
+			ch, _ := New("http://localhost:1")
 			_, err := ch.AuthUrl()
-
 			Expect(err).ToNot(BeNil())
 		})
 
@@ -29,7 +27,7 @@ var _ = Describe("AuthUrl()", func() {
 			}))
 			defer testServer.Close()
 
-			ch := credhubFromConfig(Config{ApiUrl: testServer.URL})
+			ch, _ := New(testServer.URL)
 			_, err := ch.AuthUrl()
 
 			Expect(err).ToNot(BeNil())

@@ -17,24 +17,11 @@ import (
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/auth"
 )
 
-// CredHub server
-type Config struct {
-	// Url to CredHub server
-	ApiUrl string
-
-	// CA Certs in PEM format
-	CaCerts []string
-
-	// Skip certificate verification
-	InsecureSkipVerify bool
-}
-
 // CredHub client to access CredHub APIs.
 //
 // Use New() to construct a new CredHub object, which can then interact with the CredHub api.
 type CredHub struct {
-	// Config provides the connection details for the CredHub server
-	*Config
+	ApiURL string
 
 	// Auth provides http.Client-like Do method for authenticated requests to the CredHub server
 	// Can be typecast to a specific Auth type to get additional information and functionality.
@@ -43,38 +30,78 @@ type CredHub struct {
 
 	baseURL       *url.URL
 	defaultClient *http.Client
+
+	// CA Certs in PEM format
+	caCerts *x509.CertPool
+
+	// Skip certificate verification
+	insecureSkipVerify bool
+
+	authMethod auth.Method
 }
 
 // New creates a new CredHub API client with the provided server credentials and authentication method.
 // See the auth package for supported authentication methods.
-func New(conf *Config, authMethod auth.Method) (*CredHub, error) {
-	baseURL, err := url.Parse(conf.ApiUrl)
+func New(addr string, options ...func(*CredHub) error) (*CredHub, error) {
+	baseURL, err := url.Parse(addr)
+
 	if err != nil {
 		return nil, err
 	}
 
 	credhub := &CredHub{
-		Config:  conf,
+		ApiURL:  addr,
 		baseURL: baseURL,
 	}
 
-	if credhub.baseURL.Scheme == "https" {
-		certPool := x509.NewCertPool()
-
-		for _, cert := range conf.CaCerts {
-			ok := certPool.AppendCertsFromPEM([]byte(cert))
-			if !ok {
-				return nil, errors.New("Ca Certs contains an invalid certificate")
-			}
+	for _, option := range options {
+		if err := option(credhub); err != nil {
+			return nil, err
 		}
+	}
 
-		credhub.defaultClient = httpsClient(conf.InsecureSkipVerify, certPool)
+	if credhub.baseURL.Scheme == "https" {
+		credhub.defaultClient = httpsClient(credhub.insecureSkipVerify, credhub.caCerts)
 	} else {
 		credhub.defaultClient = httpClient()
 	}
-	credhub.Auth = authMethod(credhub)
+
+	if credhub.authMethod != nil {
+		credhub.Auth = credhub.authMethod(credhub)
+	} else {
+		credhub.Auth = credhub.defaultClient
+	}
 
 	return credhub, nil
+}
+
+func Auth(method auth.Method) func(*CredHub) error {
+	return func(c *CredHub) error {
+		c.authMethod = method
+		return nil
+	}
+}
+
+func CACerts(certs []string) func(*CredHub) error {
+	return func(c *CredHub) error {
+		c.caCerts = x509.NewCertPool()
+
+		for _, cert := range certs {
+			ok := c.caCerts.AppendCertsFromPEM([]byte(cert))
+			if !ok {
+				return errors.New("provided ca certs are invalid")
+			}
+		}
+
+		return nil
+	}
+}
+
+func SkipTLSValidation() func(*CredHub) error {
+	return func(c *CredHub) error {
+		c.insecureSkipVerify = true
+		return nil
+	}
 }
 
 // Request sends an authenticated request to the CredHub server.

@@ -18,13 +18,10 @@ var _ = Describe("Api", func() {
 			return &DummyAuth{Config: config}
 		}
 
-		It("should assign Config and Auth", func() {
-			config := &Config{ApiUrl: "http://example.com"}
-
-			ch, err := New(config, dummy)
+		It("should assign the Auth", func() {
+			ch, err := New("http://example.com", Auth(dummy))
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(ch.Config).To(BeIdenticalTo(config))
 
 			da, ok := ch.Auth.(*DummyAuth)
 
@@ -32,10 +29,8 @@ var _ = Describe("Api", func() {
 			Expect(da.Config).To(BeIdenticalTo(ch))
 		})
 
-		It("returns an error when the ApiUrl is invalid", func() {
-			config := &Config{ApiUrl: "://example.com"}
-
-			ch, err := New(config, dummy)
+		It("returns an error when the ApiURL is invalid", func() {
+			ch, err := New("://example.com")
 			Expect(err).To(HaveOccurred())
 			Expect(ch).To(BeNil())
 
@@ -59,7 +54,7 @@ var _ = Describe("Api", func() {
 			}
 			caCerts = append(caCerts, "invalid certificate")
 
-			_, err := New(&Config{ApiUrl: "https://example.com", CaCerts: caCerts}, noopAuth)
+			_, err := New("https://example.com", CACerts(caCerts))
 			Expect(err).To(HaveOccurred())
 		})
 	})
@@ -72,10 +67,10 @@ var _ = Describe("Api", func() {
 
 		BeforeEach(func() {
 			mockAuth = &DummyAuth{}
-			ch = credhubWithAuth(Config{ApiUrl: "http://example.com/"}, mockAuth)
+			ch, _ = New("http://example.com/", Auth(authMethod(mockAuth)))
 		})
 
-		It("should send the requested using the provided auth to the ApiUrl", func() {
+		It("should send the requested using the provided auth to the ApiURL", func() {
 			payload := map[string]interface{}{
 				"some-field":  1,
 				"other-field": "blah",
@@ -110,24 +105,8 @@ var _ = Describe("Api", func() {
 	})
 })
 
-func credhubFromConfig(config Config) *CredHub {
-	c, err := New(&config, noopAuth)
-
-	ExpectWithOffset(1, err).ToNot(HaveOccurred())
-
-	return c
-}
-
-func credhubWithAuth(config Config, authentication auth.Auth) *CredHub {
-	c, err := New(&config, func(auth.ServerConfig) auth.Auth {
+func authMethod(authentication auth.Auth) auth.Method {
+	return func(auth.ServerConfig) auth.Auth {
 		return authentication
-	})
-
-	ExpectWithOffset(1, err).ToNot(HaveOccurred())
-
-	return c
-}
-
-func noopAuth(auth.ServerConfig) auth.Auth {
-	return nil
+	}
 }

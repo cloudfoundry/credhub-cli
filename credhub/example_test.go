@@ -13,13 +13,9 @@ func ExampleCredHub() {
 	return
 
 	// Use a CredHub server on "https://example.com" using UAA password grant
-	server := credhub.Config{
-		ApiUrl:             "https://example.com",
-		InsecureSkipVerify: true,
-	}
-	authOption := auth.UaaPasswordGrant("credhub_cli", "", "username", "password")
 
-	ch, err := credhub.New(&server, authOption)
+	authOption := auth.UaaPasswordGrant("credhub_cli", "", "username", "password")
+	ch, err := credhub.New("https://example.com", credhub.SkipTLSValidation(), credhub.Auth(authOption))
 
 	if err != nil {
 		panic("credhub client configured incorrectly: " + err.Error())
@@ -30,7 +26,7 @@ func ExampleCredHub() {
 		panic("couldn't fetch authurl")
 	}
 
-	fmt.Println("CredHub server: ", ch.ApiUrl)
+	fmt.Println("CredHub server: ", ch.ApiURL)
 	fmt.Println("Auth server: ", authUrl)
 
 	// Retrieve a password stored at "/my/password"
@@ -63,21 +59,16 @@ func ExampleCredHub() {
 func ExampleNew() {
 	return
 
-	server := credhub.Config{
-		ApiUrl:             "https://example.com",
-		InsecureSkipVerify: true,
-	}
 	authOption := auth.UaaClientCredentialGrant("client-id", "client-secret")
+	ch, _ := credhub.New("https://example.com", credhub.SkipTLSValidation(), credhub.Auth(authOption))
 
-	ch, _ := credhub.New(&server, authOption)
-
-	fmt.Println("Connected to ", ch.ApiUrl)
+	fmt.Println("Connected to ", ch.ApiURL)
 }
 
 func ExampleCredHub_Request() {
 	return
 
-	ch := credhub.CredHub{}
+	ch, _ := credhub.New("https://example.com")
 
 	// Get encryption key usage
 	response, err := ch.Request("POST", "/api/v1/key-usage", nil)
@@ -101,13 +92,10 @@ func Example() {
 	return
 
 	// CredHub server at https://example.com, using UAA Password grant
-	ch, _ := credhub.New(
-		&credhub.Config{
-			ApiUrl:  "https://example.com",
-			CaCerts: []string{"--- BEGIN ---\nroot-certificate\n--- END ---"},
-		},
-		auth.UaaPasswordGrant("credhub_cli", "", "username", "password"),
-	)
+	authOption := auth.UaaPasswordGrant("credhub_cli", "", "username", "password")
+	ch, err := credhub.New("https://example.com",
+		credhub.CACerts([]string{"--- BEGIN ---\nroot-certificate\n--- END ---"}),
+		credhub.Auth(authOption))
 
 	// We'll be working with a certificate stored at "/my-certificates/the-cert"
 	path := "/my-certificates/"

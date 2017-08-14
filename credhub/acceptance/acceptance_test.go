@@ -13,17 +13,18 @@ import (
 
 var _ = Describe("CredHub API Acceptance", func() {
 
-	It("generates a password", func() {
-		config := Config{
-			ApiUrl:             "https://localhost:9000",
-			InsecureSkipVerify: true,
-		}
+	var ch *CredHub
 
-		method := auth.UaaPasswordGrant("credhub_cli", "", "credhub", "password")
-		ch, err := New(&config, method)
+	BeforeEach(func() {
+		var err error
+		ch, err = New("https://localhost:9000",
+			SkipTLSValidation(),
+			Auth(auth.UaaPasswordGrant("credhub_cli", "", "credhub", "password")))
 
 		Expect(err).ToNot(HaveOccurred())
+	})
 
+	It("generates a password", func() {
 		password, err := ch.GeneratePassword("/example-password", generate.Password{
 			Length: 10,
 		}, true)
@@ -33,15 +34,6 @@ var _ = Describe("CredHub API Acceptance", func() {
 	})
 
 	It("sets a password", func() {
-		config := Config{
-			ApiUrl:             "https://localhost:9000",
-			InsecureSkipVerify: true,
-		}
-		method := auth.UaaPasswordGrant("credhub_cli", "", "credhub", "password")
-
-		ch, err := New(&config, method)
-		Expect(err).ToNot(HaveOccurred())
-
 		password, err := ch.SetPassword("/example-password", values.Password("some-password"), true)
 		Expect(err).ToNot(HaveOccurred())
 
@@ -49,16 +41,6 @@ var _ = Describe("CredHub API Acceptance", func() {
 	})
 
 	It("generates a certificate", func() {
-		config := Config{
-			ApiUrl:             "https://localhost:9000",
-			InsecureSkipVerify: true,
-		}
-
-		method := auth.UaaPasswordGrant("credhub_cli", "", "credhub", "password")
-		ch, err := New(&config, method)
-
-		Expect(err).ToNot(HaveOccurred())
-
 		cred, err := ch.GenerateCertificate("/example-certificate", generate.Certificate{
 			CommonName: "example.com",
 			SelfSign:   true,

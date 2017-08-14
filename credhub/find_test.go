@@ -13,10 +13,6 @@ import (
 )
 
 var _ = Describe("Find", func() {
-	config := Config{
-		ApiUrl:             "http://example.com",
-		InsecureSkipVerify: true,
-	}
 
 	Describe("FindByPath()", func() {
 		It("requests credentials for a specified path", func() {
@@ -24,7 +20,8 @@ var _ = Describe("Find", func() {
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
 
-			ch := credhubWithAuth(config, dummy)
+			ch, _ := New("https://example.com", Auth(authMethod(dummy)))
+
 			ch.FindByPath("/some/example/path")
 			urlPath := dummy.Request.URL.Path
 			Expect(urlPath).To(Equal("/api/v1/data?path=/some/example/path"))
@@ -49,7 +46,8 @@ var _ = Describe("Find", func() {
 					Body: ioutil.NopCloser(bytes.NewBufferString(expectedResponse)),
 				}}
 
-				ch := credhubWithAuth(config, dummy)
+				ch, _ := New("https://example.com", Auth(authMethod(dummy)))
+
 				creds, err := ch.FindByPath("/some/example/path")
 
 				Expect(err).ToNot(HaveOccurred())
@@ -65,7 +63,7 @@ var _ = Describe("Find", func() {
 			It("returns an error", func() {
 				dummy := &DummyAuth{Error: errors.New("Network error occurred")}
 
-				ch := credhubWithAuth(config, dummy)
+				ch, _ := New("https://example.com", Auth(authMethod(dummy)))
 
 				_, err := ch.FindByPath("/some/example/path")
 
@@ -79,7 +77,8 @@ var _ = Describe("Find", func() {
 					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
 				}}
 
-				ch := credhubWithAuth(config, dummy)
+				ch, _ := New("https://example.com", Auth(authMethod(dummy)))
+
 				_, err := ch.FindByPath("/some/example/path")
 				Expect(err).To(HaveOccurred())
 			})
