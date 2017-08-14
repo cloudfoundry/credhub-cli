@@ -19,20 +19,20 @@ type User struct {
 }
 
 type Certificate struct {
-	KeyLength        int
-	Duration         int
-	CommonName       string
-	Organization     string
-	OrganizationUnit string
-	Locality         string
-	State            string
-	Country          string
-	AlternativeName  []string
-	KeyUsage         []string
-	ExtendedKeyUsage []string
-	Ca               string `json:"ca"`
-	IsCA             bool
-	SelfSign         bool
+	KeyLength        int      `json:"key_length,omitempty"`
+	Duration         int      `json:"duration,omitempty"`
+	CommonName       string   `json:"common_name,omitempty"`
+	Organization     string   `json:"organization,omitempty"`
+	OrganizationUnit string   `json:"organization_unit,omitempty"`
+	Locality         string   `json:"locality,omitempty"`
+	State            string   `json:"state,omitempty"`
+	Country          string   `json:"country,omitempty"`
+	AlternativeNames []string `json:"alternative_names,omitempty"`
+	KeyUsage         []string `json:"key_usage,omitempty"`
+	ExtendedKeyUsage []string `json:"extended_key_usage,omitempty"`
+	Ca               string   `json:"ca"`
+	IsCA             bool     `json:"is_ca,omitempty"`
+	SelfSign         bool     `json:"self_sign,omitempty"`
 }
 
 type RSA struct {

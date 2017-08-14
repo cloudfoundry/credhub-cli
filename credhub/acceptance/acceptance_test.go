@@ -47,4 +47,24 @@ var _ = Describe("CredHub API Acceptance", func() {
 
 		Expect(password.Value).To(BeEquivalentTo("some-password"))
 	})
+
+	It("generates a certificate", func() {
+		config := Config{
+			ApiUrl:             "https://localhost:9000",
+			InsecureSkipVerify: true,
+		}
+
+		method := auth.UaaPasswordGrant("credhub_cli", "", "credhub", "password")
+		ch, err := New(&config, method)
+
+		Expect(err).ToNot(HaveOccurred())
+
+		cred, err := ch.GenerateCertificate("/example-certificate", generate.Certificate{
+			CommonName: "example.com",
+			SelfSign:   true,
+		}, true)
+
+		Expect(err).ToNot(HaveOccurred())
+		Expect(cred.Name).To(Equal("/example-certificate"))
+	})
 })
