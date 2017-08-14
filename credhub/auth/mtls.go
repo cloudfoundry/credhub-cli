@@ -6,13 +6,18 @@ import (
 
 // Mutual TLS authentication strategy
 //
-// When a MutualTls auth.Builder (eg. MutualTlsCertificate()) is provided to credhub.New(),
-// CredHub will use this MutualTls.Do() to send authenticated requests to CredHub.
-type MutualTls struct {
+// Mutual TLS authentication is a secure method of authentication.
+// Unlike a traditional password or token-based method, mutual TLS
+// does not exchange a secret value during the authentication process.
+// The client and server each present their certificate, which contains
+// a public key, during the handshake.
+type MutualTLSStrategy struct {
 	Certificate string
 }
 
-// Provides http.Client-like interface to send requests authenticated with MutualTLS
-func (a *MutualTls) Do(http.Request) (http.Response, error) {
+// Provides http.Client-like interface to send requests authenticated with MutualTLSStrategy
+func (a *MutualTLSStrategy) Do(*http.Request) (*http.Response, error) {
 	panic("Not implemented")
 }
+
+var _ Strategy = new(MutualTLSStrategy)

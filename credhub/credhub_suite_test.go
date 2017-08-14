@@ -18,7 +18,7 @@ func TestCredhub(t *testing.T) {
 }
 
 type DummyAuth struct {
-	Config   auth.ServerConfig
+	Config   auth.Config
 	Request  *http.Request
 	Response *http.Response
 	Error    error
@@ -30,7 +30,7 @@ func (d *DummyAuth) Do(req *http.Request) (*http.Response, error) {
 	return d.Response, d.Error
 }
 
-var _ auth.Auth = new(DummyAuth)
+var _ auth.Strategy = new(DummyAuth)
 
 type NotMarshallable struct{}
 

@@ -35,9 +35,9 @@ var _ = Describe("Api", func() {
 
 			It("ignores the auth builder option", func() {
 				builderCalled := false
-				builder := func(config auth.ServerConfig) auth.Auth {
+				builder := func(config auth.Config) (auth.Strategy, error) {
 					builderCalled = true
-					return nil
+					return nil, nil
 				}
 
 				_, err := New("http://example.com", Auth(&DummyAuth{}), AuthBuilder(builder))
@@ -50,8 +50,8 @@ var _ = Describe("Api", func() {
 
 		Context("when the auth builder is used", func() {
 			It("invokes the auth builder", func() {
-				dummyBuilder := func(config auth.ServerConfig) auth.Auth {
-					return &DummyAuth{Config: config}
+				dummyBuilder := func(config auth.Config) (auth.Strategy, error) {
+					return &DummyAuth{Config: config}, nil
 				}
 
 				ch, err := New("http://example.com", AuthBuilder(dummyBuilder))

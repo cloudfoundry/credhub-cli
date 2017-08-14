@@ -7,13 +7,10 @@ import (
 	"net/http"
 )
 
-// UAA authentication strategy
+// OAuth authentication strategy
 //
 // Fields will be filled in based on Builder used to construct strategy.
-//
-// When a UAA auth.Builder (eg. UaaPasswordGrant()) is provided to credhub.New(),
-// CredHub will use this Uaa.Do() to send authenticated requests to CredHub.
-type Uaa struct {
+type OAuthStrategy struct {
 	AccessToken  string
 	RefreshToken string
 	Username     string
@@ -21,24 +18,24 @@ type Uaa struct {
 	ClientId     string
 	ClientSecret string
 	ApiClient    HttpClient
-	UaaClient    UaaClient
+	OAuthClient  OAuthClient
 }
 
 type HttpClient interface {
 	Do(*http.Request) (*http.Response, error)
 }
 
-type UaaClient interface {
+type OAuthClient interface {
 	ClientCredentialGrant(clientId, clientSecret string) (string, error)
 	PasswordGrant(clientId, clientSecret, username, password string) (string, string, error)
 	RefreshTokenGrant(clientId, clientSecret, refreshToken string) (string, string, error)
 	RevokeToken(token string) error
 }
 
-// Provides http.Client-like interface to send requests authenticated with UAA
+// Provides http.Client-like interface to send requests authenticated with OAuth
 //
 // Will automatically refresh the access token and retry the request if the token has expired.
-func (a *Uaa) Do(req *http.Request) (*http.Response, error) {
+func (a *OAuthStrategy) Do(req *http.Request) (*http.Response, error) {
 	a.Login()
 
 	req.Header.Set("Authorization", "Bearer "+a.AccessToken)
@@ -57,6 +54,67 @@ func (a *Uaa) Do(req *http.Request) (*http.Response, error) {
 	}
 
 	return resp, err
+}
+
+// Refresh the access token
+// If refresh token is available (ie. constructed with UaaPasswordGrant() or UaaSession()),
+// a refresh grant will be used.
+// Otherwise, client_credentials grant type will be used to retrieve a new access token.
+func (a *OAuthStrategy) Refresh() error {
+	if a.RefreshToken == "" {
+		a.AccessToken = ""
+
+		return a.Login()
+	}
+
+	accessToken, refreshToken, err := a.OAuthClient.RefreshTokenGrant(a.ClientId, a.ClientSecret, a.RefreshToken)
+
+	if err != nil {
+		return err
+	}
+
+	a.AccessToken = accessToken
+	a.RefreshToken = refreshToken
+
+	return nil
+}
+
+// Invalidate the access and refresh tokens on the OAuth server
+func (a *OAuthStrategy) Logout() {
+	panic("Not implemented")
+}
+
+// Login will make a token grant request to the OAuth server
+//
+// The grant type will be client_credentials if either ClientID or ClientSecret is not empty,
+// otherwise password grant type will be used.
+//
+// On success, the AccessToken and RefreshToken (if given) will be populated.
+//
+// Login will be a no-op if the AccessToken is not-empty when invoked.
+func (a *OAuthStrategy) Login() error {
+	if a.AccessToken != "" {
+		return nil
+	}
+
+	var accessToken string
+	var refreshToken string
+	var err error
+
+	if a.Username == "" {
+		accessToken, err = a.OAuthClient.ClientCredentialGrant(a.ClientId, a.ClientSecret)
+	} else {
+		accessToken, refreshToken, err = a.OAuthClient.PasswordGrant(a.ClientId, a.ClientSecret, a.Username, a.Password)
+	}
+
+	if err != nil {
+		return err
+	}
+
+	a.AccessToken = accessToken
+	a.RefreshToken = refreshToken
+
+	return nil
 }
 
 func tokenExpired(resp *http.Response) (bool, error) {
@@ -85,63 +143,4 @@ func tokenExpired(resp *http.Response) (bool, error) {
 	return errResp["error"] == "access_token_expired", nil
 }
 
-// Refresh the access token
-// If refresh token is available (ie. constructed with UaaPasswordGrant() or UaaSession()),
-// a refresh grant will be used.
-// Otherwise, client credential grant will be used to retrieve a new access token.
-func (a *Uaa) Refresh() error {
-	if a.RefreshToken == "" {
-		a.AccessToken = ""
-
-		return a.Login()
-	}
-
-	accessToken, refreshToken, err := a.UaaClient.RefreshTokenGrant(a.ClientId, a.ClientSecret, a.RefreshToken)
-
-	if err != nil {
-		return err
-	}
-
-	a.AccessToken = accessToken
-	a.RefreshToken = refreshToken
-
-	return nil
-}
-
-// Invalidate the access and refresh tokens on the UAA server
-func (a *Uaa) Logout() {
-	panic("Not implemented")
-}
-
-// Login will make a token grant request to the UAA server
-//
-// The grant type will be client credentials grant if either ClientID or ClientSecret is not empty,
-// otherwise password grant will be used.
-//
-// On success, the AccessToken and RefreshToken (if given) will be populated.
-//
-// Login will be a no-op if the AccessToken is not-empty when invoked.
-func (a *Uaa) Login() error {
-	if a.AccessToken != "" {
-		return nil
-	}
-
-	var accessToken string
-	var refreshToken string
-	var err error
-
-	if a.Username == "" {
-		accessToken, err = a.UaaClient.ClientCredentialGrant(a.ClientId, a.ClientSecret)
-	} else {
-		accessToken, refreshToken, err = a.UaaClient.PasswordGrant(a.ClientId, a.ClientSecret, a.Username, a.Password)
-	}
-
-	if err != nil {
-		return err
-	}
-
-	a.AccessToken = accessToken
-	a.RefreshToken = refreshToken
-
-	return nil
-}
+var _ Strategy = new(OAuthStrategy)

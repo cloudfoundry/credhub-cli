@@ -38,14 +38,14 @@ func ExampleCredHub() {
 	fmt.Println("My password: ", password.Value)
 
 	// Manually refresh the access token
-	uaa, ok := ch.Auth.(*auth.Uaa) // This works because we authenticated with auth.UaaPasswordGrant
+	uaa, ok := ch.Auth.(*auth.OAuthStrategy) // This works because we authenticated with auth.UaaPasswordGrant
 	if !ok {
 		panic("not using uaa")
 	}
 
 	fmt.Println("Old access token: ", uaa.AccessToken)
 
-	uaa.Refresh() // For demo purposes only, tokens will be automatically refreshed by auth.Uaa
+	uaa.Refresh() // For demo purposes only, tokens will be automatically refreshed by auth.OAuthStrategy
 
 	fmt.Println("New access token:", uaa.AccessToken)
 	// FIXME Output:

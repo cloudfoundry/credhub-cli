@@ -19,7 +19,7 @@ type token struct {
 	TokenType    string `json:"token_type"`
 }
 
-// ClientCredentialGrant requests a token using client credential grant
+// ClientCredentialGrant requests a token using client_credentials grant type
 func (u *Client) ClientCredentialGrant(clientId, clientSecret string) (string, error) {
 	values := url.Values{
 		"grant_type":    {"client_credentials"},
@@ -33,7 +33,7 @@ func (u *Client) ClientCredentialGrant(clientId, clientSecret string) (string, e
 	return token.AccessToken, err
 }
 
-// ClientCredentialGrant requests an access token and refresh token using password grant
+// PasswordGrant requests an access token and refresh token using password grant type
 func (u *Client) PasswordGrant(clientId, clientSecret, username, password string) (string, string, error) {
 	values := url.Values{
 		"grant_type":    {"password"},
@@ -49,7 +49,7 @@ func (u *Client) PasswordGrant(clientId, clientSecret, username, password string
 	return token.AccessToken, token.RefreshToken, err
 }
 
-// RefreshTokenGrant requests a new access token and refresh token using refresh token grant
+// RefreshTokenGrant requests a new access token and refresh token using refresh_token grant type
 func (u *Client) RefreshTokenGrant(clientId, clientSecret, refreshToken string) (string, string, error) {
 	values := url.Values{
 		"grant_type":    {"refresh_token"},
@@ -64,7 +64,6 @@ func (u *Client) RefreshTokenGrant(clientId, clientSecret, refreshToken string) 
 	return token.AccessToken, token.RefreshToken, err
 }
 
-// TokenGrantRequest requests a new token with the given request headers
 func (u *Client) tokenGrantRequest(headers url.Values) (token, error) {
 	request, _ := http.NewRequest("POST", u.AuthUrl+"/oauth/token", bytes.NewBufferString(headers.Encode()))
 	request.Header.Add("Accept", "application/json")

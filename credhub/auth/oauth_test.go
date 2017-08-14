@@ -13,7 +13,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Uaa", func() {
+var _ = Describe("OAuthStrategy", func() {
 	var (
 		mockUaaClient *dummyUaaClient
 	)
@@ -29,10 +29,10 @@ var _ = Describe("Uaa", func() {
 
 			dc := &DummyClient{Response: expectedResponse, Error: expectedError}
 
-			uaa := auth.Uaa{
+			uaa := auth.OAuthStrategy{
 				AccessToken: "some-access-token",
 				ApiClient:   dc,
-				UaaClient:   mockUaaClient,
+				OAuthClient: mockUaaClient,
 			}
 
 			request, _ := http.NewRequest("GET", "https://some-endpoint.com/path/", nil)
@@ -56,8 +56,8 @@ var _ = Describe("Uaa", func() {
 
 				dc := &DummyClient{Response: &http.Response{}, Error: nil}
 
-				uaa := auth.Uaa{
-					UaaClient:    mockUaaClient,
+				uaa := auth.OAuthStrategy{
+					OAuthClient:  mockUaaClient,
 					ApiClient:    dc,
 					ClientId:     "client-id",
 					ClientSecret: "client-secret",
@@ -92,13 +92,13 @@ var _ = Describe("Uaa", func() {
 				mockUaaClient.NewAccessToken = "new-access-token"
 				mockUaaClient.NewRefreshToken = "new-refresh-token"
 
-				uaa := auth.Uaa{
+				uaa := auth.OAuthStrategy{
 					AccessToken:  "old-access-token",
 					RefreshToken: "old-refresh-token",
 					ClientId:     "client-id",
 					ClientSecret: "client-secret",
 					ApiClient:    fhc,
-					UaaClient:    mockUaaClient,
+					OAuthClient:  mockUaaClient,
 				}
 
 				request, _ := http.NewRequest("GET", "https://some-endpoint.com/path/", nil)
@@ -128,13 +128,13 @@ var _ = Describe("Uaa", func() {
 					return resp, nil
 				}
 
-				uaa := auth.Uaa{
+				uaa := auth.OAuthStrategy{
 					AccessToken:  "old-access-token",
 					RefreshToken: "old-refresh-token",
 					ClientId:     "client-id",
 					ClientSecret: "client-secret",
 					ApiClient:    fhc,
-					UaaClient:    mockUaaClient,
+					OAuthClient:  mockUaaClient,
 				}
 
 				request, _ := http.NewRequest("GET", "https://some-endpoint.com/path/", nil)
@@ -160,11 +160,11 @@ var _ = Describe("Uaa", func() {
 
 		Context("with a refresh token", func() {
 			It("should make a refresh grant token request and save the new tokens", func() {
-				uaa := auth.Uaa{
+				uaa := auth.OAuthStrategy{
 					ClientId:     "client-id",
 					ClientSecret: "client-secret",
 					RefreshToken: "some-refresh-token",
-					UaaClient:    mockUaaClient,
+					OAuthClient:  mockUaaClient,
 				}
 
 				uaa.Refresh()
@@ -181,11 +181,11 @@ var _ = Describe("Uaa", func() {
 				It("returns an error", func() {
 					mockUaaClient.Error = errors.New("refresh token grant failed")
 
-					uaa := auth.Uaa{
+					uaa := auth.OAuthStrategy{
 						ClientId:     "client-id",
 						ClientSecret: "client-secret",
 						RefreshToken: "some-refresh-token",
-						UaaClient:    mockUaaClient,
+						OAuthClient:  mockUaaClient,
 					}
 
 					err := uaa.Refresh()
@@ -199,12 +199,12 @@ var _ = Describe("Uaa", func() {
 		Context("without a refresh token", func() {
 			Context("with a username and password", func() {
 				It("should make a password grant request", func() {
-					uaa := auth.Uaa{
+					uaa := auth.OAuthStrategy{
 						ClientId:     "client-id",
 						ClientSecret: "client-secret",
 						Username:     "user-name",
 						Password:     "user-password",
-						UaaClient:    mockUaaClient,
+						OAuthClient:  mockUaaClient,
 					}
 
 					uaa.Refresh()
@@ -221,12 +221,12 @@ var _ = Describe("Uaa", func() {
 				It("when performing the password grant returns an error", func() {
 					mockUaaClient.Error = errors.New("password grant error")
 
-					uaa := auth.Uaa{
+					uaa := auth.OAuthStrategy{
 						ClientId:     "client-id",
 						ClientSecret: "client-secret",
 						Username:     "user-name",
 						Password:     "user-password",
-						UaaClient:    mockUaaClient,
+						OAuthClient:  mockUaaClient,
 					}
 
 					err := uaa.Refresh()
@@ -236,10 +236,10 @@ var _ = Describe("Uaa", func() {
 
 			Context("with client credentials", func() {
 				It("should make a client credentials grant request", func() {
-					uaa := auth.Uaa{
+					uaa := auth.OAuthStrategy{
 						ClientId:     "client-id",
 						ClientSecret: "client-secret",
-						UaaClient:    mockUaaClient,
+						OAuthClient:  mockUaaClient,
 					}
 
 					uaa.Refresh()
@@ -255,10 +255,10 @@ var _ = Describe("Uaa", func() {
 					It("returns an error", func() {
 						mockUaaClient.Error = errors.New("client credentials grant failed")
 
-						uaa := auth.Uaa{
+						uaa := auth.OAuthStrategy{
 							ClientId:     "client-id",
 							ClientSecret: "client-secret",
-							UaaClient:    mockUaaClient,
+							OAuthClient:  mockUaaClient,
 						}
 
 						err := uaa.Refresh()
@@ -280,7 +280,7 @@ var _ = Describe("Uaa", func() {
 
 		Context("when there is already an access token", func() {
 			It("should do nothing", func() {
-				uaa := auth.Uaa{
+				uaa := auth.OAuthStrategy{
 					AccessToken: "some-access-token",
 				}
 
@@ -292,12 +292,12 @@ var _ = Describe("Uaa", func() {
 
 		Context("with a username and password", func() {
 			It("should make a password grant request", func() {
-				uaa := auth.Uaa{
+				uaa := auth.OAuthStrategy{
 					ClientId:     "client-id",
 					ClientSecret: "client-secret",
 					Username:     "user-name",
 					Password:     "user-password",
-					UaaClient:    mockUaaClient,
+					OAuthClient:  mockUaaClient,
 				}
 
 				uaa.Refresh()
@@ -315,11 +315,11 @@ var _ = Describe("Uaa", func() {
 				It("returns an error", func() {
 					mockUaaClient.Error = errors.New("refresh token grant failed")
 
-					uaa := auth.Uaa{
+					uaa := auth.OAuthStrategy{
 						ClientId:     "client-id",
 						ClientSecret: "client-secret",
 						RefreshToken: "some-refresh-token",
-						UaaClient:    mockUaaClient,
+						OAuthClient:  mockUaaClient,
 					}
 
 					err := uaa.Refresh()
@@ -332,10 +332,10 @@ var _ = Describe("Uaa", func() {
 
 		Context("with client credentials", func() {
 			It("should make a client credentials grant request", func() {
-				uaa := auth.Uaa{
+				uaa := auth.OAuthStrategy{
 					ClientId:     "client-id",
 					ClientSecret: "client-secret",
-					UaaClient:    mockUaaClient,
+					OAuthClient:  mockUaaClient,
 				}
 
 				uaa.Refresh()
@@ -351,10 +351,10 @@ var _ = Describe("Uaa", func() {
 				It("returns an error", func() {
 					mockUaaClient.Error = errors.New("client credentials grant failed")
 
-					uaa := auth.Uaa{
+					uaa := auth.OAuthStrategy{
 						ClientId:     "client-id",
 						ClientSecret: "client-secret",
-						UaaClient:    mockUaaClient,
+						OAuthClient:  mockUaaClient,
 					}
 
 					err := uaa.Refresh()

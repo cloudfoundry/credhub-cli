@@ -23,10 +23,10 @@ import (
 type CredHub struct {
 	ApiURL string
 
-	// Auth provides http.Client-like Do method for authenticated requests to the CredHub server
-	// Can be typecast to a specific Auth type to get additional information and functionality.
-	// eg. auth.Uaa provides Logout(), Refresh(), AccessToken and RefreshToken
-	auth.Auth
+	// Strategy provides http.Client-like Do method for authenticated requests to the CredHub server
+	// Can be typecast to a specific Strategy type to get additional information and functionality.
+	// eg. auth.OAuthStrategy provides Logout(), Refresh(), AccessToken and RefreshToken
+	Auth auth.Strategy
 
 	baseURL       *url.URL
 	defaultClient *http.Client
@@ -66,12 +66,19 @@ func New(addr string, options ...func(*CredHub) error) (*CredHub, error) {
 		credhub.defaultClient = httpClient()
 	}
 
-	if credhub.Auth == nil {
-		if credhub.authBuilder != nil {
-			credhub.Auth = credhub.authBuilder(credhub)
-		} else {
-			credhub.Auth = credhub.defaultClient
-		}
+	if credhub.Auth != nil {
+		return credhub, nil
+	}
+
+	if credhub.authBuilder == nil {
+		credhub.Auth = credhub.defaultClient
+		return credhub, nil
+	}
+
+	credhub.Auth, err = credhub.authBuilder(credhub)
+
+	if err != nil {
+		return nil, err
 	}
 
 	return credhub, nil
@@ -84,9 +91,9 @@ func AuthBuilder(method auth.Builder) func(*CredHub) error {
 	}
 }
 
-func Auth(auth auth.Auth) func(*CredHub) error {
+func Auth(strategy auth.Strategy) func(*CredHub) error {
 	return func(c *CredHub) error {
-		c.Auth = auth
+		c.Auth = strategy
 		return nil
 	}
 }
