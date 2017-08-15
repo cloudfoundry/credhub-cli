@@ -23,8 +23,8 @@ var _ = Describe("Find", func() {
 			ch, _ := New("https://example.com", Auth(dummy))
 
 			ch.FindByPath("/some/example/path")
-			urlPath := dummy.Request.URL.Path
-			Expect(urlPath).To(Equal("/api/v1/data?path=/some/example/path"))
+			url := dummy.Request.URL
+			Expect(url.String()).To(Equal("https://example.com/api/v1/data?path=%2Fsome%2Fexample%2Fpath"))
 			Expect(dummy.Request.Method).To(Equal(http.MethodGet))
 		})
 
@@ -43,7 +43,7 @@ var _ = Describe("Find", func() {
   ]
 }`
 				dummy := &DummyAuth{Response: &http.Response{
-					StatusCode: 200,
+					StatusCode: http.StatusOK,
 					Body:       ioutil.NopCloser(bytes.NewBufferString(expectedResponse)),
 				}}
 

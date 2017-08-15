@@ -73,7 +73,7 @@ func ExampleCredHub_Request() {
 	ch, _ := credhub.New("https://example.com")
 
 	// Get encryption key usage
-	response, err := ch.Request("POST", "/api/v1/key-usage", nil)
+	response, err := ch.Request("POST", "/api/v1/key-usage", nil, nil)
 	if err != nil {
 		panic("couldn't get key usage")
 	}

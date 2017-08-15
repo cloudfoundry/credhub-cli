@@ -129,15 +129,16 @@ func SkipTLSValidation() func(*CredHub) error {
 //
 // Use Request() directly to access the CredHub server if an appropriate helper method is not available.
 // For unauthenticated requests (eg. /health), use Config.Client() instead.
-func (c *CredHub) Request(method string, pathStr string, body interface{}) (*http.Response, error) {
-	url := *c.baseURL // clone
-	url.Path = pathStr
+func (c *CredHub) Request(method string, pathStr string, query url.Values, body interface{}) (*http.Response, error) {
+	u := *c.baseURL // clone
+	u.Path = pathStr
+	u.RawQuery = query.Encode()
 
 	jsonBody, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
-	req, err := http.NewRequest(method, url.String(), bytes.NewReader(jsonBody))
+	req, err := http.NewRequest(method, u.String(), bytes.NewReader(jsonBody))
 
 	if err != nil {
 		return nil, err

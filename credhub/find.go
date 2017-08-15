@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials"
 )
@@ -17,7 +18,10 @@ func (ch *CredHub) FindByPartialName(nameLike string) ([]credentials.Base, error
 func (ch *CredHub) FindByPath(path string) ([]credentials.Base, error) {
 	var creds map[string][]credentials.Base
 
-	resp, err := ch.Request(http.MethodGet, "/api/v1/data?path="+path, nil)
+	query := url.Values{}
+	query.Set("path", path)
+
+	resp, err := ch.Request(http.MethodGet, "/api/v1/data", query, nil)
 
 	if err != nil {
 		return []credentials.Base{}, err

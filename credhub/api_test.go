@@ -116,7 +116,7 @@ var _ = Describe("Api", func() {
 			mockAuth.Response = &http.Response{}
 			mockAuth.Error = errors.New("Some error")
 
-			response, err := ch.Request("PATCH", "/api/v1/some-endpoint", payload)
+			response, err := ch.Request("PATCH", "/api/v1/some-endpoint", nil, payload)
 
 			Expect(response).To(Equal(mockAuth.Response))
 			Expect(err).To(Equal(mockAuth.Error))
@@ -131,12 +131,12 @@ var _ = Describe("Api", func() {
 		})
 
 		It("fails to send the request when the body cannot be marshalled to JSON", func() {
-			_, err := ch.Request("PATCH", "/api/v1/some-endpoint", &NotMarshallable{})
+			_, err := ch.Request("PATCH", "/api/v1/some-endpoint", nil, &NotMarshallable{})
 			Expect(err).To(HaveOccurred())
 		})
 
 		It("fails to send when the request method is invalid", func() {
-			_, err := ch.Request(" ", "/api/v1/some-endpoint", nil)
+			_, err := ch.Request(" ", "/api/v1/some-endpoint", nil, nil)
 			Expect(err).To(HaveOccurred())
 		})
 
@@ -150,7 +150,7 @@ var _ = Describe("Api", func() {
 
 				ch, _ := New("https://example.com", Auth(dummy))
 
-				_, err = ch.Request("GET", "/example-password", nil)
+				_, err = ch.Request("GET", "/example-password", nil, nil)
 
 				Expect(err).To(MatchError("error occurred"))
 			})

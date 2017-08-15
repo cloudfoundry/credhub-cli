@@ -44,7 +44,7 @@ func (ch *CredHub) generateCredential(name, credType string, gen interface{}, ov
 	requestBody["parameters"] = gen
 	requestBody["overwrite"] = overwrite
 
-	resp, err := ch.Request(http.MethodPost, "/api/v1/data", requestBody)
+	resp, err := ch.Request(http.MethodPost, "/api/v1/data", nil, requestBody)
 
 	if err != nil {
 		return err
@@ -53,14 +53,8 @@ func (ch *CredHub) generateCredential(name, credType string, gen interface{}, ov
 	defer resp.Body.Close()
 	dec := json.NewDecoder(resp.Body)
 
-	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		respErr := &Error{}
-
-		if err = dec.Decode(respErr); err != nil {
-			return err
-		}
-
-		return respErr
+	if err := ch.checkForServerError(resp); err != nil {
+		return err
 	}
 
 	return dec.Decode(&cred)
