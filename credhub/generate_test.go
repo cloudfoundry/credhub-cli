@@ -45,6 +45,7 @@ var _ = Describe("Generate", func() {
 		Context("when successful", func() {
 			It("returns the generated certificate", func() {
 				dummy := &DummyAuth{Response: &http.Response{
+					StatusCode: 200,
 					Body: ioutil.NopCloser(bytes.NewBufferString(`{
       "id": "some-id",
       "name": "/example-certificate",
@@ -142,6 +143,7 @@ var _ = Describe("Generate", func() {
 		Context("when successful", func() {
 			It("returns the generated password", func() {
 				dummy := &DummyAuth{Response: &http.Response{
+					StatusCode: 200,
 					Body: ioutil.NopCloser(bytes.NewBufferString(`{
 	      "id": "some-id",
 	      "name": "/example-password",
@@ -166,7 +168,7 @@ var _ = Describe("Generate", func() {
 			})
 		})
 
-		Context("when request fails", func() {
+		Context("when request fails to complete", func() {
 			var err error
 			It("returns an error", func() {
 				networkError := errors.New("Network error occurred")

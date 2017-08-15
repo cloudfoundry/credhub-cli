@@ -47,6 +47,7 @@ var _ = Describe("Set", func() {
 		Context("when successful", func() {
 			It("returns the credential that has been set", func() {
 				dummy := &DummyAuth{Response: &http.Response{
+					StatusCode: 200,
 					Body: ioutil.NopCloser(bytes.NewBufferString(`{
 		  "id": "some-id",
 		  "name": "/example-certificate",
@@ -131,6 +132,7 @@ var _ = Describe("Set", func() {
 		Context("when successful", func() {
 			It("returns the credential that has been set", func() {
 				dummy := &DummyAuth{Response: &http.Response{
+					StatusCode: 200,
 					Body: ioutil.NopCloser(bytes.NewBufferString(`{
 		  "id": "some-id",
 		  "name": "/example-password",

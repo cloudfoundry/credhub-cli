@@ -145,7 +145,17 @@ func (c *CredHub) Request(method string, pathStr string, body interface{}) (*htt
 
 	req.Header.Set("Content-Type", "application/json")
 
-	return c.Auth.Do(req)
+	resp, err := c.Auth.Do(req)
+
+	if err != nil {
+		return resp, err
+	}
+
+	if err := c.checkForServerError(resp); err != nil {
+		return nil, err
+	}
+
+	return resp, err
 }
 
 func (c *CredHub) request(method string, path string, body io.Reader) (*http.Response, error) {
@@ -156,7 +166,34 @@ func (c *CredHub) request(method string, path string, body io.Reader) (*http.Res
 
 	request, _ := http.NewRequest(method, url.String(), body)
 
-	return client.Do(request)
+	resp, err := client.Do(request)
+
+	if err != nil {
+		return resp, err
+	}
+
+	if err := c.checkForServerError(resp); err != nil {
+		return nil, err
+	}
+
+	return resp, err
+}
+
+func (c *CredHub) checkForServerError(resp *http.Response) error {
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		defer resp.Body.Close()
+		dec := json.NewDecoder(resp.Body)
+
+		respErr := &Error{}
+
+		if err := dec.Decode(respErr); err != nil {
+			return err
+		}
+
+		return respErr
+	}
+
+	return nil
 }
 
 func httpClient() *http.Client {

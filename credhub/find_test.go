@@ -43,7 +43,8 @@ var _ = Describe("Find", func() {
   ]
 }`
 				dummy := &DummyAuth{Response: &http.Response{
-					Body: ioutil.NopCloser(bytes.NewBufferString(expectedResponse)),
+					StatusCode: 200,
+					Body:       ioutil.NopCloser(bytes.NewBufferString(expectedResponse)),
 				}}
 
 				ch, _ := New("https://example.com", Auth(dummy))

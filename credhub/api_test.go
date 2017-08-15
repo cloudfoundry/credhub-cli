@@ -8,6 +8,8 @@ import (
 	. "github.com/cloudfoundry-incubator/credhub-cli/credhub"
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/auth"
 
+	"bytes"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -136,6 +138,22 @@ var _ = Describe("Api", func() {
 		It("fails to send when the request method is invalid", func() {
 			_, err := ch.Request(" ", "/api/v1/some-endpoint", nil)
 			Expect(err).To(HaveOccurred())
+		})
+
+		Context("when response body is an error ", func() {
+			var err error
+			It("returns an error", func() {
+				dummy := &DummyAuth{Response: &http.Response{
+					StatusCode: 400,
+					Body:       ioutil.NopCloser(bytes.NewBufferString(`{"error" : "error occurred" }`)),
+				}}
+
+				ch, _ := New("https://example.com", Auth(dummy))
+
+				_, err = ch.Request("GET", "/example-password", nil)
+
+				Expect(err).To(MatchError("error occurred"))
+			})
 		})
 	})
 })

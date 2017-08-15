@@ -38,7 +38,8 @@ var _ = Describe("Get", func() {
       "version_created_at": "2017-01-05T01:01:01Z"
     }`
 				dummy := &DummyAuth{Response: &http.Response{
-					Body: ioutil.NopCloser(bytes.NewBufferString(responseString)),
+					StatusCode: 200,
+					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
 				}}
 
 				ch, _ := New("https://example.com", Auth(dummy))
@@ -99,7 +100,8 @@ var _ = Describe("Get", func() {
       "version_created_at": "2017-01-05T01:01:01Z"
     }`
 				dummy := &DummyAuth{Response: &http.Response{
-					Body: ioutil.NopCloser(bytes.NewBufferString(responseString)),
+					StatusCode: 200,
+					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
 				}}
 
 				ch, _ := New("https://example.com", Auth(dummy))
@@ -160,7 +162,8 @@ var _ = Describe("Get", func() {
 	"version_created_at": "2017-01-01T04:07:18Z"
 }`
 				dummy := &DummyAuth{Response: &http.Response{
-					Body: ioutil.NopCloser(bytes.NewBufferString(responseString)),
+					StatusCode: 200,
+					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
 				}}
 
 				ch, _ := New("https://example.com", Auth(dummy))
