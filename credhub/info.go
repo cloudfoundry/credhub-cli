@@ -18,8 +18,9 @@ func (c *CredHub) Info() (*Info, error) {
 		return nil, err
 	}
 
-	info := &Info{}
+	defer response.Body.Close()
 
+	info := &Info{}
 	decoder := json.NewDecoder(response.Body)
 
 	if err = decoder.Decode(&info); err != nil {
