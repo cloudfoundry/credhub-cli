@@ -1,8 +1,6 @@
 package auth_test
 
 import (
-	"net/http"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
@@ -12,17 +10,6 @@ import (
 func TestAuth(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Auth Suite")
-}
-
-type DummyClient struct {
-	Request  *http.Request
-	Response *http.Response
-	Error    error
-}
-
-func (d *DummyClient) Do(req *http.Request) (*http.Response, error) {
-	d.Request = req
-	return d.Response, d.Error
 }
 
 type dummyUaaClient struct {

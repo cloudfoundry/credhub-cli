@@ -21,12 +21,8 @@ type OAuthStrategy struct {
 	Password     string
 	ClientId     string
 	ClientSecret string
-	ApiClient    HttpClient
+	ApiClient    *http.Client
 	OAuthClient  OAuthClient
-}
-
-type HttpClient interface {
-	Do(*http.Request) (*http.Response, error)
 }
 
 type OAuthClient interface {

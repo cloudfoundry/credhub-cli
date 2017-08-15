@@ -4,10 +4,10 @@ import (
 	"errors"
 	"io/ioutil"
 	"net/http"
-	"strings"
 
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/auth"
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub/auth/authfakes"
+
+	"net/http/httptest"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -24,30 +24,86 @@ var _ = Describe("OAuthStrategy", func() {
 
 	Context("Do()", func() {
 		It("should add the bearer token to the request header", func() {
-			expectedResponse := &http.Response{StatusCode: 539, Body: ioutil.NopCloser(strings.NewReader(""))}
-			expectedError := errors.New("some error")
+			var actualAuthHeader string
+			var actualRequestPath string
+			var actualRequestMethod string
 
-			dc := &DummyClient{Response: expectedResponse, Error: expectedError}
+			apiServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				actualAuthHeader = r.Header.Get("Authorization")
+				actualRequestMethod = r.Method
+				actualRequestPath = r.URL.Path
+				w.WriteHeader(http.StatusOK)
+				w.Write([]byte("success"))
+			}))
+
+			defer apiServer.Close()
 
 			uaa := auth.OAuthStrategy{
-				ApiClient:   dc,
+				ApiClient:   http.DefaultClient,
 				OAuthClient: mockUaaClient,
 			}
 
 			uaa.SetTokens("some-access-token", "")
 
-			request, _ := http.NewRequest("GET", "https://some-endpoint.com/path/", nil)
+			request, _ := http.NewRequest("GET", apiServer.URL+"/path/", nil)
 
-			actualResponse, actualError := uaa.Do(request)
-			actualRequest := dc.Request
+			resp, err := uaa.Do(request)
 
-			authHeader := actualRequest.Header.Get("Authorization")
-			Expect(authHeader).To(Equal("Bearer some-access-token"))
-			Expect(actualRequest.Method).To(Equal("GET"))
-			Expect(actualRequest.URL.String()).To(Equal("https://some-endpoint.com/path/"))
+			Expect(err).ToNot(HaveOccurred())
+			Expect(resp.StatusCode).To(Equal(http.StatusOK))
 
-			Expect(actualResponse).To(BeIdenticalTo(expectedResponse))
-			Expect(actualError).To(BeIdenticalTo(expectedError))
+			Expect(actualAuthHeader).To(Equal("Bearer some-access-token"))
+			Expect(actualRequestMethod).To(Equal("GET"))
+			Expect(actualRequestPath).To(Equal("/path/"))
+		})
+
+		It("forwards responses", func() {
+			apiServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(http.StatusOK)
+				w.Write([]byte("success"))
+			}))
+
+			defer apiServer.Close()
+
+			uaa := auth.OAuthStrategy{
+				ApiClient:   http.DefaultClient,
+				OAuthClient: mockUaaClient,
+			}
+
+			request, _ := http.NewRequest("GET", apiServer.URL, nil)
+			resp, err := uaa.Do(request)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(resp.StatusCode).To(Equal(http.StatusOK))
+
+			defer resp.Body.Close()
+
+			bytes, err := ioutil.ReadAll(resp.Body)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(bytes).To(Equal([]byte("success")))
+		})
+
+		It("forwards connection errors", func() {
+			apiServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				// Kill the connection without returning a status code
+				hj, _ := w.(http.Hijacker)
+				conn, _, _ := hj.Hijack()
+				conn.Close()
+			}))
+
+			defer apiServer.Close()
+
+			uaa := auth.OAuthStrategy{
+				ApiClient:   http.DefaultClient,
+				OAuthClient: mockUaaClient,
+			}
+
+			request, _ := http.NewRequest("GET", apiServer.URL, nil)
+			resp, err := uaa.Do(request)
+
+			Expect(err).To(HaveOccurred())
+			Expect(resp).To(BeNil())
 		})
 
 		Context("when there is no access token", func() {
@@ -55,22 +111,29 @@ var _ = Describe("OAuthStrategy", func() {
 				mockUaaClient.NewAccessToken = "new-access-token"
 				mockUaaClient.NewRefreshToken = "new-refresh-token"
 
-				dc := &DummyClient{Response: &http.Response{}, Error: nil}
+				var lastAuthHeader string
+
+				apiServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					lastAuthHeader = r.Header.Get("Authorization")
+					w.WriteHeader(http.StatusOK)
+				}))
+
+				defer apiServer.Close()
 
 				oauth := auth.OAuthStrategy{
 					OAuthClient:  mockUaaClient,
-					ApiClient:    dc,
+					ApiClient:    http.DefaultClient,
 					ClientId:     "client-id",
 					ClientSecret: "client-secret",
 					Username:     "user-name",
 					Password:     "user-password",
 				}
 
-				request, _ := http.NewRequest("GET", "https://some-endpoint.com/path/", nil)
+				request, _ := http.NewRequest("GET", apiServer.URL, nil)
 
 				oauth.Do(request)
 
-				Expect(dc.Request.Header.Get("Authorization")).To(Equal("Bearer new-access-token"))
+				Expect(lastAuthHeader).To(Equal("Bearer new-access-token"))
 				Expect(oauth.AccessToken()).To(Equal("new-access-token"))
 				Expect(oauth.RefreshToken()).To(Equal("new-refresh-token"))
 			})
@@ -96,17 +159,16 @@ var _ = Describe("OAuthStrategy", func() {
 
 		Context("when the access token has expired", func() {
 			It("should refresh the token and submit the request again", func() {
-				fhc := &authfakes.FakeHttpClient{}
-				fhc.DoStub = func(req *http.Request) (*http.Response, error) {
-					resp := &http.Response{}
-					if req.Header.Get("Authorization") != "Bearer new-access-token" {
-						resp.StatusCode = 573
-						resp.Body = ioutil.NopCloser(strings.NewReader(`{"error": "access_token_expired"}`))
+				apiServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					if r.Header.Get("Authorization") != "Bearer new-access-token" {
+						w.WriteHeader(573)
+						w.Write([]byte(`{"error": "access_token_expired"}`))
 					} else {
-						resp.Body = ioutil.NopCloser(strings.NewReader(`Success!`))
+						w.Write([]byte(`Success!`))
 					}
-					return resp, nil
-				}
+				}))
+
+				defer apiServer.Close()
 
 				mockUaaClient.NewAccessToken = "new-access-token"
 				mockUaaClient.NewRefreshToken = "new-refresh-token"
@@ -114,13 +176,13 @@ var _ = Describe("OAuthStrategy", func() {
 				uaa := auth.OAuthStrategy{
 					ClientId:     "client-id",
 					ClientSecret: "client-secret",
-					ApiClient:    fhc,
+					ApiClient:    http.DefaultClient,
 					OAuthClient:  mockUaaClient,
 				}
 
 				uaa.SetTokens("old-access-token", "old-refresh-token")
 
-				request, _ := http.NewRequest("GET", "https://some-endpoint.com/path/", nil)
+				request, _ := http.NewRequest("GET", apiServer.URL, nil)
 
 				response, err := uaa.Do(request)
 
@@ -139,21 +201,19 @@ var _ = Describe("OAuthStrategy", func() {
 			Context("when refreshing token fails", func() {
 				It("returns an error", func() {
 					mockUaaClient.Error = errors.New("failed to refresh")
-					fhc := &authfakes.FakeHttpClient{}
-					fhc.DoReturns(&http.Response{
-						StatusCode: 573,
-						Body:       ioutil.NopCloser(strings.NewReader(`{"error": "access_token_expired"}`)),
-					}, nil)
+					apiServer := fixedResponseServer(573, []byte(`{"error": "access_token_expired"}`))
+					defer apiServer.Close()
+
 					oauth := auth.OAuthStrategy{
 						OAuthClient:  mockUaaClient,
-						ApiClient:    fhc,
+						ApiClient:    http.DefaultClient,
 						ClientId:     "client-id",
 						ClientSecret: "client-secret",
 						Username:     "user-name",
 						Password:     "user-password",
 					}
 					oauth.SetTokens("some-access-token", "some-refresh-token")
-					request, _ := http.NewRequest("GET", "https://some-endpoint.com/path/", nil)
+					request, _ := http.NewRequest("GET", apiServer.URL, nil)
 
 					_, err := oauth.Do(request)
 
@@ -164,24 +224,19 @@ var _ = Describe("OAuthStrategy", func() {
 
 		Context("when a non-auth error has occurred", func() {
 			It("should forward the response untouched", func() {
-				fhc := &authfakes.FakeHttpClient{}
-				fhc.DoStub = func(req *http.Request) (*http.Response, error) {
-					resp := &http.Response{}
-					resp.StatusCode = 573
-					resp.Body = ioutil.NopCloser(strings.NewReader(`{"error": "some other error"}`))
-					return resp, nil
-				}
+				apiServer := fixedResponseServer(573, []byte(`{"error": "some other error"}`))
+				defer apiServer.Close()
 
 				uaa := auth.OAuthStrategy{
 					ClientId:     "client-id",
 					ClientSecret: "client-secret",
-					ApiClient:    fhc,
+					ApiClient:    http.DefaultClient,
 					OAuthClient:  mockUaaClient,
 				}
 
 				uaa.SetTokens("old-access-token", "old-refresh-token")
 
-				request, _ := http.NewRequest("GET", "https://some-endpoint.com/path/", nil)
+				request, _ := http.NewRequest("GET", apiServer.URL, nil)
 
 				response, err := uaa.Do(request)
 
@@ -408,5 +463,11 @@ var _ = Describe("OAuthStrategy", func() {
 			})
 		})
 	})
-
 })
+
+func fixedResponseServer(statusCode int, body []byte) *httptest.Server {
+	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(statusCode)
+		w.Write(body)
+	}))
+}
