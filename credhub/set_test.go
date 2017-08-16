@@ -532,4 +532,75 @@ var _ = Describe("Set", func() {
 			})
 		})
 	})
+
+	Describe("SetValue()", func() {
+		It("requests to set the Value", func() {
+			dummy := &DummyAuth{Response: &http.Response{
+				Body: ioutil.NopCloser(bytes.NewBufferString("")),
+			}}
+
+			ch, _ := New("https://example.com", Auth(dummy))
+			value := values.Value("some string value")
+
+			ch.SetValue("/example-value", value, false)
+
+			urlPath := dummy.Request.URL.Path
+			Expect(urlPath).To(Equal("/api/v1/data"))
+			Expect(dummy.Request.Method).To(Equal(http.MethodPut))
+
+			body, _ := ioutil.ReadAll(dummy.Request.Body)
+			Expect(body).To(MatchJSON(`
+			{
+			  "name": "/example-value",
+			  "overwrite": false,
+			  "type": "value",
+			  "value": "some string value"
+			}`))
+		})
+
+		Context("when successful", func() {
+			It("returns the credential that has been set", func() {
+				dummy := &DummyAuth{Response: &http.Response{
+					StatusCode: http.StatusOK,
+					Body: ioutil.NopCloser(bytes.NewBufferString(`
+					{
+						"id": "some-id",
+						"name": "/example-value",
+						"type": "value",
+						"value": "some string value",
+						"version_created_at": "2017-01-01T04:07:18Z"
+					}`)),
+				}}
+
+				ch, _ := New("https://example.com", Auth(dummy))
+
+				cred, _ := ch.SetValue("/example-value", values.Value(""), false)
+
+				Expect(cred.Name).To(Equal("/example-value"))
+				Expect(cred.Type).To(Equal("value"))
+				Expect(cred.Value).To(Equal(values.Value("some string value")))
+			})
+		})
+
+		Context("when request fails", func() {
+			It("returns an error", func() {
+				dummy := &DummyAuth{Error: errors.New("Network error occurred")}
+				ch, _ := New("https://example.com", Auth(dummy))
+				_, err := ch.SetValue("/example-value", values.Value(""), false)
+				Expect(err).To(HaveOccurred())
+			})
+		})
+
+		Context("when response body cannot be unmarshalled", func() {
+			It("returns an error", func() {
+				dummy := &DummyAuth{Response: &http.Response{
+					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
+				}}
+
+				ch, _ := New("https://example.com", Auth(dummy))
+				_, err := ch.SetValue("/example-value", values.Value(""), false)
+				Expect(err).To(HaveOccurred())
+			})
+		})
+	})
 })

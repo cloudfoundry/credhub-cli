@@ -511,4 +511,64 @@ var _ = Describe("Get", func() {
 		})
 	})
 
+	Describe("GetValue()", func() {
+		It("requests the credential by name", func() {
+			dummy := &DummyAuth{Response: &http.Response{
+				Body: ioutil.NopCloser(bytes.NewBufferString("")),
+			}}
+
+			ch, _ := New("https://example.com", Auth(dummy))
+			ch.GetValue("/example-value")
+			url := dummy.Request.URL
+			Expect(url.String()).To(Equal("https://example.com/api/v1/data?current=true&name=%2Fexample-value"))
+			Expect(dummy.Request.Method).To(Equal(http.MethodGet))
+		})
+
+		Context("when successful", func() {
+			It("returns a value credential", func() {
+				responseString := `{
+				  "data": [
+					{
+					  "id": "some-id",
+					  "name": "/example-value",
+					  "type": "value",
+					  "value": "some-value",
+					  "version_created_at": "2017-01-05T01:01:01Z"
+				}]}`
+
+				dummy := &DummyAuth{Response: &http.Response{
+					StatusCode: http.StatusOK,
+					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
+				}}
+
+				ch, _ := New("https://example.com", Auth(dummy))
+				cred, err := ch.GetValue("/example-value")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(cred.Value).To(Equal(values.Value("some-value")))
+			})
+		})
+
+		Context("when request fails", func() {
+			It("returns an error", func() {
+				networkError := errors.New("Network error occurred")
+				dummy := &DummyAuth{Error: networkError}
+				ch, _ := New("https://example.com", Auth(dummy))
+				_, err := ch.GetValue("/example-value")
+
+				Expect(err).To(Equal(networkError))
+			})
+		})
+
+		Context("when response body cannot be unmarshalled", func() {
+			It("returns an error", func() {
+				dummy := &DummyAuth{Response: &http.Response{
+					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
+				}}
+				ch, _ := New("https://example.com", Auth(dummy))
+				_, err := ch.GetValue("/example-cred")
+
+				Expect(err).To(HaveOccurred())
+			})
+		})
+	})
 })

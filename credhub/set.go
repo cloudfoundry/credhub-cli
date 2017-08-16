@@ -10,7 +10,10 @@ import (
 
 // Sets a Value credential with a user-provided value.
 func (ch *CredHub) SetValue(name string, value values.Value, overwrite bool) (credentials.Value, error) {
-	panic("Not implemented")
+	var cred credentials.Value
+	err := ch.setCredential(name, "value", value, overwrite, &cred)
+
+	return cred, err
 }
 
 // Sets a JSON credential with a user-provided value.
