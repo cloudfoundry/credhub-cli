@@ -52,7 +52,10 @@ func (ch *CredHub) SetRSA(name string, value values.RSA, overwrite bool) (creden
 
 // Sets an SSH credential with a user-provided value.
 func (ch *CredHub) SetSSH(name string, value values.SSH, overwrite bool) (credentials.SSH, error) {
-	panic("Not implemented")
+	var cred credentials.SSH
+	err := ch.setCredential(name, "ssh", value, overwrite, &cred)
+
+	return cred, err
 }
 
 func (ch *CredHub) setCredential(name, credType string, value interface{}, overwrite bool, cred interface{}) error {

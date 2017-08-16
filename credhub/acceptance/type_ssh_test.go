@@ -8,6 +8,7 @@ import (
 	. "github.com/onsi/gomega"
 
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials/generate"
+	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials/values"
 )
 
 var _ = Describe("SSH Credential Type", func() {
@@ -22,6 +23,27 @@ var _ = Describe("SSH Credential Type", func() {
 		privateKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(privateKey.N.BitLen()).To(Equal(2048))
+
+		By("generate the ssh keys again without overwrite returns same ssh")
+		ssh, err := credhubClient.GenerateSSH(name, opts, false)
+		Expect(err).ToNot(HaveOccurred())
+		Expect(ssh).To(Equal(generatedSSH))
+
+		By("setting the ssh keys again without overwrite returns the same")
+		newSSH := values.SSH{PrivateKey: "private key", PublicKey: "public key"}
+		ssh, err = credhubClient.SetSSH(name, newSSH, false)
+		Expect(err).ToNot(HaveOccurred())
+		Expect(ssh).To(Equal(generatedSSH))
+
+		By("overwriting with generate")
+		ssh, err = credhubClient.GenerateSSH(name, opts, true)
+		Expect(err).ToNot(HaveOccurred())
+		Expect(ssh).ToNot(Equal(generatedSSH))
+
+		By("overwriting with set")
+		ssh, err = credhubClient.SetSSH(name, newSSH, true)
+		Expect(err).ToNot(HaveOccurred())
+		Expect(ssh.Value).To(Equal(newSSH))
 
 	})
 })

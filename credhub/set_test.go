@@ -349,4 +349,84 @@ var _ = Describe("Set", func() {
 			})
 		})
 	})
+
+	Describe("SetSSH()", func() {
+		It("requests to set the SSH", func() {
+			dummy := &DummyAuth{Response: &http.Response{
+				Body: ioutil.NopCloser(bytes.NewBufferString("")),
+			}}
+
+			ch, _ := New("https://example.com", Auth(dummy))
+			SSH := values.SSH{PrivateKey: "private-key", PublicKey: "public-key"}
+
+			ch.SetSSH("/example-ssh", SSH, false)
+
+			urlPath := dummy.Request.URL.Path
+			Expect(urlPath).To(Equal("/api/v1/data"))
+			Expect(dummy.Request.Method).To(Equal(http.MethodPut))
+
+			body, _ := ioutil.ReadAll(dummy.Request.Body)
+			Expect(body).To(MatchJSON(`
+			{
+				"name": "/example-ssh",
+				"type": "ssh",
+				"overwrite": false,
+				"value": {
+					"public_key": "public-key",
+					"private_key": "private-key"
+				}
+			}`))
+		})
+
+		Context("when successful", func() {
+			It("returns the credential that has been set", func() {
+				dummy := &DummyAuth{Response: &http.Response{
+					StatusCode: http.StatusOK,
+					Body: ioutil.NopCloser(bytes.NewBufferString(`
+					{
+						"id": "67fc3def-bbfb-4953-83f8-4ab0682ad676",
+						"name": "/example-ssh",
+						"type": "ssh",
+						"value": {
+							"public_key": "public-key",
+							"private_key": "private-key"
+						},
+						"version_created_at": "2017-01-01T04:07:18Z"
+					}`)),
+				}}
+
+				ch, _ := New("https://example.com", Auth(dummy))
+
+				cred, _ := ch.SetSSH("/example-ssh", values.SSH{}, false)
+
+				Expect(cred.Name).To(Equal("/example-ssh"))
+				Expect(cred.Type).To(Equal("ssh"))
+				Expect(cred.Value).To(Equal(values.SSH{
+					PrivateKey: "private-key",
+					PublicKey:  "public-key",
+				}))
+			})
+		})
+
+		Context("when request fails", func() {
+			It("returns an error", func() {
+				dummy := &DummyAuth{Error: errors.New("Network error occurred")}
+				ch, _ := New("https://example.com", Auth(dummy))
+				_, err := ch.SetSSH("/example-ssh", values.SSH{}, false)
+				Expect(err).To(HaveOccurred())
+			})
+		})
+
+		Context("when response body cannot be unmarshalled", func() {
+			It("returns an error", func() {
+				dummy := &DummyAuth{Response: &http.Response{
+					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
+				}}
+
+				ch, _ := New("https://example.com", Auth(dummy))
+				_, err := ch.SetSSH("/example-ssh", values.SSH{}, false)
+				Expect(err).To(HaveOccurred())
+			})
+		})
+	})
 })
