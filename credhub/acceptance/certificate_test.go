@@ -26,7 +26,6 @@ var _ = Describe("Certificate", func() {
 	})
 
 	Specify("certificate lifecycle", func() {
-
 		name := fmt.Sprintf("/acceptance/certificate/%v", time.Now().UnixNano())
 		generateCert := generate.Certificate{
 			CommonName: "example.com",
