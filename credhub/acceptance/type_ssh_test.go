@@ -29,7 +29,7 @@ var _ = Describe("SSH Credential Type", func() {
 		Expect(err).ToNot(HaveOccurred())
 		Expect(ssh).To(Equal(generatedSSH))
 
-		By("setting the ssh keys again without overwrite returns the same")
+		By("setting the ssh keys again without overwrite returns the same ssh")
 		newSSH := values.SSH{PrivateKey: "private key", PublicKey: "public key"}
 		ssh, err = credhubClient.SetSSH(name, newSSH, false)
 		Expect(err).ToNot(HaveOccurred())
@@ -45,5 +45,15 @@ var _ = Describe("SSH Credential Type", func() {
 		Expect(err).ToNot(HaveOccurred())
 		Expect(ssh.Value).To(Equal(newSSH))
 
+		By("getting the ssh credential")
+		ssh, err = credhubClient.GetSSH(name)
+		Expect(err).ToNot(HaveOccurred())
+		Expect(ssh.Value).To(Equal(newSSH))
+
+		By("deleting the rsa credential")
+		err = credhubClient.Delete(name)
+		Expect(err).ToNot(HaveOccurred())
+		_, err = credhubClient.GetRSA(name)
+		Expect(err).To(HaveOccurred())
 	})
 })

@@ -358,4 +358,75 @@ var _ = Describe("Get", func() {
 			})
 		})
 	})
+
+	Describe("GetSSH()", func() {
+		It("requests the credential by name", func() {
+			dummy := &DummyAuth{Response: &http.Response{
+				Body: ioutil.NopCloser(bytes.NewBufferString("")),
+			}}
+
+			ch, _ := New("https://example.com", Auth(dummy))
+			ch.GetSSH("/example-ssh")
+			url := dummy.Request.URL
+			Expect(url.String()).To(Equal("https://example.com/api/v1/data?current=true&name=%2Fexample-ssh"))
+			Expect(dummy.Request.Method).To(Equal(http.MethodGet))
+		})
+
+		Context("when successful", func() {
+			It("returns a ssh credential", func() {
+				responseString := `{
+				  "data": [
+					{
+					  "id": "some-id",
+					  "name": "/example-ssh",
+					  "type": "ssh",
+					  "value": {
+						"public_key": "public-key",
+						"private_key": "private-key",
+						"public_key_fingerprint": "public-key-fingerprint"
+					  },
+					  "version_created_at": "2017-01-01T04:07:18Z"
+					}
+				  ]
+				}`
+
+				dummy := &DummyAuth{Response: &http.Response{
+					StatusCode: http.StatusOK,
+					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
+				}}
+
+				ch, _ := New("https://example.com", Auth(dummy))
+				cred, err := ch.GetSSH("/example-ssh")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(cred.Value).To(Equal(values.SSH{
+					PublicKey:            "public-key",
+					PrivateKey:           "private-key",
+					PublicKeyFingerprint: "public-key-fingerprint",
+				}))
+			})
+		})
+
+		Context("when request fails", func() {
+			It("returns an error", func() {
+				networkError := errors.New("Network error occurred")
+				dummy := &DummyAuth{Error: networkError}
+				ch, _ := New("https://example.com", Auth(dummy))
+				_, err := ch.GetSSH("/example-ssh")
+
+				Expect(err).To(Equal(networkError))
+			})
+		})
+
+		Context("when response body cannot be unmarshalled", func() {
+			It("returns an error", func() {
+				dummy := &DummyAuth{Response: &http.Response{
+					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
+				}}
+				ch, _ := New("https://example.com", Auth(dummy))
+				_, err := ch.GetSSH("/example-cred")
+
+				Expect(err).To(HaveOccurred())
+			})
+		})
+	})
 })
