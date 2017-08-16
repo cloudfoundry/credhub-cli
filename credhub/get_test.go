@@ -12,6 +12,7 @@ import (
 
 	. "github.com/cloudfoundry-incubator/credhub-cli/credhub"
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials/values"
+	. "github.com/onsi/ginkgo/extensions/table"
 )
 
 var _ = Describe("Get", func() {
@@ -56,15 +57,6 @@ var _ = Describe("Get", func() {
 				Expect(cred.Type).To(Equal("password"))
 				Expect(cred.Value.(string)).To(Equal("some-password"))
 				Expect(cred.VersionCreatedAt).To(Equal("2017-01-05T01:01:01Z"))
-			})
-		})
-
-		Context("when request fails", func() {
-			It("returns an error", func() {
-				dummy := &DummyAuth{Error: errors.New("Network error occurred")}
-				ch, _ := New("https://example.com", Auth(dummy))
-				_, err := ch.Get("/example-password")
-				Expect(err).To(HaveOccurred())
 			})
 		})
 
@@ -131,17 +123,6 @@ var _ = Describe("Get", func() {
 			})
 		})
 
-		Context("when request fails", func() {
-			It("returns an error", func() {
-				networkError := errors.New("Network error occurred")
-				dummy := &DummyAuth{Error: networkError}
-				ch, _ := New("https://example.com", Auth(dummy))
-				_, err := ch.GetPassword("/example-password")
-
-				Expect(err).To(Equal(networkError))
-			})
-		})
-
 		Context("when response body cannot be unmarshalled", func() {
 			It("returns an error", func() {
 				dummy := &DummyAuth{Response: &http.Response{
@@ -195,16 +176,6 @@ var _ = Describe("Get", func() {
 				Expect(cred.Value.Certificate).To(Equal("-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----"))
 				Expect(cred.Value.PrivateKey).To(Equal("-----BEGIN RSA PRIVATE KEY-----\n...\n-----END RSA PRIVATE KEY-----"))
 				Expect(cred.VersionCreatedAt).To(Equal("2017-01-01T04:07:18Z"))
-			})
-		})
-
-		Context("when request fails", func() {
-			It("returns an error", func() {
-				networkError := errors.New("Network error occurred")
-				dummy := &DummyAuth{Error: networkError}
-				ch, _ := New("https://example.com", Auth(dummy))
-				_, err := ch.GetCertificate("/example-certificate")
-				Expect(err).To(Equal(networkError))
 			})
 		})
 
@@ -267,17 +238,6 @@ var _ = Describe("Get", func() {
 			})
 		})
 
-		Context("when request fails", func() {
-			It("returns an error", func() {
-				networkError := errors.New("Network error occurred")
-				dummy := &DummyAuth{Error: networkError}
-				ch, _ := New("https://example.com", Auth(dummy))
-				_, err := ch.GetUser("/example-user")
-
-				Expect(err).To(Equal(networkError))
-			})
-		})
-
 		Context("when response body cannot be unmarshalled", func() {
 			It("returns an error", func() {
 				dummy := &DummyAuth{Response: &http.Response{
@@ -333,17 +293,6 @@ var _ = Describe("Get", func() {
 					PublicKey:  "public-key",
 					PrivateKey: "private-key",
 				}))
-			})
-		})
-
-		Context("when request fails", func() {
-			It("returns an error", func() {
-				networkError := errors.New("Network error occurred")
-				dummy := &DummyAuth{Error: networkError}
-				ch, _ := New("https://example.com", Auth(dummy))
-				_, err := ch.GetRSA("/example-rsa")
-
-				Expect(err).To(Equal(networkError))
 			})
 		})
 
@@ -404,17 +353,6 @@ var _ = Describe("Get", func() {
 					PrivateKey:           "private-key",
 					PublicKeyFingerprint: "public-key-fingerprint",
 				}))
-			})
-		})
-
-		Context("when request fails", func() {
-			It("returns an error", func() {
-				networkError := errors.New("Network error occurred")
-				dummy := &DummyAuth{Error: networkError}
-				ch, _ := New("https://example.com", Auth(dummy))
-				_, err := ch.GetSSH("/example-ssh")
-
-				Expect(err).To(Equal(networkError))
 			})
 		})
 
@@ -487,17 +425,6 @@ var _ = Describe("Get", func() {
 			})
 		})
 
-		Context("when request fails", func() {
-			It("returns an error", func() {
-				networkError := errors.New("Network error occurred")
-				dummy := &DummyAuth{Error: networkError}
-				ch, _ := New("https://example.com", Auth(dummy))
-				_, err := ch.GetJSON("/example-json")
-
-				Expect(err).To(Equal(networkError))
-			})
-		})
-
 		Context("when response body cannot be unmarshalled", func() {
 			It("returns an error", func() {
 				dummy := &DummyAuth{Response: &http.Response{
@@ -548,17 +475,6 @@ var _ = Describe("Get", func() {
 			})
 		})
 
-		Context("when request fails", func() {
-			It("returns an error", func() {
-				networkError := errors.New("Network error occurred")
-				dummy := &DummyAuth{Error: networkError}
-				ch, _ := New("https://example.com", Auth(dummy))
-				_, err := ch.GetValue("/example-value")
-
-				Expect(err).To(Equal(networkError))
-			})
-		})
-
 		Context("when response body cannot be unmarshalled", func() {
 			It("returns an error", func() {
 				dummy := &DummyAuth{Response: &http.Response{
@@ -571,4 +487,49 @@ var _ = Describe("Get", func() {
 			})
 		})
 	})
+
+	DescribeTable("request fails due to network error",
+		func(performAction func(*CredHub) error) {
+			networkError := errors.New("Network error occurred")
+			dummy := &DummyAuth{Error: networkError}
+			ch, _ := New("https://example.com", Auth(dummy))
+
+			err := performAction(ch)
+
+			Expect(err).To(Equal(networkError))
+		},
+
+		Entry("Get", func(ch *CredHub) error {
+			_, err := ch.Get("/example-password")
+			return err
+		}),
+		Entry("GetPassword", func(ch *CredHub) error {
+			_, err := ch.GetPassword("/example-password")
+			return err
+		}),
+		Entry("GetCertificate", func(ch *CredHub) error {
+			_, err := ch.GetCertificate("/example-certificate")
+			return err
+		}),
+		Entry("GetUser", func(ch *CredHub) error {
+			_, err := ch.GetUser("/example-password")
+			return err
+		}),
+		Entry("GetRSA", func(ch *CredHub) error {
+			_, err := ch.GetRSA("/example-password")
+			return err
+		}),
+		Entry("GetSSH", func(ch *CredHub) error {
+			_, err := ch.GetSSH("/example-password")
+			return err
+		}),
+		Entry("GetJSON", func(ch *CredHub) error {
+			_, err := ch.GetJSON("/example-password")
+			return err
+		}),
+		Entry("GetValue", func(ch *CredHub) error {
+			_, err := ch.GetValue("/example-password")
+			return err
+		}),
+	)
 })
