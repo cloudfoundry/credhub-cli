@@ -38,5 +38,5 @@ func testCredentialPath(credentialName string) string {
 }
 
 func testCredentialPrefix() string {
-	return fmt.Sprintf("/acceptance/%v", currentTestNumber)
+	return fmt.Sprintf("/acceptance/%v/", currentTestNumber)
 }

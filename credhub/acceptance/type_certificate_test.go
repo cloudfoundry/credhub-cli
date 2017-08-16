@@ -8,8 +8,8 @@ import (
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials/values"
 )
 
-var _ = Describe("Certificate", func() {
-	Specify("certificate lifecycle", func() {
+var _ = Describe("Certificate Credential Type", func() {
+	Specify("lifecycle", func() {
 		name := testCredentialPath("some-certificate")
 
 		generateCert := generate.Certificate{

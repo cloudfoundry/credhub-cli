@@ -121,10 +121,10 @@ var _ = Describe("Generate", func() {
 
 			ch, _ := New("https://example.com", Auth(dummy))
 
-			cert := generate.Password{
+			passwordOptions := generate.Password{
 				Length: 12,
 			}
-			ch.GeneratePassword("/example-password", cert, true)
+			ch.GeneratePassword("/example-password", passwordOptions, true)
 			urlPath := dummy.Request.URL.Path
 			Expect(urlPath).To(Equal("/api/v1/data"))
 
@@ -159,12 +159,12 @@ var _ = Describe("Generate", func() {
 					Length: 12,
 				}
 
-				generatedCert, err := ch.GeneratePassword("/example-password", p, false)
+				generatedPassword, err := ch.GeneratePassword("/example-password", p, false)
 				Expect(err).ToNot(HaveOccurred())
-				Expect(generatedCert.Id).To(Equal("some-id"))
-				Expect(generatedCert.Type).To(Equal("password"))
-				Expect(generatedCert.Name).To(Equal("/example-password"))
-				Expect(generatedCert.Value).To(BeEquivalentTo("some-password"))
+				Expect(generatedPassword.Id).To(Equal("some-id"))
+				Expect(generatedPassword.Type).To(Equal("password"))
+				Expect(generatedPassword.Name).To(Equal("/example-password"))
+				Expect(generatedPassword.Value).To(BeEquivalentTo("some-password"))
 			})
 		})
 

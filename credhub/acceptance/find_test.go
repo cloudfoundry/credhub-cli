@@ -10,8 +10,8 @@ import (
 
 var _ = Describe("Find", func() {
 
-	passwordName1 := testCredentialPath("first-password")
-	passwordName2 := testCredentialPath("second-password")
+	passwordName1 := testCredentialPath("find-test/first-password")
+	passwordName2 := testCredentialPath("find-test/second-password")
 
 	var expectedPassword1 credentials.Password
 	var expectedPassword2 credentials.Password
@@ -36,7 +36,7 @@ var _ = Describe("Find", func() {
 	})
 
 	Specify("finding the credentials by path", func() {
-		results, err := credhubClient.FindByPath(testCredentialPrefix())
+		results, err := credhubClient.FindByPath(testCredentialPrefix() + "find-test")
 
 		Expect(err).ToNot(HaveOccurred())
 		Expect(results).To(ConsistOf(expectedPassword1.Base, expectedPassword2.Base))

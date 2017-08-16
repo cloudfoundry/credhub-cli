@@ -8,8 +8,8 @@ import (
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials/values"
 )
 
-var _ = Describe("Password", func() {
-	Specify("password lifecycle", func() {
+var _ = Describe("Password Credential Type", func() {
+	Specify("lifecycle", func() {
 		name := testCredentialPath("some-password")
 		generatePassword := generate.Password{Length: 10}
 
@@ -38,12 +38,12 @@ var _ = Describe("Password", func() {
 		By("overwriting the password with set")
 		password, err = credhubClient.SetPassword(name, values.Password("some-password"), true)
 		Expect(err).ToNot(HaveOccurred())
-		Expect(password.Value).To(BeEquivalentTo("some-password"))
+		Expect(password.Value).To(Equal(values.Password("some-password")))
 
 		By("getting the password")
 		password, err = credhubClient.GetPassword(name)
 		Expect(err).ToNot(HaveOccurred())
-		Expect(password.Value).To(BeEquivalentTo("some-password"))
+		Expect(password.Value).To(Equal(values.Password("some-password")))
 
 		By("deleting the password")
 		err = credhubClient.Delete(name)
