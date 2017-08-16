@@ -196,4 +196,96 @@ var _ = Describe("Generate", func() {
 
 		})
 	})
+
+	Describe("GenerateUser()", func() {
+		It("requests to generate the user", func() {
+			dummy := &DummyAuth{Response: &http.Response{
+				Body: ioutil.NopCloser(bytes.NewBufferString("")),
+			}}
+
+			ch, _ := New("https://example.com", Auth(dummy))
+
+			userOptions := generate.User{
+				Username: "name",
+				Length:   12,
+			}
+
+			ch.GenerateUser("/example-user", userOptions, true)
+			urlPath := dummy.Request.URL.Path
+			Expect(urlPath).To(Equal("/api/v1/data"))
+
+			Expect(dummy.Request.Method).To(Equal(http.MethodPost))
+
+			var requestBody map[string]interface{}
+			body, _ := ioutil.ReadAll(dummy.Request.Body)
+			json.Unmarshal(body, &requestBody)
+
+			Expect(requestBody["name"]).To(Equal("/example-user"))
+			Expect(requestBody["type"]).To(Equal("user"))
+			Expect(requestBody["overwrite"]).To(BeTrue())
+			Expect(requestBody["value"]).To(Equal(map[string]interface{}{"username": "name"}))
+			Expect(requestBody["parameters"]).To(Equal(map[string]interface{}{"length": float64(12)}))
+		})
+
+		Context("when successful", func() {
+			It("returns the generated user", func() {
+				dummy := &DummyAuth{Response: &http.Response{
+					StatusCode: http.StatusOK,
+					Body: ioutil.NopCloser(bytes.NewBufferString(`
+					 {
+  "id": "some-id",
+  "name": "/example-user",
+  "type": "user",
+  "value": {
+    "username": "generated-username",
+    "password": "generated-password"
+  },
+  "version_created_at": "2017-01-05T01:01:01Z"
+}`)),
+				}}
+
+				ch, _ := New("https://example.com", Auth(dummy))
+
+				p := generate.User{
+					Length: 12,
+				}
+
+				generatedUser, err := ch.GenerateUser("/example-user", p, false)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(generatedUser.Id).To(Equal("some-id"))
+				Expect(generatedUser.Type).To(Equal("user"))
+				Expect(generatedUser.Name).To(Equal("/example-user"))
+				Expect(generatedUser.Value.Username).To(BeEquivalentTo("generated-username"))
+				Expect(generatedUser.Value.Password).To(BeEquivalentTo("generated-password"))
+			})
+		})
+
+		Context("when request fails to complete", func() {
+			var err error
+			It("returns an error", func() {
+				networkError := errors.New("Network error occurred")
+				dummy := &DummyAuth{Error: networkError}
+				ch, _ := New("https://example.com", Auth(dummy))
+
+				_, err = ch.GenerateUser("/example-user", generate.User{}, false)
+
+				Expect(err).To(HaveOccurred())
+			})
+		})
+
+		Context("when response body cannot be unmarshalled", func() {
+			It("returns an error", func() {
+
+				dummy := &DummyAuth{Response: &http.Response{
+					Body: ioutil.NopCloser(bytes.NewBufferString("invalid-response")),
+				}}
+				ch, _ := New("https://example.com", Auth(dummy))
+
+				_, err := ch.GenerateUser("/example-user", generate.User{}, false)
+
+				Expect(err).To(HaveOccurred())
+			})
+
+		})
+	})
 })

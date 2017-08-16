@@ -10,12 +10,12 @@ type Password struct {
 }
 
 type User struct {
-	Username       string
-	Length         int
-	IncludeSpecial bool
-	ExcludeNumber  bool
-	ExcludeUpper   bool
-	ExcludeLower   bool
+	Username       string `json:"-"`
+	Length         int    `json:"length,omitempty"`
+	IncludeSpecial bool   `json:"include_special,omitempty"`
+	ExcludeNumber  bool   `json:"exclude_number,omitempty"`
+	ExcludeUpper   bool   `json:"exclude_upper,omitempty"`
+	ExcludeLower   bool   `json:"exclude_lower,omitempty"`
 }
 
 type Certificate struct {

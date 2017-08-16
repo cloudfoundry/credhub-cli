@@ -17,7 +17,9 @@ func (ch *CredHub) GeneratePassword(name string, gen generate.Password, overwrit
 
 // Generates a user credential based on the provided parameters.
 func (ch *CredHub) GenerateUser(name string, gen generate.User, overwrite bool) (credentials.User, error) {
-	panic("Not implemented")
+	var cred credentials.User
+	err := ch.generateCredential(name, "user", gen, overwrite, &cred)
+	return cred, err
 }
 
 // Generates a user credential based on the provided parameters.
@@ -43,6 +45,10 @@ func (ch *CredHub) generateCredential(name, credType string, gen interface{}, ov
 	requestBody["type"] = credType
 	requestBody["parameters"] = gen
 	requestBody["overwrite"] = overwrite
+
+	if user, ok := gen.(generate.User); ok {
+		requestBody["value"] = map[string]string{"username": user.Username}
+	}
 
 	resp, err := ch.Request(http.MethodPost, "/api/v1/data", nil, requestBody)
 
