@@ -28,7 +28,10 @@ func (ch *CredHub) SetPassword(name string, value values.Password, overwrite boo
 
 // Sets a User credential with a user-provided value.
 func (ch *CredHub) SetUser(name string, value values.User, overwrite bool) (credentials.User, error) {
-	panic("Not implemented")
+	var cred credentials.User
+	err := ch.setCredential(name, "user", value, overwrite, &cred)
+
+	return cred, err
 }
 
 // Sets a Certificate credential with a user-provided value.

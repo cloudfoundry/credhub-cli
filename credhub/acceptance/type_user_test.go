@@ -2,6 +2,7 @@ package acceptance_test
 
 import (
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials/generate"
+	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials/values"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -21,5 +22,23 @@ var _ = Describe("User Credential Type", func() {
 		user, err = credhubClient.GenerateUser(name, opts, false)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(user.Value).To(Equal(generatedUser))
+
+		newUser := values.User{Username: "name", Password: "password"}
+
+		By("setting the user again without overwrite returns same user")
+		user, err = credhubClient.SetUser(name, newUser, false)
+		Expect(err).ToNot(HaveOccurred())
+		Expect(user.Value).To(Equal(generatedUser))
+
+		By("overwriting the user with generate")
+		user, err = credhubClient.GenerateUser(name, opts, true)
+		Expect(err).ToNot(HaveOccurred())
+		Expect(user.Value.Password).To(HaveLen(10))
+		Expect(user.Value).ToNot(Equal(generatedUser))
+
+		By("overwriting the user with set")
+		user, err = credhubClient.SetUser(name, newUser, true)
+		Expect(err).ToNot(HaveOccurred())
+		Expect(user.Value.User).To(Equal(newUser))
 	})
 })

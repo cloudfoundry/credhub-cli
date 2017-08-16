@@ -182,4 +182,91 @@ var _ = Describe("Set", func() {
 			})
 		})
 	})
+
+	Describe("SetUser()", func() {
+		It("requests to set the user", func() {
+			dummy := &DummyAuth{Response: &http.Response{
+				Body: ioutil.NopCloser(bytes.NewBufferString("")),
+			}}
+
+			ch, _ := New("https://example.com", Auth(dummy))
+			user := values.User{Username: "some-user", Password: "some-password"}
+
+			ch.SetUser("/example-user", user, false)
+
+			urlPath := dummy.Request.URL.Path
+			Expect(urlPath).To(Equal("/api/v1/data"))
+			Expect(dummy.Request.Method).To(Equal(http.MethodPut))
+
+			body, _ := ioutil.ReadAll(dummy.Request.Body)
+			Expect(body).To(MatchJSON(`
+			{
+				"name" : "/example-user",
+				"type" : "user",
+				"overwrite" : false,
+				"value": {
+					"username" : "some-user",
+					"password" : "some-password"
+				}
+			}`))
+		})
+
+		Context("when successful", func() {
+			It("returns the credential that has been set", func() {
+				dummy := &DummyAuth{Response: &http.Response{
+					StatusCode: http.StatusOK,
+					Body: ioutil.NopCloser(bytes.NewBufferString(`
+					{
+						"id": "67fc3def-bbfb-4953-83f8-4ab0682ad675",
+						"name": "/example-user",
+						"type": "user",
+						"value": {
+							"username": "FQnwWoxgSrDuqDLmeLpU",
+							"password": "6mRPZB3bAfb8lRpacnXsHfDhlPqFcjH2h9YDvLpL",
+							"password_hash": "some-hash"
+						},
+						"version_created_at": "2017-01-05T01:01:01Z"
+					}`)),
+				}}
+
+				ch, _ := New("https://example.com", Auth(dummy))
+
+				user := values.User{Username: "username", Password: "some-user"}
+				cred, _ := ch.SetUser("/example-user", user, false)
+
+				Expect(cred.Name).To(Equal("/example-user"))
+				Expect(cred.Type).To(Equal("user"))
+				Expect(cred.Value.User).To(Equal(values.User{
+					Username: "FQnwWoxgSrDuqDLmeLpU",
+					Password: "6mRPZB3bAfb8lRpacnXsHfDhlPqFcjH2h9YDvLpL",
+				}))
+
+				Expect(cred.Value.PasswordHash).To(Equal("some-hash"))
+
+			})
+		})
+
+		Context("when request fails", func() {
+			It("returns an error", func() {
+				dummy := &DummyAuth{Error: errors.New("Network error occurred")}
+				ch, _ := New("https://example.com", Auth(dummy))
+				user := values.User{Username: "username", Password: "some-user"}
+				_, err := ch.SetUser("/example-user", user, false)
+				Expect(err).To(HaveOccurred())
+			})
+		})
+
+		Context("when response body cannot be unmarshalled", func() {
+			It("returns an error", func() {
+				dummy := &DummyAuth{Response: &http.Response{
+					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
+				}}
+				ch, _ := New("https://example.com", Auth(dummy))
+
+				user := values.User{Username: "username", Password: "some-user"}
+				_, err := ch.SetUser("/example-user", user, false)
+				Expect(err).To(HaveOccurred())
+			})
+		})
+	})
 })
