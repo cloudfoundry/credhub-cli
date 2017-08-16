@@ -14,7 +14,7 @@ import (
 var _ = Describe("RSA Credential Type", func() {
 	Specify("lifecycle", func() {
 		name := testCredentialPath("some-rsa")
-		opts := generate.RSA{KeyLength: 4096}
+		opts := generate.RSA{KeyLength: 2048}
 
 		By("generate rsa keys with path " + name)
 		generatedRSA, err := credhubClient.GenerateRSA(name, opts, false)
@@ -22,7 +22,7 @@ var _ = Describe("RSA Credential Type", func() {
 		block, _ := pem.Decode([]byte(generatedRSA.Value.PrivateKey))
 		privateKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
 		Expect(err).ToNot(HaveOccurred())
-		Expect(privateKey.N.BitLen()).To(Equal(4096))
+		Expect(privateKey.N.BitLen()).To(Equal(2048))
 
 		By("generate the rsa keys again without overwrite returns same rsa")
 		rsa, err := credhubClient.GenerateRSA(name, opts, false)
