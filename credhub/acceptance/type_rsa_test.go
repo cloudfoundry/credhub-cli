@@ -9,11 +9,12 @@ import (
 	"crypto/x509"
 
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials/generate"
+	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials/values"
 )
 
 var _ = Describe("RSA Credential Type", func() {
 	Specify("lifecycle", func() {
-		name := testCredentialPath("some-generatedRSA")
+		name := testCredentialPath("some-rsa")
 		opts := generate.RSA{KeyLength: 4096}
 
 		By("generate an rsa key with path " + name)
@@ -29,9 +30,20 @@ var _ = Describe("RSA Credential Type", func() {
 		Expect(err).ToNot(HaveOccurred())
 		Expect(rsa).To(Equal(generatedRSA))
 
-		By("overwriting the user with generate")
+		By("setting the rsa again without overwrite returns same rsa")
+		newRSA := values.RSA{PrivateKey: "private key", PublicKey: "public key"}
+		rsa, err = credhubClient.SetRSA(name, newRSA, false)
+		Expect(err).ToNot(HaveOccurred())
+		Expect(rsa).To(Equal(generatedRSA))
+
+		By("overwriting the rsa with generate")
 		rsa, err = credhubClient.GenerateRSA(name, opts, true)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(rsa).ToNot(Equal(generatedRSA))
+
+		By("overwriting the rsa with set")
+		rsa, err = credhubClient.SetRSA(name, newRSA, true)
+		Expect(err).ToNot(HaveOccurred())
+		Expect(rsa.Value).To(Equal(newRSA))
 	})
 })

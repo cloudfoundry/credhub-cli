@@ -44,7 +44,10 @@ func (ch *CredHub) SetCertificate(name string, value values.Certificate, overwri
 
 // Sets an RSA credential with a user-provided value.
 func (ch *CredHub) SetRSA(name string, value values.RSA, overwrite bool) (credentials.RSA, error) {
-	panic("Not implemented")
+	var cred credentials.RSA
+	err := ch.setCredential(name, "rsa", value, overwrite, &cred)
+
+	return cred, err
 }
 
 // Sets an SSH credential with a user-provided value.

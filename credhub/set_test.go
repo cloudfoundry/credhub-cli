@@ -269,4 +269,84 @@ var _ = Describe("Set", func() {
 			})
 		})
 	})
+
+	Describe("SetRSA()", func() {
+		It("requests to set the RSA", func() {
+			dummy := &DummyAuth{Response: &http.Response{
+				Body: ioutil.NopCloser(bytes.NewBufferString("")),
+			}}
+
+			ch, _ := New("https://example.com", Auth(dummy))
+			RSA := values.RSA{PrivateKey: "private-key", PublicKey: "public-key"}
+
+			ch.SetRSA("/example-rsa", RSA, false)
+
+			urlPath := dummy.Request.URL.Path
+			Expect(urlPath).To(Equal("/api/v1/data"))
+			Expect(dummy.Request.Method).To(Equal(http.MethodPut))
+
+			body, _ := ioutil.ReadAll(dummy.Request.Body)
+			Expect(body).To(MatchJSON(`
+			{
+				"name": "/example-rsa",
+				"type": "rsa",
+				"overwrite": false,
+				"value": {
+					"public_key": "public-key",
+					"private_key": "private-key"
+				}
+			}`))
+		})
+
+		Context("when successful", func() {
+			It("returns the credential that has been set", func() {
+				dummy := &DummyAuth{Response: &http.Response{
+					StatusCode: http.StatusOK,
+					Body: ioutil.NopCloser(bytes.NewBufferString(`
+					{
+						"id": "67fc3def-bbfb-4953-83f8-4ab0682ad676",
+						"name": "/example-rsa",
+						"type": "rsa",
+						"value": {
+							"public_key": "public-key",
+							"private_key": "private-key"
+						},
+						"version_created_at": "2017-01-01T04:07:18Z"
+					}`)),
+				}}
+
+				ch, _ := New("https://example.com", Auth(dummy))
+
+				cred, _ := ch.SetRSA("/example-rsa", values.RSA{}, false)
+
+				Expect(cred.Name).To(Equal("/example-rsa"))
+				Expect(cred.Type).To(Equal("rsa"))
+				Expect(cred.Value).To(Equal(values.RSA{
+					PrivateKey: "private-key",
+					PublicKey:  "public-key",
+				}))
+			})
+		})
+
+		Context("when request fails", func() {
+			It("returns an error", func() {
+				dummy := &DummyAuth{Error: errors.New("Network error occurred")}
+				ch, _ := New("https://example.com", Auth(dummy))
+				_, err := ch.SetRSA("/example-rsa", values.RSA{}, false)
+				Expect(err).To(HaveOccurred())
+			})
+		})
+
+		Context("when response body cannot be unmarshalled", func() {
+			It("returns an error", func() {
+				dummy := &DummyAuth{Response: &http.Response{
+					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
+				}}
+
+				ch, _ := New("https://example.com", Auth(dummy))
+				_, err := ch.SetRSA("/example-rsa", values.RSA{}, false)
+				Expect(err).To(HaveOccurred())
+			})
+		})
+	})
 })
