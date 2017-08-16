@@ -15,7 +15,10 @@ func (ch *CredHub) SetValue(name string, value values.Value, overwrite bool) (cr
 
 // Sets a JSON credential with a user-provided value.
 func (ch *CredHub) SetJSON(name string, value values.JSON, overwrite bool) (credentials.JSON, error) {
-	panic("Not implemented")
+	var cred credentials.JSON
+	err := ch.setCredential(name, "json", value, overwrite, &cred)
+
+	return cred, err
 }
 
 // Sets a Password credential with a user-provided value.

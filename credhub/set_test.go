@@ -429,4 +429,107 @@ var _ = Describe("Set", func() {
 			})
 		})
 	})
+
+	Describe("SetJSON()", func() {
+		It("requests to set the JSON", func() {
+			dummy := &DummyAuth{Response: &http.Response{
+				Body: ioutil.NopCloser(bytes.NewBufferString("")),
+			}}
+
+			ch, _ := New("https://example.com", Auth(dummy))
+			JSON := make(map[string]interface{})
+			json.Unmarshal([]byte(`{
+					"key": 123,
+					"key_list": [
+					  "val1",
+					  "val2"
+					],
+					"is_true": true
+				}`), &JSON)
+
+			ch.SetJSON("/example-json", JSON, false)
+
+			urlPath := dummy.Request.URL.Path
+			Expect(urlPath).To(Equal("/api/v1/data"))
+			Expect(dummy.Request.Method).To(Equal(http.MethodPut))
+
+			body, _ := ioutil.ReadAll(dummy.Request.Body)
+			Expect(body).To(MatchJSON(`
+			{
+			  "name": "/example-json",
+			  "overwrite": false,
+			  "type": "json",
+			  "value": {
+				"key": 123,
+				"key_list": [
+				  "val1",
+				  "val2"
+				],
+				"is_true": true
+			  }
+			}`))
+		})
+
+		Context("when successful", func() {
+			It("returns the credential that has been set", func() {
+				dummy := &DummyAuth{Response: &http.Response{
+					StatusCode: http.StatusOK,
+					Body: ioutil.NopCloser(bytes.NewBufferString(`
+					{
+						"id": "some-id",
+						"name": "/example-json",
+						"type": "json",
+						"value": {
+							"key": 123,
+							"key_list": [
+							  "val1",
+							  "val2"
+							],
+							"is_true": true
+						  },
+						"version_created_at": "2017-01-01T04:07:18Z"
+					}`)),
+				}}
+
+				JSON := make(map[string]interface{})
+				json.Unmarshal([]byte(`{
+					"key": 123,
+					"key_list": [
+					  "val1",
+					  "val2"
+					],
+					"is_true": true
+				}`), &JSON)
+
+				ch, _ := New("https://example.com", Auth(dummy))
+
+				cred, _ := ch.SetJSON("/example-json", nil, false)
+
+				Expect(cred.Name).To(Equal("/example-json"))
+				Expect(cred.Type).To(Equal("json"))
+				Expect(cred.Value).To(Equal(JSON))
+			})
+		})
+
+		Context("when request fails", func() {
+			It("returns an error", func() {
+				dummy := &DummyAuth{Error: errors.New("Network error occurred")}
+				ch, _ := New("https://example.com", Auth(dummy))
+				_, err := ch.SetJSON("/example-json", nil, false)
+				Expect(err).To(HaveOccurred())
+			})
+		})
+
+		Context("when response body cannot be unmarshalled", func() {
+			It("returns an error", func() {
+				dummy := &DummyAuth{Response: &http.Response{
+					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
+				}}
+
+				ch, _ := New("https://example.com", Auth(dummy))
+				_, err := ch.SetJSON("/example-json", nil, false)
+				Expect(err).To(HaveOccurred())
+			})
+		})
+	})
 })

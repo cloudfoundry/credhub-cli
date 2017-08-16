@@ -33,7 +33,10 @@ func (ch *CredHub) GetValue(name string) (credentials.Value, error) {
 
 // Returns the JSON credential by name.
 func (ch *CredHub) GetJSON(name string) (credentials.JSON, error) {
-	panic("Not implemented")
+	var cred credentials.JSON
+	err := ch.getCurrentCredential(name, &cred)
+
+	return cred, err
 }
 
 // Returns the current Password credential by name.
