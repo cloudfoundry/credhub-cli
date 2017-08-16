@@ -1,12 +1,11 @@
 package acceptance_test
 
 import (
+	"crypto/x509"
 	"encoding/pem"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-
-	"crypto/x509"
 
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials/generate"
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials/values"
