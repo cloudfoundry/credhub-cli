@@ -36,7 +36,7 @@ type Certificate struct {
 }
 
 type RSA struct {
-	KeyLength int
+	KeyLength int `json:"key_length"`
 }
 
 type SSH struct {

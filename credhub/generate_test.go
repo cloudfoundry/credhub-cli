@@ -288,4 +288,97 @@ var _ = Describe("Generate", func() {
 
 		})
 	})
+
+	Describe("GenerateRSA()", func() {
+		It("requests to generate the RSA", func() {
+			dummy := &DummyAuth{Response: &http.Response{
+				Body: ioutil.NopCloser(bytes.NewBufferString("")),
+			}}
+
+			ch, _ := New("https://example.com", Auth(dummy))
+
+			rsaOptions := generate.RSA{
+				KeyLength: 2048,
+			}
+
+			ch.GenerateRSA("/example-rsa", rsaOptions, true)
+			urlPath := dummy.Request.URL.Path
+			Expect(urlPath).To(Equal("/api/v1/data"))
+
+			Expect(dummy.Request.Method).To(Equal(http.MethodPost))
+
+			body, _ := ioutil.ReadAll(dummy.Request.Body)
+			Expect(body).To(MatchJSON(`
+			{
+				"name": "/example-rsa",
+				"type": "rsa",
+				"parameters": {
+					"key_length": 2048
+				},
+				"overwrite": true
+			}`))
+		})
+
+		Context("when successful", func() {
+			It("returns the generated RSA", func() {
+				dummy := &DummyAuth{Response: &http.Response{
+					StatusCode: http.StatusOK,
+					Body: ioutil.NopCloser(bytes.NewBufferString(`
+					{
+					  "id": "some-id",
+					  "name": "/example-rsa",
+					  "type": "rsa",
+					  "value": {
+						"public_key": "generated-public-key",
+						"private_key": "generated-private-key"
+					  },
+					  "version_created_at": "2017-01-01T04:07:18Z"
+					}`)),
+				}}
+
+				ch, _ := New("https://example.com", Auth(dummy))
+
+				p := generate.RSA{
+					KeyLength: 2048,
+				}
+
+				generatedRSA, err := ch.GenerateRSA("/example-rsa", p, false)
+
+				Expect(err).ToNot(HaveOccurred())
+				Expect(generatedRSA.Id).To(Equal("some-id"))
+				Expect(generatedRSA.Type).To(Equal("rsa"))
+				Expect(generatedRSA.Name).To(Equal("/example-rsa"))
+				Expect(generatedRSA.Value.PublicKey).To(Equal("generated-public-key"))
+				Expect(generatedRSA.Value.PrivateKey).To(Equal("generated-private-key"))
+			})
+		})
+
+		Context("when request fails to complete", func() {
+			var err error
+			It("returns an error", func() {
+				networkError := errors.New("Network error occurred")
+				dummy := &DummyAuth{Error: networkError}
+				ch, _ := New("https://example.com", Auth(dummy))
+
+				_, err = ch.GenerateRSA("/example-rsa", generate.RSA{}, false)
+
+				Expect(err).To(HaveOccurred())
+			})
+		})
+
+		Context("when response body cannot be unmarshalled", func() {
+			It("returns an error", func() {
+
+				dummy := &DummyAuth{Response: &http.Response{
+					Body: ioutil.NopCloser(bytes.NewBufferString("invalid-response")),
+				}}
+				ch, _ := New("https://example.com", Auth(dummy))
+
+				_, err := ch.GenerateRSA("/example-rsa", generate.RSA{}, false)
+
+				Expect(err).To(HaveOccurred())
+			})
+
+		})
+	})
 })
