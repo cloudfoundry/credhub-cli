@@ -62,7 +62,10 @@ func (ch *CredHub) GetCertificate(name string) (credentials.Certificate, error) 
 
 // Returns the current RSA credential by name.
 func (ch *CredHub) GetRSA(name string) (credentials.RSA, error) {
-	panic("Not implemented")
+	var cred credentials.RSA
+	err := ch.getCurrentCredential(name, &cred)
+
+	return cred, err
 }
 
 // Returns the current SSH credential by name.

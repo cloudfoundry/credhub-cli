@@ -289,4 +289,73 @@ var _ = Describe("Get", func() {
 			})
 		})
 	})
+
+	Describe("GetRSA()", func() {
+		It("requests the credential by name", func() {
+			dummy := &DummyAuth{Response: &http.Response{
+				Body: ioutil.NopCloser(bytes.NewBufferString("")),
+			}}
+
+			ch, _ := New("https://example.com", Auth(dummy))
+			ch.GetRSA("/example-rsa")
+			url := dummy.Request.URL
+			Expect(url.String()).To(Equal("https://example.com/api/v1/data?current=true&name=%2Fexample-rsa"))
+			Expect(dummy.Request.Method).To(Equal(http.MethodGet))
+		})
+
+		Context("when successful", func() {
+			It("returns a rsa credential", func() {
+				responseString := `{
+				  "data": [
+					{
+					  "id": "67fc3def-bbfb-4953-83f8-4ab0682ad677",
+					  "name": "/example-rsa",
+					  "type": "rsa",
+					  "value": {
+						"public_key": "public-key",
+						"private_key": "private-key"
+					  },
+					  "version_created_at": "2017-01-01T04:07:18Z"
+					}
+				  ]
+				}`
+
+				dummy := &DummyAuth{Response: &http.Response{
+					StatusCode: http.StatusOK,
+					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
+				}}
+
+				ch, _ := New("https://example.com", Auth(dummy))
+				cred, err := ch.GetRSA("/example-rsa")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(cred.Value).To(Equal(values.RSA{
+					PublicKey:  "public-key",
+					PrivateKey: "private-key",
+				}))
+			})
+		})
+
+		Context("when request fails", func() {
+			It("returns an error", func() {
+				networkError := errors.New("Network error occurred")
+				dummy := &DummyAuth{Error: networkError}
+				ch, _ := New("https://example.com", Auth(dummy))
+				_, err := ch.GetRSA("/example-rsa")
+
+				Expect(err).To(Equal(networkError))
+			})
+		})
+
+		Context("when response body cannot be unmarshalled", func() {
+			It("returns an error", func() {
+				dummy := &DummyAuth{Response: &http.Response{
+					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
+				}}
+				ch, _ := New("https://example.com", Auth(dummy))
+				_, err := ch.GetRSA("/example-cred")
+
+				Expect(err).To(HaveOccurred())
+			})
+		})
+	})
 })
