@@ -10,6 +10,7 @@ import (
 	. "github.com/onsi/gomega"
 
 	. "github.com/cloudfoundry-incubator/credhub-cli/credhub"
+	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials/values"
 )
 
 var _ = Describe("Get", func() {
@@ -213,6 +214,76 @@ var _ = Describe("Get", func() {
 				}}
 				ch, _ := New("https://example.com", Auth(dummy))
 				_, err := ch.GetCertificate("/example-cred")
+
+				Expect(err).To(HaveOccurred())
+			})
+		})
+	})
+
+	Describe("GetUser()", func() {
+		It("requests the credential by name", func() {
+			dummy := &DummyAuth{Response: &http.Response{
+				Body: ioutil.NopCloser(bytes.NewBufferString("")),
+			}}
+
+			ch, _ := New("https://example.com", Auth(dummy))
+			ch.GetUser("/example-user")
+			url := dummy.Request.URL
+			Expect(url.String()).To(Equal("https://example.com/api/v1/data?current=true&name=%2Fexample-user"))
+			Expect(dummy.Request.Method).To(Equal(http.MethodGet))
+		})
+
+		Context("when successful", func() {
+			It("returns a user credential", func() {
+				responseString := `{
+				  "data": [
+					{
+					  "id": "some-id",
+					  "name": "/example-user",
+					  "type": "user",
+					  "value": {
+						"username": "some-username",
+						"password": "some-password",
+						"password_hash": "some-hash"
+					  },
+					  "version_created_at": "2017-01-05T01:01:01Z"
+					}
+				  ]
+				}`
+				dummy := &DummyAuth{Response: &http.Response{
+					StatusCode: http.StatusOK,
+					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
+				}}
+
+				ch, _ := New("https://example.com", Auth(dummy))
+				cred, err := ch.GetUser("/example-user")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(cred.Value.PasswordHash).To(Equal("some-hash"))
+				Expect(cred.Value.User).To(Equal(values.User{
+					Username: "some-username",
+					Password: "some-password",
+				}))
+			})
+		})
+
+		Context("when request fails", func() {
+			It("returns an error", func() {
+				networkError := errors.New("Network error occurred")
+				dummy := &DummyAuth{Error: networkError}
+				ch, _ := New("https://example.com", Auth(dummy))
+				_, err := ch.GetUser("/example-user")
+
+				Expect(err).To(Equal(networkError))
+			})
+		})
+
+		Context("when response body cannot be unmarshalled", func() {
+			It("returns an error", func() {
+				dummy := &DummyAuth{Response: &http.Response{
+					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
+				}}
+				ch, _ := New("https://example.com", Auth(dummy))
+				_, err := ch.GetUser("/example-cred")
 
 				Expect(err).To(HaveOccurred())
 			})

@@ -46,7 +46,10 @@ func (ch *CredHub) GetPassword(name string) (credentials.Password, error) {
 
 // Returns the current User credential by name.
 func (ch *CredHub) GetUser(name string) (credentials.User, error) {
-	panic("Not implemented")
+	var cred credentials.User
+	err := ch.getCurrentCredential(name, &cred)
+
+	return cred, err
 }
 
 // Returns the current Certificate credential by name.
