@@ -38,7 +38,9 @@ func (ch *CredHub) GenerateRSA(name string, gen generate.RSA, overwrite bool) (c
 
 // Generates an SSH credential based on the provided parameters.
 func (ch *CredHub) GenerateSSH(name string, gen generate.SSH, overwrite bool) (credentials.SSH, error) {
-	panic("Not implemented")
+	var cred credentials.SSH
+	err := ch.generateCredential(name, "ssh", gen, overwrite, &cred)
+	return cred, err
 }
 
 func (ch *CredHub) generateCredential(name, credType string, gen interface{}, overwrite bool, cred interface{}) error {

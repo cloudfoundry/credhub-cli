@@ -40,6 +40,6 @@ type RSA struct {
 }
 
 type SSH struct {
-	SshComment string
-	KeyLength  int
+	Comment   string `json:"ssh_comment,omitempty"`
+	KeyLength int    `json:"key_length"`
 }

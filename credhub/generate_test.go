@@ -381,4 +381,97 @@ var _ = Describe("Generate", func() {
 
 		})
 	})
+
+	Describe("GenerateSSH()", func() {
+		It("requests to generate the SSH", func() {
+			dummy := &DummyAuth{Response: &http.Response{
+				Body: ioutil.NopCloser(bytes.NewBufferString("")),
+			}}
+
+			ch, _ := New("https://example.com", Auth(dummy))
+
+			sshOptions := generate.SSH{
+				KeyLength: 2048,
+			}
+
+			ch.GenerateSSH("/example-ssh", sshOptions, true)
+			urlPath := dummy.Request.URL.Path
+			Expect(urlPath).To(Equal("/api/v1/data"))
+
+			Expect(dummy.Request.Method).To(Equal(http.MethodPost))
+
+			body, _ := ioutil.ReadAll(dummy.Request.Body)
+			Expect(body).To(MatchJSON(`
+			{
+				"name": "/example-ssh",
+				"type": "ssh",
+				"parameters": {
+					"key_length": 2048
+				},
+				"overwrite": true
+			}`))
+		})
+
+		Context("when successful", func() {
+			It("returns the generated SSH", func() {
+				dummy := &DummyAuth{Response: &http.Response{
+					StatusCode: http.StatusOK,
+					Body: ioutil.NopCloser(bytes.NewBufferString(`
+					{
+					  "id": "some-id",
+					  "name": "/example-ssh",
+					  "type": "ssh",
+					  "value": {
+						"public_key": "generated-public-key",
+						"private_key": "generated-private-key"
+					  },
+					  "version_created_at": "2017-01-01T04:07:18Z"
+					}`)),
+				}}
+
+				ch, _ := New("https://example.com", Auth(dummy))
+
+				p := generate.SSH{
+					KeyLength: 2048,
+				}
+
+				generatedSSH, err := ch.GenerateSSH("/example-ssh", p, false)
+
+				Expect(err).ToNot(HaveOccurred())
+				Expect(generatedSSH.Id).To(Equal("some-id"))
+				Expect(generatedSSH.Type).To(Equal("ssh"))
+				Expect(generatedSSH.Name).To(Equal("/example-ssh"))
+				Expect(generatedSSH.Value.PublicKey).To(Equal("generated-public-key"))
+				Expect(generatedSSH.Value.PrivateKey).To(Equal("generated-private-key"))
+			})
+		})
+
+		Context("when request fails to complete", func() {
+			var err error
+			It("returns an error", func() {
+				networkError := errors.New("Network error occurred")
+				dummy := &DummyAuth{Error: networkError}
+				ch, _ := New("https://example.com", Auth(dummy))
+
+				_, err = ch.GenerateSSH("/example-ssh", generate.SSH{}, false)
+
+				Expect(err).To(HaveOccurred())
+			})
+		})
+
+		Context("when response body cannot be unmarshalled", func() {
+			It("returns an error", func() {
+
+				dummy := &DummyAuth{Response: &http.Response{
+					Body: ioutil.NopCloser(bytes.NewBufferString("invalid-response")),
+				}}
+				ch, _ := New("https://example.com", Auth(dummy))
+
+				_, err := ch.GenerateSSH("/example-ssh", generate.SSH{}, false)
+
+				Expect(err).To(HaveOccurred())
+			})
+
+		})
+	})
 })
