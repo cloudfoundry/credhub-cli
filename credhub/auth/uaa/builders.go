@@ -19,14 +19,14 @@ func ClientCredentialsGrantBuilder(clientId, clientSecret string) auth.Builder {
 func AuthBuilder(clientId, clientSecret, username, password, accessToken, refreshToken string) auth.Builder {
 	return func(config auth.Config) (auth.Strategy, error) {
 		httpClient := config.Client()
-		authUrl, err := config.AuthUrl()
+		authUrl, err := config.AuthURL()
 
 		if err != nil {
 			return nil, err
 		}
 
 		uaaClient := Client{
-			AuthUrl: authUrl,
+			AuthURL: authUrl,
 			Client:  httpClient,
 		}
 

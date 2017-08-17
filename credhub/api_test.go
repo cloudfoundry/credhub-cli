@@ -1,14 +1,14 @@
 package credhub_test
 
 import (
+	"bytes"
 	"errors"
 	"io/ioutil"
 	"net/http"
+	"net/http/httptest"
 
 	. "github.com/cloudfoundry-incubator/credhub-cli/credhub"
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/auth"
-
-	"bytes"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -20,6 +20,48 @@ var _ = Describe("Api", func() {
 			ch, err := New("http://example.com")
 			Expect(err).ToNot(HaveOccurred())
 			Expect(ch.Auth).ToNot(BeNil())
+		})
+
+		Context("when the AuthURL option is used", func() {
+			It("returns the url without hitting the api", func() {
+				apiHit := false
+
+				credHubServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+					apiHit = true
+					w.Write([]byte(`{
+						"auth-server": {"url": "https://uaa.example.com:8443"},
+						"app": {"name": "CredHub", "version": "0.7.0"}
+					}`))
+				}))
+
+				defer credHubServer.Close()
+
+				var authConfig auth.Config
+
+				authBuilder := func(config auth.Config) (auth.Strategy, error) {
+					authConfig = config
+					return http.DefaultClient, nil
+				}
+
+				ch, err := New(credHubServer.URL, AuthURL("https://some-auth-url.com"), AuthBuilder(authBuilder))
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(apiHit).To(BeFalse())
+				Expect(err).ToNot(HaveOccurred())
+
+				// Ensure builder is invoked with the correct AuthURL
+				Expect(authConfig.AuthURL()).To(Equal("https://some-auth-url.com"))
+				Expect(ch.AuthURL()).To(Equal("https://some-auth-url.com"))
+
+			})
+
+			Context("when the url is invalid", func() {
+				It("returns an error", func() {
+					ch, err := New("http://example.com", AuthURL("://some-auth-url.com"))
+					Expect(ch).To(BeNil())
+					Expect(err).To(HaveOccurred())
+				})
+			})
 		})
 
 		Context("when the Auth option is used", func() {

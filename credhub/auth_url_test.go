@@ -10,12 +10,12 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("AuthUrl()", func() {
+var _ = Describe("AuthURL()", func() {
 	Context("Errors", func() {
 
 		Specify("when ApiURL is inaccessible", func() {
 			ch, _ := New("http://localhost:1")
-			_, err := ch.AuthUrl()
+			_, err := ch.AuthURL()
 			Expect(err).ToNot(BeNil())
 		})
 
@@ -28,7 +28,7 @@ var _ = Describe("AuthUrl()", func() {
 			defer testServer.Close()
 
 			ch, _ := New(testServer.URL)
-			_, err := ch.AuthUrl()
+			_, err := ch.AuthURL()
 
 			Expect(err).ToNot(BeNil())
 		})

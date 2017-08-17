@@ -38,6 +38,7 @@ type CredHub struct {
 	insecureSkipVerify bool
 
 	authBuilder auth.Builder
+	authURL     *url.URL
 }
 
 // New creates a new CredHub API client with the provided server credentials and authentication method.
@@ -95,6 +96,13 @@ func Auth(strategy auth.Strategy) func(*CredHub) error {
 	return func(c *CredHub) error {
 		c.Auth = strategy
 		return nil
+	}
+}
+func AuthURL(authURL string) func(*CredHub) error {
+	return func(c *CredHub) error {
+		var err error
+		c.authURL, err = url.Parse(authURL)
+		return err
 	}
 }
 

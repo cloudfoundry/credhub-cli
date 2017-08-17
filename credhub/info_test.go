@@ -37,7 +37,7 @@ var _ = Describe("Info()", func() {
 
 		Expect(info.App.Name).To(Equal("CredHub"))
 		Expect(info.App.Version).To(Equal("0.7.0"))
-		Expect(info.AuthServer.Url).To(Equal("https://uaa.example.com:8443"))
+		Expect(info.AuthServer.URL).To(Equal("https://uaa.example.com:8443"))
 	})
 
 	Context("when the info endpoint cannot be parsed", func() {

@@ -14,7 +14,7 @@ type DummyServerConfig struct {
 	Error error
 }
 
-func (d *DummyServerConfig) AuthUrl() (string, error) {
+func (d *DummyServerConfig) AuthURL() (string, error) {
 	return "http://example.com/auth/url", d.Error
 }
 
@@ -33,7 +33,7 @@ var _ = Describe("Constructors", func() {
 			Expect(auth.ClientSecret).To(Equal("some-client-secret"))
 			Expect(auth.Username).To(Equal("some-username"))
 			Expect(auth.Password).To(Equal("some-password"))
-			Expect(auth.OAuthClient.(*Client).AuthUrl).To(Equal("http://example.com/auth/url"))
+			Expect(auth.OAuthClient.(*Client).AuthURL).To(Equal("http://example.com/auth/url"))
 			client := config.Client()
 			Expect(auth.OAuthClient.(*Client).Client).To(BeIdenticalTo(client))
 			Expect(auth.ApiClient).To(BeIdenticalTo(client))
@@ -63,7 +63,7 @@ var _ = Describe("Constructors", func() {
 			Expect(auth.ClientSecret).To(Equal("some-client-secret"))
 			Expect(auth.Username).To(BeEmpty())
 			Expect(auth.Password).To(BeEmpty())
-			Expect(auth.OAuthClient.(*Client).AuthUrl).To(Equal("http://example.com/auth/url"))
+			Expect(auth.OAuthClient.(*Client).AuthURL).To(Equal("http://example.com/auth/url"))
 			client := config.Client()
 			Expect(auth.OAuthClient.(*Client).Client).To(BeIdenticalTo(client))
 			Expect(auth.ApiClient).To(BeIdenticalTo(client))
@@ -100,7 +100,7 @@ var _ = Describe("Constructors", func() {
 			Expect(auth.Password).To(Equal("some-password"))
 			Expect(auth.AccessToken()).To(Equal("some-access-token"))
 			Expect(auth.RefreshToken()).To(Equal("some-refresh-token"))
-			Expect(auth.OAuthClient.(*Client).AuthUrl).To(Equal("http://example.com/auth/url"))
+			Expect(auth.OAuthClient.(*Client).AuthURL).To(Equal("http://example.com/auth/url"))
 			client := config.Client()
 			Expect(auth.OAuthClient.(*Client).Client).To(BeIdenticalTo(client))
 			Expect(auth.ApiClient).To(BeIdenticalTo(client))

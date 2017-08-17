@@ -13,7 +13,7 @@ type Strategy interface {
 
 // Provides client details to Builders
 type Config interface {
-	AuthUrl() (string, error)
+	AuthURL() (string, error)
 	Client() *http.Client
 }
 

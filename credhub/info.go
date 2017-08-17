@@ -8,7 +8,7 @@ type Info struct {
 		Version string
 	}
 	AuthServer struct {
-		Url string
+		URL string
 	} `json:"auth-server"`
 }
 

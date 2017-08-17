@@ -10,9 +10,9 @@ import (
 	"strings"
 )
 
-// Client makes requests to the UAA server at AuthUrl
+// Client makes requests to the UAA server at AuthURL
 type Client struct {
-	AuthUrl string
+	AuthURL string
 	Client  *http.Client
 }
 
@@ -68,7 +68,7 @@ func (u *Client) RefreshTokenGrant(clientId, clientSecret, refreshToken string) 
 }
 
 func (u *Client) tokenGrantRequest(headers url.Values) (token, error) {
-	request, _ := http.NewRequest("POST", u.AuthUrl+"/oauth/token", bytes.NewBufferString(headers.Encode()))
+	request, _ := http.NewRequest("POST", u.AuthURL+"/oauth/token", bytes.NewBufferString(headers.Encode()))
 	request.Header.Add("Accept", "application/json")
 	request.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
@@ -110,7 +110,7 @@ func (u *Client) RevokeToken(accessToken string) error {
 		return errors.New("could not parse jti from payload")
 	}
 
-	request, _ := http.NewRequest(http.MethodDelete, u.AuthUrl+"/oauth/token/revoke/"+jti, nil)
+	request, _ := http.NewRequest(http.MethodDelete, u.AuthURL+"/oauth/token/revoke/"+jti, nil)
 	request.Header.Set("Authorization", "Bearer "+accessToken)
 	resp, err := u.Client.Do(request)
 

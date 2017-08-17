@@ -35,7 +35,7 @@ var _ = Describe("Client", func() {
 			defer uaaServer.Close()
 
 			client := Client{
-				AuthUrl: uaaServer.URL,
+				AuthURL: uaaServer.URL,
 				Client:  http.DefaultClient,
 			}
 
@@ -72,7 +72,7 @@ var _ = Describe("Client", func() {
 			defer uaaServer.Close()
 
 			client := Client{
-				AuthUrl: uaaServer.URL,
+				AuthURL: uaaServer.URL,
 				Client:  http.DefaultClient,
 			}
 
@@ -109,7 +109,7 @@ var _ = Describe("Client", func() {
 			defer uaaServer.Close()
 
 			client := Client{
-				AuthUrl: uaaServer.URL,
+				AuthURL: uaaServer.URL,
 				Client:  http.DefaultClient,
 			}
 
@@ -135,7 +135,7 @@ var _ = Describe("Client", func() {
 			defer uaaServer.Close()
 
 			client := Client{
-				AuthUrl: uaaServer.URL,
+				AuthURL: uaaServer.URL,
 				Client:  http.DefaultClient,
 			}
 			err := client.RevokeToken(token)
@@ -155,7 +155,7 @@ var _ = Describe("Client", func() {
 				defer uaaServer.Close()
 
 				client := Client{
-					AuthUrl: uaaServer.URL,
+					AuthURL: uaaServer.URL,
 					Client:  http.DefaultClient,
 				}
 
@@ -181,7 +181,7 @@ var _ = Describe("Client", func() {
 			defer uaaServer.Close()
 
 			client := &Client{
-				AuthUrl: uaaServer.URL,
+				AuthURL: uaaServer.URL,
 				Client:  http.DefaultClient,
 			}
 
@@ -215,7 +215,7 @@ var _ = Describe("Client", func() {
 			defer uaaServer.Close()
 
 			client := &Client{
-				AuthUrl: uaaServer.URL,
+				AuthURL: uaaServer.URL,
 				Client:  http.DefaultClient,
 			}
 

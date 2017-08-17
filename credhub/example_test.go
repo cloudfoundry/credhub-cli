@@ -22,7 +22,7 @@ func ExampleCredHub() {
 		panic("credhub client configured incorrectly: " + err.Error())
 	}
 
-	authUrl, err := ch.AuthUrl()
+	authUrl, err := ch.AuthURL()
 	if err != nil {
 		panic("couldn't fetch authurl")
 	}
