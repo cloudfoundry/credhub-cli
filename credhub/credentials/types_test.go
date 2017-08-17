@@ -198,14 +198,11 @@ version_created_at: '2017-01-01T04:07:18Z'
         ],
         "is_true": true
       }`
-			var jsonValue map[string]interface{}
-			err = json.Unmarshal([]byte(jsonValueString), &jsonValue)
-			Expect(err).To(BeNil())
 
 			Expect(cred.Id).To(Equal("some-id"))
 			Expect(cred.Name).To(Equal("/example-json"))
 			Expect(cred.Type).To(Equal("json"))
-			Expect(cred.Value).To(Equal(jsonValue))
+			Expect([]byte(cred.Value)).To(MatchJSON(jsonValueString))
 			Expect(cred.VersionCreatedAt).To(Equal("2017-01-01T04:07:18Z"))
 
 			jsonOutput, err := json.Marshal(cred)

@@ -37,8 +37,23 @@ type Value struct {
 
 // A JSON type credential
 type JSON struct {
-	Metadata `yaml:",inline"`
-	Value    json.RawMessage `json:"value"`
+	Metadata
+	Value json.RawMessage `json:"value"`
+}
+
+func (j JSON) MarshalYAML() (interface{}, error) {
+	var x interface{}
+
+	json.Unmarshal(j.Value, &x)
+
+	return struct {
+		Metadata `yaml:",inline"`
+		Value    interface{}
+	}{
+		Metadata: j.Metadata,
+		Value:    x,
+	}, nil
+
 }
 
 // A Password type credential
