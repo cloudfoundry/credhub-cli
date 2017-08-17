@@ -463,6 +463,63 @@ var _ = Describe("OAuthStrategy", func() {
 			})
 		})
 	})
+
+	Context("Logout()", func() {
+		var uaa auth.OAuthStrategy
+
+		BeforeEach(func() {
+			uaa = auth.OAuthStrategy{
+				OAuthClient: mockUaaClient,
+			}
+			uaa.SetTokens("some-access-token", "some-refresh-token")
+		})
+
+		It("revokes the token", func() {
+			uaa.Logout()
+			Expect(mockUaaClient.RevokedToken).To(Equal("some-access-token"))
+		})
+
+		Context("when revoking the token succeeds", func() {
+			It("clears the access and refresh token", func() {
+				uaa.Logout()
+				Expect(uaa.AccessToken()).To(BeEmpty())
+				Expect(uaa.RefreshToken()).To(BeEmpty())
+			})
+
+			It("returns no error", func() {
+				err := uaa.Logout()
+				Expect(err).ToNot(HaveOccurred())
+			})
+		})
+
+		Context("when revoking the token fails", func() {
+			BeforeEach(func() {
+				mockUaaClient.Error = errors.New("failed to revoke token")
+			})
+
+			It("returns the error", func() {
+				err := uaa.Logout()
+				Expect(err).To(MatchError("failed to revoke token"))
+			})
+
+			It("does not clear the access and refresh token", func() {
+				uaa.Logout()
+				Expect(uaa.AccessToken()).ToNot(BeEmpty())
+				Expect(uaa.RefreshToken()).ToNot(BeEmpty())
+			})
+		})
+
+		Context("when we are not logged in", func() {
+			BeforeEach(func() {
+				uaa.SetTokens("", "")
+			})
+
+			It("does not attempt to revoke the token", func() {
+				uaa.Logout()
+				Expect(mockUaaClient.RevokedToken).To(BeEmpty())
+			})
+		})
+	})
 })
 
 func fixedResponseServer(statusCode int, body []byte) *httptest.Server {

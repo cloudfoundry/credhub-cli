@@ -2,9 +2,12 @@ package uaa
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/url"
+	"strings"
 )
 
 // Client makes requests to the UAA server at AuthUrl
@@ -86,6 +89,34 @@ func (u *Client) tokenGrantRequest(headers url.Values) (token, error) {
 }
 
 // RevokeToken revokes the given access token
-func (u *Client) RevokeToken(accessToken string) (err error) {
-	panic("not implemented")
+func (u *Client) RevokeToken(accessToken string) error {
+	segments := strings.Split(accessToken, ".")
+
+	if len(segments) < 2 {
+		return errors.New("access token missing segments")
+	}
+
+	jsonPayload, err := base64.RawURLEncoding.DecodeString(segments[1])
+
+	if err != nil {
+		return errors.New("could not base64 decode token payload")
+	}
+
+	payload := make(map[string]interface{})
+	json.Unmarshal(jsonPayload, &payload)
+	jti, ok := payload["jti"].(string)
+
+	if !ok {
+		return errors.New("could not parse jti from payload")
+	}
+
+	request, _ := http.NewRequest(http.MethodDelete, u.AuthUrl+"/oauth/token/revoke/"+jti, nil)
+	request.Header.Set("Authorization", "Bearer "+accessToken)
+	resp, err := u.Client.Do(request)
+
+	if err == nil {
+		defer resp.Body.Close()
+	}
+
+	return err
 }

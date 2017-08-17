@@ -17,8 +17,8 @@ type dummyUaaClient struct {
 	ClientSecret string
 	Username     string
 	Password     string
-	AccessToken  string
 	RefreshToken string
+	RevokedToken string
 
 	NewAccessToken  string
 	NewRefreshToken string
@@ -50,6 +50,6 @@ func (d *dummyUaaClient) RefreshTokenGrant(clientId, clientSecret, refreshToken 
 }
 
 func (d *dummyUaaClient) RevokeToken(token string) error {
-	d.AccessToken = token
+	d.RevokedToken = token
 	return d.Error
 }

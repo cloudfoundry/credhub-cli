@@ -67,6 +67,7 @@ func (a *OAuthStrategy) Do(req *http.Request) (*http.Response, error) {
 // Otherwise, client_credentials grant type will be used to retrieve a new access token.
 func (a *OAuthStrategy) Refresh() error {
 	refreshToken := a.RefreshToken()
+
 	if refreshToken == "" {
 		return a.requestToken()
 	}
@@ -83,8 +84,20 @@ func (a *OAuthStrategy) Refresh() error {
 }
 
 // Invalidate the access and refresh tokens on the OAuth server
-func (a *OAuthStrategy) Logout() {
-	panic("Not implemented")
+func (a *OAuthStrategy) Logout() error {
+	accessToken := a.AccessToken()
+
+	if accessToken == "" {
+		return nil
+	}
+
+	if err := a.OAuthClient.RevokeToken(a.AccessToken()); err != nil {
+		return err
+	}
+
+	a.SetTokens("", "")
+
+	return nil
 }
 
 // Login will make a token grant request to the OAuth server

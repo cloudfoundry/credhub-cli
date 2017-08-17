@@ -121,6 +121,54 @@ var _ = Describe("Client", func() {
 		})
 	})
 
+	Context("RevokeToken()", func() {
+		It("requests to revoke the token", func() {
+			token := "e30K.eyJqdGkiOiIxIn0K.e30K" // {}.{"jti":"1"}.{}
+
+			var request *http.Request
+
+			uaaServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				request = r
+				w.WriteHeader(http.StatusOK)
+			}))
+
+			defer uaaServer.Close()
+
+			client := Client{
+				AuthUrl: uaaServer.URL,
+				Client:  http.DefaultClient,
+			}
+			err := client.RevokeToken(token)
+
+			Expect(err).To(BeNil())
+			Expect(request.Method).To(Equal(http.MethodDelete))
+			Expect(request.Header.Get("Authorization")).To(Equal("Bearer " + token))
+			Expect(request.URL.Path).To(Equal("/oauth/token/revoke/1"))
+		})
+
+		DescribeTable("token is invallid",
+			func(token string) {
+				uaaServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.WriteHeader(http.StatusOK)
+				}))
+
+				defer uaaServer.Close()
+
+				client := Client{
+					AuthUrl: uaaServer.URL,
+					Client:  http.DefaultClient,
+				}
+
+				err := client.RevokeToken(token)
+				Expect(err).To(HaveOccurred())
+			},
+			Entry("missing segments", "first"),
+			Entry("not base64", "^first.^second.^third"),
+			Entry("not valid json", "bm90IGpzb24K.bm90IGpzb24K.bm90IGpzb24K"), // bm90IGpzb24K = not json
+			Entry("missing jti claim", "e30K.e30K.e30K"),                      // e30K = {}
+		)
+	})
+
 	DescribeTable("unable to complete the request",
 		func(performAction func(*Client) error) {
 			uaaServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -152,6 +200,9 @@ var _ = Describe("Client", func() {
 		Entry("refresh token grant", func(c *Client) error {
 			_, _, err := c.RefreshTokenGrant("client-id", "client-secret", "some-refresh-token")
 			return err
+		}),
+		Entry("revoke token", func(c *Client) error {
+			return c.RevokeToken("e30K.eyJqdGkiOiIxIn0K.e30K") // {}.{"jti":"1"}.{}
 		}),
 	)
 
