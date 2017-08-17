@@ -2,6 +2,8 @@
 package credentials
 
 import (
+	"encoding/json"
+
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials/values"
 )
 
@@ -36,7 +38,7 @@ type Value struct {
 // A JSON type credential
 type JSON struct {
 	Metadata `yaml:",inline"`
-	Value    values.JSON `json:"value"`
+	Value    json.RawMessage `json:"value"`
 }
 
 // A Password type credential

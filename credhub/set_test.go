@@ -491,23 +491,20 @@ var _ = Describe("Set", func() {
 					}`)),
 				}}
 
-				JSON := make(map[string]interface{})
-				json.Unmarshal([]byte(`{
-					"key": 123,
-					"key_list": [
-					  "val1",
-					  "val2"
-					],
-					"is_true": true
-				}`), &JSON)
-
 				ch, _ := New("https://example.com", Auth(dummy))
 
 				cred, _ := ch.SetJSON("/example-json", nil, false)
 
 				Expect(cred.Name).To(Equal("/example-json"))
 				Expect(cred.Type).To(Equal("json"))
-				Expect(cred.Value).To(Equal(JSON))
+				Expect([]byte(cred.Value)).To(MatchJSON(`{
+					"key": 123,
+					"key_list": [
+					  "val1",
+					  "val2"
+					],
+					"is_true": true
+				}`))
 			})
 		})
 

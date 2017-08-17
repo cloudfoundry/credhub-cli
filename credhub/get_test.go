@@ -2,7 +2,6 @@ package credhub_test
 
 import (
 	"bytes"
-	"encoding/json"
 	"errors"
 	"io/ioutil"
 	"net/http"
@@ -403,16 +402,6 @@ var _ = Describe("Get", func() {
 				  ]
 				}`
 
-				expectedJSON := make(map[string]interface{})
-				json.Unmarshal([]byte(`{
-						"key": 123,
-						"key_list": [
-						  "val1",
-						  "val2"
-						],
-						"is_true": true
-					}`), &expectedJSON)
-
 				dummy := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusOK,
 					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
@@ -421,7 +410,14 @@ var _ = Describe("Get", func() {
 				ch, _ := New("https://example.com", Auth(dummy))
 				cred, err := ch.GetJSON("/example-json")
 				Expect(err).ToNot(HaveOccurred())
-				Expect(cred.Value).To(Equal(expectedJSON))
+				Expect([]byte(cred.Value)).To(MatchJSON(`{
+						"key": 123,
+						"key_list": [
+						  "val1",
+						  "val2"
+						],
+						"is_true": true
+					}`))
 			})
 		})
 
