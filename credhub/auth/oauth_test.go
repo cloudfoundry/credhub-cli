@@ -4,10 +4,10 @@ import (
 	"errors"
 	"io/ioutil"
 	"net/http"
+	"net/http/httptest"
+	"strings"
 
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/auth"
-
-	"net/http/httptest"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -182,7 +182,7 @@ var _ = Describe("OAuthStrategy", func() {
 
 				uaa.SetTokens("old-access-token", "old-refresh-token")
 
-				request, _ := http.NewRequest("GET", apiServer.URL, nil)
+				request, _ := http.NewRequest("POST", apiServer.URL, strings.NewReader("some body"))
 
 				response, err := uaa.Do(request)
 
@@ -219,6 +219,17 @@ var _ = Describe("OAuthStrategy", func() {
 
 					Expect(err).To(MatchError("failed to refresh"))
 				})
+			})
+		})
+
+		Context("when cloning the request fails", func() {
+			It("returns an error", func() {
+				uaa := auth.OAuthStrategy{}
+				uaa.SetTokens("old-access-token", "old-refresh-token")
+				request, _ := http.NewRequest("POST", "http://some-domain.com", &errorReader{})
+
+				_, err := uaa.Do(request)
+				Expect(err).To(MatchError("failed to clone request body: error reading"))
 			})
 		})
 
@@ -527,4 +538,11 @@ func fixedResponseServer(statusCode int, body []byte) *httptest.Server {
 		w.WriteHeader(statusCode)
 		w.Write(body)
 	}))
+}
+
+type errorReader struct {
+}
+
+func (r *errorReader) Read(b []byte) (n int, err error) {
+	return 0, errors.New("error reading")
 }

@@ -3,6 +3,7 @@ package auth
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"net/http"
 	"sync"
@@ -41,6 +42,14 @@ func (a *OAuthStrategy) Do(req *http.Request) (*http.Response, error) {
 	}
 
 	req.Header.Set("Authorization", "Bearer "+a.AccessToken())
+
+	clone, err := cloneRequest(req)
+
+	if err != nil {
+		return nil, errors.New("failed to clone request body: " + err.Error())
+	}
+
+	req.Header.Set("Authorization", "Bearer "+a.AccessToken())
 	resp, err := a.ApiClient.Do(req)
 
 	if err != nil {
@@ -58,7 +67,7 @@ func (a *OAuthStrategy) Do(req *http.Request) (*http.Response, error) {
 	}
 
 	req.Header.Set("Authorization", "Bearer "+a.AccessToken())
-	return a.ApiClient.Do(req)
+	return a.ApiClient.Do(clone)
 }
 
 // Refresh the access token
@@ -182,6 +191,27 @@ func tokenExpired(resp *http.Response) (bool, error) {
 	}
 
 	return errResp["error"] == "access_token_expired", nil
+}
+
+func cloneRequest(r *http.Request) (*http.Request, error) {
+	if r.Body == nil {
+		return r, nil
+	}
+
+	r2 := new(http.Request)
+	*r2 = *r
+
+	// deep copy the body
+	buf, err := ioutil.ReadAll(r.Body)
+
+	if err != nil {
+		return nil, err
+	}
+
+	r.Body = ioutil.NopCloser(bytes.NewBuffer(buf))
+	r2.Body = ioutil.NopCloser(bytes.NewBuffer(buf))
+
+	return r2, nil
 }
 
 var _ Strategy = new(OAuthStrategy)
