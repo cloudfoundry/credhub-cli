@@ -348,10 +348,10 @@ var _ = Describe("Get", func() {
 				ch, _ := New("https://example.com", Auth(dummy))
 				cred, err := ch.GetSSH("/example-ssh")
 				Expect(err).ToNot(HaveOccurred())
-				Expect(cred.Value).To(Equal(values.SSH{
-					PublicKey:            "public-key",
-					PrivateKey:           "private-key",
-					PublicKeyFingerprint: "public-key-fingerprint",
+				Expect(cred.Value.PublicKeyFingerprint).To(Equal("public-key-fingerprint"))
+				Expect(cred.Value.SSH).To(Equal(values.SSH{
+					PublicKey:  "public-key",
+					PrivateKey: "private-key",
 				}))
 			})
 		})

@@ -1,7 +1,9 @@
 // CredHub credential types
 package credentials
 
-import "github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials/values"
+import (
+	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials/values"
+)
 
 // Base fields of a credential
 type Base struct {
@@ -67,5 +69,8 @@ type RSA struct {
 // An SSH type credential
 type SSH struct {
 	Metadata `yaml:",inline"`
-	Value    values.SSH `json:"value"`
+	Value    struct {
+		values.SSH           `yaml:",inline"`
+		PublicKeyFingerprint string `json:"public_key_fingerprint" yaml:"public_key_fingerprint"`
+	} `json:"value"`
 }

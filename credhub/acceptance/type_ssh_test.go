@@ -43,12 +43,12 @@ var _ = Describe("SSH Credential Type", func() {
 		By("overwriting with set")
 		ssh, err = credhubClient.SetSSH(name, newSSH, true)
 		Expect(err).ToNot(HaveOccurred())
-		Expect(ssh.Value).To(Equal(newSSH))
+		Expect(ssh.Value.SSH).To(Equal(newSSH))
 
 		By("getting the ssh credential")
 		ssh, err = credhubClient.GetSSH(name)
 		Expect(err).ToNot(HaveOccurred())
-		Expect(ssh.Value).To(Equal(newSSH))
+		Expect(ssh.Value.SSH).To(Equal(newSSH))
 
 		By("deleting the rsa credential")
 		err = credhubClient.Delete(name)

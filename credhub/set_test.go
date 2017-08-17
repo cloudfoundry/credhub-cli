@@ -401,7 +401,7 @@ var _ = Describe("Set", func() {
 
 				Expect(cred.Name).To(Equal("/example-ssh"))
 				Expect(cred.Type).To(Equal("ssh"))
-				Expect(cred.Value).To(Equal(values.SSH{
+				Expect(cred.Value.SSH).To(Equal(values.SSH{
 					PrivateKey: "private-key",
 					PublicKey:  "public-key",
 				}))
@@ -603,4 +603,5 @@ var _ = Describe("Set", func() {
 			})
 		})
 	})
+
 })
