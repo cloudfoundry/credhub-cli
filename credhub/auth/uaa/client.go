@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/url"
 	"strings"
@@ -20,6 +21,19 @@ type token struct {
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
 	TokenType    string `json:"token_type"`
+}
+
+type responseError struct {
+	Name        string `json:"error"`
+	Description string `json:"error_description"`
+}
+
+func (e *responseError) Error() string {
+	if e.Description == "" {
+		return e.Name
+	}
+
+	return fmt.Sprintf("%s %s", e.Name, e.Description)
 }
 
 // ClientCredentialGrant requests a token using client_credentials grant type
@@ -68,13 +82,13 @@ func (u *Client) RefreshTokenGrant(clientId, clientSecret, refreshToken string) 
 }
 
 func (u *Client) tokenGrantRequest(headers url.Values) (token, error) {
+	var t token
+
 	request, _ := http.NewRequest("POST", u.AuthURL+"/oauth/token", bytes.NewBufferString(headers.Encode()))
 	request.Header.Add("Accept", "application/json")
 	request.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
 	response, err := u.Client.Do(request)
-
-	var t token
 
 	if err != nil {
 		return t, err
@@ -83,9 +97,19 @@ func (u *Client) tokenGrantRequest(headers url.Values) (token, error) {
 	defer response.Body.Close()
 
 	decoder := json.NewDecoder(response.Body)
-	err = decoder.Decode(&t)
 
-	return t, err
+	if response.StatusCode >= 200 && response.StatusCode < 300 {
+		err = decoder.Decode(&t)
+		return t, err
+	}
+
+	respErr := responseError{}
+
+	if err := decoder.Decode(&respErr); err != nil {
+		return t, err
+	}
+
+	return t, &respErr
 }
 
 // RevokeToken revokes the given access token

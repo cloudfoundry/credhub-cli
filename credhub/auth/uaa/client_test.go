@@ -236,4 +236,66 @@ var _ = Describe("Client", func() {
 			return err
 		}),
 	)
+
+	DescribeTable("credentials are invalid",
+		func(performAction func(*Client) error) {
+			uaaServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(http.StatusUnauthorized)
+				w.Write([]byte(`{"error":"unauthorized","error_description":"Bad credentials"}`))
+			}))
+
+			defer uaaServer.Close()
+
+			client := &Client{
+				AuthURL: uaaServer.URL,
+				Client:  http.DefaultClient,
+			}
+
+			err := performAction(client)
+			Expect(err).To(HaveOccurred())
+		},
+		Entry("client credentials", func(c *Client) error {
+			_, err := c.ClientCredentialGrant("client-id", "client-secret")
+			return err
+		}),
+		Entry("password grant", func(c *Client) error {
+			_, _, err := c.PasswordGrant("some-client-id", "some-client-secret", "username", "password")
+			return err
+		}),
+		Entry("refresh token grant", func(c *Client) error {
+			_, _, err := c.RefreshTokenGrant("client-id", "client-secret", "some-refresh-token")
+			return err
+		}),
+	)
+
+	DescribeTable("error response is invalid",
+		func(performAction func(*Client) error) {
+			uaaServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(http.StatusUnauthorized)
+				w.Write([]byte(`{`))
+			}))
+
+			defer uaaServer.Close()
+
+			client := &Client{
+				AuthURL: uaaServer.URL,
+				Client:  http.DefaultClient,
+			}
+
+			err := performAction(client)
+			Expect(err.Error()).ToNot(BeEmpty())
+		},
+		Entry("client credentials", func(c *Client) error {
+			_, err := c.ClientCredentialGrant("client-id", "client-secret")
+			return err
+		}),
+		Entry("password grant", func(c *Client) error {
+			_, _, err := c.PasswordGrant("some-client-id", "some-client-secret", "username", "password")
+			return err
+		}),
+		Entry("refresh token grant", func(c *Client) error {
+			_, _, err := c.RefreshTokenGrant("client-id", "client-secret", "some-refresh-token")
+			return err
+		}),
+	)
 })
