@@ -95,7 +95,7 @@ func Example() {
 
 	// CredHub server at https://example.com, using UAA Password grant
 	ch, err := credhub.New("https://example.com",
-		credhub.CACerts([]string{"--- BEGIN ---\nroot-certificate\n--- END ---"}),
+		credhub.CaCerts(string("--- BEGIN ---\nroot-certificate\n--- END ---")),
 		credhub.AuthBuilder(uaa.PasswordGrantBuilder("credhub_cli", "", "username", "password")))
 
 	// We'll be working with a certificate stored at "/my-certificates/the-cert"

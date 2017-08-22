@@ -133,7 +133,7 @@ var _ = Describe("Api", func() {
 			}
 			caCerts = append(caCerts, "invalid certificate")
 
-			_, err := New("https://example.com", CACerts(caCerts))
+			_, err := New("https://example.com", CaCerts(caCerts...))
 			Expect(err).To(HaveOccurred())
 		})
 	})

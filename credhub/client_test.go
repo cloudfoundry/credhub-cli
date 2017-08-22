@@ -40,7 +40,7 @@ var _ = Describe("Client()", func() {
 				expectedRootCAs.AppendCertsFromPEM(caCertBytes)
 			}
 
-			ch, _ := New("https://example.com", CACerts(caCerts))
+			ch, _ := New("https://example.com", CaCerts(caCerts...))
 
 			client := ch.Client()
 

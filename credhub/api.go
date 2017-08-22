@@ -106,7 +106,7 @@ func AuthURL(authURL string) func(*CredHub) error {
 	}
 }
 
-func CACerts(certs []string) func(*CredHub) error {
+func CaCerts(certs ...string) func(*CredHub) error {
 	return func(c *CredHub) error {
 		c.caCerts = x509.NewCertPool()
 
