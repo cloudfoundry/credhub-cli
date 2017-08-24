@@ -8,20 +8,20 @@ import (
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/auth"
 )
 
-func AuthBuilder(method auth.Builder) func(*CredHub) error {
+func AuthBuilder(method auth.Builder) Option {
 	return func(c *CredHub) error {
 		c.authBuilder = method
 		return nil
 	}
 }
 
-func Auth(strategy auth.Strategy) func(*CredHub) error {
+func Auth(strategy auth.Strategy) Option {
 	return func(c *CredHub) error {
 		c.Auth = strategy
 		return nil
 	}
 }
-func AuthURL(authURL string) func(*CredHub) error {
+func AuthURL(authURL string) Option {
 	return func(c *CredHub) error {
 		var err error
 		c.authURL, err = url.Parse(authURL)
@@ -29,7 +29,7 @@ func AuthURL(authURL string) func(*CredHub) error {
 	}
 }
 
-func CaCerts(certs ...string) func(*CredHub) error {
+func CaCerts(certs ...string) Option {
 	return func(c *CredHub) error {
 		c.caCerts = x509.NewCertPool()
 
@@ -44,7 +44,7 @@ func CaCerts(certs ...string) func(*CredHub) error {
 	}
 }
 
-func SkipTLSValidation() func(*CredHub) error {
+func SkipTLSValidation() Option {
 	return func(c *CredHub) error {
 		c.insecureSkipVerify = true
 		return nil

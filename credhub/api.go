@@ -34,9 +34,11 @@ type CredHub struct {
 	authURL     *url.URL
 }
 
+type Option func(*CredHub) error
+
 // New creates a new CredHub API client with the provided server credentials and authentication method.
 // See the auth package for supported authentication methods.
-func New(addr string, options ...func(*CredHub) error) (*CredHub, error) {
+func New(addr string, options ...Option) (*CredHub, error) {
 	baseURL, err := url.Parse(addr)
 
 	if err != nil {
