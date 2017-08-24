@@ -5,18 +5,18 @@ import (
 )
 
 // Provides a Builder for a UAA authentication strategy using password grant type
-func PasswordGrantBuilder(clientId, clientSecret, username, password string) auth.Builder {
-	return AuthBuilder(clientId, clientSecret, username, password, "", "")
+func UaaPassword(clientId, clientSecret, username, password string) auth.Builder {
+	return Uaa(clientId, clientSecret, username, password, "", "")
 }
 
 // UaaClientCredentialGrant provides a Builder for a UAA authentication strategy
 // using client_credentials grant type
-func ClientCredentialsGrantBuilder(clientId, clientSecret string) auth.Builder {
-	return AuthBuilder(clientId, clientSecret, "", "", "", "")
+func UaaClientCredentials(clientId, clientSecret string) auth.Builder {
+	return Uaa(clientId, clientSecret, "", "", "", "")
 }
 
 // Provides a Builder for a UAA authentication strategy using existing tokens
-func AuthBuilder(clientId, clientSecret, username, password, accessToken, refreshToken string) auth.Builder {
+func Uaa(clientId, clientSecret, username, password, accessToken, refreshToken string) auth.Builder {
 	return func(config auth.Config) (auth.Strategy, error) {
 		httpClient := config.Client()
 		authUrl, err := config.AuthURL()

@@ -26,7 +26,7 @@ var _ = Describe("Constructors", func() {
 	Describe("PasswordGrant()", func() {
 		It("constructs a OAuthStrategy auth using password grant", func() {
 			config := DummyServerConfig{}
-			builder := PasswordGrantBuilder("some-client-id", "some-client-secret", "some-username", "some-password")
+			builder := UaaPassword("some-client-id", "some-client-secret", "some-username", "some-password")
 			strategy, _ := builder(&config)
 			auth := strategy.(*auth.OAuthStrategy)
 			Expect(auth.ClientId).To(Equal("some-client-id"))
@@ -44,7 +44,7 @@ var _ = Describe("Constructors", func() {
 				config := DummyServerConfig{
 					Error: errors.New("Failed to fetch Auth URL"),
 				}
-				builder := PasswordGrantBuilder("some-client-id", "some-client-secret", "some-username", "some-password")
+				builder := UaaPassword("some-client-id", "some-client-secret", "some-username", "some-password")
 				_, err := builder(&config)
 
 				Expect(err).To(MatchError("Failed to fetch Auth URL"))
@@ -56,7 +56,7 @@ var _ = Describe("Constructors", func() {
 	Describe("ClientCredentialsGrant()", func() {
 		It("constructs a OAuthStrategy auth using client credentials grant", func() {
 			config := DummyServerConfig{}
-			builder := ClientCredentialsGrantBuilder("some-client-id", "some-client-secret")
+			builder := UaaClientCredentials("some-client-id", "some-client-secret")
 			strategy, _ := builder(&config)
 			auth := strategy.(*auth.OAuthStrategy)
 			Expect(auth.ClientId).To(Equal("some-client-id"))
@@ -74,7 +74,7 @@ var _ = Describe("Constructors", func() {
 				config := DummyServerConfig{
 					Error: errors.New("Failed to fetch Auth URL"),
 				}
-				builder := ClientCredentialsGrantBuilder("some-client-id", "some-client-secret")
+				builder := UaaClientCredentials("some-client-id", "some-client-secret")
 				_, err := builder(&config)
 
 				Expect(err).To(MatchError("Failed to fetch Auth URL"))
@@ -86,7 +86,7 @@ var _ = Describe("Constructors", func() {
 	Describe("AuthBuilder()", func() {
 		It("constructs a OAuthStrategy auth using existing tokens", func() {
 			config := DummyServerConfig{}
-			builder := AuthBuilder("some-client-id",
+			builder := Uaa("some-client-id",
 				"some-client-secret",
 				"some-username",
 				"some-password",
@@ -111,7 +111,7 @@ var _ = Describe("Constructors", func() {
 				config := DummyServerConfig{
 					Error: errors.New("Failed to fetch Auth URL"),
 				}
-				builder := AuthBuilder("some-client-id",
+				builder := Uaa("some-client-id",
 					"some-client-secret",
 					"some-username",
 					"some-password",

@@ -8,19 +8,20 @@ import (
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/auth"
 )
 
-func AuthBuilder(method auth.Builder) Option {
+func Auth(method auth.Builder) Option {
 	return func(c *CredHub) error {
 		c.authBuilder = method
 		return nil
 	}
 }
 
-func Auth(strategy auth.Strategy) Option {
+func AuthStrategy(strategy auth.Strategy) Option {
 	return func(c *CredHub) error {
 		c.Auth = strategy
 		return nil
 	}
 }
+
 func AuthURL(authURL string) Option {
 	return func(c *CredHub) error {
 		var err error

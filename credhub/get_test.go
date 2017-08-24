@@ -22,7 +22,7 @@ var _ = Describe("Get", func() {
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
 
-			ch, _ := New("https://example.com", Auth(dummy))
+			ch, _ := New("https://example.com", AuthStrategy(dummy))
 
 			ch.Get("/example-password")
 			url := dummy.Request.URL.String()
@@ -47,7 +47,7 @@ var _ = Describe("Get", func() {
 					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
 				}}
 
-				ch, _ := New("https://example.com", Auth(dummy))
+				ch, _ := New("https://example.com", AuthStrategy(dummy))
 
 				cred, err := ch.Get("/example-password")
 				Expect(err).To(BeNil())
@@ -65,7 +65,7 @@ var _ = Describe("Get", func() {
 					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
 				}}
 
-				ch, _ := New("https://example.com", Auth(dummy))
+				ch, _ := New("https://example.com", AuthStrategy(dummy))
 				_, err := ch.Get("/example-password")
 
 				Expect(err).To(HaveOccurred())
@@ -78,7 +78,7 @@ var _ = Describe("Get", func() {
 					StatusCode: http.StatusOK,
 					Body:       ioutil.NopCloser(bytes.NewBufferString(`{"data":[]}`)),
 				}}
-				ch, _ := New("https://example.com", Auth(dummy))
+				ch, _ := New("https://example.com", AuthStrategy(dummy))
 				_, err := ch.Get("/example-password")
 
 				Expect(err).To(MatchError("response did not contain any credentials"))
@@ -92,7 +92,7 @@ var _ = Describe("Get", func() {
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
 
-			ch, _ := New("https://example.com", Auth(dummy))
+			ch, _ := New("https://example.com", AuthStrategy(dummy))
 			ch.GetPassword("/example-password")
 			url := dummy.Request.URL
 			Expect(url.String()).To(Equal("https://example.com/api/v1/data?current=true&name=%2Fexample-password"))
@@ -115,7 +115,7 @@ var _ = Describe("Get", func() {
 					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
 				}}
 
-				ch, _ := New("https://example.com", Auth(dummy))
+				ch, _ := New("https://example.com", AuthStrategy(dummy))
 				cred, err := ch.GetPassword("/example-password")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(cred.Value).To(BeEquivalentTo("some-password"))
@@ -127,7 +127,7 @@ var _ = Describe("Get", func() {
 				dummy := &DummyAuth{Response: &http.Response{
 					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
 				}}
-				ch, _ := New("https://example.com", Auth(dummy))
+				ch, _ := New("https://example.com", AuthStrategy(dummy))
 				_, err := ch.GetPassword("/example-cred")
 
 				Expect(err).To(HaveOccurred())
@@ -141,7 +141,7 @@ var _ = Describe("Get", func() {
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
 
-			ch, _ := New("https://example.com", Auth(dummy))
+			ch, _ := New("https://example.com", AuthStrategy(dummy))
 			ch.GetCertificate("/example-certificate")
 			url := dummy.Request.URL
 			Expect(url.String()).To(Equal("https://example.com/api/v1/data?current=true&name=%2Fexample-certificate"))
@@ -167,7 +167,7 @@ var _ = Describe("Get", func() {
 					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
 				}}
 
-				ch, _ := New("https://example.com", Auth(dummy))
+				ch, _ := New("https://example.com", AuthStrategy(dummy))
 
 				cred, err := ch.GetCertificate("/example-certificate")
 				Expect(err).ToNot(HaveOccurred())
@@ -183,7 +183,7 @@ var _ = Describe("Get", func() {
 				dummy := &DummyAuth{Response: &http.Response{
 					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
 				}}
-				ch, _ := New("https://example.com", Auth(dummy))
+				ch, _ := New("https://example.com", AuthStrategy(dummy))
 				_, err := ch.GetCertificate("/example-cred")
 
 				Expect(err).To(HaveOccurred())
@@ -197,7 +197,7 @@ var _ = Describe("Get", func() {
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
 
-			ch, _ := New("https://example.com", Auth(dummy))
+			ch, _ := New("https://example.com", AuthStrategy(dummy))
 			ch.GetUser("/example-user")
 			url := dummy.Request.URL
 			Expect(url.String()).To(Equal("https://example.com/api/v1/data?current=true&name=%2Fexample-user"))
@@ -226,7 +226,7 @@ var _ = Describe("Get", func() {
 					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
 				}}
 
-				ch, _ := New("https://example.com", Auth(dummy))
+				ch, _ := New("https://example.com", AuthStrategy(dummy))
 				cred, err := ch.GetUser("/example-user")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(cred.Value.PasswordHash).To(Equal("some-hash"))
@@ -242,7 +242,7 @@ var _ = Describe("Get", func() {
 				dummy := &DummyAuth{Response: &http.Response{
 					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
 				}}
-				ch, _ := New("https://example.com", Auth(dummy))
+				ch, _ := New("https://example.com", AuthStrategy(dummy))
 				_, err := ch.GetUser("/example-cred")
 
 				Expect(err).To(HaveOccurred())
@@ -256,7 +256,7 @@ var _ = Describe("Get", func() {
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
 
-			ch, _ := New("https://example.com", Auth(dummy))
+			ch, _ := New("https://example.com", AuthStrategy(dummy))
 			ch.GetRSA("/example-rsa")
 			url := dummy.Request.URL
 			Expect(url.String()).To(Equal("https://example.com/api/v1/data?current=true&name=%2Fexample-rsa"))
@@ -285,7 +285,7 @@ var _ = Describe("Get", func() {
 					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
 				}}
 
-				ch, _ := New("https://example.com", Auth(dummy))
+				ch, _ := New("https://example.com", AuthStrategy(dummy))
 				cred, err := ch.GetRSA("/example-rsa")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(cred.Value).To(Equal(values.RSA{
@@ -300,7 +300,7 @@ var _ = Describe("Get", func() {
 				dummy := &DummyAuth{Response: &http.Response{
 					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
 				}}
-				ch, _ := New("https://example.com", Auth(dummy))
+				ch, _ := New("https://example.com", AuthStrategy(dummy))
 				_, err := ch.GetRSA("/example-cred")
 
 				Expect(err).To(HaveOccurred())
@@ -314,7 +314,7 @@ var _ = Describe("Get", func() {
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
 
-			ch, _ := New("https://example.com", Auth(dummy))
+			ch, _ := New("https://example.com", AuthStrategy(dummy))
 			ch.GetSSH("/example-ssh")
 			url := dummy.Request.URL
 			Expect(url.String()).To(Equal("https://example.com/api/v1/data?current=true&name=%2Fexample-ssh"))
@@ -344,7 +344,7 @@ var _ = Describe("Get", func() {
 					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
 				}}
 
-				ch, _ := New("https://example.com", Auth(dummy))
+				ch, _ := New("https://example.com", AuthStrategy(dummy))
 				cred, err := ch.GetSSH("/example-ssh")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(cred.Value.PublicKeyFingerprint).To(Equal("public-key-fingerprint"))
@@ -360,7 +360,7 @@ var _ = Describe("Get", func() {
 				dummy := &DummyAuth{Response: &http.Response{
 					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
 				}}
-				ch, _ := New("https://example.com", Auth(dummy))
+				ch, _ := New("https://example.com", AuthStrategy(dummy))
 				_, err := ch.GetSSH("/example-cred")
 
 				Expect(err).To(HaveOccurred())
@@ -374,7 +374,7 @@ var _ = Describe("Get", func() {
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
 
-			ch, _ := New("https://example.com", Auth(dummy))
+			ch, _ := New("https://example.com", AuthStrategy(dummy))
 			ch.GetJSON("/example-json")
 			url := dummy.Request.URL
 			Expect(url.String()).To(Equal("https://example.com/api/v1/data?current=true&name=%2Fexample-json"))
@@ -407,7 +407,7 @@ var _ = Describe("Get", func() {
 					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
 				}}
 
-				ch, _ := New("https://example.com", Auth(dummy))
+				ch, _ := New("https://example.com", AuthStrategy(dummy))
 				cred, err := ch.GetJSON("/example-json")
 				Expect(err).ToNot(HaveOccurred())
 				Expect([]byte(cred.Value)).To(MatchJSON(`{
@@ -426,7 +426,7 @@ var _ = Describe("Get", func() {
 				dummy := &DummyAuth{Response: &http.Response{
 					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
 				}}
-				ch, _ := New("https://example.com", Auth(dummy))
+				ch, _ := New("https://example.com", AuthStrategy(dummy))
 				_, err := ch.GetJSON("/example-cred")
 
 				Expect(err).To(HaveOccurred())
@@ -440,7 +440,7 @@ var _ = Describe("Get", func() {
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
 
-			ch, _ := New("https://example.com", Auth(dummy))
+			ch, _ := New("https://example.com", AuthStrategy(dummy))
 			ch.GetValue("/example-value")
 			url := dummy.Request.URL
 			Expect(url.String()).To(Equal("https://example.com/api/v1/data?current=true&name=%2Fexample-value"))
@@ -464,7 +464,7 @@ var _ = Describe("Get", func() {
 					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
 				}}
 
-				ch, _ := New("https://example.com", Auth(dummy))
+				ch, _ := New("https://example.com", AuthStrategy(dummy))
 				cred, err := ch.GetValue("/example-value")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(cred.Value).To(Equal(values.Value("some-value")))
@@ -476,7 +476,7 @@ var _ = Describe("Get", func() {
 				dummy := &DummyAuth{Response: &http.Response{
 					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
 				}}
-				ch, _ := New("https://example.com", Auth(dummy))
+				ch, _ := New("https://example.com", AuthStrategy(dummy))
 				_, err := ch.GetValue("/example-cred")
 
 				Expect(err).To(HaveOccurred())
@@ -488,7 +488,7 @@ var _ = Describe("Get", func() {
 		func(performAction func(*CredHub) error) {
 			networkError := errors.New("Network error occurred")
 			dummy := &DummyAuth{Error: networkError}
-			ch, _ := New("https://example.com", Auth(dummy))
+			ch, _ := New("https://example.com", AuthStrategy(dummy))
 
 			err := performAction(ch)
 

@@ -41,7 +41,7 @@ var _ = Describe("Api", func() {
 					return http.DefaultClient, nil
 				}
 
-				ch, err := New(credHubServer.URL, AuthURL("https://some-auth-url.com"), AuthBuilder(authBuilder))
+				ch, err := New(credHubServer.URL, AuthURL("https://some-auth-url.com"), Auth(authBuilder))
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(apiHit).To(BeFalse())
@@ -65,7 +65,7 @@ var _ = Describe("Api", func() {
 		Context("when the Auth option is used", func() {
 			It("sets the Auth", func() {
 				expectedAuth := &DummyAuth{}
-				ch, err := New("http://example.com", Auth(expectedAuth))
+				ch, err := New("http://example.com", AuthStrategy(expectedAuth))
 
 				Expect(err).ToNot(HaveOccurred())
 
@@ -82,7 +82,7 @@ var _ = Describe("Api", func() {
 					return nil, nil
 				}
 
-				_, err := New("http://example.com", Auth(&DummyAuth{}), AuthBuilder(builder))
+				_, err := New("http://example.com", AuthStrategy(&DummyAuth{}), Auth(builder))
 
 				Expect(err).ToNot(HaveOccurred())
 
@@ -96,7 +96,7 @@ var _ = Describe("Api", func() {
 					return &DummyAuth{Config: config}, nil
 				}
 
-				ch, err := New("http://example.com", AuthBuilder(dummyBuilder))
+				ch, err := New("http://example.com", Auth(dummyBuilder))
 				Expect(err).ToNot(HaveOccurred())
 
 				da, ok := ch.Auth.(*DummyAuth)
