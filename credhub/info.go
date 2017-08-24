@@ -1,18 +1,12 @@
 package credhub
 
-import "encoding/json"
+import (
+	"encoding/json"
 
-type Info struct {
-	App struct {
-		Name    string
-		Version string
-	}
-	AuthServer struct {
-		URL string
-	} `json:"auth-server"`
-}
+	"github.com/cloudfoundry-incubator/credhub-cli/credhub/server"
+)
 
-func (c *CredHub) Info() (*Info, error) {
+func (c *CredHub) Info() (*server.Info, error) {
 	response, err := c.request("GET", "/info", nil)
 	if err != nil {
 		return nil, err
@@ -20,7 +14,7 @@ func (c *CredHub) Info() (*Info, error) {
 
 	defer response.Body.Close()
 
-	info := &Info{}
+	info := &server.Info{}
 	decoder := json.NewDecoder(response.Body)
 
 	if err = decoder.Decode(&info); err != nil {
