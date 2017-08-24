@@ -1,6 +1,10 @@
 package credhub
 
-import "net/url"
+import (
+	"net/url"
+
+	"github.com/cloudfoundry-incubator/credhub-cli/credhub/auth"
+)
 
 // New creates a new CredHub API client with the provided server credentials and authentication method.
 // See the auth package for supported authentication methods.
@@ -12,8 +16,9 @@ func New(addr string, options ...Option) (*CredHub, error) {
 	}
 
 	credhub := &CredHub{
-		ApiURL:  addr,
-		baseURL: baseURL,
+		ApiURL:      addr,
+		baseURL:     baseURL,
+		authBuilder: auth.Noop,
 	}
 
 	for _, option := range options {
@@ -26,15 +31,6 @@ func New(addr string, options ...Option) (*CredHub, error) {
 		credhub.defaultClient = httpsClient(credhub.insecureSkipVerify, credhub.caCerts)
 	} else {
 		credhub.defaultClient = httpClient()
-	}
-
-	if credhub.Auth != nil {
-		return credhub, nil
-	}
-
-	if credhub.authBuilder == nil {
-		credhub.Auth = credhub.defaultClient
-		return credhub, nil
 	}
 
 	credhub.Auth, err = credhub.authBuilder(credhub)

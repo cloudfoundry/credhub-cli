@@ -17,13 +17,6 @@ func Auth(method auth.Builder) Option {
 	}
 }
 
-func AuthStrategy(strategy auth.Strategy) Option {
-	return func(c *CredHub) error {
-		c.Auth = strategy
-		return nil
-	}
-}
-
 func AuthURL(authURL string) Option {
 	return func(c *CredHub) error {
 		var err error

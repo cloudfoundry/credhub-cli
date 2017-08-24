@@ -62,34 +62,6 @@ var _ = Describe("Api", func() {
 			})
 		})
 
-		Context("when the Auth option is used", func() {
-			It("sets the Auth", func() {
-				expectedAuth := &DummyAuth{}
-				ch, err := New("http://example.com", AuthStrategy(expectedAuth))
-
-				Expect(err).ToNot(HaveOccurred())
-
-				auth, ok := ch.Auth.(*DummyAuth)
-
-				Expect(ok).To(BeTrue())
-				Expect(auth).To(BeIdenticalTo(expectedAuth))
-			})
-
-			It("ignores the auth builder option", func() {
-				builderCalled := false
-				builder := func(config auth.Config) (auth.Strategy, error) {
-					builderCalled = true
-					return nil, nil
-				}
-
-				_, err := New("http://example.com", AuthStrategy(&DummyAuth{}), Auth(builder))
-
-				Expect(err).ToNot(HaveOccurred())
-
-				Expect(builderCalled).To(BeFalse())
-			})
-		})
-
 		Context("when the auth builder is used", func() {
 			It("invokes the auth builder", func() {
 				dummyBuilder := func(config auth.Config) (auth.Strategy, error) {

@@ -1,13 +1,12 @@
-package uaa
+package auth
 
 import (
 	"errors"
 	"net/http"
 
+	"github.com/cloudfoundry-incubator/credhub-cli/credhub/auth/uaa"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub/auth"
 )
 
 type DummyServerConfig struct {
@@ -28,14 +27,14 @@ var _ = Describe("Constructors", func() {
 			config := DummyServerConfig{}
 			builder := UaaPassword("some-client-id", "some-client-secret", "some-username", "some-password")
 			strategy, _ := builder(&config)
-			auth := strategy.(*auth.OAuthStrategy)
+			auth := strategy.(*OAuthStrategy)
 			Expect(auth.ClientId).To(Equal("some-client-id"))
 			Expect(auth.ClientSecret).To(Equal("some-client-secret"))
 			Expect(auth.Username).To(Equal("some-username"))
 			Expect(auth.Password).To(Equal("some-password"))
-			Expect(auth.OAuthClient.(*Client).AuthURL).To(Equal("http://example.com/auth/url"))
+			Expect(auth.OAuthClient.(*uaa.Client).AuthURL).To(Equal("http://example.com/auth/url"))
 			client := config.Client()
-			Expect(auth.OAuthClient.(*Client).Client).To(BeIdenticalTo(client))
+			Expect(auth.OAuthClient.(*uaa.Client).Client).To(BeIdenticalTo(client))
 			Expect(auth.ApiClient).To(BeIdenticalTo(client))
 		})
 
@@ -58,14 +57,14 @@ var _ = Describe("Constructors", func() {
 			config := DummyServerConfig{}
 			builder := UaaClientCredentials("some-client-id", "some-client-secret")
 			strategy, _ := builder(&config)
-			auth := strategy.(*auth.OAuthStrategy)
+			auth := strategy.(*OAuthStrategy)
 			Expect(auth.ClientId).To(Equal("some-client-id"))
 			Expect(auth.ClientSecret).To(Equal("some-client-secret"))
 			Expect(auth.Username).To(BeEmpty())
 			Expect(auth.Password).To(BeEmpty())
-			Expect(auth.OAuthClient.(*Client).AuthURL).To(Equal("http://example.com/auth/url"))
+			Expect(auth.OAuthClient.(*uaa.Client).AuthURL).To(Equal("http://example.com/auth/url"))
 			client := config.Client()
-			Expect(auth.OAuthClient.(*Client).Client).To(BeIdenticalTo(client))
+			Expect(auth.OAuthClient.(*uaa.Client).Client).To(BeIdenticalTo(client))
 			Expect(auth.ApiClient).To(BeIdenticalTo(client))
 		})
 
@@ -93,16 +92,16 @@ var _ = Describe("Constructors", func() {
 				"some-access-token",
 				"some-refresh-token")
 			strategy, _ := builder(&config)
-			auth := strategy.(*auth.OAuthStrategy)
+			auth := strategy.(*OAuthStrategy)
 			Expect(auth.ClientId).To(Equal("some-client-id"))
 			Expect(auth.ClientSecret).To(Equal("some-client-secret"))
 			Expect(auth.Username).To(Equal("some-username"))
 			Expect(auth.Password).To(Equal("some-password"))
 			Expect(auth.AccessToken()).To(Equal("some-access-token"))
 			Expect(auth.RefreshToken()).To(Equal("some-refresh-token"))
-			Expect(auth.OAuthClient.(*Client).AuthURL).To(Equal("http://example.com/auth/url"))
+			Expect(auth.OAuthClient.(*uaa.Client).AuthURL).To(Equal("http://example.com/auth/url"))
 			client := config.Client()
-			Expect(auth.OAuthClient.(*Client).Client).To(BeIdenticalTo(client))
+			Expect(auth.OAuthClient.(*uaa.Client).Client).To(BeIdenticalTo(client))
 			Expect(auth.ApiClient).To(BeIdenticalTo(client))
 		})
 

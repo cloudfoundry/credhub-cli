@@ -30,6 +30,12 @@ func (d *DummyAuth) Do(req *http.Request) (*http.Response, error) {
 	return d.Response, d.Error
 }
 
+func (d *DummyAuth) Builder() auth.Builder {
+	return func(config auth.Config) (auth.Strategy, error) {
+		return d, nil
+	}
+}
+
 var _ auth.Strategy = new(DummyAuth)
 
 type NotMarshallable struct{}
