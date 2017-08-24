@@ -8,8 +8,8 @@ import (
 )
 
 // Provides an unauthenticated http.Client to the CredHub server
-func (c *CredHub) Client() *http.Client {
-	return c.defaultClient
+func (ch *CredHub) Client() *http.Client {
+	return ch.defaultClient
 }
 func httpClient() *http.Client {
 	return &http.Client{

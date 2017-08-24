@@ -1,10 +1,21 @@
 package auth
 
 import (
+	"net/http"
+
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/auth/uaa"
 )
 
-func Noop(config Config) (Strategy, error) {
+// Config provides CredHub configuration necessary to build an auth Strategy
+type Config interface {
+	AuthURL() (string, error)
+	Client() *http.Client
+}
+
+// Builder constructs the auth type given a configuration
+type Builder func(config Config) (Strategy, error)
+
+var Noop Builder = func(config Config) (Strategy, error) {
 	return &NoopStrategy{config.Client()}, nil
 }
 

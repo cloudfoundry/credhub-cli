@@ -17,8 +17,8 @@ import (
 //
 // Use Request() directly to access the CredHub server if an appropriate helper method is not available.
 // For unauthenticated requests (eg. /health), use Config.Client() instead.
-func (c *CredHub) Request(method string, pathStr string, query url.Values, body interface{}) (*http.Response, error) {
-	u := *c.baseURL // clone
+func (ch *CredHub) Request(method string, pathStr string, query url.Values, body interface{}) (*http.Response, error) {
+	u := *ch.baseURL // clone
 	u.Path = pathStr
 	u.RawQuery = query.Encode()
 
@@ -34,23 +34,23 @@ func (c *CredHub) Request(method string, pathStr string, query url.Values, body 
 
 	req.Header.Set("Content-Type", "application/json")
 
-	resp, err := c.Auth.Do(req)
+	resp, err := ch.Auth.Do(req)
 
 	if err != nil {
 		return resp, err
 	}
 
-	if err := c.checkForServerError(resp); err != nil {
+	if err := ch.checkForServerError(resp); err != nil {
 		return nil, err
 	}
 
 	return resp, err
 }
 
-func (c *CredHub) request(method string, path string, body io.Reader) (*http.Response, error) {
-	client := c.Client()
+func (ch *CredHub) request(method string, path string, body io.Reader) (*http.Response, error) {
+	client := ch.Client()
 
-	url := *c.baseURL // clone
+	url := *ch.baseURL // clone
 	url.Path = path
 
 	request, _ := http.NewRequest(method, url.String(), body)
@@ -61,14 +61,14 @@ func (c *CredHub) request(method string, path string, body io.Reader) (*http.Res
 		return resp, err
 	}
 
-	if err := c.checkForServerError(resp); err != nil {
+	if err := ch.checkForServerError(resp); err != nil {
 		return nil, err
 	}
 
 	return resp, err
 }
 
-func (c *CredHub) checkForServerError(resp *http.Response) error {
+func (ch *CredHub) checkForServerError(resp *http.Response) error {
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		defer resp.Body.Close()
 		dec := json.NewDecoder(resp.Body)
