@@ -12,13 +12,14 @@ import (
 
 // CredHub client to access CredHub APIs.
 //
-// Use New() to construct a new CredHub object, which can then interact with the CredHub api.
+// Use New() to construct a new CredHub object, which can then interact with the CredHub API.
 type CredHub struct {
+	// ApiURL is the full url to the target CredHub server
 	ApiURL string
 
-	// Strategy provides http.Client-like Do method for authenticated requests to the CredHub server
-	// Can be typecast to a specific Strategy type to get additional information and functionality.
-	// eg. auth.OAuthStrategy provides Logout(), Refresh(), AccessToken and RefreshToken
+	// Auth provides an authentication Strategy for authenticated requests to the CredHub server
+	// Can be type asserted to a specific Strategy type to get additional functionality and information.
+	// eg. auth.OAuthStrategy provides Logout(), Refresh(), AccessToken() and RefreshToken()
 	Auth auth.Strategy
 
 	baseURL       *url.URL

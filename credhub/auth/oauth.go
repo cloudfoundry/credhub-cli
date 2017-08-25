@@ -10,8 +10,6 @@ import (
 )
 
 // OAuth authentication strategy
-//
-// Fields will be filled in based on Builder used to construct strategy.
 type OAuthStrategy struct {
 	accessToken  string
 	refreshToken string
@@ -33,9 +31,9 @@ type OAuthClient interface {
 	RevokeToken(token string) error
 }
 
-// Provides http.Client-like interface to send requests authenticated with OAuth
+// Do submits requests with bearer token authorization, using the AccessToken as the bearer token.
 //
-// Will automatically refresh the access token and retry the request if the token has expired.
+// Will automatically refresh the AccessToken and retry the request if the token has expired.
 func (a *OAuthStrategy) Do(req *http.Request) (*http.Response, error) {
 	if err := a.Login(); err != nil {
 		return nil, err
@@ -70,10 +68,10 @@ func (a *OAuthStrategy) Do(req *http.Request) (*http.Response, error) {
 	return a.ApiClient.Do(clone)
 }
 
-// Refresh the access token
-// If refresh token is available (ie. constructed with UaaPasswordGrant() or UaaSession()),
-// a refresh grant will be used.
-// Otherwise, client_credentials grant type will be used to retrieve a new access token.
+// Refresh will get a new AccessToken
+//
+// If RefreshToken is available, a refresh token grant will be used, otherwise
+// client credential grant will be used.
 func (a *OAuthStrategy) Refresh() error {
 	refreshToken := a.RefreshToken()
 
@@ -92,7 +90,9 @@ func (a *OAuthStrategy) Refresh() error {
 	return nil
 }
 
-// Invalidate the access and refresh tokens on the OAuth server
+// Logout will send a revoke token request
+//
+// On success, the AccessToken and RefreshToken will be empty
 func (a *OAuthStrategy) Logout() error {
 	accessToken := a.AccessToken()
 
@@ -111,12 +111,12 @@ func (a *OAuthStrategy) Logout() error {
 
 // Login will make a token grant request to the OAuth server
 //
-// The grant type will be client_credentials if either ClientID or ClientSecret is not empty,
-// otherwise password grant type will be used.
+// The grant type will be password grant if Username is not empty, and client
+// credentials grant otherwise.
 //
 // On success, the AccessToken and RefreshToken (if given) will be populated.
 //
-// Login will be a no-op if the AccessToken is not-empty when invoked.
+// Login will be a no-op if the AccessToken is not empty when invoked.
 func (a *OAuthStrategy) Login() error {
 	if a.AccessToken() != "" {
 		return nil
@@ -145,6 +145,7 @@ func (a *OAuthStrategy) requestToken() error {
 	return nil
 }
 
+// AccessToken is the Bearer token to be used for authenticated requests
 func (a *OAuthStrategy) AccessToken() string {
 	a.mu.RLock()
 	defer a.mu.RUnlock()
@@ -152,6 +153,8 @@ func (a *OAuthStrategy) AccessToken() string {
 	return a.accessToken
 }
 
+// RefreshToken is used to by Refresh() to get a new AccessToken.
+// Only applies for password grants.
 func (a *OAuthStrategy) RefreshToken() string {
 	a.mu.RLock()
 	defer a.mu.RUnlock()
@@ -159,6 +162,7 @@ func (a *OAuthStrategy) RefreshToken() string {
 	return a.refreshToken
 }
 
+// SetToken sets the AccessToken and RefreshTokens
 func (a *OAuthStrategy) SetTokens(access, refresh string) {
 	a.mu.Lock()
 	defer a.mu.Unlock()
