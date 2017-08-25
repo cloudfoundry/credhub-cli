@@ -1,3 +1,4 @@
+// CredHub server types
 package server
 
 type Info struct {
