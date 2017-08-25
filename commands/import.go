@@ -18,7 +18,7 @@ import (
 )
 
 type ImportCommand struct {
-	File string `short:"f" long:"file" description:"File containing credentials to import. File must be in yaml format containing a list of credentials under the key 'credentials'. Name, type and value are required for each credential in the list." required:"true"`
+	File string `short:"f" long:"file" description:"File containing credentials to import" required:"true"`
 }
 
 var (

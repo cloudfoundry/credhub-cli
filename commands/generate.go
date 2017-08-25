@@ -13,7 +13,7 @@ import (
 
 type GenerateCommand struct {
 	CredentialIdentifier string   `short:"n" required:"yes" long:"name" description:"Name of the credential to generate"`
-	CredentialType       string   `short:"t" long:"type" description:"Sets the credential type to generate. Valid types include 'password', 'user', 'certificate', 'ssh' and 'rsa'. Type-specific values are set with the following flags (supported types prefixed)."`
+	CredentialType       string   `short:"t" long:"type" description:"Sets the credential type to generate. Valid types include 'password', 'user', 'certificate', 'ssh' and 'rsa'."`
 	NoOverwrite          bool     `short:"O" long:"no-overwrite" description:"Credential is not modified if stored value already exists"`
 	OutputJson           bool     `long:"output-json" description:"Return response in JSON format"`
 	Username             string   `short:"z" long:"username" description:"Sets the username value of the credential"`
