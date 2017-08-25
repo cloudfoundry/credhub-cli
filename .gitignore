@@ -7,3 +7,4 @@ credhub-cli
 .idea
 tmp
 !test/*.pem
+!credhub/fixtures/*.pem
