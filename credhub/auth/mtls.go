@@ -15,7 +15,7 @@ type MutualTLSStrategy struct {
 	Certificate string
 }
 
-// Provides http.Client-like interface to send requests authenticated with MutualTLSStrategy
+// Do sends requests with an http.Client modified to verify client certificates
 func (a *MutualTLSStrategy) Do(*http.Request) (*http.Response, error) {
 	panic("Not implemented")
 }

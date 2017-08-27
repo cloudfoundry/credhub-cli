@@ -9,7 +9,7 @@ import (
 
 func TestAuth(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Auth Suite")
+	RunSpecs(t, "CredHub API Auth Suite")
 }
 
 type dummyUaaClient struct {

@@ -1,3 +1,4 @@
+// UAA client for token grants and revocation
 package uaa
 
 import (

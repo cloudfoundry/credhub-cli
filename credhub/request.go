@@ -3,21 +3,28 @@ package credhub
 import (
 	"bytes"
 	"encoding/json"
-	"io"
 	"net/http"
 	"net/url"
 )
 
 // Request sends an authenticated request to the CredHub server.
 //
-// The pathStr should include the full path (eg. /api/v1/data) and any query parameters.
+// The pathStr should include the full path (eg. /api/v1/data).
 // The request body should be marshallable to JSON, but can be left nil for GET requests.
 //
 // Request() is used by other CredHub client methods to send authenticated requests to the CredHub server.
 //
-// Use Request() directly to access the CredHub server if an appropriate helper method is not available.
+// Use Request() directly to send authenticated requests to the CredHub server.
 // For unauthenticated requests (eg. /health), use Config.Client() instead.
 func (ch *CredHub) Request(method string, pathStr string, query url.Values, body interface{}) (*http.Response, error) {
+	return ch.request(ch.Auth, method, pathStr, query, body)
+}
+
+type requester interface {
+	Do(req *http.Request) (*http.Response, error)
+}
+
+func (ch *CredHub) request(client requester, method string, pathStr string, query url.Values, body interface{}) (*http.Response, error) {
 	u := *ch.baseURL // clone
 	u.Path = pathStr
 	u.RawQuery = query.Encode()
@@ -26,36 +33,15 @@ func (ch *CredHub) Request(method string, pathStr string, query url.Values, body
 	if err != nil {
 		return nil, err
 	}
-	req, err := http.NewRequest(method, u.String(), bytes.NewReader(jsonBody))
 
+	req, err := http.NewRequest(method, u.String(), bytes.NewReader(jsonBody))
 	if err != nil {
 		return nil, err
 	}
 
 	req.Header.Set("Content-Type", "application/json")
 
-	resp, err := ch.Auth.Do(req)
-
-	if err != nil {
-		return resp, err
-	}
-
-	if err := ch.checkForServerError(resp); err != nil {
-		return nil, err
-	}
-
-	return resp, err
-}
-
-func (ch *CredHub) request(method string, path string, body io.Reader) (*http.Response, error) {
-	client := ch.Client()
-
-	url := *ch.baseURL // clone
-	url.Path = path
-
-	request, _ := http.NewRequest(method, url.String(), body)
-
-	resp, err := client.Do(request)
+	resp, err := client.Do(req)
 
 	if err != nil {
 		return resp, err
