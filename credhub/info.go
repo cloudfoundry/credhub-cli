@@ -7,7 +7,7 @@ import (
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/server"
 )
 
-// Returns CredHub server information
+// Info returns the targeted CredHub server information.
 func (ch *CredHub) Info() (*server.Info, error) {
 	response, err := ch.request(ch.Client(), "GET", "/info", nil, nil)
 	if err != nil {
@@ -26,8 +26,7 @@ func (ch *CredHub) Info() (*server.Info, error) {
 	return info, nil
 }
 
-// AuthURL provides the authentication server URL. If necessary, it will fetch the URL
-// from /info.
+// AuthURL returns the targeted CredHub server's trusted authentication server URL.
 func (ch *CredHub) AuthURL() (string, error) {
 	if ch.authURL != nil {
 		return ch.authURL.String(), nil

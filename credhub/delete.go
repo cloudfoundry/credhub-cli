@@ -5,7 +5,7 @@ import (
 	"net/url"
 )
 
-// Deletes a credential by name
+// Delete will delete all versions of a credential by name
 func (ch *CredHub) Delete(name string) error {
 	query := url.Values{}
 	query.Set("name", name)

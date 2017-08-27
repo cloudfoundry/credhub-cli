@@ -50,7 +50,7 @@ func CaCerts(certs ...string) Option {
 	}
 }
 
-// SkipTLSValidation will skip root certificate verification for HTTPS.
+// SkipTLSValidation will skip root certificate verification for HTTPS. Not recommended!
 func SkipTLSValidation() Option {
 	return func(c *CredHub) error {
 		c.insecureSkipVerify = true
