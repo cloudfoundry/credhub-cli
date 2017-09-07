@@ -5,7 +5,7 @@ import (
 
 	"github.com/cloudfoundry-incubator/credhub-cli/client"
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
-	"github.com/cloudfoundry-incubator/credhub-cli/repositories"
+	"github.com/cloudfoundry-incubator/credhub-cli/credhub/auth/uaa"
 )
 
 type LogoutCommand struct {
@@ -21,13 +21,12 @@ func (cmd LogoutCommand) Execute([]string) error {
 }
 
 func RevokeTokenIfNecessary(cfg config.Config) {
-	if cfg.RefreshToken != "" && cfg.RefreshToken != "revoked" {
-		authRepository := repositories.NewAuthRepository(client.NewHttpClient(cfg), false)
-		request, err := client.NewTokenRevocationRequest(cfg)
-		if err == nil {
-			authRepository.SendRequest(request, "logout")
-		}
+	uaaClient := uaa.Client{
+		AuthURL: cfg.AuthURL,
+		Client: client.NewHttpClient(cfg),
 	}
+
+	err = uaaClient.RevokeToken(cfg.AccessToken)
 }
 
 func MarkTokensAsRevokedInConfig(cfg *config.Config) {

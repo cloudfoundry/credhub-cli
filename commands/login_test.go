@@ -525,7 +525,7 @@ var _ = Describe("Login", func() {
 						"error_description":"An Authentication object was not found in the SecurityContext"
 						}`),
 					))
-				badUaaServer.RouteToHandler("DELETE", "/oauth/token/revoke/5b9c9fd51ba14838ac2e6b222d487106-r",
+				badUaaServer.RouteToHandler("DELETE", "/oauth/token/revoke/"+VALID_ACCESS_TOKEN_JTI,
 					RespondWith(http.StatusOK, ""),
 				)
 				badUaaServer.RouteToHandler("GET", "/info", RespondWith(http.StatusOK, ""))
@@ -535,8 +535,7 @@ var _ = Describe("Login", func() {
 
 				cfg := config.ReadConfig()
 				cfg.AuthURL = badUaaServer.URL()
-				cfg.AccessToken = "fake_token"
-				cfg.RefreshToken = "5b9c9fd51ba14838ac2e6b222d487106-r"
+				cfg.AccessToken = VALID_ACCESS_TOKEN
 				config.WriteConfig(cfg)
 			})
 

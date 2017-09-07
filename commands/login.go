@@ -78,7 +78,6 @@ func (cmd LoginCommand) Execute([]string) error {
 		RevokeTokenIfNecessary(cfg)
 		MarkTokensAsRevokedInConfig(&cfg)
 		config.WriteConfig(cfg)
-		//return err
 		return errors.NewAuthorizationError()
 	}
 
