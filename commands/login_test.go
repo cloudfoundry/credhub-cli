@@ -473,7 +473,7 @@ var _ = Describe("Login", func() {
 				session := runCommand("login", "-u", "user", "-p", "pass", "-s", badServer.URL())
 
 				Eventually(session).Should(Exit(1))
-				Eventually(session.Err).Should(Say("The targeted API does not appear to be valid. Please validate the API address and retry your request."))
+				Eventually(session.Err).Should(Say("Error connecting to the targeted API"))
 				Expect(uaaServer.ReceivedRequests()).Should(HaveLen(0))
 			})
 
@@ -485,7 +485,7 @@ var _ = Describe("Login", func() {
 				session := runCommand("login", "-u", "user", "-p", "pass", "-s", badServer.URL())
 
 				Eventually(session).Should(Exit(1))
-				Eventually(session.Err).Should(Say("The targeted API does not appear to be valid. Please validate the API address and retry your request."))
+				Eventually(session.Err).Should(Say("Error connecting to the targeted API"))
 				Expect(uaaServer.ReceivedRequests()).Should(HaveLen(0))
 				cfg2 := config.ReadConfig()
 				Expect(cfg2.ApiURL).To(Equal("foo"))

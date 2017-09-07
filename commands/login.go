@@ -41,7 +41,7 @@ func (cmd LoginCommand) Execute([]string) error {
 
 		err = GetApiInfo(&cfg, cmd.ServerUrl, cmd.SkipTlsValidation)
 		if err != nil {
-			return err
+			return errors.NewNetworkError(err)
 		}
 	}
 

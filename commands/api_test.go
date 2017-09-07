@@ -215,7 +215,7 @@ var _ = Describe("API", func() {
 					session := runCommand("api", badServer.URL())
 
 					Eventually(session).Should(Exit(1))
-					Eventually(session.Err).Should(Say("The targeted API does not appear to be valid."))
+					Eventually(session.Err).Should(Say("Error connecting to the targeted API"))
 
 					// previous value remains
 					session = runCommand("api")

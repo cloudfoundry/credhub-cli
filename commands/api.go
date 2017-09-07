@@ -11,6 +11,7 @@ import (
 	"github.com/cloudfoundry-incubator/credhub-cli/errors"
 	"github.com/cloudfoundry-incubator/credhub-cli/util"
 	"github.com/fatih/color"
+	"github.com/cloudfoundry-incubator/credhub-cli/credhub"
 )
 
 var warning = color.New(color.Bold, color.FgYellow).PrintlnFunc()
@@ -47,7 +48,7 @@ func (cmd ApiCommand) Execute([]string) error {
 
 		err = GetApiInfo(&cfg, serverUrl, cmd.SkipTlsValidation)
 		if err != nil {
-			return err
+			return errors.NewNetworkError(err)
 		}
 
 		fmt.Println("Setting the target url:", cfg.ApiURL)
@@ -76,11 +77,15 @@ func GetApiInfo(cfg *config.Config, serverUrl string, skipTlsValidation bool) er
 	cfg.ApiURL = parsedUrl.String()
 
 	cfg.InsecureSkipVerify = skipTlsValidation
-	credhubInfo, err := actions.NewInfo(client.NewHttpClient(*cfg), *cfg).GetServerInfo()
+	credhubClient, err := credhub.New(serverUrl, credhub.CaCerts(cfg.CaCerts...), credhub.SkipTLSValidation(skipTlsValidation))
 	if err != nil {
 		return err
 	}
-	cfg.AuthURL = credhubInfo.AuthServer.Url
+	credhubInfo, err := credhubClient.Info()
+	if err != nil {
+		return err
+	}
+	cfg.AuthURL = credhubInfo.AuthServer.URL
 
 	if parsedUrl.Scheme != "https" {
 		warning("Warning: Insecure HTTP API detected. Data sent to this API could be intercepted" +
