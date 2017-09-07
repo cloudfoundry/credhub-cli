@@ -47,7 +47,7 @@ func (cmd ApiCommand) Execute([]string) error {
 
 		serverUrl = util.AddDefaultSchemeIfNecessary(serverUrl)
 
-		credhubInfo, err := GetApiInfo(&cfg, serverUrl, caCerts, cmd.SkipTlsValidation)
+		credhubInfo, err := GetApiInfo(serverUrl, caCerts, cmd.SkipTlsValidation)
 		if err != nil {
 			return errors.NewNetworkError(err)
 		}
@@ -83,7 +83,7 @@ func (cmd ApiCommand) Execute([]string) error {
 	return nil
 }
 
-func GetApiInfo(cfg *config.Config, serverUrl string, caCerts []string, skipTlsValidation bool) (*server.Info, error) {
+func GetApiInfo(serverUrl string, caCerts []string, skipTlsValidation bool) (*server.Info, error) {
 	credhubClient, err := credhub.New(serverUrl, credhub.CaCerts(caCerts...), credhub.SkipTLSValidation(skipTlsValidation))
 	if err != nil {
 		return nil, err

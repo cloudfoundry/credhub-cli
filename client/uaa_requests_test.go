@@ -34,7 +34,7 @@ var _ = Describe("UAA Requests", func() {
 			Expect(request.Header).To(HaveKeyWithValue("Accept", []string{"application/json"}))
 			Expect(request.Header).To(HaveKeyWithValue("Content-Type", []string{"application/x-www-form-urlencoded"}))
 			Expect(request.Header).To(HaveKeyWithValue("Authorization", []string{"Basic " + basicEncoded}))
-			Expect(request.URL.Path).To(Equal("/oauth/token/"))
+			Expect(request.URL.Path).To(Equal("/oauth/token"))
 			Expect(request.Method).To(Equal("POST"))
 
 			byteBuff := new(bytes.Buffer)
@@ -55,7 +55,7 @@ var _ = Describe("UAA Requests", func() {
 			request := NewClientCredentialsGrantTokenRequest(cfg, client, clientSecret)
 			Expect(request.Header).To(HaveKeyWithValue("Accept", []string{"application/json"}))
 			Expect(request.Header).To(HaveKeyWithValue("Content-Type", []string{"application/x-www-form-urlencoded"}))
-			Expect(request.URL.Path).To(Equal("/oauth/token/"))
+			Expect(request.URL.Path).To(Equal("/oauth/token"))
 			Expect(request.Method).To(Equal("POST"))
 
 			byteBuff := new(bytes.Buffer)
@@ -77,7 +77,7 @@ var _ = Describe("UAA Requests", func() {
 			Expect(request.Header).To(HaveKeyWithValue("Accept", []string{"application/json"}))
 			Expect(request.Header).To(HaveKeyWithValue("Content-Type", []string{"application/x-www-form-urlencoded"}))
 			Expect(request.Header).To(HaveKeyWithValue("Authorization", []string{"Basic " + basicEncoded}))
-			Expect(request.URL.Path).To(Equal("/oauth/token/"))
+			Expect(request.URL.Path).To(Equal("/oauth/token"))
 			Expect(request.Method).To(Equal("POST"))
 
 			byteBuff := new(bytes.Buffer)

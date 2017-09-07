@@ -93,9 +93,9 @@ var _ = Describe("Login", func() {
 
 	Describe("password flow", func() {
 		BeforeEach(func() {
-			uaaServer.RouteToHandler("POST", "/oauth/token/",
+			uaaServer.RouteToHandler("POST", "/oauth/token",
 				CombineHandlers(
-					VerifyBody([]byte(`grant_type=password&password=pass&response_type=token&username=user`)),
+					VerifyBody([]byte(`client_id=`+config.AuthClient+`&client_secret=`+config.AuthPassword+`&grant_type=password&password=pass&response_type=token&username=user`)),
 					RespondWith(http.StatusOK, `{
 						"access_token":"2YotnFZFEjr1zCsicMWpAA",
 						"refresh_token":"erousflkajqwer",
@@ -156,7 +156,7 @@ var _ = Describe("Login", func() {
 
 	Describe("client flow", func() {
 		BeforeEach(func() {
-			uaaServer.RouteToHandler("POST", "/oauth/token/",
+			uaaServer.RouteToHandler("POST", "/oauth/token",
 				CombineHandlers(
 					VerifyBody([]byte(`client_id=test_client&client_secret=test_secret&grant_type=client_credentials&response_type=token`)),
 					RespondWith(http.StatusOK, `{
@@ -271,9 +271,9 @@ var _ = Describe("Login", func() {
 
 		BeforeEach(func() {
 			uaaServer = NewServer()
-			uaaServer.RouteToHandler("POST", "/oauth/token/",
+			uaaServer.RouteToHandler("POST", "/oauth/token",
 				CombineHandlers(
-					VerifyBody([]byte(`grant_type=password&password=pass&response_type=token&username=user`)),
+					VerifyBody([]byte(`client_id=`+config.AuthClient+`&client_secret=`+config.AuthPassword+`&grant_type=password&password=pass&response_type=token&username=user`)),
 					RespondWith(http.StatusOK, `{
 						"access_token":"2YotnFZFEjr1zCsicMWpAA",
 						"refresh_token":"erousflkajqwer",
@@ -337,9 +337,9 @@ var _ = Describe("Login", func() {
 			authServer = NewTlsServer("../test/server-tls-cert.pem", "../test/server-tls-key.pem")
 			SetupServers(server, authServer)
 
-			authServer.RouteToHandler("POST", "/oauth/token/",
+			authServer.RouteToHandler("POST", "/oauth/token",
 				CombineHandlers(
-					VerifyBody([]byte(`grant_type=password&password=pass&response_type=token&username=user`)),
+					VerifyBody([]byte(`client_id=`+config.AuthClient+`&client_secret=`+config.AuthPassword+`&grant_type=password&password=pass&response_type=token&username=user`)),
 					RespondWith(http.StatusOK, `{
 						"access_token":"2YotnFZFEjr1zCsicMWpAA",
 						"refresh_token":"erousflkajqwer",
@@ -454,9 +454,9 @@ var _ = Describe("Login", func() {
 		})
 
 		It("accepts the API URL from the environment", func() {
-			authServer.RouteToHandler("POST", "/oauth/token/",
+			authServer.RouteToHandler("POST", "/oauth/token",
 				CombineHandlers(
-					VerifyBody([]byte(`grant_type=password&password=pass&response_type=token&username=user`)),
+					VerifyBody([]byte(`client_id=`+config.AuthClient+`&client_secret=`+config.AuthPassword+`&grant_type=password&password=pass&response_type=token&username=user`)),
 					RespondWith(http.StatusOK, `{
 						"access_token":"2YotnFZFEjr1zCsicMWpAA",
 						"refresh_token":"erousflkajqwer",
@@ -517,9 +517,9 @@ var _ = Describe("Login", func() {
 
 			BeforeEach(func() {
 				badUaaServer = NewServer()
-				badUaaServer.RouteToHandler("POST", "/oauth/token/",
+				badUaaServer.RouteToHandler("POST", "/oauth/token",
 					CombineHandlers(
-						VerifyBody([]byte(`grant_type=password&password=pass&response_type=token&username=user`)),
+						VerifyBody([]byte(`client_id=`+config.AuthClient+`&client_secret=`+config.AuthPassword+`&grant_type=password&password=pass&response_type=token&username=user`)),
 						RespondWith(http.StatusUnauthorized, `{
 						"error":"unauthorized",
 						"error_description":"An Authentication object was not found in the SecurityContext"

@@ -3,13 +3,12 @@ package commands
 import (
 	"fmt"
 
-	"github.com/cloudfoundry-incubator/credhub-cli/actions"
 	"github.com/cloudfoundry-incubator/credhub-cli/client"
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	"github.com/cloudfoundry-incubator/credhub-cli/errors"
-	"github.com/cloudfoundry-incubator/credhub-cli/models"
 	"github.com/howeyc/gopass"
 	"github.com/cloudfoundry-incubator/credhub-cli/util"
+	"github.com/cloudfoundry-incubator/credhub-cli/credhub/auth/uaa"
 )
 
 type LoginCommand struct {
@@ -24,7 +23,8 @@ type LoginCommand struct {
 
 func (cmd LoginCommand) Execute([]string) error {
 	var (
-		token models.Token
+		accessToken string
+		refreshToken string
 		err   error
 	)
 	cfg := config.ReadConfig()
@@ -44,7 +44,7 @@ func (cmd LoginCommand) Execute([]string) error {
 			return err
 		}
 
-		credhubInfo, err := GetApiInfo(&cfg, serverUrl, cfg.CaCerts, cmd.SkipTlsValidation)
+		credhubInfo, err := GetApiInfo(serverUrl, cfg.CaCerts, cmd.SkipTlsValidation)
 		if err != nil {
 			return errors.NewNetworkError(err)
 		}
@@ -62,23 +62,28 @@ func (cmd LoginCommand) Execute([]string) error {
 		return err
 	}
 
+	uaaClient := uaa.Client{
+		AuthURL: cfg.AuthURL,
+		Client: client.NewHttpClient(cfg),
+	}
+
 	if cmd.ClientName != "" || cmd.ClientSecret != "" {
-		token, err = actions.NewAuthToken(client.NewHttpClient(cfg), cfg).GetAuthTokenByClientCredential(cmd.ClientName, cmd.ClientSecret)
+		accessToken, err = uaaClient.ClientCredentialGrant(cmd.ClientName, cmd.ClientSecret)
 	} else {
 		promptForMissingCredentials(&cmd)
-
-		token, err = actions.NewAuthToken(client.NewHttpClient(cfg), cfg).GetAuthTokenByPasswordGrant(cmd.Username, cmd.Password)
+		accessToken, refreshToken, err = uaaClient.PasswordGrant(config.AuthClient, config.AuthPassword, cmd.Username, cmd.Password)
 	}
 
 	if err != nil {
 		RevokeTokenIfNecessary(cfg)
 		MarkTokensAsRevokedInConfig(&cfg)
 		config.WriteConfig(cfg)
-		return err
+		//return err
+		return errors.NewAuthorizationError()
 	}
 
-	cfg.AccessToken = token.AccessToken
-	cfg.RefreshToken = token.RefreshToken
+	cfg.AccessToken = accessToken
+	cfg.RefreshToken = refreshToken
 	config.WriteConfig(cfg)
 
 	if cmd.ServerUrl != "" {

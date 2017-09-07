@@ -135,7 +135,7 @@ var _ = SynchronizedAfterSuite(func() {}, func() {
 func login() {
 	authServer.AppendHandlers(
 		CombineHandlers(
-			VerifyRequest("POST", "/oauth/token/"),
+			VerifyRequest("POST", "/oauth/token"),
 			RespondWith(http.StatusOK, `{
 			"access_token":"test-access-token",
 			"refresh_token":"test-refresh-token",
@@ -265,7 +265,7 @@ func ItAutomaticallyLogsIn(method string, args ...string) {
 
 				authServer.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest("POST", "/oauth/token/"),
+						VerifyRequest("POST", "/oauth/token"),
 						VerifyBody([]byte(`client_id=test_client&client_secret=test_secret&grant_type=client_credentials&response_type=token`)),
 						RespondWith(http.StatusOK, `{
 								"access_token":"2YotnFZFEjr1zCsicMWpAA",
@@ -287,7 +287,7 @@ func ItAutomaticallyLogsIn(method string, args ...string) {
 			It("automatically authenticates", func() {
 				authServer.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest("POST", "/oauth/token/"),
+						VerifyRequest("POST", "/oauth/token"),
 						VerifyBody([]byte(`client_id=test_client&client_secret=test_secret&grant_type=client_credentials&response_type=token`)),
 						RespondWith(http.StatusOK, `{
 								"access_token":"2YotnFZFEjr1zCsicMWpAA",

@@ -10,7 +10,7 @@ import (
 )
 
 func NewPasswordGrantTokenRequest(cfg config.Config, user, pass string) *http.Request {
-	authUrl := cfg.AuthURL + "/oauth/token/"
+	authUrl := cfg.AuthURL + "/oauth/token"
 	data := url.Values{}
 	data.Set("grant_type", "password")
 	data.Add("response_type", "token")
@@ -24,7 +24,7 @@ func NewPasswordGrantTokenRequest(cfg config.Config, user, pass string) *http.Re
 }
 
 func NewClientCredentialsGrantTokenRequest(cfg config.Config, clientId, clientSecret string) *http.Request {
-	authUrl := cfg.AuthURL + "/oauth/token/"
+	authUrl := cfg.AuthURL + "/oauth/token"
 	data := url.Values{}
 	data.Set("grant_type", "client_credentials")
 	data.Add("response_type", "token")
@@ -37,7 +37,7 @@ func NewClientCredentialsGrantTokenRequest(cfg config.Config, clientId, clientSe
 }
 
 func NewRefreshTokenRequest(cfg config.Config) *http.Request {
-	authUrl := cfg.AuthURL + "/oauth/token/"
+	authUrl := cfg.AuthURL + "/oauth/token"
 	data := url.Values{}
 	data.Set("grant_type", "refresh_token")
 	data.Set("refresh_token", cfg.RefreshToken)

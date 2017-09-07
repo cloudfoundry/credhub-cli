@@ -14,11 +14,6 @@ func NewAuthToken(httpClient client.HttpClient, config config.Config) ServerInfo
 	return ServerInfo{httpClient: httpClient, config: config}
 }
 
-func (serverInfo ServerInfo) GetAuthTokenByPasswordGrant(user string, pass string) (models.Token, error) {
-	request := client.NewPasswordGrantTokenRequest(serverInfo.config, user, pass)
-	return getAuthToken(serverInfo, request)
-}
-
 func (serverInfo ServerInfo) GetAuthTokenByClientCredential(clientName string, clientSecret string) (models.Token, error) {
 	request := client.NewClientCredentialsGrantTokenRequest(serverInfo.config, clientName, clientSecret)
 	return getAuthToken(serverInfo, request)
