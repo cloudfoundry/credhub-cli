@@ -13,7 +13,7 @@ func ExampleCredHub() {
 	_ = func() {
 		// Use a CredHub server on "https://example.com" using UAA password grant
 		ch, err := credhub.New("https://example.com",
-			credhub.SkipTLSValidation(),
+			credhub.SkipTLSValidation(true),
 			credhub.Auth(auth.UaaPassword("credhub_cli", "", "username", "password")))
 
 		if err != nil {
@@ -60,7 +60,7 @@ func ExampleNew() {
 	_ = func() {
 		ch, _ := credhub.New(
 			"https://example.com",
-			credhub.SkipTLSValidation(),
+			credhub.SkipTLSValidation(true),
 			credhub.Auth(auth.UaaClientCredentials("client-id", "client-secret")),
 		)
 

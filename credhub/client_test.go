@@ -57,7 +57,7 @@ var _ = Describe("Client()", func() {
 
 	Context("With InsecureSkipVerify", func() {
 		It("should return a http.Client with tls.Config without RootCAs", func() {
-			ch, _ := New("https://example.com", SkipTLSValidation())
+			ch, _ := New("https://example.com", SkipTLSValidation(true))
 			client := ch.Client()
 
 			transport := client.Transport.(*http.Transport)
