@@ -12,6 +12,7 @@ import (
 	"github.com/cloudfoundry-incubator/credhub-cli/util"
 	"github.com/fatih/color"
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub"
+	"github.com/cloudfoundry-incubator/credhub-cli/credhub/server"
 )
 
 var warning = color.New(color.Bold, color.FgYellow).PrintlnFunc()
@@ -39,24 +40,39 @@ func (cmd ApiCommand) Execute([]string) error {
 			return errors.NewNoTargetUrlError()
 		}
 	} else {
-		existingCfg := cfg
-
-		err := cfg.UpdateTrustedCAs(cmd.CaCerts)
+		caCerts, err := ReadOrGetCaCerts(cmd.CaCerts)
 		if err != nil {
 			return err
 		}
 
-		err = GetApiInfo(&cfg, serverUrl, cmd.SkipTlsValidation)
+		serverUrl = util.AddDefaultSchemeIfNecessary(serverUrl)
+
+		credhubInfo, err := GetApiInfo(&cfg, serverUrl, caCerts, cmd.SkipTlsValidation)
 		if err != nil {
 			return errors.NewNetworkError(err)
 		}
 
-		fmt.Println("Setting the target url:", cfg.ApiURL)
-
-		if existingCfg.AuthURL != cfg.AuthURL {
-			RevokeTokenIfNecessary(existingCfg)
+		if credhubInfo.AuthServer.URL != cfg.AuthURL {
+			RevokeTokenIfNecessary(cfg)
 			MarkTokensAsRevokedInConfig(&cfg)
 		}
+
+		cfg.ApiURL = serverUrl
+		cfg.AuthURL = credhubInfo.AuthServer.URL
+		cfg.InsecureSkipVerify = cmd.SkipTlsValidation
+		cfg.CaCerts = caCerts
+
+		err = VerifyAuthServerConnection(cfg, cmd.SkipTlsValidation)
+		if err != nil {
+			return errors.NewNetworkError(err)
+		}
+
+		err = PrintWarnings(serverUrl, cmd.SkipTlsValidation)
+		if err != nil {
+			return err
+		}
+		fmt.Println("Setting the target url:", cfg.ApiURL)
+
 		err = config.WriteConfig(cfg)
 
 		if err != nil {
@@ -67,25 +83,21 @@ func (cmd ApiCommand) Execute([]string) error {
 	return nil
 }
 
-func GetApiInfo(cfg *config.Config, serverUrl string, skipTlsValidation bool) error {
-	serverUrl = util.AddDefaultSchemeIfNecessary(serverUrl)
+func GetApiInfo(cfg *config.Config, serverUrl string, caCerts []string, skipTlsValidation bool) (*server.Info, error) {
+	credhubClient, err := credhub.New(serverUrl, credhub.CaCerts(caCerts...), credhub.SkipTLSValidation(skipTlsValidation))
+	if err != nil {
+		return nil, err
+	}
+
+	credhubInfo, err := credhubClient.Info()
+	return credhubInfo, err
+}
+
+func PrintWarnings(serverUrl string, skipTlsValidation bool) error {
 	parsedUrl, err := url.Parse(serverUrl)
 	if err != nil {
 		return err
 	}
-
-	cfg.ApiURL = parsedUrl.String()
-
-	cfg.InsecureSkipVerify = skipTlsValidation
-	credhubClient, err := credhub.New(serverUrl, credhub.CaCerts(cfg.CaCerts...), credhub.SkipTLSValidation(skipTlsValidation))
-	if err != nil {
-		return err
-	}
-	credhubInfo, err := credhubClient.Info()
-	if err != nil {
-		return err
-	}
-	cfg.AuthURL = credhubInfo.AuthServer.URL
 
 	if parsedUrl.Scheme != "https" {
 		warning("Warning: Insecure HTTP API detected. Data sent to this API could be intercepted" +
@@ -96,13 +108,21 @@ func GetApiInfo(cfg *config.Config, serverUrl string, skipTlsValidation bool) er
 			deprecation("Warning: The --skip-tls-validation flag is deprecated. Please use --ca-cert instead.")
 		}
 	}
+	return nil
+}
 
-	err = verifyAuthServerConnection(*cfg, skipTlsValidation)
-	if err != nil {
-		return err
+func ReadOrGetCaCerts(caCerts []string) ([]string, error) {
+	certs := []string{}
+
+	for _, cert := range caCerts {
+		certContents, err := util.ReadFileOrStringFromField(cert)
+		if err != nil {
+			return certs, err
+		}
+		certs = append(certs, certContents)
 	}
 
-	return nil
+	return certs, nil
 }
 
 func targetUrl(cmd ApiCommand) string {
@@ -113,7 +133,7 @@ func targetUrl(cmd ApiCommand) string {
 	}
 }
 
-func verifyAuthServerConnection(cfg config.Config, skipTlsValidation bool) error {
+func VerifyAuthServerConnection(cfg config.Config, skipTlsValidation bool) error {
 	var err error
 
 	if !skipTlsValidation {

@@ -9,6 +9,7 @@ import (
 	"github.com/cloudfoundry-incubator/credhub-cli/errors"
 	"github.com/cloudfoundry-incubator/credhub-cli/models"
 	"github.com/howeyc/gopass"
+	"github.com/cloudfoundry-incubator/credhub-cli/util"
 )
 
 type LoginCommand struct {
@@ -33,13 +34,23 @@ func (cmd LoginCommand) Execute([]string) error {
 	}
 
 	if cmd.ServerUrl != "" {
-		err = cfg.UpdateTrustedCAs(cmd.CaCerts)
+		cfg.InsecureSkipVerify = cmd.SkipTlsValidation
 
+		serverUrl := util.AddDefaultSchemeIfNecessary(cmd.ServerUrl)
+		cfg.ApiURL = serverUrl
+
+		err := cfg.UpdateTrustedCAs(cmd.CaCerts)
 		if err != nil {
 			return err
 		}
 
-		err = GetApiInfo(&cfg, cmd.ServerUrl, cmd.SkipTlsValidation)
+		credhubInfo, err := GetApiInfo(&cfg, serverUrl, cfg.CaCerts, cmd.SkipTlsValidation)
+		if err != nil {
+			return errors.NewNetworkError(err)
+		}
+		cfg.AuthURL = credhubInfo.AuthServer.URL
+
+		err = VerifyAuthServerConnection(cfg, cmd.SkipTlsValidation)
 		if err != nil {
 			return errors.NewNetworkError(err)
 		}
@@ -71,6 +82,7 @@ func (cmd LoginCommand) Execute([]string) error {
 	config.WriteConfig(cfg)
 
 	if cmd.ServerUrl != "" {
+		PrintWarnings(cmd.ServerUrl, cmd.SkipTlsValidation)
 		fmt.Println("Setting the target url:", cfg.ApiURL)
 	}
 
