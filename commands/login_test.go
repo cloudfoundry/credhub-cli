@@ -305,6 +305,22 @@ var _ = Describe("Login", func() {
 			Expect(cfg.AuthURL).To(Equal(uaaServer.URL()))
 		})
 
+
+		Context("when the provided server url does not have a scheme specified", func() {
+			It("sets a default scheme", func() {
+				server := NewTLSServer()
+				server.RouteToHandler("GET", "/info", RespondWith(http.StatusOK, `{
+						"app":{"version":"my-version","name":"CredHub"},
+						"auth-server":{"url":"`+uaaServer.URL()+`"}
+						}`),
+				)
+
+				session := runCommand("login", "-u", "user", "-p", "pass", "-s", server.Addr(), "--skip-tls-validation")
+
+				Eventually(session).Should(Exit(0))
+			})
+		})
+
 		It("saves caCert to config when it is provided", func() {
 			testCa, _ := ioutil.ReadFile("../test/server-tls-ca.pem")
 			session := runCommand("login", "-u", "user", "-p", "pass", "-s", apiServer.URL(), "--ca-cert", "../test/server-tls-ca.pem")

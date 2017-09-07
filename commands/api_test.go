@@ -137,6 +137,22 @@ var _ = Describe("API", func() {
 			Expect(cfg.ApiURL).To(Equal(server.URL()))
 		})
 
+		Context("when the provided server url does not have a scheme specified", func() {
+			It("sets a default scheme", func() {
+				apiServer := NewTLSServer()
+
+				apiServer.RouteToHandler("GET", "/info", RespondWith(http.StatusOK, `{
+						"app":{"version":"my-version","name":"CredHub"},
+						"auth-server":{"url":"`+authServer.URL()+`"}
+						}`),
+				)
+
+				session := runCommand("api", apiServer.Addr(), "--skip-tls-validation")
+
+				Eventually(session).Should(Exit(0))
+			})
+		})
+
 		Context("when the provided server url's scheme is https", func() {
 			var (
 				theServer    *Server
