@@ -15,7 +15,7 @@ func (ch *CredHub) GetById(id string) (credentials.Credential, error) {
 }
 
 // GetAll returns all credential versions for a given credential name. The returned credential may be of any type.
-func (ch *CredHub) GetAll(name string) ([]credentials.Credential, error) {
+func (ch *CredHub) GetAllVersions(name string) ([]credentials.Credential, error) {
 	panic("Not implemented")
 }
 
