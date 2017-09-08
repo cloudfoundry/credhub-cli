@@ -20,7 +20,7 @@ func (ch *CredHub) GetAll(name string) ([]credentials.Credential, error) {
 }
 
 // Get returns the current credential version for a given credential name. The returned credential may be of any type.
-func (ch *CredHub) Get(name string) (credentials.Credential, error) {
+func (ch *CredHub) GetLatestVersion(name string) (credentials.Credential, error) {
 	var cred credentials.Credential
 	err := ch.getCurrentCredential(name, &cred)
 	return cred, err
@@ -84,8 +84,8 @@ func (ch *CredHub) GetSSH(name string) (credentials.SSH, error) {
 
 func (ch *CredHub) getCurrentCredential(name string, cred interface{}) error {
 	query := url.Values{}
+	query.Set("versions", "1")
 	query.Set("name", name)
-	query.Set("current", "true")
 
 	resp, err := ch.Request(http.MethodGet, "/api/v1/data", query, nil)
 

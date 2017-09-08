@@ -24,9 +24,9 @@ var _ = Describe("Get", func() {
 
 			ch, _ := New("https://example.com", Auth(dummy.Builder()))
 
-			ch.Get("/example-password")
+			ch.GetLatestVersion("/example-password")
 			url := dummy.Request.URL.String()
-			Expect(url).To(Equal("https://example.com/api/v1/data?current=true&name=%2Fexample-password"))
+			Expect(url).To(Equal("https://example.com/api/v1/data?name=%2Fexample-password&versions=1"))
 			Expect(dummy.Request.Method).To(Equal(http.MethodGet))
 		})
 
@@ -49,7 +49,7 @@ var _ = Describe("Get", func() {
 
 				ch, _ := New("https://example.com", Auth(dummy.Builder()))
 
-				cred, err := ch.Get("/example-password")
+				cred, err := ch.GetLatestVersion("/example-password")
 				Expect(err).To(BeNil())
 				Expect(cred.Id).To(Equal("some-id"))
 				Expect(cred.Name).To(Equal("/example-password"))
@@ -66,7 +66,7 @@ var _ = Describe("Get", func() {
 				}}
 
 				ch, _ := New("https://example.com", Auth(dummy.Builder()))
-				_, err := ch.Get("/example-password")
+				_, err := ch.GetLatestVersion("/example-password")
 
 				Expect(err).To(HaveOccurred())
 			})
@@ -79,7 +79,7 @@ var _ = Describe("Get", func() {
 					Body:       ioutil.NopCloser(bytes.NewBufferString(`{"data":[]}`)),
 				}}
 				ch, _ := New("https://example.com", Auth(dummy.Builder()))
-				_, err := ch.Get("/example-password")
+				_, err := ch.GetLatestVersion("/example-password")
 
 				Expect(err).To(MatchError("response did not contain any credentials"))
 			})
@@ -95,7 +95,9 @@ var _ = Describe("Get", func() {
 			ch, _ := New("https://example.com", Auth(dummy.Builder()))
 			ch.GetPassword("/example-password")
 			url := dummy.Request.URL
-			Expect(url.String()).To(Equal("https://example.com/api/v1/data?current=true&name=%2Fexample-password"))
+			Expect(url.String()).To(ContainSubstring("https://example.com/api/v1/data"))
+			Expect(url.String()).To(ContainSubstring("name=%2Fexample-password"))
+			Expect(url.String()).To(ContainSubstring("versions=1"))
 			Expect(dummy.Request.Method).To(Equal(http.MethodGet))
 		})
 
@@ -144,7 +146,10 @@ var _ = Describe("Get", func() {
 			ch, _ := New("https://example.com", Auth(dummy.Builder()))
 			ch.GetCertificate("/example-certificate")
 			url := dummy.Request.URL
-			Expect(url.String()).To(Equal("https://example.com/api/v1/data?current=true&name=%2Fexample-certificate"))
+			Expect(url.String()).To(ContainSubstring("https://example.com/api/v1/data"))
+			Expect(url.String()).To(ContainSubstring("name=%2Fexample-certificate"))
+			Expect(url.String()).To(ContainSubstring("versions=1"))
+
 			Expect(dummy.Request.Method).To(Equal(http.MethodGet))
 		})
 
@@ -200,7 +205,10 @@ var _ = Describe("Get", func() {
 			ch, _ := New("https://example.com", Auth(dummy.Builder()))
 			ch.GetUser("/example-user")
 			url := dummy.Request.URL
-			Expect(url.String()).To(Equal("https://example.com/api/v1/data?current=true&name=%2Fexample-user"))
+			Expect(url.String()).To(ContainSubstring("https://example.com/api/v1/data"))
+			Expect(url.String()).To(ContainSubstring("name=%2Fexample-user"))
+			Expect(url.String()).To(ContainSubstring("versions=1"))
+
 			Expect(dummy.Request.Method).To(Equal(http.MethodGet))
 		})
 
@@ -259,7 +267,10 @@ var _ = Describe("Get", func() {
 			ch, _ := New("https://example.com", Auth(dummy.Builder()))
 			ch.GetRSA("/example-rsa")
 			url := dummy.Request.URL
-			Expect(url.String()).To(Equal("https://example.com/api/v1/data?current=true&name=%2Fexample-rsa"))
+			Expect(url.String()).To(ContainSubstring("https://example.com/api/v1/data"))
+			Expect(url.String()).To(ContainSubstring("name=%2Fexample-rsa"))
+			Expect(url.String()).To(ContainSubstring("versions=1"))
+
 			Expect(dummy.Request.Method).To(Equal(http.MethodGet))
 		})
 
@@ -317,7 +328,10 @@ var _ = Describe("Get", func() {
 			ch, _ := New("https://example.com", Auth(dummy.Builder()))
 			ch.GetSSH("/example-ssh")
 			url := dummy.Request.URL
-			Expect(url.String()).To(Equal("https://example.com/api/v1/data?current=true&name=%2Fexample-ssh"))
+			Expect(url.String()).To(ContainSubstring("https://example.com/api/v1/data"))
+			Expect(url.String()).To(ContainSubstring("name=%2Fexample-ssh"))
+			Expect(url.String()).To(ContainSubstring("versions=1"))
+
 			Expect(dummy.Request.Method).To(Equal(http.MethodGet))
 		})
 
@@ -377,7 +391,10 @@ var _ = Describe("Get", func() {
 			ch, _ := New("https://example.com", Auth(dummy.Builder()))
 			ch.GetJSON("/example-json")
 			url := dummy.Request.URL
-			Expect(url.String()).To(Equal("https://example.com/api/v1/data?current=true&name=%2Fexample-json"))
+			Expect(url.String()).To(ContainSubstring("https://example.com/api/v1/data"))
+			Expect(url.String()).To(ContainSubstring("name=%2Fexample-json"))
+			Expect(url.String()).To(ContainSubstring("versions=1"))
+
 			Expect(dummy.Request.Method).To(Equal(http.MethodGet))
 		})
 
@@ -443,7 +460,10 @@ var _ = Describe("Get", func() {
 			ch, _ := New("https://example.com", Auth(dummy.Builder()))
 			ch.GetValue("/example-value")
 			url := dummy.Request.URL
-			Expect(url.String()).To(Equal("https://example.com/api/v1/data?current=true&name=%2Fexample-value"))
+			Expect(url.String()).To(ContainSubstring("https://example.com/api/v1/data"))
+			Expect(url.String()).To(ContainSubstring("name=%2Fexample-value"))
+			Expect(url.String()).To(ContainSubstring("versions=1"))
+
 			Expect(dummy.Request.Method).To(Equal(http.MethodGet))
 		})
 
@@ -496,7 +516,7 @@ var _ = Describe("Get", func() {
 		},
 
 		Entry("Get", func(ch *CredHub) error {
-			_, err := ch.Get("/example-password")
+			_, err := ch.GetLatestVersion("/example-password")
 			return err
 		}),
 		Entry("GetPassword", func(ch *CredHub) error {
