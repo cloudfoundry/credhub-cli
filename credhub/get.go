@@ -22,7 +22,7 @@ func (ch *CredHub) GetById(id string) (credentials.Credential, error) {
 	return cred, err
 }
 
-// GetAll returns all credential versions for a given credential name. The returned credential may be of any type.
+// GetAllVersions returns all credential versions for a given credential name. The returned credential may be of any type.
 func (ch *CredHub) GetAllVersions(name string) ([]credentials.Credential, error) {
 	query := url.Values{}
 	query.Set("name", name)
