@@ -16,18 +16,18 @@ import (
 
 var _ = Describe("Get", func() {
 
-	Describe("Get()", func() {
+	Describe("GetLatestVersion()", func() {
 		It("requests the credential by name", func() {
-			dummy := &DummyAuth{Response: &http.Response{
+			dummyAuth := &DummyAuth{Response: &http.Response{
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
 
-			ch, _ := New("https://example.com", Auth(dummy.Builder()))
+			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
 
 			ch.GetLatestVersion("/example-password")
-			url := dummy.Request.URL.String()
+			url := dummyAuth.Request.URL.String()
 			Expect(url).To(Equal("https://example.com/api/v1/data?name=%2Fexample-password&versions=1"))
-			Expect(dummy.Request.Method).To(Equal(http.MethodGet))
+			Expect(dummyAuth.Request.Method).To(Equal(http.MethodGet))
 		})
 
 		Context("when successful", func() {
@@ -42,12 +42,12 @@ var _ = Describe("Get", func() {
       "version_created_at": "2017-01-05T01:01:01Z"
     }
     ]}`
-				dummy := &DummyAuth{Response: &http.Response{
+				dummyAuth := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusOK,
 					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
 				}}
 
-				ch, _ := New("https://example.com", Auth(dummy.Builder()))
+				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
 
 				cred, err := ch.GetLatestVersion("/example-password")
 				Expect(err).To(BeNil())
@@ -61,11 +61,11 @@ var _ = Describe("Get", func() {
 
 		Context("when response body cannot be unmarshalled", func() {
 			It("returns an error", func() {
-				dummy := &DummyAuth{Response: &http.Response{
+				dummyAuth := &DummyAuth{Response: &http.Response{
 					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
 				}}
 
-				ch, _ := New("https://example.com", Auth(dummy.Builder()))
+				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
 				_, err := ch.GetLatestVersion("/example-password")
 
 				Expect(err).To(HaveOccurred())
@@ -74,11 +74,137 @@ var _ = Describe("Get", func() {
 
 		Context("when the response body contains an empty list", func() {
 			It("returns an error", func() {
-				dummy := &DummyAuth{Response: &http.Response{
+				dummyAuth := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusOK,
 					Body:       ioutil.NopCloser(bytes.NewBufferString(`{"data":[]}`)),
 				}}
-				ch, _ := New("https://example.com", Auth(dummy.Builder()))
+				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
+				_, err := ch.GetLatestVersion("/example-password")
+
+				Expect(err).To(MatchError("response did not contain any credentials"))
+			})
+		})
+	})
+
+	Describe("GetNVersions()", func() {
+		It("makes a request for N versions of a credential", func() {
+			dummyAuth := &DummyAuth{Response: &http.Response{
+				Body: ioutil.NopCloser(bytes.NewBufferString("")),
+			}}
+
+			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
+
+			ch.GetNVersions("/example-password", 3)
+			url := dummyAuth.Request.URL.String()
+			Expect(url).To(Equal("https://example.com/api/v1/data?name=%2Fexample-password&versions=3"))
+			Expect(dummyAuth.Request.Method).To(Equal(http.MethodGet))
+		})
+
+		Context("when successful", func() {
+			It("returns a list of N passwords", func() {
+				responseString := `{
+	"data": [
+	{
+      "id": "some-id",
+      "name": "/example-password",
+      "type": "password",
+      "value": "some-password",
+      "version_created_at": "2017-01-05T01:01:01Z"
+    },
+	{
+      "id": "some-id",
+      "name": "/example-password",
+      "type": "password",
+      "value": "some-other-password",
+      "version_created_at": "2017-01-05T01:01:01Z"
+    }
+    ]}`
+				dummyAuth := &DummyAuth{Response: &http.Response{
+					StatusCode: http.StatusOK,
+					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
+				}}
+
+				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
+
+				creds, err := ch.GetNVersions("/example-password", 2)
+				Expect(err).To(BeNil())
+				Expect(creds[0].Id).To(Equal("some-id"))
+				Expect(creds[0].Name).To(Equal("/example-password"))
+				Expect(creds[0].Type).To(Equal("password"))
+				Expect(creds[0].Value.(string)).To(Equal("some-password"))
+				Expect(creds[0].VersionCreatedAt).To(Equal("2017-01-05T01:01:01Z"))
+
+				Expect(creds[1].Value.(string)).To(Equal("some-other-password"))
+			})
+
+			It("returns a list of N users", func() {
+				responseString := `{
+	"data": [
+	{
+      "id": "some-id",
+      "name": "/example-user",
+      "type": "user",
+      "value": {
+      	"username": "first-username",
+      	"password": "dummy_password",
+      	"password_hash": "$6$kjhlkjh$lkjhasdflkjhasdflkjh"
+      },
+      "version_created_at": "2017-01-05T01:01:01Z"
+    },
+	{
+      "id": "some-id",
+      "name": "/example-user",
+      "type": "user",
+      "value": {
+      	"username": "second-username",
+      	"password": "another_random_dummy_password",
+      	"password_hash": "$6$kjhlkjh$lkjhasdflkjhasdflkjh"
+      },
+      "version_created_at": "2017-01-05T01:01:01Z"
+    }
+    ]}`
+				dummyAuth := &DummyAuth{Response: &http.Response{
+					StatusCode: http.StatusOK,
+					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
+				}}
+
+				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
+
+				creds, err := ch.GetNVersions("/example-user", 2)
+				Expect(err).To(BeNil())
+				Expect(creds[0].Id).To(Equal("some-id"))
+				Expect(creds[0].Name).To(Equal("/example-user"))
+				Expect(creds[0].Type).To(Equal("user"))
+				firstCredValue := creds[0].Value.(map[string]interface{})
+				Expect(firstCredValue["username"]).To(Equal("first-username"))
+				Expect(firstCredValue["password"]).To(Equal("dummy_password"))
+				Expect(firstCredValue["password_hash"]).To(Equal("$6$kjhlkjh$lkjhasdflkjhasdflkjh"))
+				Expect(creds[0].VersionCreatedAt).To(Equal("2017-01-05T01:01:01Z"))
+
+				Expect(creds[1].Value.(map[string]interface{})["username"]).To(Equal("second-username"))
+			})
+		})
+
+		Context("when response body cannot be unmarshalled", func() {
+			It("returns an error", func() {
+				dummyAuth := &DummyAuth{Response: &http.Response{
+					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
+				}}
+
+				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
+				_, err := ch.GetLatestVersion("/example-password")
+
+				Expect(err).To(HaveOccurred())
+			})
+		})
+
+		Context("when the response body contains an empty list", func() {
+			It("returns an error", func() {
+				dummyAuth := &DummyAuth{Response: &http.Response{
+					StatusCode: http.StatusOK,
+					Body:       ioutil.NopCloser(bytes.NewBufferString(`{"data":[]}`)),
+				}}
+				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
 				_, err := ch.GetLatestVersion("/example-password")
 
 				Expect(err).To(MatchError("response did not contain any credentials"))
@@ -88,17 +214,17 @@ var _ = Describe("Get", func() {
 
 	Describe("GetPassword()", func() {
 		It("requests the credential by name", func() {
-			dummy := &DummyAuth{Response: &http.Response{
+			dummyAuth := &DummyAuth{Response: &http.Response{
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
 
-			ch, _ := New("https://example.com", Auth(dummy.Builder()))
+			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
 			ch.GetPassword("/example-password")
-			url := dummy.Request.URL
+			url := dummyAuth.Request.URL
 			Expect(url.String()).To(ContainSubstring("https://example.com/api/v1/data"))
 			Expect(url.String()).To(ContainSubstring("name=%2Fexample-password"))
 			Expect(url.String()).To(ContainSubstring("versions=1"))
-			Expect(dummy.Request.Method).To(Equal(http.MethodGet))
+			Expect(dummyAuth.Request.Method).To(Equal(http.MethodGet))
 		})
 
 		Context("when successful", func() {
@@ -112,12 +238,12 @@ var _ = Describe("Get", func() {
       "value": "some-password",
       "version_created_at": "2017-01-05T01:01:01Z"
     }]}`
-				dummy := &DummyAuth{Response: &http.Response{
+				dummyAuth := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusOK,
 					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
 				}}
 
-				ch, _ := New("https://example.com", Auth(dummy.Builder()))
+				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
 				cred, err := ch.GetPassword("/example-password")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(cred.Value).To(BeEquivalentTo("some-password"))
@@ -126,10 +252,10 @@ var _ = Describe("Get", func() {
 
 		Context("when response body cannot be unmarshalled", func() {
 			It("returns an error", func() {
-				dummy := &DummyAuth{Response: &http.Response{
+				dummyAuth := &DummyAuth{Response: &http.Response{
 					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
 				}}
-				ch, _ := New("https://example.com", Auth(dummy.Builder()))
+				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
 				_, err := ch.GetPassword("/example-cred")
 
 				Expect(err).To(HaveOccurred())
@@ -139,18 +265,18 @@ var _ = Describe("Get", func() {
 
 	Describe("GetCertificate()", func() {
 		It("requests the credential by name", func() {
-			dummy := &DummyAuth{Response: &http.Response{
+			dummyAuth := &DummyAuth{Response: &http.Response{
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
 
-			ch, _ := New("https://example.com", Auth(dummy.Builder()))
+			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
 			ch.GetCertificate("/example-certificate")
-			url := dummy.Request.URL
+			url := dummyAuth.Request.URL
 			Expect(url.String()).To(ContainSubstring("https://example.com/api/v1/data"))
 			Expect(url.String()).To(ContainSubstring("name=%2Fexample-certificate"))
 			Expect(url.String()).To(ContainSubstring("versions=1"))
 
-			Expect(dummy.Request.Method).To(Equal(http.MethodGet))
+			Expect(dummyAuth.Request.Method).To(Equal(http.MethodGet))
 		})
 
 		Context("when successful", func() {
@@ -167,12 +293,12 @@ var _ = Describe("Get", func() {
 	},
 	"version_created_at": "2017-01-01T04:07:18Z"
 }]}`
-				dummy := &DummyAuth{Response: &http.Response{
+				dummyAuth := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusOK,
 					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
 				}}
 
-				ch, _ := New("https://example.com", Auth(dummy.Builder()))
+				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
 
 				cred, err := ch.GetCertificate("/example-certificate")
 				Expect(err).ToNot(HaveOccurred())
@@ -185,10 +311,10 @@ var _ = Describe("Get", func() {
 
 		Context("when response body cannot be unmarshalled", func() {
 			It("returns an error", func() {
-				dummy := &DummyAuth{Response: &http.Response{
+				dummyAuth := &DummyAuth{Response: &http.Response{
 					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
 				}}
-				ch, _ := New("https://example.com", Auth(dummy.Builder()))
+				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
 				_, err := ch.GetCertificate("/example-cred")
 
 				Expect(err).To(HaveOccurred())
@@ -198,18 +324,18 @@ var _ = Describe("Get", func() {
 
 	Describe("GetUser()", func() {
 		It("requests the credential by name", func() {
-			dummy := &DummyAuth{Response: &http.Response{
+			dummyAuth := &DummyAuth{Response: &http.Response{
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
 
-			ch, _ := New("https://example.com", Auth(dummy.Builder()))
+			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
 			ch.GetUser("/example-user")
-			url := dummy.Request.URL
+			url := dummyAuth.Request.URL
 			Expect(url.String()).To(ContainSubstring("https://example.com/api/v1/data"))
 			Expect(url.String()).To(ContainSubstring("name=%2Fexample-user"))
 			Expect(url.String()).To(ContainSubstring("versions=1"))
 
-			Expect(dummy.Request.Method).To(Equal(http.MethodGet))
+			Expect(dummyAuth.Request.Method).To(Equal(http.MethodGet))
 		})
 
 		Context("when successful", func() {
@@ -229,12 +355,12 @@ var _ = Describe("Get", func() {
 					}
 				  ]
 				}`
-				dummy := &DummyAuth{Response: &http.Response{
+				dummyAuth := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusOK,
 					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
 				}}
 
-				ch, _ := New("https://example.com", Auth(dummy.Builder()))
+				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
 				cred, err := ch.GetUser("/example-user")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(cred.Value.PasswordHash).To(Equal("some-hash"))
@@ -247,10 +373,10 @@ var _ = Describe("Get", func() {
 
 		Context("when response body cannot be unmarshalled", func() {
 			It("returns an error", func() {
-				dummy := &DummyAuth{Response: &http.Response{
+				dummyAuth := &DummyAuth{Response: &http.Response{
 					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
 				}}
-				ch, _ := New("https://example.com", Auth(dummy.Builder()))
+				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
 				_, err := ch.GetUser("/example-cred")
 
 				Expect(err).To(HaveOccurred())
@@ -260,18 +386,18 @@ var _ = Describe("Get", func() {
 
 	Describe("GetRSA()", func() {
 		It("requests the credential by name", func() {
-			dummy := &DummyAuth{Response: &http.Response{
+			dummyAuth := &DummyAuth{Response: &http.Response{
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
 
-			ch, _ := New("https://example.com", Auth(dummy.Builder()))
+			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
 			ch.GetRSA("/example-rsa")
-			url := dummy.Request.URL
+			url := dummyAuth.Request.URL
 			Expect(url.String()).To(ContainSubstring("https://example.com/api/v1/data"))
 			Expect(url.String()).To(ContainSubstring("name=%2Fexample-rsa"))
 			Expect(url.String()).To(ContainSubstring("versions=1"))
 
-			Expect(dummy.Request.Method).To(Equal(http.MethodGet))
+			Expect(dummyAuth.Request.Method).To(Equal(http.MethodGet))
 		})
 
 		Context("when successful", func() {
@@ -291,12 +417,12 @@ var _ = Describe("Get", func() {
 				  ]
 				}`
 
-				dummy := &DummyAuth{Response: &http.Response{
+				dummyAuth := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusOK,
 					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
 				}}
 
-				ch, _ := New("https://example.com", Auth(dummy.Builder()))
+				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
 				cred, err := ch.GetRSA("/example-rsa")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(cred.Value).To(Equal(values.RSA{
@@ -308,10 +434,10 @@ var _ = Describe("Get", func() {
 
 		Context("when response body cannot be unmarshalled", func() {
 			It("returns an error", func() {
-				dummy := &DummyAuth{Response: &http.Response{
+				dummyAuth := &DummyAuth{Response: &http.Response{
 					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
 				}}
-				ch, _ := New("https://example.com", Auth(dummy.Builder()))
+				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
 				_, err := ch.GetRSA("/example-cred")
 
 				Expect(err).To(HaveOccurred())
@@ -321,18 +447,18 @@ var _ = Describe("Get", func() {
 
 	Describe("GetSSH()", func() {
 		It("requests the credential by name", func() {
-			dummy := &DummyAuth{Response: &http.Response{
+			dummyAuth := &DummyAuth{Response: &http.Response{
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
 
-			ch, _ := New("https://example.com", Auth(dummy.Builder()))
+			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
 			ch.GetSSH("/example-ssh")
-			url := dummy.Request.URL
+			url := dummyAuth.Request.URL
 			Expect(url.String()).To(ContainSubstring("https://example.com/api/v1/data"))
 			Expect(url.String()).To(ContainSubstring("name=%2Fexample-ssh"))
 			Expect(url.String()).To(ContainSubstring("versions=1"))
 
-			Expect(dummy.Request.Method).To(Equal(http.MethodGet))
+			Expect(dummyAuth.Request.Method).To(Equal(http.MethodGet))
 		})
 
 		Context("when successful", func() {
@@ -353,12 +479,12 @@ var _ = Describe("Get", func() {
 				  ]
 				}`
 
-				dummy := &DummyAuth{Response: &http.Response{
+				dummyAuth := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusOK,
 					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
 				}}
 
-				ch, _ := New("https://example.com", Auth(dummy.Builder()))
+				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
 				cred, err := ch.GetSSH("/example-ssh")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(cred.Value.PublicKeyFingerprint).To(Equal("public-key-fingerprint"))
@@ -371,10 +497,10 @@ var _ = Describe("Get", func() {
 
 		Context("when response body cannot be unmarshalled", func() {
 			It("returns an error", func() {
-				dummy := &DummyAuth{Response: &http.Response{
+				dummyAuth := &DummyAuth{Response: &http.Response{
 					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
 				}}
-				ch, _ := New("https://example.com", Auth(dummy.Builder()))
+				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
 				_, err := ch.GetSSH("/example-cred")
 
 				Expect(err).To(HaveOccurred())
@@ -384,18 +510,18 @@ var _ = Describe("Get", func() {
 
 	Describe("GetJSON()", func() {
 		It("requests the credential by name", func() {
-			dummy := &DummyAuth{Response: &http.Response{
+			dummyAuth := &DummyAuth{Response: &http.Response{
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
 
-			ch, _ := New("https://example.com", Auth(dummy.Builder()))
+			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
 			ch.GetJSON("/example-json")
-			url := dummy.Request.URL
+			url := dummyAuth.Request.URL
 			Expect(url.String()).To(ContainSubstring("https://example.com/api/v1/data"))
 			Expect(url.String()).To(ContainSubstring("name=%2Fexample-json"))
 			Expect(url.String()).To(ContainSubstring("versions=1"))
 
-			Expect(dummy.Request.Method).To(Equal(http.MethodGet))
+			Expect(dummyAuth.Request.Method).To(Equal(http.MethodGet))
 		})
 
 		Context("when successful", func() {
@@ -419,12 +545,12 @@ var _ = Describe("Get", func() {
 				  ]
 				}`
 
-				dummy := &DummyAuth{Response: &http.Response{
+				dummyAuth := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusOK,
 					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
 				}}
 
-				ch, _ := New("https://example.com", Auth(dummy.Builder()))
+				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
 				cred, err := ch.GetJSON("/example-json")
 				Expect(err).ToNot(HaveOccurred())
 				Expect([]byte(cred.Value)).To(MatchJSON(`{
@@ -440,10 +566,10 @@ var _ = Describe("Get", func() {
 
 		Context("when response body cannot be unmarshalled", func() {
 			It("returns an error", func() {
-				dummy := &DummyAuth{Response: &http.Response{
+				dummyAuth := &DummyAuth{Response: &http.Response{
 					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
 				}}
-				ch, _ := New("https://example.com", Auth(dummy.Builder()))
+				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
 				_, err := ch.GetJSON("/example-cred")
 
 				Expect(err).To(HaveOccurred())
@@ -453,18 +579,18 @@ var _ = Describe("Get", func() {
 
 	Describe("GetValue()", func() {
 		It("requests the credential by name", func() {
-			dummy := &DummyAuth{Response: &http.Response{
+			dummyAuth := &DummyAuth{Response: &http.Response{
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
 
-			ch, _ := New("https://example.com", Auth(dummy.Builder()))
+			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
 			ch.GetValue("/example-value")
-			url := dummy.Request.URL
+			url := dummyAuth.Request.URL
 			Expect(url.String()).To(ContainSubstring("https://example.com/api/v1/data"))
 			Expect(url.String()).To(ContainSubstring("name=%2Fexample-value"))
 			Expect(url.String()).To(ContainSubstring("versions=1"))
 
-			Expect(dummy.Request.Method).To(Equal(http.MethodGet))
+			Expect(dummyAuth.Request.Method).To(Equal(http.MethodGet))
 		})
 
 		Context("when successful", func() {
@@ -479,12 +605,12 @@ var _ = Describe("Get", func() {
 					  "version_created_at": "2017-01-05T01:01:01Z"
 				}]}`
 
-				dummy := &DummyAuth{Response: &http.Response{
+				dummyAuth := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusOK,
 					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
 				}}
 
-				ch, _ := New("https://example.com", Auth(dummy.Builder()))
+				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
 				cred, err := ch.GetValue("/example-value")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(cred.Value).To(Equal(values.Value("some-value")))
@@ -493,10 +619,10 @@ var _ = Describe("Get", func() {
 
 		Context("when response body cannot be unmarshalled", func() {
 			It("returns an error", func() {
-				dummy := &DummyAuth{Response: &http.Response{
+				dummyAuth := &DummyAuth{Response: &http.Response{
 					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
 				}}
-				ch, _ := New("https://example.com", Auth(dummy.Builder()))
+				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
 				_, err := ch.GetValue("/example-cred")
 
 				Expect(err).To(HaveOccurred())
@@ -507,15 +633,19 @@ var _ = Describe("Get", func() {
 	DescribeTable("request fails due to network error",
 		func(performAction func(*CredHub) error) {
 			networkError := errors.New("Network error occurred")
-			dummy := &DummyAuth{Error: networkError}
-			ch, _ := New("https://example.com", Auth(dummy.Builder()))
+			dummyAuth := &DummyAuth{Error: networkError}
+			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
 
 			err := performAction(ch)
 
 			Expect(err).To(Equal(networkError))
 		},
 
-		Entry("Get", func(ch *CredHub) error {
+		Entry("GetNVersions", func(ch *CredHub) error {
+			_, err := ch.GetNVersions("/example-password", 47)
+			return err
+		}),
+		Entry("GetLatestVersion", func(ch *CredHub) error {
 			_, err := ch.GetLatestVersion("/example-password")
 			return err
 		}),

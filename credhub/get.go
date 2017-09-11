@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"net/url"
 
+	"strconv"
+
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials"
 )
 
@@ -24,6 +26,12 @@ func (ch *CredHub) GetLatestVersion(name string) (credentials.Credential, error)
 	var cred credentials.Credential
 	err := ch.getCurrentCredential(name, &cred)
 	return cred, err
+}
+
+// Get returns the N most recent credential versions for a given credential name. The returned credentials may be of any type.
+func (ch *CredHub) GetNVersions(name string, numberOfVersions int) ([]credentials.Credential, error) {
+	creds, err := ch.getNVersionsOfCredential(name, numberOfVersions)
+	return creds, err
 }
 
 // GetValue returns the current credential version for a given credential name. The returned credential must be of type 'value'.
@@ -112,4 +120,27 @@ func (ch *CredHub) getCurrentCredential(name string, cred interface{}) error {
 	rawMessage := data[0]
 
 	return json.Unmarshal(rawMessage, cred)
+}
+
+func (ch *CredHub) getNVersionsOfCredential(name string, numberOfVersions int) ([]credentials.Credential, error) {
+	query := url.Values{}
+	query.Set("name", name)
+	query.Set("versions", strconv.Itoa(numberOfVersions))
+
+	resp, err := ch.Request(http.MethodGet, "/api/v1/data", query, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+	dec := json.NewDecoder(resp.Body)
+
+	response := make(map[string][]credentials.Credential)
+
+	if err := dec.Decode(&response); err != nil {
+		return nil, err
+	}
+
+	return response["data"], nil
 }

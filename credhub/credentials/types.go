@@ -41,21 +41,6 @@ type JSON struct {
 	Value json.RawMessage `json:"value"`
 }
 
-func (j JSON) MarshalYAML() (interface{}, error) {
-	var x interface{}
-
-	json.Unmarshal(j.Value, &x)
-
-	return struct {
-		Metadata `yaml:",inline"`
-		Value    interface{}
-	}{
-		Metadata: j.Metadata,
-		Value:    x,
-	}, nil
-
-}
-
 // A Password type credential
 type Password struct {
 	Metadata `yaml:",inline"`
@@ -90,4 +75,19 @@ type SSH struct {
 		values.SSH           `yaml:",inline"`
 		PublicKeyFingerprint string `json:"public_key_fingerprint" yaml:"public_key_fingerprint"`
 	} `json:"value"`
+}
+
+func (j JSON) MarshalYAML() (interface{}, error) {
+	var x interface{}
+
+	json.Unmarshal(j.Value, &x)
+
+	return struct {
+		Metadata `yaml:",inline"`
+		Value    interface{}
+	}{
+		Metadata: j.Metadata,
+		Value:    x,
+	}, nil
+
 }
