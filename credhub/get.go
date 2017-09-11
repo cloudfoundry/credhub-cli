@@ -24,7 +24,10 @@ func (ch *CredHub) GetById(id string) (credentials.Credential, error) {
 
 // GetAll returns all credential versions for a given credential name. The returned credential may be of any type.
 func (ch *CredHub) GetAllVersions(name string) ([]credentials.Credential, error) {
-	panic("Not implemented")
+	query := url.Values{}
+	query.Set("name", name)
+
+	return ch.makeMultiCredentialGetRequest(query)
 }
 
 // Get returns the current credential version for a given credential name. The returned credential may be of any type.
@@ -137,6 +140,10 @@ func (ch *CredHub) getNVersionsOfCredential(name string, numberOfVersions int) (
 	query.Set("name", name)
 	query.Set("versions", strconv.Itoa(numberOfVersions))
 
+	return ch.makeMultiCredentialGetRequest(query)
+}
+
+func (ch *CredHub) makeMultiCredentialGetRequest(query url.Values) ([]credentials.Credential, error) {
 	resp, err := ch.Request(http.MethodGet, "/api/v1/data", query, nil)
 
 	if err != nil {
@@ -148,9 +155,14 @@ func (ch *CredHub) getNVersionsOfCredential(name string, numberOfVersions int) (
 
 	response := make(map[string][]credentials.Credential)
 
-	if err := dec.Decode(&response); err != nil {
-		return nil, err
+	dec.Decode(&response)
+
+	var ok bool
+	var data []credentials.Credential
+
+	if data, ok = response["data"]; !ok || len(data) == 0 {
+		return nil, errors.New("response did not contain any credentials")
 	}
 
-	return response["data"], nil
+	return data, nil
 }
