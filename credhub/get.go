@@ -30,7 +30,7 @@ func (ch *CredHub) GetAllVersions(name string) ([]credentials.Credential, error)
 	return ch.makeMultiCredentialGetRequest(query)
 }
 
-// Get returns the current credential version for a given credential name. The returned credential may be of any type.
+// GetLatestVersion returns the current credential version for a given credential name. The returned credential may be of any type.
 func (ch *CredHub) GetLatestVersion(name string) (credentials.Credential, error) {
 	var cred credentials.Credential
 	err := ch.getCurrentCredential(name, &cred)
