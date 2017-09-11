@@ -86,6 +86,76 @@ var _ = Describe("Get", func() {
 		})
 	})
 
+	Describe("GetById()", func() {
+		It("requests the credential by id", func() {
+			dummyAuth := &DummyAuth{Response: &http.Response{
+				Body: ioutil.NopCloser(bytes.NewBufferString("")),
+			}}
+
+			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
+
+			ch.GetById("0239482304958")
+			url := dummyAuth.Request.URL.String()
+			Expect(url).To(Equal("https://example.com/api/v1/data?id=0239482304958"))
+			Expect(dummyAuth.Request.Method).To(Equal(http.MethodGet))
+		})
+
+		Context("when successful", func() {
+			It("returns a credential by name", func() {
+				responseString := `{
+	"data": [
+	{
+      "id": "0239482304958",
+      "name": "/reasonable-password",
+      "type": "password",
+      "value": "some-password",
+      "version_created_at": "2017-01-05T01:01:01Z"
+    }
+    ]}`
+				dummyAuth := &DummyAuth{Response: &http.Response{
+					StatusCode: http.StatusOK,
+					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
+				}}
+
+				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
+
+				cred, err := ch.GetById("0239482304958")
+				Expect(err).To(BeNil())
+				Expect(cred.Id).To(Equal("0239482304958"))
+				Expect(cred.Name).To(Equal("/reasonable-password"))
+				Expect(cred.Type).To(Equal("password"))
+				Expect(cred.Value.(string)).To(Equal("some-password"))
+				Expect(cred.VersionCreatedAt).To(Equal("2017-01-05T01:01:01Z"))
+			})
+		})
+
+		Context("when response body cannot be unmarshalled", func() {
+			It("returns an error", func() {
+				dummyAuth := &DummyAuth{Response: &http.Response{
+					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
+				}}
+
+				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
+				_, err := ch.GetById("0239482304958")
+
+				Expect(err).To(HaveOccurred())
+			})
+		})
+
+		Context("when the response body contains an empty list", func() {
+			It("returns an error", func() {
+				dummyAuth := &DummyAuth{Response: &http.Response{
+					StatusCode: http.StatusOK,
+					Body:       ioutil.NopCloser(bytes.NewBufferString(`{"data":[]}`)),
+				}}
+				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
+				_, err := ch.GetById("0239482304958")
+
+				Expect(err).To(MatchError("response did not contain any credentials"))
+			})
+		})
+	})
+
 	Describe("GetNVersions()", func() {
 		It("makes a request for N versions of a credential", func() {
 			dummyAuth := &DummyAuth{Response: &http.Response{

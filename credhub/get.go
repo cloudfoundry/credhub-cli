@@ -11,9 +11,15 @@ import (
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials"
 )
 
-// GetById returns a credential version by ID. The returned credential may be of any type.
+// GetById returns a credential version by ID. The returned credential will be encoded as a map
 func (ch *CredHub) GetById(id string) (credentials.Credential, error) {
-	panic("Not implemented")
+	var cred credentials.Credential
+	query := url.Values{}
+	query.Set("id", id)
+
+	err := ch.makeCredentialGetRequest(query, &cred)
+
+	return cred, err
 }
 
 // GetAll returns all credential versions for a given credential name. The returned credential may be of any type.
@@ -95,6 +101,10 @@ func (ch *CredHub) getCurrentCredential(name string, cred interface{}) error {
 	query.Set("versions", "1")
 	query.Set("name", name)
 
+	return ch.makeCredentialGetRequest(query, cred)
+}
+
+func (ch *CredHub) makeCredentialGetRequest(query url.Values, cred interface{}) error{
 	resp, err := ch.Request(http.MethodGet, "/api/v1/data", query, nil)
 
 	if err != nil {
