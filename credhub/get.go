@@ -37,7 +37,7 @@ func (ch *CredHub) GetLatestVersion(name string) (credentials.Credential, error)
 	return cred, err
 }
 
-// Get returns the N most recent credential versions for a given credential name. The returned credentials may be of any type.
+// GetNVersions returns the N most recent credential versions for a given credential name. The returned credentials may be of any type.
 func (ch *CredHub) GetNVersions(name string, numberOfVersions int) ([]credentials.Credential, error) {
 	creds, err := ch.getNVersionsOfCredential(name, numberOfVersions)
 	return creds, err
