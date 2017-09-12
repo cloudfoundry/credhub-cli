@@ -11,7 +11,7 @@ import (
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials"
 )
 
-// GetById returns a credential version by ID. The returned credential will be encoded as a map
+// GetById returns a credential version by ID. The returned credential will be encoded as a map and may be of any type.
 func (ch *CredHub) GetById(id string) (credentials.Credential, error) {
 	var cred credentials.Credential
 	query := url.Values{}
@@ -22,7 +22,7 @@ func (ch *CredHub) GetById(id string) (credentials.Credential, error) {
 	return cred, err
 }
 
-// GetAllVersions returns all credential versions for a given credential name. The returned credential may be of any type.
+// GetAllVersions returns all credential versions for a given credential name. The returned credentials will be encoded as a list of maps and may be of any type.
 func (ch *CredHub) GetAllVersions(name string) ([]credentials.Credential, error) {
 	query := url.Values{}
 	query.Set("name", name)
@@ -30,20 +30,20 @@ func (ch *CredHub) GetAllVersions(name string) ([]credentials.Credential, error)
 	return ch.makeMultiCredentialGetRequest(query)
 }
 
-// GetLatestVersion returns the current credential version for a given credential name. The returned credential may be of any type.
+// GetLatestVersion returns the current credential version for a given credential name. The returned credential will be encoded as a map and may be of any type.
 func (ch *CredHub) GetLatestVersion(name string) (credentials.Credential, error) {
 	var cred credentials.Credential
 	err := ch.getCurrentCredential(name, &cred)
 	return cred, err
 }
 
-// GetNVersions returns the N most recent credential versions for a given credential name. The returned credentials may be of any type.
+// GetNVersions returns the N most recent credential versions for a given credential name. The returned credentials will be encoded as a list of maps and may be of any type.
 func (ch *CredHub) GetNVersions(name string, numberOfVersions int) ([]credentials.Credential, error) {
 	creds, err := ch.getNVersionsOfCredential(name, numberOfVersions)
 	return creds, err
 }
 
-// GetValue returns the current credential version for a given credential name. The returned credential must be of type 'value'.
+// GetValue returns the current credential version for a given credential name. The returned credential will be encoded as a map and must be of type 'value'.
 func (ch *CredHub) GetValue(name string) (credentials.Value, error) {
 	var cred credentials.Value
 	err := ch.getCurrentCredential(name, &cred)
@@ -51,7 +51,7 @@ func (ch *CredHub) GetValue(name string) (credentials.Value, error) {
 	return cred, err
 }
 
-// GetJSON returns the current credential version for a given credential name. The returned credential must be of type 'json'.
+// GetJSON returns the current credential version for a given credential name. The returned credential will be encoded as a map and must be of type 'json'.
 func (ch *CredHub) GetJSON(name string) (credentials.JSON, error) {
 	var cred credentials.JSON
 	err := ch.getCurrentCredential(name, &cred)
@@ -59,7 +59,7 @@ func (ch *CredHub) GetJSON(name string) (credentials.JSON, error) {
 	return cred, err
 }
 
-// GetPassword returns the current credential version for a given credential name. The returned credential must be of type 'password'.
+// GetPassword returns the current credential version for a given credential name. The returned credential will be encoded as a map and must be of type 'password'.
 func (ch *CredHub) GetPassword(name string) (credentials.Password, error) {
 	var cred credentials.Password
 	err := ch.getCurrentCredential(name, &cred)
@@ -67,7 +67,7 @@ func (ch *CredHub) GetPassword(name string) (credentials.Password, error) {
 	return cred, err
 }
 
-// GetUser returns the current credential version for a given credential name. The returned credential must be of type 'user'.
+// GetUser returns the current credential version for a given credential name. The returned credential will be encoded as a map and must be of type 'user'.
 func (ch *CredHub) GetUser(name string) (credentials.User, error) {
 	var cred credentials.User
 	err := ch.getCurrentCredential(name, &cred)
@@ -75,7 +75,7 @@ func (ch *CredHub) GetUser(name string) (credentials.User, error) {
 	return cred, err
 }
 
-// GetCertificate returns the current credential version for a given credential name. The returned credential must be of type 'certificate'.
+// GetCertificate returns the current credential version for a given credential name. The returned credential will be encoded as a map and must be of type 'certificate'.
 func (ch *CredHub) GetCertificate(name string) (credentials.Certificate, error) {
 	var cred credentials.Certificate
 	err := ch.getCurrentCredential(name, &cred)
@@ -83,7 +83,7 @@ func (ch *CredHub) GetCertificate(name string) (credentials.Certificate, error) 
 	return cred, err
 }
 
-// GetRSA returns the current credential version for a given credential name. The returned credential must be of type 'rsa'.
+// GetRSA returns the current credential version for a given credential name. The returned credential will be encoded as a map and must be of type 'rsa'.
 func (ch *CredHub) GetRSA(name string) (credentials.RSA, error) {
 	var cred credentials.RSA
 	err := ch.getCurrentCredential(name, &cred)
@@ -91,7 +91,7 @@ func (ch *CredHub) GetRSA(name string) (credentials.RSA, error) {
 	return cred, err
 }
 
-// GetSSH returns the current credential version for a given credential name. The returned credential must be of type 'ssh'.
+// GetSSH returns the current credential version for a given credential name. The returned credential will be encoded as a map and must be of type 'ssh'.
 func (ch *CredHub) GetSSH(name string) (credentials.SSH, error) {
 	var cred credentials.SSH
 	err := ch.getCurrentCredential(name, &cred)
