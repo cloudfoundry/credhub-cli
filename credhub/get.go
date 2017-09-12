@@ -14,10 +14,8 @@ import (
 // GetById returns a credential version by ID. The returned credential will be encoded as a map and may be of any type.
 func (ch *CredHub) GetById(id string) (credentials.Credential, error) {
 	var cred credentials.Credential
-	query := url.Values{}
-	query.Set("id", id)
 
-	err := ch.makeCredentialGetRequest(query, &cred)
+	err := ch.makeCredentialGetByIdRequest(id, &cred)
 
 	return cred, err
 }
@@ -107,7 +105,7 @@ func (ch *CredHub) getCurrentCredential(name string, cred interface{}) error {
 	return ch.makeCredentialGetRequest(query, cred)
 }
 
-func (ch *CredHub) makeCredentialGetRequest(query url.Values, cred interface{}) error{
+func (ch *CredHub) makeCredentialGetRequest(query url.Values, cred interface{}) error {
 	resp, err := ch.Request(http.MethodGet, "/api/v1/data", query, nil)
 
 	if err != nil {
@@ -133,6 +131,23 @@ func (ch *CredHub) makeCredentialGetRequest(query url.Values, cred interface{}) 
 	rawMessage := data[0]
 
 	return json.Unmarshal(rawMessage, cred)
+}
+
+func (ch *CredHub) makeCredentialGetByIdRequest(id string, cred *credentials.Credential) error {
+	resp, err := ch.Request(http.MethodGet, "/api/v1/data/"+id, nil, nil)
+
+	if err != nil {
+		return err
+	}
+
+	defer resp.Body.Close()
+	dec := json.NewDecoder(resp.Body)
+
+	if err := dec.Decode(cred); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (ch *CredHub) getNVersionsOfCredential(name string, numberOfVersions int) ([]credentials.Credential, error) {

@@ -96,22 +96,19 @@ var _ = Describe("Get", func() {
 
 			ch.GetById("0239482304958")
 			url := dummyAuth.Request.URL.String()
-			Expect(url).To(Equal("https://example.com/api/v1/data?id=0239482304958"))
+			Expect(url).To(Equal("https://example.com/api/v1/data/0239482304958"))
 			Expect(dummyAuth.Request.Method).To(Equal(http.MethodGet))
 		})
 
 		Context("when successful", func() {
 			It("returns a credential by name", func() {
 				responseString := `{
-	"data": [
-	{
       "id": "0239482304958",
       "name": "/reasonable-password",
       "type": "password",
       "value": "some-password",
       "version_created_at": "2017-01-05T01:01:01Z"
-    }
-    ]}`
+    }`
 				dummyAuth := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusOK,
 					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
@@ -142,16 +139,16 @@ var _ = Describe("Get", func() {
 			})
 		})
 
-		Context("when the response body contains an empty list", func() {
-			It("returns an error", func() {
+		Context("when the credential does not exist", func() {
+			It("returns the error from the server", func() {
 				dummyAuth := &DummyAuth{Response: &http.Response{
-					StatusCode: http.StatusOK,
-					Body:       ioutil.NopCloser(bytes.NewBufferString(`{"data":[]}`)),
+					StatusCode: http.StatusNotFound,
+					Body:       ioutil.NopCloser(bytes.NewBufferString(`{"error":"The request could not be completed because the credential does not exist or you do not have sufficient authorization."}`)),
 				}}
 				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
 				_, err := ch.GetById("0239482304958")
 
-				Expect(err).To(MatchError("response did not contain any credentials"))
+				Expect(err).To(MatchError("The request could not be completed because the credential does not exist or you do not have sufficient authorization."))
 			})
 		})
 	})
