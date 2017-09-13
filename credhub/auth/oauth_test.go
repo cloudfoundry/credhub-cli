@@ -347,9 +347,10 @@ var _ = Describe("OAuthStrategy", func() {
 			Context("with client credentials", func() {
 				It("should make a client credentials grant request", func() {
 					uaa := auth.OAuthStrategy{
-						ClientId:     "client-id",
-						ClientSecret: "client-secret",
-						OAuthClient:  mockUaaClient,
+						ClientId:                "client-id",
+						ClientSecret:            "client-secret",
+						OAuthClient:             mockUaaClient,
+						ClientCredentialRefresh: true,
 					}
 
 					uaa.Refresh()
@@ -366,9 +367,10 @@ var _ = Describe("OAuthStrategy", func() {
 						mockUaaClient.Error = errors.New("client credentials grant failed")
 
 						uaa := auth.OAuthStrategy{
-							ClientId:     "client-id",
-							ClientSecret: "client-secret",
-							OAuthClient:  mockUaaClient,
+							ClientId:                "client-id",
+							ClientSecret:            "client-secret",
+							OAuthClient:             mockUaaClient,
+							ClientCredentialRefresh: true,
 						}
 
 						err := uaa.Refresh()
@@ -442,9 +444,10 @@ var _ = Describe("OAuthStrategy", func() {
 		Context("with client credentials", func() {
 			It("should make a client credentials grant request", func() {
 				uaa := auth.OAuthStrategy{
-					ClientId:     "client-id",
-					ClientSecret: "client-secret",
-					OAuthClient:  mockUaaClient,
+					ClientId:                "client-id",
+					ClientSecret:            "client-secret",
+					OAuthClient:             mockUaaClient,
+					ClientCredentialRefresh: true,
 				}
 
 				uaa.Refresh()
@@ -461,9 +464,10 @@ var _ = Describe("OAuthStrategy", func() {
 					mockUaaClient.Error = errors.New("client credentials grant failed")
 
 					uaa := auth.OAuthStrategy{
-						ClientId:     "client-id",
-						ClientSecret: "client-secret",
-						OAuthClient:  mockUaaClient,
+						ClientId:                "client-id",
+						ClientSecret:            "client-secret",
+						OAuthClient:             mockUaaClient,
+						ClientCredentialRefresh: true,
 					}
 
 					err := uaa.Refresh()

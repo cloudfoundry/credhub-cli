@@ -16,12 +16,13 @@ type OAuthStrategy struct {
 
 	mu sync.RWMutex // guards AccessToken & Refresh Token
 
-	Username     string
-	Password     string
-	ClientId     string
-	ClientSecret string
-	ApiClient    *http.Client
-	OAuthClient  OAuthClient
+	Username                string
+	Password                string
+	ClientId                string
+	ClientSecret            string
+	ApiClient               *http.Client
+	OAuthClient             OAuthClient
+	ClientCredentialRefresh bool
 }
 
 type OAuthClient interface {
@@ -79,7 +80,14 @@ func (a *OAuthStrategy) Refresh() error {
 		return a.requestToken()
 	}
 
-	accessToken, refreshToken, err := a.OAuthClient.RefreshTokenGrant(a.ClientId, a.ClientSecret, refreshToken)
+	var accessToken string
+	var err error
+
+	if a.ClientCredentialRefresh {
+		accessToken, err = a.OAuthClient.ClientCredentialGrant(a.ClientId, a.ClientSecret)
+	} else {
+		accessToken, refreshToken, err = a.OAuthClient.RefreshTokenGrant(a.ClientId, a.ClientSecret, refreshToken)
+	}
 
 	if err != nil {
 		return err
@@ -130,7 +138,7 @@ func (a *OAuthStrategy) requestToken() error {
 	var refreshToken string
 	var err error
 
-	if a.Username == "" {
+	if a.ClientCredentialRefresh {
 		accessToken, err = a.OAuthClient.ClientCredentialGrant(a.ClientId, a.ClientSecret)
 	} else {
 		accessToken, refreshToken, err = a.OAuthClient.PasswordGrant(a.ClientId, a.ClientSecret, a.Username, a.Password)

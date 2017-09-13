@@ -90,7 +90,8 @@ var _ = Describe("Constructors", func() {
 				"some-username",
 				"some-password",
 				"some-access-token",
-				"some-refresh-token")
+				"some-refresh-token",
+				true)
 			strategy, _ := builder(&config)
 			auth := strategy.(*OAuthStrategy)
 			Expect(auth.ClientId).To(Equal("some-client-id"))
@@ -115,7 +116,8 @@ var _ = Describe("Constructors", func() {
 					"some-username",
 					"some-password",
 					"some-access-token",
-					"some-refresh-token")
+					"some-refresh-token",
+					true)
 				_, err := builder(&config)
 
 				Expect(err).To(MatchError("Failed to fetch Auth URL"))

@@ -33,16 +33,16 @@ func MutualTLS(certificate string) Builder {
 
 // UaaPassword builds an OauthStrategy for UAA using password_grant token requests
 func UaaPassword(clientId, clientSecret, username, password string) Builder {
-	return Uaa(clientId, clientSecret, username, password, "", "")
+	return Uaa(clientId, clientSecret, username, password, "", "", false)
 }
 
 // UaaClientCredential builds an OauthStrategy for UAA using client_credential_grant token requests
 func UaaClientCredentials(clientId, clientSecret string) Builder {
-	return Uaa(clientId, clientSecret, "", "", "", "")
+	return Uaa(clientId, clientSecret, "", "", "", "", true)
 }
 
 // Uaa builds an OauthStrategy for a UAA using existing tokens
-func Uaa(clientId, clientSecret, username, password, accessToken, refreshToken string) Builder {
+func Uaa(clientId, clientSecret, username, password, accessToken, refreshToken string, usingClientCrendentials bool) Builder {
 	return func(config Config) (Strategy, error) {
 		httpClient := config.Client()
 		authUrl, err := config.AuthURL()
@@ -63,6 +63,7 @@ func Uaa(clientId, clientSecret, username, password, accessToken, refreshToken s
 			ClientSecret: clientSecret,
 			ApiClient:    httpClient,
 			OAuthClient:  &uaaClient,
+			ClientCredentialRefresh: usingClientCrendentials,
 		}
 
 		oauth.SetTokens(accessToken, refreshToken)
