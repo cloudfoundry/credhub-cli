@@ -44,7 +44,9 @@ var _ = Describe("Set", func() {
 			session := runCommand("set", "-n", "my-value", "-v", "potatoes", "-t", "value")
 
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say(responseMyValuePotatoesYaml))
+			Eventually(session.Out).Should(Say("name: my-value"))
+			Eventually(session.Out).Should(Say("type: value"))
+			Eventually(session.Out).Should(Say("value: potatoes"))
 		})
 
 		It("escapes special characters in the value", func() {
@@ -53,7 +55,9 @@ var _ = Describe("Set", func() {
 			session := runCommand("set", "-t", "value", "-n", "my-character-test", "-v", `{"password":"some-still-bad-password"}`)
 
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say(responseMySpecialCharacterValue))
+			Eventually(session.Out).Should(Say("name: my-character-test"))
+			Eventually(session.Out).Should(Say("type: value"))
+			Eventually(session.Out).Should(Say(`value: '{"password":"some-still-bad-password"}'`))
 		})
 
 		It("puts a secret using explicit value type and returns in json format", func() {
@@ -255,7 +259,9 @@ var _ = Describe("Set", func() {
 			session := runCommand("set", "-n", "my-password", "-w", "potatoes", "-t", "password")
 
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say(responseMyPasswordPotatoesYaml))
+			Eventually(session.Out).Should(Say("name: my-password"))
+			Eventually(session.Out).Should(Say("type: password"))
+			Eventually(session.Out).Should(Say("value: potatoes"))
 		})
 
 		It("prompts for value if value is not provided", func() {
@@ -264,8 +270,10 @@ var _ = Describe("Set", func() {
 			session := runCommandWithStdin(strings.NewReader("potatoes\n"), "set", "-n", "my-password", "-t", "password")
 
 			Eventually(session.Out).Should(Say("password:"))
-			Eventually(session.Wait("10s").Out).Should(Say(responseMyPasswordPotatoesYaml))
 			Eventually(session).Should(Exit(0))
+			Eventually(session.Out).Should(Say("name: my-password"))
+			Eventually(session.Out).Should(Say("type: password"))
+			Eventually(session.Out).Should(Say("value: potatoes"))
 		})
 
 		It("can set password that contains spaces interactively", func() {
@@ -273,11 +281,11 @@ var _ = Describe("Set", func() {
 
 			session := runCommandWithStdin(strings.NewReader("potatoes potatoes\n"), "set", "-n", "my-password", "-t", "password")
 
-			response := fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_YAML, "my-password", "password", "potatoes potatoes")
-
 			Eventually(session.Out).Should(Say("password:"))
-			Eventually(session.Wait("10s").Out).Should(Say(response))
 			Eventually(session).Should(Exit(0))
+			Eventually(session.Out).Should(Say("name: my-password"))
+			Eventually(session.Out).Should(Say("type: password"))
+			Eventually(session.Out).Should(Say("value: potatoes potatoes"))
 		})
 
 		It("escapes special characters in the password", func() {
@@ -286,7 +294,7 @@ var _ = Describe("Set", func() {
 			session := runCommand("set", "-t", "password", "-n", "my-character-test", "-w", `{"password":"some-still-bad-password"}`)
 
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say(responseMySpecialCharacterPassword))
+			Eventually(session.Out).Should(Say(`value: '{"password":"some-still-bad-password"}'`))
 		})
 
 		It("puts a secret using explicit password type and returns in json format", func() {
@@ -304,7 +312,9 @@ var _ = Describe("Set", func() {
 			session := runCommand("set", "-n", "my-password", "-w", "potatoes", "-t", "PASSWORD")
 
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say(responseMyPasswordPotatoesYaml))
+			Eventually(session.Out).Should(Say("name: my-password"))
+			Eventually(session.Out).Should(Say("type: password"))
+			Eventually(session.Out).Should(Say("value: potatoes"))
 		})
 	})
 

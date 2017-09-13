@@ -56,7 +56,9 @@ var _ = Describe("Get", func() {
 		session := runCommand("get", "-n", "my-value")
 
 		Eventually(session).Should(Exit(0))
-		Eventually(session.Out).Should(Say(responseMyValuePotatoesYaml))
+		Eventually(session.Out).Should(Say("name: my-value"))
+		Eventually(session.Out).Should(Say("type: value"))
+		Eventually(session.Out).Should(Say("value: potatoes"))
 	})
 
 	It("gets a password secret", func() {
@@ -72,7 +74,9 @@ var _ = Describe("Get", func() {
 		session := runCommand("get", "-n", "my-password")
 
 		Eventually(session).Should(Exit(0))
-		Eventually(session.Out).Should(Say(responseMyPasswordPotatoesYaml))
+		Eventually(session.Out).Should(Say("name: my-password"))
+		Eventually(session.Out).Should(Say("type: password"))
+		Eventually(session.Out).Should(Say("value: potatoes"))
 	})
 
 	It("gets a json secret", func() {
@@ -88,7 +92,15 @@ var _ = Describe("Get", func() {
 		session := runCommand("get", "-n", "json-secret")
 
 		Eventually(session).Should(Exit(0))
-		Eventually(session.Out).Should(Say(responseMyJsonFormatYaml))
+		Eventually(session.Out).Should(Say("name: json-secret"))
+		Eventually(session.Out).Should(Say("type: json"))
+		Eventually(session.Out).Should(Say(`value:
+  an:
+  - array
+  foo: bar
+  nested:
+    a: 1`))
+
 	})
 
 	It("gets a certificate secret", func() {
@@ -104,7 +116,11 @@ var _ = Describe("Get", func() {
 		session := runCommand("get", "-n", "my-secret")
 
 		Eventually(session).Should(Exit(0))
-		Eventually(session.Out).Should(Say(responseMyCertificateYaml))
+		Eventually(session.Out).Should(Say("name: my-secret"))
+		Eventually(session.Out).Should(Say("type: certificate"))
+		Eventually(session.Out).Should(Say("ca: my-ca"))
+		Eventually(session.Out).Should(Say("certificate: my-cert"))
+		Eventually(session.Out).Should(Say("private_key: my-priv"))
 	})
 
 	It("gets an rsa secret", func() {
@@ -120,7 +136,10 @@ var _ = Describe("Get", func() {
 		session := runCommand("get", "-n", "foo-rsa-key")
 
 		Eventually(session).Should(Exit(0))
-		Eventually(session.Out).Should(Say(responseMyRSAFooYaml))
+		Eventually(session.Out).Should(Say("name: foo-rsa-key"))
+		Eventually(session.Out).Should(Say("type: rsa"))
+		Eventually(session.Out).Should(Say("private_key: some-private-key"))
+		Eventually(session.Out).Should(Say("public_key: some-public-key"))
 	})
 
 	It("can output json", func() {
@@ -158,11 +177,15 @@ var _ = Describe("Get", func() {
 		session := runCommand("get", "-n", "my-username-credential")
 
 		Eventually(session).Should(Exit(0))
-		Expect(session.Out.Contents()).To(ContainSubstring(responseMyUsernameYaml))
+		Eventually(session.Out).Should(Say("name: my-username-credential"))
+		Eventually(session.Out).Should(Say("type: user"))
+		Eventually(session.Out).Should(Say("password: test-password"))
+		Eventually(session.Out).Should(Say(`password_hash: passw0rd-H4\$h`))
+		Eventually(session.Out).Should(Say("username: my-username"))
 	})
 
 	It("gets a secret by ID", func() {
-		responseJson := fmt.Sprintf(STRING_CREDENTIAL_ARRAY_RESPONSE_JSON, "password", "my-password", "potatoes")
+		responseJson := fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_JSON, "password", "my-password", "potatoes")
 
 		server.RouteToHandler("GET", "/api/v1/data/"+UUID,
 			CombineHandlers(
@@ -174,11 +197,15 @@ var _ = Describe("Get", func() {
 		session := runCommand("get", "--id", UUID)
 
 		Eventually(session).Should(Exit(0))
-		Eventually(session.Out).Should(Say(responseMyPasswordPotatoesYaml))
+		Eventually(session).Should(Exit(0))
+		Eventually(session.Out).Should(Say("name: my-password"))
+		Eventually(session.Out).Should(Say("type: password"))
+		Eventually(session.Out).Should(Say("value: potatoes"))
+
 	})
 
 	It("does not use Printf on user-supplied data", func() {
-		responseJson := fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_JSON, "password", "injected", "et''%/7(V&`|?m|Ckih$")
+		responseJson := fmt.Sprintf(STRING_CREDENTIAL_ARRAY_RESPONSE_JSON, "password", "injected", "et''%/7(V&`|?m|Ckih$")
 
 		server.RouteToHandler("GET", "/api/v1/data",
 			CombineHandlers(

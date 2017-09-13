@@ -43,7 +43,9 @@ var _ = Describe("Generate", func() {
 			session := runCommand("generate", "-n", "my-password", "-t", "password")
 
 			Eventually(session).Should(Exit(0))
-			Expect(session.Out).To(Say(responseMyPasswordPotatoesYaml))
+			Eventually(session.Out).Should(Say("name: my-password"))
+			Eventually(session.Out).Should(Say("type: password"))
+			Eventually(session.Out).Should(Say("value: potatoes"))
 		})
 
 		It("can print the generated password secret as JSON", func() {
@@ -76,7 +78,9 @@ var _ = Describe("Generate", func() {
 			session := runCommand("generate", "-n", "my-password", "-t", "password")
 
 			Eventually(session).Should(Exit(0))
-			Expect(session.Out).To(Say(responseMyPasswordPotatoesYaml))
+			Eventually(session.Out).Should(Say("name: my-password"))
+			Eventually(session.Out).Should(Say("type: password"))
+			Eventually(session.Out).Should(Say("value: potatoes"))
 		})
 
 		It("can print the secret as JSON", func() {

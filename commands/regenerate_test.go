@@ -35,7 +35,10 @@ var _ = Describe("Regenerate", func() {
 			session := runCommand("regenerate", "--name", "my-password-stuffs")
 
 			Eventually(session).Should(Exit(0))
-			Expect(session.Out).To(Say(fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_YAML, "my-password-stuffs", "password", "nu-potatoes")))
+			Eventually(session.Out).Should(Say("name: my-password-stuff"))
+			Eventually(session.Out).Should(Say("type: password"))
+			Eventually(session.Out).Should(Say("value: nu-potatoes"))
+
 		})
 
 		It("prints the regenerated password secret in json format", func() {

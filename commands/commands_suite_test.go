@@ -50,7 +50,7 @@ const CERTIFICATE_CREDENTIAL_ARRAY_RESPONSE_JSON = `{"data":[` + CERTIFICATE_CRE
 const RSA_SSH_CREDENTIAL_ARRAY_RESPONSE_JSON = `{"data":[` + RSA_SSH_CREDENTIAL_RESPONSE_JSON + `]}`
 const USER_CREDENTIAL_ARRAY_RESPONSE_JSON = `{"data":[` + USER_CREDENTIAL_RESPONSE_JSON + `]}`
 
-const STRING_CREDENTIAL_RESPONSE_YAML = "id: " + UUID + "\nname: %s\ntype: %s\nvalue: %s\nversion_created_at: " + TIMESTAMP
+const STRING_CREDENTIAL_RESPONSE_YAML = "name: %s\nversion_created_at: " + TIMESTAMP + "\nid: " + UUID + "\ntype: %s\nvalue: %s"
 const JSON_CREDENTIAL_RESPONSE_YAML = "id: " + UUID + "\nname: %s\ntype: json\nvalue:\n%s\nversion_created_at: " + TIMESTAMP
 const CERTIFICATE_CREDENTIAL_RESPONSE_YAML = "id: " + UUID + "\nname: %s\ntype: certificate\nvalue:\n  ca: %s\n  certificate: %s\n  private_key: %s\nversion_created_at: " + TIMESTAMP
 const SSH_CREDENTIAL_RESPONSE_YAML = "id: " + UUID + "\nname: %s\ntype: ssh\nvalue:\n  private_key: %s\n  public_key: %s\nversion_created_at: " + TIMESTAMP
@@ -58,7 +58,6 @@ const RSA_CREDENTIAL_RESPONSE_YAML = "id: " + UUID + "\nname: %s\ntype: rsa\nval
 const USER_CREDENTIAL_RESPONSE_YAML = "id: " + UUID + "\nname: %s\ntype: user\nvalue:\n  password: %s\n  password_hash: %s\n  username: %s\nversion_created_at: " + TIMESTAMP
 const USER_WITHOUT_USERNAME_CREDENTIAL_RESPONSE_YAML = "id: " + UUID + "\nname: %s\ntype: user\nvalue:\n  password: %s\n  password_hash: %s\n  username: null\nversion_created_at: " + TIMESTAMP
 
-var responseMyValuePotatoesYaml = fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_YAML, "my-value", "value", "potatoes")
 var responseMyValuePotatoesJson = fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_JSON, "value", "my-value", "potatoes")
 var responseMyPasswordPotatoesYaml = fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_YAML, "my-password", "password", "potatoes")
 var responseMyPasswordPotatoesJson = fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_JSON, "password", "my-password", "potatoes")
@@ -76,8 +75,6 @@ var responseMyRSAFooJson = fmt.Sprintf(RSA_SSH_CREDENTIAL_RESPONSE_JSON, "rsa", 
 var responseMyRSAWithNewlinesJson = fmt.Sprintf(RSA_SSH_CREDENTIAL_RESPONSE_JSON, "rsa", "foo-rsa-key", `some\npublic\nkey`, `some\nprivate\nkey`)
 var responseMyUsernameYaml = fmt.Sprintf(USER_CREDENTIAL_RESPONSE_YAML, "my-username-credential", "test-password", "passw0rd-H4$h", "my-username")
 var responseMyUsernameJson = fmt.Sprintf(USER_CREDENTIAL_RESPONSE_JSON, "my-username-credential", "my-username", "test-password", "passw0rd-H4$h")
-var responseMySpecialCharacterValue = fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_YAML, "my-character-test", "value", `'{"password":"some-still-bad-password"}'`)
-var responseMySpecialCharacterPassword = fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_YAML, "my-character-test", "password", `'{"password":"some-still-bad-password"}'`)
 var responseMySpecialCharacterJson = fmt.Sprintf(JSON_CREDENTIAL_RESPONSE_YAML, "my-character-test", "  foo: b\"ar")
 
 func TestCommands(t *testing.T) {
