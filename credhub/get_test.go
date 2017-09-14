@@ -405,14 +405,14 @@ var _ = Describe("Get", func() {
 		})
 	})
 
-	Describe("GetPassword()", func() {
+	Describe("GetLatestPassword()", func() {
 		It("requests the credential by name", func() {
 			dummyAuth := &DummyAuth{Response: &http.Response{
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
 
 			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
-			ch.GetPassword("/example-password")
+			ch.GetLatestPassword("/example-password")
 			url := dummyAuth.Request.URL
 			Expect(url.String()).To(ContainSubstring("https://example.com/api/v1/data"))
 			Expect(url.String()).To(ContainSubstring("name=%2Fexample-password"))
@@ -437,7 +437,7 @@ var _ = Describe("Get", func() {
 				}}
 
 				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
-				cred, err := ch.GetPassword("/example-password")
+				cred, err := ch.GetLatestPassword("/example-password")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(cred.Value).To(BeEquivalentTo("some-password"))
 			})
@@ -449,21 +449,21 @@ var _ = Describe("Get", func() {
 					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
 				}}
 				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
-				_, err := ch.GetPassword("/example-cred")
+				_, err := ch.GetLatestPassword("/example-cred")
 
 				Expect(err).To(HaveOccurred())
 			})
 		})
 	})
 
-	Describe("GetCertificate()", func() {
+	Describe("GetLatestCertificate()", func() {
 		It("requests the credential by name", func() {
 			dummyAuth := &DummyAuth{Response: &http.Response{
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
 
 			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
-			ch.GetCertificate("/example-certificate")
+			ch.GetLatestCertificate("/example-certificate")
 			url := dummyAuth.Request.URL
 			Expect(url.String()).To(ContainSubstring("https://example.com/api/v1/data"))
 			Expect(url.String()).To(ContainSubstring("name=%2Fexample-certificate"))
@@ -493,7 +493,7 @@ var _ = Describe("Get", func() {
 
 				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
 
-				cred, err := ch.GetCertificate("/example-certificate")
+				cred, err := ch.GetLatestCertificate("/example-certificate")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(cred.Value.Ca).To(Equal("-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----"))
 				Expect(cred.Value.Certificate).To(Equal("-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----"))
@@ -508,21 +508,21 @@ var _ = Describe("Get", func() {
 					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
 				}}
 				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
-				_, err := ch.GetCertificate("/example-cred")
+				_, err := ch.GetLatestCertificate("/example-cred")
 
 				Expect(err).To(HaveOccurred())
 			})
 		})
 	})
 
-	Describe("GetUser()", func() {
+	Describe("GetLatestUser()", func() {
 		It("requests the credential by name", func() {
 			dummyAuth := &DummyAuth{Response: &http.Response{
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
 
 			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
-			ch.GetUser("/example-user")
+			ch.GetLatestUser("/example-user")
 			url := dummyAuth.Request.URL
 			Expect(url.String()).To(ContainSubstring("https://example.com/api/v1/data"))
 			Expect(url.String()).To(ContainSubstring("name=%2Fexample-user"))
@@ -554,7 +554,7 @@ var _ = Describe("Get", func() {
 				}}
 
 				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
-				cred, err := ch.GetUser("/example-user")
+				cred, err := ch.GetLatestUser("/example-user")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(cred.Value.PasswordHash).To(Equal("some-hash"))
 				Expect(cred.Value.User).To(Equal(values.User{
@@ -570,21 +570,21 @@ var _ = Describe("Get", func() {
 					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
 				}}
 				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
-				_, err := ch.GetUser("/example-cred")
+				_, err := ch.GetLatestUser("/example-cred")
 
 				Expect(err).To(HaveOccurred())
 			})
 		})
 	})
 
-	Describe("GetRSA()", func() {
+	Describe("GetLatestRSA()", func() {
 		It("requests the credential by name", func() {
 			dummyAuth := &DummyAuth{Response: &http.Response{
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
 
 			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
-			ch.GetRSA("/example-rsa")
+			ch.GetLatestRSA("/example-rsa")
 			url := dummyAuth.Request.URL
 			Expect(url.String()).To(ContainSubstring("https://example.com/api/v1/data"))
 			Expect(url.String()).To(ContainSubstring("name=%2Fexample-rsa"))
@@ -616,7 +616,7 @@ var _ = Describe("Get", func() {
 				}}
 
 				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
-				cred, err := ch.GetRSA("/example-rsa")
+				cred, err := ch.GetLatestRSA("/example-rsa")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(cred.Value).To(Equal(values.RSA{
 					PublicKey:  "public-key",
@@ -631,21 +631,21 @@ var _ = Describe("Get", func() {
 					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
 				}}
 				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
-				_, err := ch.GetRSA("/example-cred")
+				_, err := ch.GetLatestRSA("/example-cred")
 
 				Expect(err).To(HaveOccurred())
 			})
 		})
 	})
 
-	Describe("GetSSH()", func() {
+	Describe("GetLatestSSH()", func() {
 		It("requests the credential by name", func() {
 			dummyAuth := &DummyAuth{Response: &http.Response{
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
 
 			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
-			ch.GetSSH("/example-ssh")
+			ch.GetLatestSSH("/example-ssh")
 			url := dummyAuth.Request.URL
 			Expect(url.String()).To(ContainSubstring("https://example.com/api/v1/data"))
 			Expect(url.String()).To(ContainSubstring("name=%2Fexample-ssh"))
@@ -678,7 +678,7 @@ var _ = Describe("Get", func() {
 				}}
 
 				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
-				cred, err := ch.GetSSH("/example-ssh")
+				cred, err := ch.GetLatestSSH("/example-ssh")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(cred.Value.PublicKeyFingerprint).To(Equal("public-key-fingerprint"))
 				Expect(cred.Value.SSH).To(Equal(values.SSH{
@@ -694,21 +694,21 @@ var _ = Describe("Get", func() {
 					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
 				}}
 				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
-				_, err := ch.GetSSH("/example-cred")
+				_, err := ch.GetLatestSSH("/example-cred")
 
 				Expect(err).To(HaveOccurred())
 			})
 		})
 	})
 
-	Describe("GetJSON()", func() {
+	Describe("GetLatestJSON()", func() {
 		It("requests the credential by name", func() {
 			dummyAuth := &DummyAuth{Response: &http.Response{
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
 
 			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
-			ch.GetJSON("/example-json")
+			ch.GetLatestJSON("/example-json")
 			url := dummyAuth.Request.URL
 			Expect(url.String()).To(ContainSubstring("https://example.com/api/v1/data"))
 			Expect(url.String()).To(ContainSubstring("name=%2Fexample-json"))
@@ -744,7 +744,7 @@ var _ = Describe("Get", func() {
 				}}
 
 				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
-				cred, err := ch.GetJSON("/example-json")
+				cred, err := ch.GetLatestJSON("/example-json")
 				Expect(err).ToNot(HaveOccurred())
 				Expect([]byte(cred.Value)).To(MatchJSON(`{
 						"key": 123,
@@ -763,21 +763,21 @@ var _ = Describe("Get", func() {
 					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
 				}}
 				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
-				_, err := ch.GetJSON("/example-cred")
+				_, err := ch.GetLatestJSON("/example-cred")
 
 				Expect(err).To(HaveOccurred())
 			})
 		})
 	})
 
-	Describe("GetValue()", func() {
+	Describe("GetLatestValue()", func() {
 		It("requests the credential by name", func() {
 			dummyAuth := &DummyAuth{Response: &http.Response{
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
 
 			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
-			ch.GetValue("/example-value")
+			ch.GetLatestValue("/example-value")
 			url := dummyAuth.Request.URL
 			Expect(url.String()).To(ContainSubstring("https://example.com/api/v1/data"))
 			Expect(url.String()).To(ContainSubstring("name=%2Fexample-value"))
@@ -804,7 +804,7 @@ var _ = Describe("Get", func() {
 				}}
 
 				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
-				cred, err := ch.GetValue("/example-value")
+				cred, err := ch.GetLatestValue("/example-value")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(cred.Value).To(Equal(values.Value("some-value")))
 			})
@@ -816,7 +816,7 @@ var _ = Describe("Get", func() {
 					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
 				}}
 				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
-				_, err := ch.GetValue("/example-cred")
+				_, err := ch.GetLatestValue("/example-cred")
 
 				Expect(err).To(HaveOccurred())
 			})
@@ -843,31 +843,31 @@ var _ = Describe("Get", func() {
 			return err
 		}),
 		Entry("GetPassword", func(ch *CredHub) error {
-			_, err := ch.GetPassword("/example-password")
+			_, err := ch.GetLatestPassword("/example-password")
 			return err
 		}),
 		Entry("GetCertificate", func(ch *CredHub) error {
-			_, err := ch.GetCertificate("/example-certificate")
+			_, err := ch.GetLatestCertificate("/example-certificate")
 			return err
 		}),
 		Entry("GetUser", func(ch *CredHub) error {
-			_, err := ch.GetUser("/example-password")
+			_, err := ch.GetLatestUser("/example-password")
 			return err
 		}),
 		Entry("GetRSA", func(ch *CredHub) error {
-			_, err := ch.GetRSA("/example-password")
+			_, err := ch.GetLatestRSA("/example-password")
 			return err
 		}),
 		Entry("GetSSH", func(ch *CredHub) error {
-			_, err := ch.GetSSH("/example-password")
+			_, err := ch.GetLatestSSH("/example-password")
 			return err
 		}),
 		Entry("GetJSON", func(ch *CredHub) error {
-			_, err := ch.GetJSON("/example-password")
+			_, err := ch.GetLatestJSON("/example-password")
 			return err
 		}),
 		Entry("GetValue", func(ch *CredHub) error {
-			_, err := ch.GetValue("/example-password")
+			_, err := ch.GetLatestValue("/example-password")
 			return err
 		}),
 	)

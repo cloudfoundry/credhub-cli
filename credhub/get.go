@@ -41,56 +41,56 @@ func (ch *CredHub) GetNVersions(name string, numberOfVersions int) ([]credential
 	return creds, err
 }
 
-// GetValue returns the current credential version for a given credential name. The returned credential will be encoded as a map and must be of type 'value'.
-func (ch *CredHub) GetValue(name string) (credentials.Value, error) {
+// GetLatestValue returns the current credential version for a given credential name. The returned credential will be encoded as a map and must be of type 'value'.
+func (ch *CredHub) GetLatestValue(name string) (credentials.Value, error) {
 	var cred credentials.Value
 	err := ch.getCurrentCredential(name, &cred)
 
 	return cred, err
 }
 
-// GetJSON returns the current credential version for a given credential name. The returned credential will be encoded as a map and must be of type 'json'.
-func (ch *CredHub) GetJSON(name string) (credentials.JSON, error) {
+// GetLatestJSON returns the current credential version for a given credential name. The returned credential will be encoded as a map and must be of type 'json'.
+func (ch *CredHub) GetLatestJSON(name string) (credentials.JSON, error) {
 	var cred credentials.JSON
 	err := ch.getCurrentCredential(name, &cred)
 
 	return cred, err
 }
 
-// GetPassword returns the current credential version for a given credential name. The returned credential will be encoded as a map and must be of type 'password'.
-func (ch *CredHub) GetPassword(name string) (credentials.Password, error) {
+// GetLatestPassword returns the current credential version for a given credential name. The returned credential will be encoded as a map and must be of type 'password'.
+func (ch *CredHub) GetLatestPassword(name string) (credentials.Password, error) {
 	var cred credentials.Password
 	err := ch.getCurrentCredential(name, &cred)
 
 	return cred, err
 }
 
-// GetUser returns the current credential version for a given credential name. The returned credential will be encoded as a map and must be of type 'user'.
-func (ch *CredHub) GetUser(name string) (credentials.User, error) {
+// GetLatestUser returns the current credential version for a given credential name. The returned credential will be encoded as a map and must be of type 'user'.
+func (ch *CredHub) GetLatestUser(name string) (credentials.User, error) {
 	var cred credentials.User
 	err := ch.getCurrentCredential(name, &cred)
 
 	return cred, err
 }
 
-// GetCertificate returns the current credential version for a given credential name. The returned credential will be encoded as a map and must be of type 'certificate'.
-func (ch *CredHub) GetCertificate(name string) (credentials.Certificate, error) {
+// GetLatestCertificate returns the current credential version for a given credential name. The returned credential will be encoded as a map and must be of type 'certificate'.
+func (ch *CredHub) GetLatestCertificate(name string) (credentials.Certificate, error) {
 	var cred credentials.Certificate
 	err := ch.getCurrentCredential(name, &cred)
 
 	return cred, err
 }
 
-// GetRSA returns the current credential version for a given credential name. The returned credential will be encoded as a map and must be of type 'rsa'.
-func (ch *CredHub) GetRSA(name string) (credentials.RSA, error) {
+// GetLatestRSA returns the current credential version for a given credential name. The returned credential will be encoded as a map and must be of type 'rsa'.
+func (ch *CredHub) GetLatestRSA(name string) (credentials.RSA, error) {
 	var cred credentials.RSA
 	err := ch.getCurrentCredential(name, &cred)
 
 	return cred, err
 }
 
-// GetSSH returns the current credential version for a given credential name. The returned credential will be encoded as a map and must be of type 'ssh'.
-func (ch *CredHub) GetSSH(name string) (credentials.SSH, error) {
+// GetLatestSSH returns the current credential version for a given credential name. The returned credential will be encoded as a map and must be of type 'ssh'.
+func (ch *CredHub) GetLatestSSH(name string) (credentials.SSH, error) {
 	var cred credentials.SSH
 	err := ch.getCurrentCredential(name, &cred)
 
