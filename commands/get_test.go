@@ -332,9 +332,19 @@ var _ = Describe("Get", func() {
 		session := runCommand("get", "-n", "my-password", "--versions", "2")
 
 		Eventually(session).Should(Exit(0))
-		Eventually(session.Out).Should(Say("name: my-password"))
-		Eventually(session.Out).Should(Say("value: old-password"))
-		Eventually(session.Out).Should(Say("value: new-password"))
+		Eventually(session.Out).Should(Say(`versions:
+- name: my-password
+  version_created_at: ` + TIMESTAMP + `
+  id: ` + UUID + `
+  type: password
+  value: old-password
+- name: my-password
+  version_created_at: ` + TIMESTAMP + `
+  id: ` + UUID + `
+  type: password
+  value: new-password
+`))
+
 	})
 
 	It("does not use Printf on user-supplied data", func() {

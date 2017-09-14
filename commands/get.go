@@ -66,8 +66,10 @@ func (cmd GetCommand) Execute([]string) error {
 	}
 
 	if arrayOfCredentials != nil {
-		fmt.Println("versions:")
-		printCredential(cmd.OutputJson, arrayOfCredentials)
+		output := map[string][]credentials.Credential{
+			"versions": arrayOfCredentials,
+		}
+		printCredential(cmd.OutputJson, output)
 	} else {
 		printCredential(cmd.OutputJson, credential)
 	}
