@@ -319,6 +319,24 @@ var _ = Describe("Get", func() {
 
 	})
 
+	It("gets the specified number of versions of a secret", func() {
+		responseJson := `{"data":[{"type":"password","id":"` + UUID + `","name":"my-password","version_created_at":"` + TIMESTAMP + `","value":"old-password"},{"type":"password","id":"` + UUID + `","name":"my-password","version_created_at":"` + TIMESTAMP + `","value":"new-password"}]}`
+
+		server.RouteToHandler("GET", "/api/v1/data",
+			CombineHandlers(
+				VerifyRequest("GET", "/api/v1/data", "name=my-password&versions=2"),
+				RespondWith(http.StatusOK, responseJson),
+			),
+		)
+
+		session := runCommand("get", "-n", "my-password", "--versions", "2")
+
+		Eventually(session).Should(Exit(0))
+		Eventually(session.Out).Should(Say("name: my-password"))
+		Eventually(session.Out).Should(Say("value: old-password"))
+		Eventually(session.Out).Should(Say("value: new-password"))
+	})
+
 	It("does not use Printf on user-supplied data", func() {
 		responseJson := fmt.Sprintf(STRING_CREDENTIAL_ARRAY_RESPONSE_JSON, "password", "injected", "et''%/7(V&`|?m|Ckih$")
 
