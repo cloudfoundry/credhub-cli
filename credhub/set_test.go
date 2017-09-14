@@ -25,7 +25,8 @@ var _ = Describe("Set", func() {
 			ch, _ := New("https://example.com", Auth(dummy.Builder()))
 
 			certificate := values.Certificate{
-				Ca: "some-ca",
+				Ca:     "some-ca",
+				CaName: "/some-ca-name",
 			}
 			ch.SetCertificate("/example-certificate", certificate, true)
 
@@ -42,6 +43,7 @@ var _ = Describe("Set", func() {
 			Expect(requestBody["overwrite"]).To(BeTrue())
 
 			Expect(requestBody["value"].(map[string]interface{})["ca"]).To(Equal("some-ca"))
+			Expect(requestBody["value"].(map[string]interface{})["ca_name"]).To(Equal("/some-ca-name"))
 		})
 
 		Context("when successful", func() {

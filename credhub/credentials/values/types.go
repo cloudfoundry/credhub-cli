@@ -14,6 +14,7 @@ type User struct {
 
 type Certificate struct {
 	Ca          string `json:"ca"`
+	CaName      string `json:"ca_name,omitempty" yaml:"ca_name,omitempty"`
 	Certificate string `json:"certificate"`
 	PrivateKey  string `json:"private_key" yaml:"private_key"`
 }
