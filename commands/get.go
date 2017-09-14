@@ -30,28 +30,10 @@ func (cmd GetCommand) Execute([]string) error {
 
 	var credhubClient *credhub.CredHub
 
-	if os.Getenv("CREDHUB_CLIENT") != "" || os.Getenv("CREDHUB_SECRET") != "" {
-		credhubClient, err = credhub.New(cfg.ApiURL, credhub.CaCerts(cfg.CaCerts...), credhub.SkipTLSValidation(cfg.InsecureSkipVerify), credhub.Auth(auth.Uaa(
-			os.Getenv("CREDHUB_CLIENT"),
-			os.Getenv("CREDHUB_SECRET"),
-			"",
-			"",
-			cfg.AccessToken,
-			cfg.RefreshToken,
-			true,
-		)),
-			credhub.AuthURL(cfg.AuthURL))
+	if clientCredentialsInEnvironment() {
+		credhubClient, err = newCredhubClient(&cfg, os.Getenv("CREDHUB_CLIENT"), os.Getenv("CREDHUB_SECRET"), true)
 	} else {
-		credhubClient, err = credhub.New(cfg.ApiURL, credhub.CaCerts(cfg.CaCerts...), credhub.SkipTLSValidation(cfg.InsecureSkipVerify), credhub.Auth(auth.Uaa(
-			config.AuthClient,
-			config.AuthPassword,
-			"",
-			"",
-			cfg.AccessToken,
-			cfg.RefreshToken,
-			false,
-		)),
-			credhub.AuthURL(cfg.AuthURL))
+		credhubClient, err = newCredhubClient(&cfg, config.AuthClient, config.AuthPassword, false)
 	}
 	if err != nil {
 		return err
@@ -59,7 +41,7 @@ func (cmd GetCommand) Execute([]string) error {
 
 	err = config.ValidateConfig(cfg)
 	if err != nil {
-		if os.Getenv("CREDHUB_CLIENT") == "" && os.Getenv("CREDHUB_SECRET") == "" {
+		if !clientCredentialsInEnvironment() {
 			return err
 		}
 	}
@@ -85,6 +67,25 @@ func (cmd GetCommand) Execute([]string) error {
 	}
 
 	return nil
+}
+
+func newCredhubClient(cfg *config.Config, clientId string, clientSecret string, usingClientCredentials bool) (*credhub.CredHub, error) {
+	credhubClient, err := credhub.New(cfg.ApiURL, credhub.CaCerts(cfg.CaCerts...), credhub.SkipTLSValidation(cfg.InsecureSkipVerify), credhub.Auth(auth.Uaa(
+		clientId,
+		clientSecret,
+		"",
+		"",
+		cfg.AccessToken,
+		cfg.RefreshToken,
+		usingClientCredentials,
+	)),
+		credhub.AuthURL(cfg.AuthURL))
+
+	return credhubClient, err
+}
+
+func clientCredentialsInEnvironment() bool {
+	return os.Getenv("CREDHUB_CLIENT") != "" || os.Getenv("CREDHUB_SECRET") != ""
 }
 
 func getLatestVersionWithTokenRefresh(credhubClient *credhub.CredHub, name string, cfg *config.Config) (credential credentials.Credential, err error) {
