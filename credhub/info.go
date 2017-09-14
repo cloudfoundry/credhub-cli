@@ -38,11 +38,11 @@ func (ch *CredHub) AuthURL() (string, error) {
 		return "", err
 	}
 
-	authUrl := info.AuthServer.URL
+	authURL := info.AuthServer.URL
 
-	if authUrl == "" {
+	if authURL == "" {
 		return "", errors.New("AuthURL not found")
 	}
 
-	return authUrl, nil
+	return authURL, nil
 }

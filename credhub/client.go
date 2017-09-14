@@ -19,9 +19,9 @@ func (ch *CredHub) Client() *http.Client {
 func (ch *CredHub) client() *http.Client {
 	if ch.baseURL.Scheme == "https" {
 		return httpsClient(ch.insecureSkipVerify, ch.caCerts)
-	} else {
-		return httpClient()
 	}
+
+	return httpClient()
 }
 
 func httpClient() *http.Client {
