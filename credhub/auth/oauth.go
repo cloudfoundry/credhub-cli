@@ -126,7 +126,7 @@ func (a *OAuthStrategy) Logout() error {
 //
 // Login will be a no-op if the AccessToken is not empty when invoked.
 func (a *OAuthStrategy) Login() error {
-	if a.AccessToken() != "" {
+	if a.AccessToken() != "" && a.AccessToken() != "revoked" {
 		return nil
 	}
 

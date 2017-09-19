@@ -26,7 +26,8 @@ var _ = Describe("Set", func() {
 	})
 
 	ItRequiresAuthentication("set", "-n", "test-credential", "-t", "password", "-w", "value")
-	ItAutomaticallyLogsIn("PUT", "set", "-n", "test-credential", "-t", "password", "-w", "test-value")
+	ItRequiresAnAPIToBeSet("set", "-n", "test-credential", "-t", "password", "-w", "value")
+	ItAutomaticallyLogsIn("PUT", "set_response.json", "set", "-n", "test-credential", "-t", "password", "-w", "test-value")
 
 	Describe("not specifying type", func() {
 		It("returns an error", func() {

@@ -84,7 +84,7 @@ var _ = Describe("Action", func() {
 				req, _ := http.NewRequest("POST", "my-url", bytes.NewBufferString("{}"))
 				_, error := subject.DoAction(req, "my-item")
 
-				Expect(error).To(MatchError(credhub_errors.NewNoTargetUrlError()))
+				Expect(error).To(MatchError(credhub_errors.NewNoApiUrlSetError()))
 			})
 
 			Context("when repository returns unauthorized", func() {

@@ -20,8 +20,9 @@ var _ = Describe("Generate", func() {
 		login()
 	})
 
-	ItRequiresAuthentication("get", "-n", "test-credential")
-	ItAutomaticallyLogsIn("POST", "generate", "-n", "test-credential", "-t", "password")
+	ItRequiresAuthentication("generate", "-n", "test-credential", "-t", "password")
+	ItRequiresAnAPIToBeSet("generate", "-n", "test-credential", "-t", "password")
+	ItAutomaticallyLogsIn("POST", "generate_response.json", "generate", "-n", "test-credential", "-t", "password")
 
 	It("requires a type", func() {
 		session := runCommand("generate", "-n", "my-credential")

@@ -42,7 +42,7 @@ func (cmd GetCommand) Execute([]string) error {
 
 	err = config.ValidateConfig(cfg)
 	if err != nil {
-		if !clientCredentialsInEnvironment() {
+		if !clientCredentialsInEnvironment() || config.ValidateConfigApi(cfg) != nil{
 			return err
 		}
 	}

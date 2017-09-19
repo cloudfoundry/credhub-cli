@@ -35,12 +35,12 @@ func (cmd ImportCommand) Execute([]string) error {
 		return err
 	}
 
-	setCredentials(bulkImport)
+	err := setCredentials(bulkImport)
 
-	return nil
+	return err
 }
 
-func setCredentials(bulkImport models.CredentialBulkImport) {
+func setCredentials(bulkImport models.CredentialBulkImport) error{
 	var (
 		name       string
 		successful int
@@ -66,8 +66,7 @@ func setCredentials(bulkImport models.CredentialBulkImport) {
 
 		if err != nil {
 			if isAuthenticationError(err) {
-				fmt.Println(err)
-				return
+				return err
 			}
 			failure := fmt.Sprintf("Credential '%s' at index %d could not be set: %v", name, i, err)
 			fmt.Println(failure + "\n")
@@ -86,7 +85,10 @@ func setCredentials(bulkImport models.CredentialBulkImport) {
 	for _, v := range errors {
 		fmt.Println(v)
 	}
+
+	return nil
 }
+
 func isAuthenticationError(err error) bool {
 	return reflect.DeepEqual(err, errors.NewNoApiUrlSetError()) ||
 		reflect.DeepEqual(err, errors.NewRevokedTokenError()) ||

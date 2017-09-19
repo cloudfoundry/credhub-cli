@@ -18,8 +18,9 @@ var _ = Describe("Delete", func() {
 		login()
 	})
 
-	ItRequiresAuthentication("get", "-n", "test-credential")
-	ItAutomaticallyLogsIn("DELETE", "delete", "-n", "test-credential")
+	ItRequiresAuthentication("delete", "-n", "test-credential")
+	ItRequiresAnAPIToBeSet("delete", "-n", "test-credential")
+	ItAutomaticallyLogsIn("DELETE", "delete_test.json", "delete", "-n", "test-credential")
 
 	Describe("Help", func() {
 		ItBehavesLikeHelp("delete", "d", func(session *Session) {

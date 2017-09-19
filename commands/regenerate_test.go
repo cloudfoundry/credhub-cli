@@ -20,8 +20,9 @@ var _ = Describe("Regenerate", func() {
 		login()
 	})
 
-	ItRequiresAuthentication("get", "-n", "test-credential")
-	ItAutomaticallyLogsIn("POST", "regenerate", "-n", "test-credential")
+	ItRequiresAuthentication("regenerate", "-n", "test-credential")
+	ItRequiresAnAPIToBeSet("regenerate", "-n", "test-credential")
+	ItAutomaticallyLogsIn("POST", "regenerate_response.json", "regenerate", "-n", "test-credential")
 
 	Describe("Regenerating password", func() {
 		It("prints the regenerated password secret in yaml format", func() {

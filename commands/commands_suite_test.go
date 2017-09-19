@@ -18,7 +18,10 @@ import (
 
 	"crypto/tls"
 
+	"path/filepath"
+
 	test_util "github.com/cloudfoundry-incubator/credhub-cli/test"
+	"github.com/cloudfoundry-incubator/credhub-cli/config"
 )
 
 const TIMESTAMP = `2016-01-01T12:00:00Z`
@@ -243,21 +246,59 @@ func ItRequiresAuthentication(args ...string) {
 	})
 }
 
-func ItAutomaticallyLogsIn(method string, args ...string) {
-	Describe("automatic authentication", func() {
+func ItRequiresAnAPIToBeSet(args ...string) {
+	Describe("requires an API endpoint", func() {
 		BeforeEach(func() {
-			server.RouteToHandler(method, "/api/v1/data",
-				RespondWith(http.StatusOK, `{"type":"json","id":"some_uuid","name":"my-json","version_created_at":"idc","value":{"key": 1}, "credentials": [{"name": "key", "version_created_at": "something"}]}`),
-			)
+			cfg := config.ReadConfig()
+			cfg.ApiURL = ""
+			config.WriteConfig(cfg)
 		})
 
+		Context("when using password grant", func() {
+			It("requires an API endpoint", func() {
+				session := runCommand(args...)
+
+				Eventually(session).Should(Exit(1))
+				Expect(session.Err).To(Say("An API target is not set. Please target the location of your server with `credhub api --server api.example.com` to continue."))
+			})
+		})
+
+		Context("when using client_credentials", func() {
+			It("requires an API endpoint", func() {
+				session := runCommandWithEnv([]string{"CREDHUB_CLIENT=test_client", "CREDHUB_SECRET=test_secret"}, args...)
+
+				Eventually(session).Should(Exit(1))
+				Expect(session.Err).To(Say("An API target is not set. Please target the location of your server with `credhub api --server api.example.com` to continue."))
+			})
+		})
+	})
+}
+
+func ItAutomaticallyLogsIn(method string, responseFixtureFile string, args ...string) {
+	var serverResponse string
+	Describe("automatic authentication", func() {
+		BeforeEach(func() {
+			buf, _ := ioutil.ReadFile(filepath.Join("testdata", responseFixtureFile))
+			serverResponse = string(buf)
+		})
 		AfterEach(func() {
 			server.Reset()
 		})
 
 		Context("with correct environment and unauthenticated", func() {
-			It("automatically authenticates", func() {
+			BeforeEach(func() {
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(method, "/api/v1/data"),
+						VerifyHeader(http.Header{
+							"Authorization": []string{"Bearer 2YotnFZFEjr1zCsicMWpAA"},
+						}),
+						RespondWith(http.StatusOK, serverResponse),
+					),
+				)
+			})
 
+			It("automatically authenticates", func() {
 				authServer.RouteToHandler(
 					"DELETE", "/oauth/token/revoke/test-refresh-token",
 					RespondWith(http.StatusOK, nil),
@@ -269,7 +310,6 @@ func ItAutomaticallyLogsIn(method string, args ...string) {
 						VerifyBody([]byte(`client_id=test_client&client_secret=test_secret&grant_type=client_credentials&response_type=token`)),
 						RespondWith(http.StatusOK, `{
 								"access_token":"2YotnFZFEjr1zCsicMWpAA",
-								"refresh_token":"erousflkajqwer",
 								"token_type":"bearer",
 								"expires_in":3600}`),
 					),
@@ -284,14 +324,25 @@ func ItAutomaticallyLogsIn(method string, args ...string) {
 		})
 
 		Context("with correct environment and expired token", func() {
-			It("automatically authenticates", func() {
+			BeforeEach(func() {
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(method, "/api/v1/data"),
+						VerifyHeader(http.Header{
+							"Authorization": []string{"Bearer test-access-token"},
+						}),
+						RespondWith(http.StatusUnauthorized, `{
+						"error":"access_token_expired",
+						"error_description":"error description"}`),
+					),
+				)
+
 				authServer.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest("POST", "/oauth/token"),
 						VerifyBody([]byte(`client_id=test_client&client_secret=test_secret&grant_type=client_credentials&response_type=token`)),
 						RespondWith(http.StatusOK, `{
-								"access_token":"2YotnFZFEjr1zCsicMWpAA",
-								"refresh_token":"erousflkajqwer",
+								"access_token":"new-token",
 								"token_type":"bearer",
 								"expires_in":3600}`),
 					),
@@ -300,12 +351,15 @@ func ItAutomaticallyLogsIn(method string, args ...string) {
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(method, "/api/v1/data"),
-						RespondWith(http.StatusUnauthorized, `{
-						"error":"access_token_expired",
-						"error_description":"error description"}`),
+						VerifyHeader(http.Header{
+							"Authorization": []string{"Bearer new-token"},
+						}),
+						RespondWith(http.StatusOK, serverResponse),
 					),
 				)
+			})
 
+			It("automatically authenticates", func() {
 				session := runCommandWithEnv([]string{"CREDHUB_CLIENT=test_client", "CREDHUB_SECRET=test_secret"}, args...)
 				Eventually(session).Should(Exit(0))
 			})

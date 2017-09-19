@@ -20,6 +20,8 @@ var _ = Describe("Get", func() {
 	})
 
 	ItRequiresAuthentication("get", "-n", "test-credential")
+	ItRequiresAnAPIToBeSet("get", "-n", "test-credential")
+	ItAutomaticallyLogsIn("GET", "get_response.json", "get", "-n", "test-credential")
 
 	ItBehavesLikeHelp("get", "g", func(session *Session) {
 		Expect(session.Err).To(Say("Usage"))
@@ -28,122 +30,6 @@ var _ = Describe("Get", func() {
 		} else {
 			Expect(session.Err).To(Say("credhub-cli \\[OPTIONS\\] get \\[get-OPTIONS\\]"))
 		}
-	})
-
-	Describe("automatic authentication", func() {
-		AfterEach(func() {
-			server.Reset()
-		})
-
-		Context("with correct environment and unauthenticated", func() {
-			It("automatically authenticates", func() {
-				server.RouteToHandler("GET", "/api/v1/data",
-					RespondWith(http.StatusOK, fmt.Sprintf(STRING_CREDENTIAL_ARRAY_RESPONSE_JSON, "value", "my-value", "potatoes")),
-				)
-				authServer.RouteToHandler(
-					"DELETE", "/oauth/token/revoke/test-refresh-token",
-					RespondWith(http.StatusOK, nil),
-				)
-
-				authServer.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest("POST", "/oauth/token"),
-						VerifyBody([]byte(`client_id=test_client&client_secret=test_secret&grant_type=client_credentials&response_type=token`)),
-						RespondWith(http.StatusOK, `{
-								"access_token":"2YotnFZFEjr1zCsicMWpAA",
-								"refresh_token":"erousflkajqwer",
-								"token_type":"bearer",
-								"expires_in":3600}`),
-					),
-				)
-
-				runCommand("logout")
-
-				session := runCommandWithEnv([]string{"CREDHUB_CLIENT=test_client", "CREDHUB_SECRET=test_secret"}, "get", "-n", "test-credential")
-
-				Eventually(session).Should(Exit(0))
-			})
-		})
-
-		Context("with correct environment and expired token", func() {
-			It("automatically authenticates", func() {
-				authServer.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest("POST", "/oauth/token"),
-						VerifyBody([]byte(`client_id=test_client&client_secret=test_secret&grant_type=client_credentials&response_type=token`)),
-						RespondWith(http.StatusOK, `{
-								"access_token":"expired_token",
-								"refresh_token":"erousflkajqwer",
-								"token_type":"bearer",
-								"expires_in":3600}`),
-					),
-					CombineHandlers(
-						VerifyRequest("POST", "/oauth/token"),
-						VerifyBody([]byte(`client_id=test_client&client_secret=test_secret&grant_type=client_credentials&response_type=token`)),
-						RespondWith(http.StatusOK, `{
-								"access_token":"valid_token",
-								"refresh_token":"erousflkajqwer",
-								"token_type":"bearer",
-								"expires_in":3600}`),
-					),
-				)
-
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest("GET", "/api/v1/data"),
-						RespondWith(http.StatusUnauthorized, `{
-						"error":"access_token_expired",
-						"error_description":"error description"}`),
-					),
-				)
-
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest("GET", "/api/v1/data"),
-						RespondWith(http.StatusOK, fmt.Sprintf(STRING_CREDENTIAL_ARRAY_RESPONSE_JSON, "value", "my-value", "potatoes")),
-					))
-
-				session := runCommandWithEnv([]string{"CREDHUB_CLIENT=test_client", "CREDHUB_SECRET=test_secret"}, "get", "-n", "test-credential")
-				Eventually(session).Should(Exit(0))
-			})
-		})
-
-		Context("with expired password grant token", func() {
-			It("automatically refreshes", func() {
-				authServer.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest("POST", "/oauth/token"),
-						VerifyBody([]byte(`client_id=credhub_cli&client_secret=&grant_type=refresh_token&refresh_token=test-refresh-token&response_type=token`)),
-						RespondWith(http.StatusOK, `{
-								"access_token":"ValidAccessToken",
-								"refresh_token":"erousflkajqwer",
-								"token_type":"bearer",
-								"expires_in":3600}`),
-					),
-				)
-
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest("GET", "/api/v1/data"),
-						RespondWith(http.StatusUnauthorized, `{
-						"error":"access_token_expired",
-						"error_description":"error description"}`),
-					),
-				)
-
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest("GET", "/api/v1/data"),
-						RespondWith(http.StatusOK, fmt.Sprintf(STRING_CREDENTIAL_ARRAY_RESPONSE_JSON, "value", "my-value", "potatoes")),
-					),
-				)
-
-				session := runCommand("get", "-n", "test-credential")
-
-				Eventually(session).Should(Exit(0))
-			})
-		})
-
 	})
 
 	It("displays missing required parameter", func() {

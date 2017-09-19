@@ -17,14 +17,6 @@ func NewCatchAllError() error {
 	return errors.New("The targeted API was unable to perform the request. Please validate and retry your request.")
 }
 
-func NewInvalidTargetError() error {
-	return errors.New("The targeted API does not appear to be valid. Please validate the API address and retry your request.")
-}
-
-func NewNoTargetUrlError() error {
-	return errors.New("An API target is not set. Please target the location of your server with `credhub api --server api.example.com` to continue.")
-}
-
 func NewRevokedTokenError() error {
 	return errors.New("You are not currently authenticated. Please log in to continue.")
 }
@@ -37,9 +29,6 @@ func NewMissingGetParametersError() error {
 	return errors.New("A name or ID must be provided. Please update and retry your request.")
 }
 
-func NewCombinationOfParametersError() error {
-	return errors.New("The combination of parameters in the request is not allowed. Please validate your input and retry your request.")
-}
 
 func NewAuthorizationError() error {
 	return errors.New("The provided username and password combination are incorrect. Please validate your input and retry your request.")

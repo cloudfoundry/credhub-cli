@@ -3,7 +3,6 @@ package commands_test
 import (
 	"net/http"
 
-	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -16,7 +15,8 @@ var _ = Describe("Import", func() {
 		login()
 	})
 
-	ItRequiresAuthentication("get", "-n", "test-credential")
+	ItRequiresAuthentication("import", "-f", "../test/test_import_file.yml")
+	ItRequiresAnAPIToBeSet("import", "-f", "../test/test_import_file.yml")
 
 	Describe("importing a file with mixed credentials", func() {
 		It("sets all the credentials", func() {
@@ -239,32 +239,6 @@ Failed to set: 2
 `
 			Eventually(session.Out).Should(Say(successfulSetMessage))
 			Eventually(session.Out).Should(Say(summaryMessage))
-		})
-	})
-
-	Describe("when no api set", func() {
-		It("prints one error message", func() {
-			config.RemoveConfig()
-
-			session := runCommand("import", "-f", "../test/test_import_file.yml")
-
-			Expect(string(session.Out.Contents())).Should(Equal("An API target is not set. Please target the location of your server with `credhub api --server api.example.com` to continue.\n"))
-		})
-	})
-
-	Describe("when not authenticated", func() {
-		It("prints one error message", func() {
-			authServer.AppendHandlers(
-				CombineHandlers(
-					RespondWith(http.StatusOK, ""),
-				),
-			)
-
-			runCommand("logout")
-
-			session := runCommand("import", "-f", "../test/test_import_file.yml")
-
-			Expect(string(session.Out.Contents())).Should(Equal("You are not currently authenticated. Please log in to continue.\n"))
 		})
 	})
 

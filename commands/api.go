@@ -37,7 +37,7 @@ func (cmd ApiCommand) Execute([]string) error {
 		if cfg.ApiURL != "" {
 			fmt.Println(cfg.ApiURL)
 		} else {
-			return errors.NewNoTargetUrlError()
+			return errors.NewNoApiUrlSetError()
 		}
 	} else {
 		caCerts, err := ReadOrGetCaCerts(cmd.CaCerts)
