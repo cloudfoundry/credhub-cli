@@ -31,7 +31,7 @@ const VALID_ACCESS_TOKEN = "eyJhbGciOiJSUzI1NiIsImtpZCI6ImxlZ2FjeS10b2tlbi1rZXki
 const VALID_ACCESS_TOKEN_JTI = "75691799839643f89b64fe4461e49be0"
 
 const STRING_CREDENTIAL_OVERWRITE_REQUEST_JSON = `{"type":"%s","name":"%s","value":"%s","overwrite":%t}`
-const JSON_CREDENTIAL_OVERWRITE_REQUEST_JSON = `{"type":"json","name":"%s","value":%s,"overwrite":%t}`
+const JSON_CREDENTIAL_OVERWRITE_REQUEST_JSON = `{"name":"%s","overwrite":%t,"type":"json","value":%s}`
 const CERTIFICATE_CREDENTIAL_REQUEST_JSON = `{"type":"certificate","name":"%s","value":{"ca":"%s","certificate":"%s","private_key":"%s"},"overwrite":%t}`
 const CERTIFICATE_CREDENTIAL_WITH_NAMED_CA_REQUEST_JSON = `{"type":"certificate","name":"%s","value":{"ca_name":"%s","certificate":"%s","private_key":"%s"},"overwrite":%t}`
 const GENERATE_CREDENTIAL_REQUEST_JSON = `{"name":"%s","type":"%s","overwrite":%t,"parameters":%s}`

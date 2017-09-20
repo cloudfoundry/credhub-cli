@@ -186,13 +186,14 @@ var _ = Describe("Set", func() {
 	})
 
 	Describe("SetUser()", func() {
+		username := "some-user"
 		It("requests to set the user", func() {
 			dummy := &DummyAuth{Response: &http.Response{
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
 
 			ch, _ := New("https://example.com", Auth(dummy.Builder()))
-			user := values.User{Username: "some-user", Password: "some-password"}
+			user := values.User{Username: &username, Password: "some-password"}
 
 			ch.SetUser("/example-user", user, false)
 
@@ -213,6 +214,7 @@ var _ = Describe("Set", func() {
 			}`))
 		})
 
+		user := "username"
 		Context("when successful", func() {
 			It("returns the credential that has been set", func() {
 				dummy := &DummyAuth{Response: &http.Response{
@@ -233,13 +235,14 @@ var _ = Describe("Set", func() {
 
 				ch, _ := New("https://example.com", Auth(dummy.Builder()))
 
-				user := values.User{Username: "username", Password: "some-user"}
+				user := values.User{Username: &user, Password: "some-password"}
 				cred, _ := ch.SetUser("/example-user", user, false)
 
 				Expect(cred.Name).To(Equal("/example-user"))
 				Expect(cred.Type).To(Equal("user"))
+				alternateUsername := "FQnwWoxgSrDuqDLmeLpU"
 				Expect(cred.Value.User).To(Equal(values.User{
-					Username: "FQnwWoxgSrDuqDLmeLpU",
+					Username: &alternateUsername,
 					Password: "6mRPZB3bAfb8lRpacnXsHfDhlPqFcjH2h9YDvLpL",
 				}))
 
@@ -252,7 +255,7 @@ var _ = Describe("Set", func() {
 			It("returns an error", func() {
 				dummy := &DummyAuth{Error: errors.New("Network error occurred")}
 				ch, _ := New("https://example.com", Auth(dummy.Builder()))
-				user := values.User{Username: "username", Password: "some-user"}
+				user := values.User{Username: &user, Password: "some-password"}
 				_, err := ch.SetUser("/example-user", user, false)
 				Expect(err).To(HaveOccurred())
 			})
@@ -265,7 +268,7 @@ var _ = Describe("Set", func() {
 				}}
 				ch, _ := New("https://example.com", Auth(dummy.Builder()))
 
-				user := values.User{Username: "username", Password: "some-user"}
+				user := values.User{Username: &user, Password: "some-password"}
 				_, err := ch.SetUser("/example-user", user, false)
 				Expect(err).To(HaveOccurred())
 			})
@@ -433,6 +436,14 @@ var _ = Describe("Set", func() {
 	})
 
 	Describe("SetJSON()", func() {
+		JSONValue := `{
+					"key": 123,
+					"key_list": [
+					  "val1",
+					  "val2"
+					],
+					"is_true": true
+				}`
 		It("requests to set the JSON", func() {
 			dummy := &DummyAuth{Response: &http.Response{
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
@@ -440,14 +451,7 @@ var _ = Describe("Set", func() {
 
 			ch, _ := New("https://example.com", Auth(dummy.Builder()))
 			JSON := make(map[string]interface{})
-			json.Unmarshal([]byte(`{
-					"key": 123,
-					"key_list": [
-					  "val1",
-					  "val2"
-					],
-					"is_true": true
-				}`), &JSON)
+			json.Unmarshal([]byte(JSONValue), &JSON)
 
 			ch.SetJSON("/example-json", JSON, false)
 
@@ -497,16 +501,12 @@ var _ = Describe("Set", func() {
 
 				cred, _ := ch.SetJSON("/example-json", nil, false)
 
+				var unmarshalled values.JSON
+				json.Unmarshal([]byte(JSONValue), &unmarshalled)
+
 				Expect(cred.Name).To(Equal("/example-json"))
 				Expect(cred.Type).To(Equal("json"))
-				Expect([]byte(cred.Value)).To(MatchJSON(`{
-					"key": 123,
-					"key_list": [
-					  "val1",
-					  "val2"
-					],
-					"is_true": true
-				}`))
+				Expect(cred.Value).To(Equal(unmarshalled))
 			})
 		})
 

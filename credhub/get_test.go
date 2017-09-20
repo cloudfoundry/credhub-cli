@@ -12,6 +12,7 @@ import (
 	. "github.com/cloudfoundry-incubator/credhub-cli/credhub"
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials/values"
 	. "github.com/onsi/ginkgo/extensions/table"
+	"encoding/json"
 )
 
 var _ = Describe("Get", func() {
@@ -557,8 +558,9 @@ var _ = Describe("Get", func() {
 				cred, err := ch.GetLatestUser("/example-user")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(cred.Value.PasswordHash).To(Equal("some-hash"))
+				username := "some-username"
 				Expect(cred.Value.User).To(Equal(values.User{
-					Username: "some-username",
+					Username: &username,
 					Password: "some-password",
 				}))
 			})
@@ -745,15 +747,21 @@ var _ = Describe("Get", func() {
 
 				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
 				cred, err := ch.GetLatestJSON("/example-json")
-				Expect(err).ToNot(HaveOccurred())
-				Expect([]byte(cred.Value)).To(MatchJSON(`{
+
+				JSONResult := `{
 						"key": 123,
 						"key_list": [
 						  "val1",
 						  "val2"
 						],
 						"is_true": true
-					}`))
+					}`
+
+				var unmarshalled values.JSON
+				json.Unmarshal([]byte(JSONResult), &unmarshalled)
+
+				Expect(err).ToNot(HaveOccurred())
+				Expect(cred.Value).To(Equal(unmarshalled))
 			})
 		})
 

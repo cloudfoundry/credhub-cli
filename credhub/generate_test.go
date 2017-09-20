@@ -255,7 +255,7 @@ var _ = Describe("Generate", func() {
 				Expect(generatedUser.Id).To(Equal("some-id"))
 				Expect(generatedUser.Type).To(Equal("user"))
 				Expect(generatedUser.Name).To(Equal("/example-user"))
-				Expect(generatedUser.Value.Username).To(BeEquivalentTo("generated-username"))
+				Expect(*generatedUser.Value.Username).To(BeEquivalentTo("generated-username"))
 				Expect(generatedUser.Value.Password).To(BeEquivalentTo("generated-password"))
 			})
 		})

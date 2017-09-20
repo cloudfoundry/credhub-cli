@@ -2,8 +2,6 @@
 package credentials
 
 import (
-	"encoding/json"
-
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials/values"
 )
 
@@ -37,8 +35,8 @@ type Value struct {
 
 // A JSON type credential
 type JSON struct {
-	Metadata
-	Value json.RawMessage `json:"value"`
+	Metadata `yaml:",inline"`
+	Value values.JSON `json:"value"`
 }
 
 // A Password type credential
@@ -75,19 +73,4 @@ type SSH struct {
 		values.SSH           `yaml:",inline"`
 		PublicKeyFingerprint string `json:"public_key_fingerprint" yaml:"public_key_fingerprint"`
 	} `json:"value"`
-}
-
-func (j JSON) MarshalYAML() (interface{}, error) {
-	var x interface{}
-
-	json.Unmarshal(j.Value, &x)
-
-	return struct {
-		Metadata `yaml:",inline"`
-		Value    interface{}
-	}{
-		Metadata: j.Metadata,
-		Value:    x,
-	}, nil
-
 }

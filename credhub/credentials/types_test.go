@@ -9,6 +9,7 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials/values"
 )
 
 var _ = Describe("Types", func() {
@@ -99,7 +100,7 @@ version_created_at: '2017-01-05T01:01:01Z'`
 			Expect(cred.Id).To(Equal("some-id"))
 			Expect(cred.Name).To(Equal("/example-user"))
 			Expect(cred.Type).To(Equal("user"))
-			Expect(cred.Value.Username).To(Equal("some-username"))
+			Expect(*cred.Value.Username).To(Equal("some-username"))
 			Expect(cred.Value.Password).To(Equal("some-password"))
 			Expect(cred.Value.PasswordHash).To(Equal("some-password-hash"))
 			Expect(cred.VersionCreatedAt).To(Equal("2017-01-05T01:01:01Z"))
@@ -199,10 +200,13 @@ version_created_at: '2017-01-01T04:07:18Z'
         "is_true": true
       }`
 
+			var unmarshalled values.JSON
+			json.Unmarshal([]byte(jsonValueString), &unmarshalled)
+
 			Expect(cred.Id).To(Equal("some-id"))
 			Expect(cred.Name).To(Equal("/example-json"))
 			Expect(cred.Type).To(Equal("json"))
-			Expect([]byte(cred.Value)).To(MatchJSON(jsonValueString))
+			Expect(cred.Value).To(Equal(unmarshalled))
 			Expect(cred.VersionCreatedAt).To(Equal("2017-01-01T04:07:18Z"))
 
 			jsonOutput, err := json.Marshal(cred)
