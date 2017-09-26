@@ -182,7 +182,7 @@ Failed to set: 0
 
 	Describe("when importing file with no name specified", func() {
 		It("passes through the server error", func() {
-			jsonBody := `{"type":"password","value":"test-password","overwrite":true}`
+			jsonBody := `{"name":"","type":"password","value":"test-password","overwrite":true}`
 			SetupPutBadRequestServer(jsonBody)
 
 			session := runCommand("import", "-f", "../test/test_import_missing_name.yml")
@@ -225,6 +225,7 @@ Failed to set: 0
 Credential '/test/invalid_type1' at index 1 could not be set: The request does not include a valid type. Valid values include 'value', 'json', 'password', 'user', 'certificate', 'ssh' and 'rsa'.
 
 id: 5a2edd4f-1686-4c8d-80eb-5daa866f9f86
+version_created_at: 2016-01-01T12:00:00Z
 name: /test/user
 type: user
 value:

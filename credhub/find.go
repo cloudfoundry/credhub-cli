@@ -10,13 +10,13 @@ import (
 )
 
 // FindByPartialName retrieves a list of stored credential names which contain the search.
-func (ch *CredHub) FindByPartialName(nameLike string) ([]credentials.Base, error) {
+func (ch *CredHub) FindByPartialName(nameLike string) ([]credentials.FindByNameResult, error) {
 	panic("Not implemented")
 }
 
 // FindByPath retrieves a list of stored credential names which are within the specified path.
-func (ch *CredHub) FindByPath(path string) ([]credentials.Base, error) {
-	var creds map[string][]credentials.Base
+func (ch *CredHub) FindByPath(path string) ([]credentials.FindByNameResult, error) {
+	var creds map[string][]credentials.FindByNameResult
 
 	query := url.Values{}
 	query.Set("path", path)
@@ -24,7 +24,7 @@ func (ch *CredHub) FindByPath(path string) ([]credentials.Base, error) {
 	resp, err := ch.Request(http.MethodGet, "/api/v1/data", query, nil)
 
 	if err != nil {
-		return []credentials.Base{}, err
+		return []credentials.FindByNameResult{}, err
 	}
 
 	defer resp.Body.Close()
@@ -33,7 +33,7 @@ func (ch *CredHub) FindByPath(path string) ([]credentials.Base, error) {
 	err = json.Unmarshal(body, &creds)
 
 	if err != nil {
-		return []credentials.Base{}, err
+		return []credentials.FindByNameResult{}, err
 	}
 
 	return creds["credentials"], nil

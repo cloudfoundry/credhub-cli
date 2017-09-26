@@ -9,12 +9,13 @@ import (
 	"os"
 	"strings"
 
+	"encoding/json"
+
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub"
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials"
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials/values"
 	"github.com/cloudfoundry-incubator/credhub-cli/errors"
 	"github.com/cloudfoundry-incubator/credhub-cli/util"
-	"encoding/json"
 )
 
 type SetCommand struct {
@@ -129,7 +130,7 @@ func MakeRequest(cmd SetCommand, config config.Config, credhubClient *credhub.Cr
 		value.Ca = root
 		value.CaName = cmd.CaName
 		var certificateCredential credentials.Certificate
-		certificateCredential, responseError  = credhubClient.SetCertificate(cmd.CredentialIdentifier, value, !cmd.NoOverwrite)
+		certificateCredential, responseError = credhubClient.SetCertificate(cmd.CredentialIdentifier, value, !cmd.NoOverwrite)
 		output = interface{}(certificateCredential)
 	} else if cmd.Type == "user" {
 		value := values.User{}

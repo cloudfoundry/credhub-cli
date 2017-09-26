@@ -64,6 +64,13 @@ func (ch *CredHub) SetSSH(name string, value values.SSH, overwrite bool) (creden
 	return cred, err
 }
 
+func (ch *CredHub) SetCredential(name, credType string, value interface{}, overwrite bool) (credentials.Credential, error) {
+	var cred credentials.Credential
+	err := ch.setCredential(name, credType, value, overwrite, &cred)
+
+	return cred, err
+}
+
 func (ch *CredHub) setCredential(name, credType string, value interface{}, overwrite bool, cred interface{}) error {
 	requestBody := map[string]interface{}{}
 	requestBody["name"] = name

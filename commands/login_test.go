@@ -305,7 +305,6 @@ var _ = Describe("Login", func() {
 			Expect(cfg.AuthURL).To(Equal(uaaServer.URL()))
 		})
 
-
 		Context("when the provided server url does not have a scheme specified", func() {
 			It("sets a default scheme", func() {
 				server := NewTLSServer()

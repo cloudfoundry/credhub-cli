@@ -9,12 +9,10 @@ import (
 
 	"reflect"
 
-	"github.com/cloudfoundry-incubator/credhub-cli/actions"
-	"github.com/cloudfoundry-incubator/credhub-cli/client"
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
+	"github.com/cloudfoundry-incubator/credhub-cli/credhub"
 	"github.com/cloudfoundry-incubator/credhub-cli/errors"
 	"github.com/cloudfoundry-incubator/credhub-cli/models"
-	"github.com/cloudfoundry-incubator/credhub-cli/repositories"
 )
 
 type ImportCommand struct {
@@ -23,7 +21,6 @@ type ImportCommand struct {
 
 var (
 	err        error
-	repository repositories.Repository
 	bulkImport models.CredentialBulkImport
 	request    *http.Request
 )
@@ -40,7 +37,7 @@ func (cmd ImportCommand) Execute([]string) error {
 	return err
 }
 
-func setCredentials(bulkImport models.CredentialBulkImport) error{
+func setCredentials(bulkImport models.CredentialBulkImport) error {
 	var (
 		name       string
 		successful int
@@ -49,12 +46,26 @@ func setCredentials(bulkImport models.CredentialBulkImport) error{
 	errors := make([]string, 0)
 
 	cfg := config.ReadConfig()
-	repository = repositories.NewCredentialRepository(client.NewHttpClient(cfg))
-	action := actions.NewAction(repository, &cfg)
+
+	var credhubClient *credhub.CredHub
+
+	if clientCredentialsInEnvironment() {
+		credhubClient, err = newCredhubClient(&cfg, os.Getenv("CREDHUB_CLIENT"), os.Getenv("CREDHUB_SECRET"), true)
+	} else {
+		credhubClient, err = newCredhubClient(&cfg, config.AuthClient, config.AuthPassword, false)
+	}
+	if err != nil {
+		return err
+	}
+
+	err = config.ValidateConfig(cfg)
+	if err != nil {
+		if !clientCredentialsInEnvironment() || config.ValidateConfigApi(cfg) != nil {
+			return err
+		}
+	}
 
 	for i, credential := range bulkImport.Credentials {
-		request = client.NewSetRequest(cfg, credential)
-
 		switch credentialName := credential["name"].(type) {
 		case string:
 			name = credentialName
@@ -62,7 +73,7 @@ func setCredentials(bulkImport models.CredentialBulkImport) error{
 			name = ""
 		}
 
-		result, err := action.DoAction(request, name)
+		result, err := credhubClient.SetCredential(name, credential["type"].(string), credential["value"], true)
 
 		if err != nil {
 			if isAuthenticationError(err) {
@@ -76,7 +87,7 @@ func setCredentials(bulkImport models.CredentialBulkImport) error{
 		} else {
 			successful++
 		}
-		models.Println(result, false)
+		printCredential(false, result)
 	}
 
 	fmt.Println("Import complete.")

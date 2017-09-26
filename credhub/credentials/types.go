@@ -7,14 +7,19 @@ import (
 
 // Base fields of a credential
 type Base struct {
-	Name             string `json:"name"`
+	Id               string `json:"id"`
 	VersionCreatedAt string `json:"version_created_at" yaml:"version_created_at"`
+	Name             string `json:"name"`
 }
 
 type Metadata struct {
 	Base `yaml:",inline"`
-	Id   string `json:"id"`
 	Type string `json:"type"`
+}
+
+type FindByNameResult struct {
+	VersionCreatedAt string `json:"version_created_at" yaml:"version_created_at"`
+	Name             string `json:"name"`
 }
 
 // A generic credential
@@ -36,7 +41,7 @@ type Value struct {
 // A JSON type credential
 type JSON struct {
 	Metadata `yaml:",inline"`
-	Value values.JSON `json:"value"`
+	Value    values.JSON `json:"value"`
 }
 
 // A Password type credential
