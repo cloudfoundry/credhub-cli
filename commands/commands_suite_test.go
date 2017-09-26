@@ -20,8 +20,8 @@ import (
 
 	"path/filepath"
 
-	test_util "github.com/cloudfoundry-incubator/credhub-cli/test"
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
+	test_util "github.com/cloudfoundry-incubator/credhub-cli/test"
 )
 
 const TIMESTAMP = `2016-01-01T12:00:00Z`
@@ -53,32 +53,19 @@ const CERTIFICATE_CREDENTIAL_ARRAY_RESPONSE_JSON = `{"data":[` + CERTIFICATE_CRE
 const RSA_SSH_CREDENTIAL_ARRAY_RESPONSE_JSON = `{"data":[` + RSA_SSH_CREDENTIAL_RESPONSE_JSON + `]}`
 const USER_CREDENTIAL_ARRAY_RESPONSE_JSON = `{"data":[` + USER_CREDENTIAL_RESPONSE_JSON + `]}`
 
-const STRING_CREDENTIAL_RESPONSE_YAML = "name: %s\nversion_created_at: " + TIMESTAMP + "\nid: " + UUID + "\ntype: %s\nvalue: %s"
-const JSON_CREDENTIAL_RESPONSE_YAML = "id: " + UUID + "\nname: %s\ntype: json\nvalue:\n%s\nversion_created_at: " + TIMESTAMP
 const CERTIFICATE_CREDENTIAL_RESPONSE_YAML = "id: " + UUID + "\nname: %s\ntype: certificate\nvalue:\n  ca: %s\n  certificate: %s\n  private_key: %s\nversion_created_at: " + TIMESTAMP
 const SSH_CREDENTIAL_RESPONSE_YAML = "id: " + UUID + "\nname: %s\ntype: ssh\nvalue:\n  private_key: %s\n  public_key: %s\nversion_created_at: " + TIMESTAMP
 const RSA_CREDENTIAL_RESPONSE_YAML = "id: " + UUID + "\nname: %s\ntype: rsa\nvalue:\n  private_key: %s\n  public_key: %s\nversion_created_at: " + TIMESTAMP
 const USER_CREDENTIAL_RESPONSE_YAML = "id: " + UUID + "\nname: %s\ntype: user\nvalue:\n  password: %s\n  password_hash: %s\n  username: %s\nversion_created_at: " + TIMESTAMP
-const USER_WITHOUT_USERNAME_CREDENTIAL_RESPONSE_YAML = "id: " + UUID + "\nname: %s\ntype: user\nvalue:\n  password: %s\n  password_hash: %s\n  username: null\nversion_created_at: " + TIMESTAMP
 
 var responseMyValuePotatoesJson = fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_JSON, "value", "my-value", "potatoes")
-var responseMyPasswordPotatoesYaml = fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_YAML, "my-password", "password", "potatoes")
 var responseMyPasswordPotatoesJson = fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_JSON, "password", "my-password", "potatoes")
-var responseMyJsonFormatYaml = fmt.Sprintf(JSON_CREDENTIAL_RESPONSE_YAML, "json-secret", "  an:\n  - array\n  foo: bar\n  nested:\n    a: 1")
-var responseMyJsonFormatJson = fmt.Sprintf(JSON_CREDENTIAL_RESPONSE_JSON, "json-secret", "{\"an\": [\"array\"], \"foo\": \"bar\", \"nested\": {\"a\": 1}}")
 var responseMyCertificateYaml = fmt.Sprintf(CERTIFICATE_CREDENTIAL_RESPONSE_YAML, "my-secret", "my-ca", "my-cert", "my-priv")
-var responseMyCertificateWithNamedCAYaml = fmt.Sprintf(CERTIFICATE_CREDENTIAL_RESPONSE_YAML, "my-secret", "known-ca-value", "my-cert", "my-priv")
-var responseMyCertificateJson = fmt.Sprintf(CERTIFICATE_CREDENTIAL_RESPONSE_JSON, "my-secret", "my-ca", "my-cert", "my-priv")
 var responseMyCertificateWithNewlinesJson = fmt.Sprintf(CERTIFICATE_CREDENTIAL_RESPONSE_JSON, "my-secret", `my\nca`, `my\ncert`, `my\npriv`)
 var responseMySSHFooYaml = fmt.Sprintf(SSH_CREDENTIAL_RESPONSE_YAML, "foo-ssh-key", "some-private-key", "some-public-key")
-var responseMySSHFooJson = fmt.Sprintf(RSA_SSH_CREDENTIAL_RESPONSE_JSON, "ssh", "foo-ssh-key", "some-public-key", "some-private-key")
-var responseMySSHWithNewlinesJson = fmt.Sprintf(RSA_SSH_CREDENTIAL_RESPONSE_JSON, "ssh", "foo-ssh-key", `some\npublic\nkey`, `some\nprivate\nkey`)
 var responseMyRSAFooYaml = fmt.Sprintf(RSA_CREDENTIAL_RESPONSE_YAML, "foo-rsa-key", "some-private-key", "some-public-key")
-var responseMyRSAFooJson = fmt.Sprintf(RSA_SSH_CREDENTIAL_RESPONSE_JSON, "rsa", "foo-rsa-key", "some-public-key", "some-private-key")
 var responseMyRSAWithNewlinesJson = fmt.Sprintf(RSA_SSH_CREDENTIAL_RESPONSE_JSON, "rsa", "foo-rsa-key", `some\npublic\nkey`, `some\nprivate\nkey`)
 var responseMyUsernameYaml = fmt.Sprintf(USER_CREDENTIAL_RESPONSE_YAML, "my-username-credential", "test-password", "passw0rd-H4$h", "my-username")
-var responseMyUsernameJson = fmt.Sprintf(USER_CREDENTIAL_RESPONSE_JSON, "my-username-credential", "my-username", "test-password", "passw0rd-H4$h")
-var responseMySpecialCharacterJson = fmt.Sprintf(JSON_CREDENTIAL_RESPONSE_YAML, "my-character-test", "  foo: b\"ar")
 
 func TestCommands(t *testing.T) {
 	RegisterFailHandler(Fail)

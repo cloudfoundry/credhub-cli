@@ -3,8 +3,6 @@ package commands
 import (
 	"fmt"
 
-	"net/http"
-
 	"os"
 
 	"reflect"
@@ -22,7 +20,6 @@ type ImportCommand struct {
 var (
 	err        error
 	bulkImport models.CredentialBulkImport
-	request    *http.Request
 )
 
 func (cmd ImportCommand) Execute([]string) error {
