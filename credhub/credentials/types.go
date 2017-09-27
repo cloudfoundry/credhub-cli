@@ -17,6 +17,10 @@ type Metadata struct {
 	Type string `json:"type"`
 }
 
+type FindByNameResults struct {
+	Credentials []FindByNameResult `json:"credentials" yaml:"credentials"`
+}
+
 type FindByNameResult struct {
 	VersionCreatedAt string `json:"version_created_at" yaml:"version_created_at"`
 	Name             string `json:"name"`

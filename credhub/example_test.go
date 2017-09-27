@@ -136,7 +136,7 @@ func Example() {
 		}
 
 		fmt.Println("Found the following credentials in " + path + ":")
-		for _, cred := range creds {
+		for _, cred := range creds.Credentials {
 			fmt.Println(cred.Name)
 		}
 		// Sample Output:
