@@ -5,7 +5,6 @@ type GenerateRequest struct {
 	CredentialType string                `json:"type"`
 	Overwrite      *bool                 `json:"overwrite"`
 	Parameters     *GenerationParameters `json:"parameters"`
-	Value          *ProvidedValue        `json:"value,omitempty"`
 }
 
 type GenerationParameters struct {
@@ -29,8 +28,5 @@ type GenerationParameters struct {
 	SelfSign         bool     `json:"self_sign,omitempty"`
 	IsCA             bool     `json:"is_ca,omitempty"`
 	SshComment       string   `json:"ssh_comment,omitempty"`
-}
-
-type ProvidedValue struct {
-	Username string `json:"username,omitempty"`
+	Username 		 string   `json:"username,omitempty"`
 }

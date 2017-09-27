@@ -43,6 +43,13 @@ func (ch *CredHub) GenerateSSH(name string, gen generate.SSH, overwrite bool) (c
 	return cred, err
 }
 
+// GenerateCredential generates any credential type based on the credType given provided parameters.
+func (ch *CredHub) GenerateCredential(name, credType string, gen interface{}, overwrite bool) (credentials.Credential, error) {
+	var cred credentials.Credential
+	err := ch.generateCredential(name, credType, gen, overwrite, &cred)
+	return cred, err
+}
+
 func (ch *CredHub) generateCredential(name, credType string, gen interface{}, overwrite bool, cred interface{}) error {
 	requestBody := map[string]interface{}{}
 	requestBody["name"] = name

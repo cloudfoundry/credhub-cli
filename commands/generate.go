@@ -3,12 +3,10 @@ package commands
 import (
 	"strings"
 
-	"github.com/cloudfoundry-incubator/credhub-cli/actions"
-	"github.com/cloudfoundry-incubator/credhub-cli/client"
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
+	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials/generate"
 	"github.com/cloudfoundry-incubator/credhub-cli/errors"
 	"github.com/cloudfoundry-incubator/credhub-cli/models"
-	"github.com/cloudfoundry-incubator/credhub-cli/repositories"
 )
 
 type GenerateCommand struct {
@@ -44,50 +42,62 @@ func (cmd GenerateCommand) Execute([]string) error {
 		return errors.NewGenerateEmptyTypeError()
 	}
 
+	var parameters interface{}
+
 	cmd.CredentialType = strings.ToLower(cmd.CredentialType)
 
 	cfg := config.ReadConfig()
-	repository := repositories.NewCredentialRepository(client.NewHttpClient(cfg))
 
-	parameters := models.GenerationParameters{
-		IncludeSpecial:   cmd.IncludeSpecial,
-		ExcludeNumber:    cmd.ExcludeNumber,
-		ExcludeUpper:     cmd.ExcludeUpper,
-		ExcludeLower:     cmd.ExcludeLower,
-		Length:           cmd.Length,
-		CommonName:       cmd.CommonName,
-		Organization:     cmd.Organization,
-		OrganizationUnit: cmd.OrganizationUnit,
-		Locality:         cmd.Locality,
-		State:            cmd.State,
-		Country:          cmd.Country,
-		AlternativeName:  cmd.AlternativeName,
-		ExtendedKeyUsage: cmd.ExtendedKeyUsage,
-		KeyUsage:         cmd.KeyUsage,
-		KeyLength:        cmd.KeyLength,
-		Duration:         cmd.Duration,
-		Ca:               cmd.Ca,
-		SelfSign:         cmd.SelfSign,
-		IsCA:             cmd.IsCA,
-		SshComment:       cmd.SshComment,
-	}
-
-	var value *models.ProvidedValue
 	if len(cmd.Username) > 0 {
-		value = &models.ProvidedValue{
-			Username: cmd.Username,
+		parameters = generate.User{
+			Username:       cmd.Username,
+			Length:         cmd.Length,
+			IncludeSpecial: cmd.IncludeSpecial,
+			ExcludeNumber:  cmd.ExcludeNumber,
+			ExcludeUpper:   cmd.ExcludeUpper,
+			ExcludeLower:   cmd.ExcludeLower,
+		}
+	} else {
+		parameters = models.GenerationParameters{
+			IncludeSpecial:   cmd.IncludeSpecial,
+			ExcludeNumber:    cmd.ExcludeNumber,
+			ExcludeUpper:     cmd.ExcludeUpper,
+			ExcludeLower:     cmd.ExcludeLower,
+			Length:           cmd.Length,
+			CommonName:       cmd.CommonName,
+			Organization:     cmd.Organization,
+			OrganizationUnit: cmd.OrganizationUnit,
+			Locality:         cmd.Locality,
+			State:            cmd.State,
+			Country:          cmd.Country,
+			AlternativeName:  cmd.AlternativeName,
+			ExtendedKeyUsage: cmd.ExtendedKeyUsage,
+			KeyUsage:         cmd.KeyUsage,
+			KeyLength:        cmd.KeyLength,
+			Duration:         cmd.Duration,
+			Ca:               cmd.Ca,
+			SelfSign:         cmd.SelfSign,
+			IsCA:             cmd.IsCA,
+			SshComment:       cmd.SshComment,
+			Username:         cmd.Username,
 		}
 	}
 
-	action := actions.NewAction(repository, &cfg)
-	request := client.NewGenerateCredentialRequest(cfg, cmd.CredentialIdentifier, parameters, value, cmd.CredentialType, !cmd.NoOverwrite)
-	credential, err := action.DoAction(request, cmd.CredentialIdentifier)
+	if len(cmd.Username) > 0 {
+	}
+
+	credhubClient, err := initializeCredhubClient(cfg)
+	if err != nil {
+		return err
+	}
+
+	credential, err := credhubClient.GenerateCredential(cmd.CredentialIdentifier, cmd.CredentialType, parameters, !cmd.NoOverwrite)
 
 	if err != nil {
 		return err
 	}
 
-	models.Println(credential, cmd.OutputJson)
+	printCredential(cmd.OutputJson, credential)
 
 	return nil
 }

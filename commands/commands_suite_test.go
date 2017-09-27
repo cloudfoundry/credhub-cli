@@ -53,10 +53,10 @@ const CERTIFICATE_CREDENTIAL_ARRAY_RESPONSE_JSON = `{"data":[` + CERTIFICATE_CRE
 const RSA_SSH_CREDENTIAL_ARRAY_RESPONSE_JSON = `{"data":[` + RSA_SSH_CREDENTIAL_RESPONSE_JSON + `]}`
 const USER_CREDENTIAL_ARRAY_RESPONSE_JSON = `{"data":[` + USER_CREDENTIAL_RESPONSE_JSON + `]}`
 
-const CERTIFICATE_CREDENTIAL_RESPONSE_YAML = "id: " + UUID + "\nname: %s\ntype: certificate\nvalue:\n  ca: %s\n  certificate: %s\n  private_key: %s\nversion_created_at: " + TIMESTAMP
-const SSH_CREDENTIAL_RESPONSE_YAML = "id: " + UUID + "\nname: %s\ntype: ssh\nvalue:\n  private_key: %s\n  public_key: %s\nversion_created_at: " + TIMESTAMP
-const RSA_CREDENTIAL_RESPONSE_YAML = "id: " + UUID + "\nname: %s\ntype: rsa\nvalue:\n  private_key: %s\n  public_key: %s\nversion_created_at: " + TIMESTAMP
-const USER_CREDENTIAL_RESPONSE_YAML = "id: " + UUID + "\nname: %s\ntype: user\nvalue:\n  password: %s\n  password_hash: %s\n  username: %s\nversion_created_at: " + TIMESTAMP
+const CERTIFICATE_CREDENTIAL_RESPONSE_YAML = "id: " + UUID + "\nversion_created_at: " + TIMESTAMP + "\nname: %s\ntype: certificate\nvalue:\n  ca: %s\n  certificate: %s\n  private_key: %s"
+const SSH_CREDENTIAL_RESPONSE_YAML = "id: " + UUID + "\nversion_created_at: " + TIMESTAMP + "\nname: %s\ntype: ssh\nvalue:\n  private_key: %s\n  public_key: %s"
+const RSA_CREDENTIAL_RESPONSE_YAML = "id: " + UUID + "\nversion_created_at: " + TIMESTAMP + "\nname: %s\ntype: rsa\nvalue:\n  private_key: %s\n  public_key: %s"
+const USER_CREDENTIAL_RESPONSE_YAML = "id: " + UUID + "\nversion_created_at: " + TIMESTAMP + "\nname: %s\ntype: user\nvalue:\n  password: %s\n  password_hash: %s\n  username: %s"
 
 var responseMyValuePotatoesJson = fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_JSON, "value", "my-value", "potatoes")
 var responseMyPasswordPotatoesJson = fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_JSON, "password", "my-password", "potatoes")

@@ -278,9 +278,9 @@ var _ = Describe("Generate", func() {
 			Eventually(session).Should(Exit(0))
 			Expect(string(session.Out.Contents())).To(MatchJSON(`{
 				"id" :"` + UUID + `",
+				"version_created_at": "` + TIMESTAMP + `",
 				"type": "certificate",
 				"name": "my-secret",
-				"version_created_at": "` + TIMESTAMP + `",
 				"value": {
 					"ca": "my-ca",
 					"certificate": "my-cert",

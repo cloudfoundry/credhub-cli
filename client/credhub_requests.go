@@ -80,18 +80,6 @@ func NewSetJsonCredentialRequest(config config.Config, credentialType string, cr
 	return newCredentialRequest("PUT", config, credential)
 }
 
-func NewGenerateCredentialRequest(config config.Config, identifier string, parameters models.GenerationParameters, value *models.ProvidedValue, credentialType string, overwrite bool) *http.Request {
-	generateRequest := models.GenerateRequest{
-		Name:           identifier,
-		CredentialType: credentialType,
-		Overwrite:      &overwrite,
-		Parameters:     &parameters,
-		Value:          value,
-	}
-
-	return newCredentialRequest("POST", config, generateRequest)
-}
-
 func NewRegenerateCredentialRequest(config config.Config, identifier string) *http.Request {
 	regenerateRequest := models.RegenerateRequest{
 		Name:       identifier,

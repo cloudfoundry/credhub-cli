@@ -12,7 +12,6 @@ import (
 	"net/url"
 
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
-	"github.com/cloudfoundry-incubator/credhub-cli/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -149,58 +148,6 @@ var _ = Describe("Credhub API", func() {
 			byteBuff.ReadFrom(request.Body)
 
 			Expect(byteBuff.String()).To(MatchJSON(json))
-		})
-	})
-
-	Describe("NewGenerateCredentialRequest", func() {
-		It("returns a request with only overwrite", func() {
-			requestBody := `{"name":"my-name","type":"my-type","overwrite":true,"parameters":{}}`
-
-			params := models.GenerationParameters{}
-			request := NewGenerateCredentialRequest(cfg, "my-name", params, nil, "my-type", true)
-			Expect(request.Header).To(HaveKeyWithValue("Content-Type", []string{"application/json"}))
-			Expect(request.Header).To(HaveKeyWithValue("Authorization", []string{"Bearer access-token"}))
-			Expect(request.Method).To(Equal("POST"))
-
-			byteBuff := new(bytes.Buffer)
-			byteBuff.ReadFrom(request.Body)
-
-			Expect(byteBuff.String()).To(MatchJSON(requestBody))
-		})
-
-		It("returns a request with parameters", func() {
-			parameters := models.GenerationParameters{
-				IncludeSpecial: true,
-				ExcludeNumber:  true,
-				ExcludeUpper:   true,
-				ExcludeLower:   true,
-				Length:         42,
-			}
-			value := models.ProvidedValue{Username: "my-username"}
-			expectedRequestBody := `{
-					"name":"my-name",
-					"type":"password",
-					"overwrite":false,
-					"parameters": {
-						"include_special": true,
-						"exclude_number": true,
-						"exclude_upper": true,
-						"exclude_lower": true,
-						"length": 42
-					},
-					"value": {
-						"username": "my-username"
-					}
-				}`
-
-			request := NewGenerateCredentialRequest(cfg, "my-name", parameters, &value, "password", false)
-
-			bodyBuffer := new(bytes.Buffer)
-			bodyBuffer.ReadFrom(request.Body)
-			Expect(bodyBuffer).To(MatchJSON(expectedRequestBody))
-			Expect(request.Method).To(Equal("POST"))
-			Expect(request.URL.String()).To(Equal("http://example.com/api/v1/data"))
-			Expect(request.Header.Get("Content-Type")).To(Equal("application/json"))
 		})
 	})
 
