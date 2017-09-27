@@ -8,7 +8,6 @@ import (
 	"reflect"
 
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub"
 	"github.com/cloudfoundry-incubator/credhub-cli/errors"
 	"github.com/cloudfoundry-incubator/credhub-cli/models"
 )
@@ -44,22 +43,9 @@ func setCredentials(bulkImport models.CredentialBulkImport) error {
 
 	cfg := config.ReadConfig()
 
-	var credhubClient *credhub.CredHub
-
-	if clientCredentialsInEnvironment() {
-		credhubClient, err = newCredhubClient(&cfg, os.Getenv("CREDHUB_CLIENT"), os.Getenv("CREDHUB_SECRET"), true)
-	} else {
-		credhubClient, err = newCredhubClient(&cfg, config.AuthClient, config.AuthPassword, false)
-	}
+	credhubClient, err := initializeCredhubClient(cfg)
 	if err != nil {
 		return err
-	}
-
-	err = config.ValidateConfig(cfg)
-	if err != nil {
-		if !clientCredentialsInEnvironment() || config.ValidateConfigApi(cfg) != nil {
-			return err
-		}
 	}
 
 	for i, credential := range bulkImport.Credentials {

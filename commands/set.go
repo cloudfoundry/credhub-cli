@@ -50,13 +50,7 @@ func (cmd SetCommand) Execute([]string) error {
 
 	cfg := config.ReadConfig()
 
-	var credhubClient *credhub.CredHub
-
-	if clientCredentialsInEnvironment() {
-		credhubClient, err = newCredhubClient(&cfg, os.Getenv("CREDHUB_CLIENT"), os.Getenv("CREDHUB_SECRET"), true)
-	} else {
-		credhubClient, err = newCredhubClient(&cfg, config.AuthClient, config.AuthPassword, false)
-	}
+	credhubClient, err := initializeCredhubClient(cfg)
 	if err != nil {
 		return err
 	}
