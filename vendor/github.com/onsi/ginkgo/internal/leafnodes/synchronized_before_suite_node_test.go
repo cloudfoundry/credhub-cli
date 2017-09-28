@@ -5,15 +5,13 @@ import (
 	. "github.com/onsi/ginkgo/internal/leafnodes"
 	. "github.com/onsi/gomega"
 
-	"net/http"
-
 	"github.com/onsi/gomega/ghttp"
-
-	"time"
+	"net/http"
 
 	"github.com/onsi/ginkgo/internal/codelocation"
 	Failer "github.com/onsi/ginkgo/internal/failer"
 	"github.com/onsi/ginkgo/types"
+	"time"
 )
 
 var _ = Describe("SynchronizedBeforeSuiteNode", func() {

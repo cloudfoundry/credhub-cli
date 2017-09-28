@@ -1,21 +1,18 @@
 package leafnodes_test
 
 import (
-	"sync"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/internal/leafnodes"
 	"github.com/onsi/ginkgo/types"
 	. "github.com/onsi/gomega"
-
-	"net/http"
+	"sync"
 
 	"github.com/onsi/gomega/ghttp"
-
-	"time"
+	"net/http"
 
 	"github.com/onsi/ginkgo/internal/codelocation"
 	Failer "github.com/onsi/ginkgo/internal/failer"
+	"time"
 )
 
 var _ = Describe("SynchronizedAfterSuiteNode", func() {
