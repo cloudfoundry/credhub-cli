@@ -40,4 +40,7 @@ type CredHub struct {
 
 	authBuilder auth.Builder
 	authURL     *url.URL
+
+	// Version of the server to make API requests against. Some methods will hit alternate endpoints based on this value
+	ServerVersion string
 }
