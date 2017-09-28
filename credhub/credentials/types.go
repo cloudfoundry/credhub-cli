@@ -7,12 +7,12 @@ import (
 
 // Base fields of a credential
 type Base struct {
-	Id               string `json:"id"`
 	VersionCreatedAt string `json:"version_created_at" yaml:"version_created_at"`
-	Name             string `json:"name"`
+	Name             string `json:"name" yaml:"name"`
 }
 
 type Metadata struct {
+	Id   string `json:"id"`
 	Base `yaml:",inline"`
 	Type string `json:"type"`
 }
@@ -77,12 +77,7 @@ type SSH struct {
 
 // Types needed for Find functionality
 type FindResults struct {
-	Credentials []FindResult `json:"credentials" yaml:"credentials"`
-}
-
-type FindResult struct {
-	VersionCreatedAt string `json:"version_created_at" yaml:"version_created_at"`
-	Name             string `json:"name"`
+	Credentials []Base `json:"credentials" yaml:"credentials"`
 }
 
 type Paths struct {
