@@ -17,15 +17,6 @@ type Metadata struct {
 	Type string `json:"type"`
 }
 
-type FindByNameResults struct {
-	Credentials []FindByNameResult `json:"credentials" yaml:"credentials"`
-}
-
-type FindByNameResult struct {
-	VersionCreatedAt string `json:"version_created_at" yaml:"version_created_at"`
-	Name             string `json:"name"`
-}
-
 // A generic credential
 //
 // Used when the Type of the credential is not known ahead of time.
@@ -82,4 +73,22 @@ type SSH struct {
 		values.SSH           `yaml:",inline"`
 		PublicKeyFingerprint string `json:"public_key_fingerprint" yaml:"public_key_fingerprint"`
 	} `json:"value"`
+}
+
+// Types needed for Find functionality
+type FindResults struct {
+	Credentials []FindResult `json:"credentials" yaml:"credentials"`
+}
+
+type FindResult struct {
+	VersionCreatedAt string `json:"version_created_at" yaml:"version_created_at"`
+	Name             string `json:"name"`
+}
+
+type Paths struct {
+	Paths []Path `json:"paths" yaml:"paths"`
+}
+
+type Path struct {
+	Path string `json:"path" yaml:"path"`
 }

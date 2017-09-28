@@ -69,6 +69,7 @@ var _ = Describe("Find", func() {
 				_, err := ch.FindByPath("/some/example/path")
 
 				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring("Network error occurred"))
 			})
 		})
 
@@ -142,6 +143,7 @@ var _ = Describe("Find", func() {
 				_, err := ch.FindByPartialName("/some/example/path")
 
 				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring("Network error occurred"))
 			})
 		})
 
@@ -155,6 +157,76 @@ var _ = Describe("Find", func() {
 				ch, _ := New("https://example.com", Auth(dummy.Builder()))
 
 				_, err := ch.FindByPartialName("/some/example/path")
+				Expect(err).To(HaveOccurred())
+			})
+		})
+	})
+
+	Describe("ShowAllPaths()", func() {
+		It("requests credentials for a all paths", func() {
+			dummy := &DummyAuth{Response: &http.Response{
+				Body: ioutil.NopCloser(bytes.NewBufferString("")),
+			}}
+
+			ch, _ := New("https://example.com", Auth(dummy.Builder()))
+
+			ch.ShowAllPaths()
+			url := dummy.Request.URL
+			Expect(url.String()).To(Equal("https://example.com/api/v1/data?paths=true"))
+			Expect(dummy.Request.Method).To(Equal(http.MethodGet))
+		})
+
+		Context("when successful", func() {
+			It("returns a list of paths which contain credentials", func() {
+				expectedResponse := `{
+  "paths": [
+    {
+      "path": "/some/example/path/example-cred-0"
+    },
+    {
+      "path": "/some/example/path/example-cred-1"
+    }
+  ]
+}`
+				dummy := &DummyAuth{Response: &http.Response{
+					StatusCode: http.StatusOK,
+					Body:       ioutil.NopCloser(bytes.NewBufferString(expectedResponse)),
+				}}
+
+				ch, _ := New("https://example.com", Auth(dummy.Builder()))
+
+				creds, err := ch.ShowAllPaths()
+
+				Expect(err).ToNot(HaveOccurred())
+				Expect(creds.Paths[0].Path).To(Equal("/some/example/path/example-cred-0"))
+				Expect(creds.Paths[1].Path).To(Equal("/some/example/path/example-cred-1"))
+
+			})
+		})
+
+		Context("when request fails", func() {
+			It("returns an error", func() {
+				dummy := &DummyAuth{Error: errors.New("Network error occurred")}
+
+				ch, _ := New("https://example.com", Auth(dummy.Builder()))
+
+				_, err := ch.ShowAllPaths()
+
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring("Network error occurred"))
+			})
+		})
+
+		Context("when response body cannot be unmarshalled", func() {
+			It("returns an error", func() {
+				dummy := &DummyAuth{Response: &http.Response{
+					StatusCode: http.StatusOK,
+					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
+				}}
+
+				ch, _ := New("https://example.com", Auth(dummy.Builder()))
+
+				_, err := ch.ShowAllPaths()
 				Expect(err).To(HaveOccurred())
 			})
 		})
