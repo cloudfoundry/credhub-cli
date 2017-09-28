@@ -71,4 +71,26 @@ var _ = Describe("Regenerate", func() {
 			Expect(err).To(HaveOccurred())
 		})
 	})
+
+	Context("when the server version is older than 1.4.0", func() {
+		It("regenerates the specified credential using the /data endpoint", func() {
+			dummyAuth := &DummyAuth{Response: &http.Response{
+				Body: ioutil.NopCloser(bytes.NewBufferString("")),
+			}}
+
+			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()), ServerVersion("1.3.0"))
+
+			ch.Regenerate("/example-password")
+			url := dummyAuth.Request.URL.String()
+			Expect(url).To(Equal("https://example.com/api/v1/data"))
+			Expect(dummyAuth.Request.Method).To(Equal(http.MethodPost))
+
+			var requestBody map[string]interface{}
+			body, _ := ioutil.ReadAll(dummyAuth.Request.Body)
+			json.Unmarshal(body, &requestBody)
+
+			Expect(requestBody["name"]).To(Equal("/example-password"))
+			Expect(requestBody["regenerate"]).To(Equal(true))
+		})
+	})
 })

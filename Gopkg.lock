@@ -15,6 +15,12 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/hashicorp/go-version"
+  packages = ["."]
+  revision = "fc61389e27c71d120f87031ca8c88a3428f372dd"
+
+[[projects]]
+  branch = "master"
   name = "github.com/howeyc/gopass"
   packages = ["."]
   revision = "bf9dde6d0d2c004a008c27aaee91170c786f6db8"
@@ -82,6 +88,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "f4db3def99e30b087635e65b291bf2a72842eb53e3aa9e268d94162e1330bc30"
+  inputs-digest = "7d9a4562578dbd481242b06f3caf506a2f3586181ac673be6672db8fde6a4af7"
   solver-name = "gps-cdcl"
   solver-version = 1
