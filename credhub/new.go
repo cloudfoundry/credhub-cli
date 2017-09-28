@@ -10,7 +10,7 @@ import (
 // provided to specify additional parameters, including authentication.
 // See the Option type for a list of supported options.
 //
-// When targetting multiple CredHub servers, use a new CredHub API client
+// When targeting multiple CredHub servers, use a new CredHub API client
 // for each target server.
 func New(target string, options ...Option) (*CredHub, error) {
 	baseURL, err := url.Parse(target)
