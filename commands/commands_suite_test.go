@@ -137,7 +137,7 @@ func login() {
 
 	server.RouteToHandler("GET", "/info",
 		RespondWith(http.StatusOK, `{
-				"app":{"version":"my-version","name":"CredHub"}
+				"app":{"version":"9.9.9","name":"CredHub"}
 				}`),
 	)
 
@@ -202,7 +202,7 @@ func NewTlsServer(certPath, keyPath string) *Server {
 func SetupServers(chServer, uaaServer *Server) {
 	chServer.RouteToHandler("GET", "/info",
 		RespondWith(http.StatusOK, `{
-				"app":{"version":"my-version","name":"CredHub"},
+				"app":{"version":"9.9.9","name":"CredHub"},
 				"auth-server":{"url":"`+uaaServer.URL()+`"}
 				}`),
 	)

@@ -27,7 +27,7 @@ var _ = Describe("Login", func() {
 
 		server.RouteToHandler("GET", "/info",
 			RespondWith(http.StatusOK, `{
-				"app":{"version":"my-version","name":"CredHub"},
+				"app":{"version":"9.9.9","name":"CredHub"},
 				"auth-server":{"url":"`+authServer.URL()+`"}
 				}`),
 		)
@@ -309,7 +309,7 @@ var _ = Describe("Login", func() {
 			It("sets a default scheme", func() {
 				server := NewTLSServer()
 				server.RouteToHandler("GET", "/info", RespondWith(http.StatusOK, `{
-						"app":{"version":"my-version","name":"CredHub"},
+						"app":{"version":"9.9.9","name":"CredHub"},
 						"auth-server":{"url":"`+uaaServer.URL()+`"}
 						}`),
 				)
