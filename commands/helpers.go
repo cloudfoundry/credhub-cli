@@ -53,7 +53,8 @@ func newCredhubClient(cfg *config.Config, clientId string, clientSecret string, 
 		cfg.RefreshToken,
 		usingClientCredentials,
 	)),
-		credhub.AuthURL(cfg.AuthURL))
+		credhub.AuthURL(cfg.AuthURL),
+		credhub.ServerVersion(cfg.ServerVersion))
 	return credhubClient, err
 }
 

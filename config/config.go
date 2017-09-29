@@ -19,6 +19,7 @@ type Config struct {
 	RefreshToken       string
 	InsecureSkipVerify bool
 	CaCerts            []string
+	ServerVersion      string
 }
 
 func ConfigDir() string {

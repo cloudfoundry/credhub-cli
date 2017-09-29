@@ -50,6 +50,8 @@ func (cmd LoginCommand) Execute([]string) error {
 		}
 		cfg.AuthURL = credhubInfo.AuthServer.URL
 
+		cfg.ServerVersion = credhubInfo.App.Version
+
 		err = VerifyAuthServerConnection(cfg, cmd.SkipTlsValidation)
 		if err != nil {
 			return errors.NewNetworkError(err)

@@ -8,11 +8,11 @@ import (
 	"github.com/cloudfoundry-incubator/credhub-cli/actions"
 	"github.com/cloudfoundry-incubator/credhub-cli/client"
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
+	"github.com/cloudfoundry-incubator/credhub-cli/credhub"
+	"github.com/cloudfoundry-incubator/credhub-cli/credhub/server"
 	"github.com/cloudfoundry-incubator/credhub-cli/errors"
 	"github.com/cloudfoundry-incubator/credhub-cli/util"
 	"github.com/fatih/color"
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub"
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub/server"
 )
 
 var warning = color.New(color.Bold, color.FgYellow).PrintlnFunc()
@@ -59,6 +59,7 @@ func (cmd ApiCommand) Execute([]string) error {
 
 		cfg.ApiURL = serverUrl
 		cfg.AuthURL = credhubInfo.AuthServer.URL
+		cfg.ServerVersion = credhubInfo.App.Version
 		cfg.InsecureSkipVerify = cmd.SkipTlsValidation
 		cfg.CaCerts = caCerts
 

@@ -52,7 +52,7 @@ var _ = Describe("Delete", func() {
 			session := runCommand("delete", "-n", "my-secret")
 
 			Eventually(session).Should(Exit(1))
-			Eventually(string(session.Err.Contents())).Should(ContainSubstring("Get mashed://potatoes/info: unsupported protocol scheme \"mashed\""))
+			Eventually(string(session.Err.Contents())).Should(ContainSubstring("Delete mashed://potatoes/api/v1/data?name=my-secret: unsupported protocol scheme \"mashed\""))
 		})
 
 		It("displays missing required parameter", func() {
