@@ -22,7 +22,7 @@ var _ = Describe("Generate", func() {
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
 
-			ch, _ := New("https://example.com", Auth(dummy.Builder()))
+			ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
 
 			cert := generate.Certificate{
 				Ca: "some-ca",
@@ -59,7 +59,7 @@ var _ = Describe("Generate", func() {
 }`)),
 				}}
 
-				ch, _ := New("https://example.com", Auth(dummy.Builder()))
+				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
 
 				cert := generate.Certificate{
 					Ca: "some-ca",
@@ -81,7 +81,7 @@ var _ = Describe("Generate", func() {
 			It("returns an error", func() {
 				networkError := errors.New("Network error occurred")
 				dummy := &DummyAuth{Error: networkError}
-				ch, _ := New("https://example.com", Auth(dummy.Builder()))
+				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
 
 				cert := generate.Certificate{
 					Ca: "some-ca",
@@ -99,7 +99,7 @@ var _ = Describe("Generate", func() {
 				dummy := &DummyAuth{Response: &http.Response{
 					Body: ioutil.NopCloser(bytes.NewBufferString("invalid-response")),
 				}}
-				ch, _ := New("https://example.com", Auth(dummy.Builder()))
+				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
 
 				cert := generate.Certificate{
 					Ca: "some-ca",
@@ -119,7 +119,7 @@ var _ = Describe("Generate", func() {
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
 
-			ch, _ := New("https://example.com", Auth(dummy.Builder()))
+			ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
 
 			passwordOptions := generate.Password{
 				Length: 12,
@@ -153,7 +153,7 @@ var _ = Describe("Generate", func() {
 	}`)),
 				}}
 
-				ch, _ := New("https://example.com", Auth(dummy.Builder()))
+				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
 
 				p := generate.Password{
 					Length: 12,
@@ -173,7 +173,7 @@ var _ = Describe("Generate", func() {
 			It("returns an error", func() {
 				networkError := errors.New("Network error occurred")
 				dummy := &DummyAuth{Error: networkError}
-				ch, _ := New("https://example.com", Auth(dummy.Builder()))
+				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
 
 				_, err = ch.GeneratePassword("/example-password", generate.Password{}, false)
 
@@ -187,7 +187,7 @@ var _ = Describe("Generate", func() {
 				dummy := &DummyAuth{Response: &http.Response{
 					Body: ioutil.NopCloser(bytes.NewBufferString("invalid-response")),
 				}}
-				ch, _ := New("https://example.com", Auth(dummy.Builder()))
+				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
 
 				_, err := ch.GeneratePassword("/example-password", generate.Password{}, false)
 
@@ -203,7 +203,7 @@ var _ = Describe("Generate", func() {
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
 
-			ch, _ := New("https://example.com", Auth(dummy.Builder()))
+			ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
 
 			userOptions := generate.User{
 				Username: "name",
@@ -244,7 +244,7 @@ var _ = Describe("Generate", func() {
 }`)),
 				}}
 
-				ch, _ := New("https://example.com", Auth(dummy.Builder()))
+				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
 
 				p := generate.User{
 					Length: 12,
@@ -265,7 +265,7 @@ var _ = Describe("Generate", func() {
 			It("returns an error", func() {
 				networkError := errors.New("Network error occurred")
 				dummy := &DummyAuth{Error: networkError}
-				ch, _ := New("https://example.com", Auth(dummy.Builder()))
+				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
 
 				_, err = ch.GenerateUser("/example-user", generate.User{}, false)
 
@@ -279,7 +279,7 @@ var _ = Describe("Generate", func() {
 				dummy := &DummyAuth{Response: &http.Response{
 					Body: ioutil.NopCloser(bytes.NewBufferString("invalid-response")),
 				}}
-				ch, _ := New("https://example.com", Auth(dummy.Builder()))
+				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
 
 				_, err := ch.GenerateUser("/example-user", generate.User{}, false)
 
@@ -295,7 +295,7 @@ var _ = Describe("Generate", func() {
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
 
-			ch, _ := New("https://example.com", Auth(dummy.Builder()))
+			ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
 
 			rsaOptions := generate.RSA{
 				KeyLength: 2048,
@@ -336,7 +336,7 @@ var _ = Describe("Generate", func() {
 					}`)),
 				}}
 
-				ch, _ := New("https://example.com", Auth(dummy.Builder()))
+				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
 
 				p := generate.RSA{
 					KeyLength: 2048,
@@ -358,7 +358,7 @@ var _ = Describe("Generate", func() {
 			It("returns an error", func() {
 				networkError := errors.New("Network error occurred")
 				dummy := &DummyAuth{Error: networkError}
-				ch, _ := New("https://example.com", Auth(dummy.Builder()))
+				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
 
 				_, err = ch.GenerateRSA("/example-rsa", generate.RSA{}, false)
 
@@ -372,7 +372,7 @@ var _ = Describe("Generate", func() {
 				dummy := &DummyAuth{Response: &http.Response{
 					Body: ioutil.NopCloser(bytes.NewBufferString("invalid-response")),
 				}}
-				ch, _ := New("https://example.com", Auth(dummy.Builder()))
+				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
 
 				_, err := ch.GenerateRSA("/example-rsa", generate.RSA{}, false)
 
@@ -388,7 +388,7 @@ var _ = Describe("Generate", func() {
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
 
-			ch, _ := New("https://example.com", Auth(dummy.Builder()))
+			ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
 
 			sshOptions := generate.SSH{
 				KeyLength: 2048,
@@ -429,7 +429,7 @@ var _ = Describe("Generate", func() {
 					}`)),
 				}}
 
-				ch, _ := New("https://example.com", Auth(dummy.Builder()))
+				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
 
 				p := generate.SSH{
 					KeyLength: 2048,
@@ -451,7 +451,7 @@ var _ = Describe("Generate", func() {
 			It("returns an error", func() {
 				networkError := errors.New("Network error occurred")
 				dummy := &DummyAuth{Error: networkError}
-				ch, _ := New("https://example.com", Auth(dummy.Builder()))
+				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
 
 				_, err = ch.GenerateSSH("/example-ssh", generate.SSH{}, false)
 
@@ -465,7 +465,7 @@ var _ = Describe("Generate", func() {
 				dummy := &DummyAuth{Response: &http.Response{
 					Body: ioutil.NopCloser(bytes.NewBufferString("invalid-response")),
 				}}
-				ch, _ := New("https://example.com", Auth(dummy.Builder()))
+				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
 
 				_, err := ch.GenerateSSH("/example-ssh", generate.SSH{}, false)
 

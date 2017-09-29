@@ -296,7 +296,7 @@ var _ = Describe("Login", func() {
 		It("sets the target to the server's url and auth server url", func() {
 			session := runCommand("login", "-u", "user", "-p", "pass", "-s", apiServer.URL())
 
-			Expect(apiServer.ReceivedRequests()).Should(HaveLen(1))
+			Expect(apiServer.ReceivedRequests()).Should(HaveLen(2))
 			Expect(uaaServer.ReceivedRequests()).Should(HaveLen(2))
 			Eventually(session).Should(Exit(0))
 			Eventually(session.Out).Should(Say("Login Successful"))

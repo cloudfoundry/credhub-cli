@@ -1,17 +1,25 @@
 package commands
 
 import (
-	"os"
-	"github.com/cloudfoundry-incubator/credhub-cli/config"
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub"
 	"encoding/json"
 	"fmt"
+	"os"
+
+	"github.com/cloudfoundry-incubator/credhub-cli/config"
+	"github.com/cloudfoundry-incubator/credhub-cli/credhub"
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/auth"
 	"gopkg.in/yaml.v2"
 )
 
 func initializeCredhubClient(cfg config.Config) (*credhub.CredHub, error) {
 	var credhubClient *credhub.CredHub
+
+	err = config.ValidateConfig(cfg)
+	if err != nil {
+		if !clientCredentialsInEnvironment() || config.ValidateConfigApi(cfg) != nil {
+			return nil, err
+		}
+	}
 
 	if clientCredentialsInEnvironment() {
 		credhubClient, err = newCredhubClient(&cfg, os.Getenv("CREDHUB_CLIENT"), os.Getenv("CREDHUB_SECRET"), true)
@@ -20,13 +28,6 @@ func initializeCredhubClient(cfg config.Config) (*credhub.CredHub, error) {
 	}
 	if err != nil {
 		return nil, err
-	}
-
-	err = config.ValidateConfig(cfg)
-	if err != nil {
-		if !clientCredentialsInEnvironment() || config.ValidateConfigApi(cfg) != nil {
-			return nil, err
-		}
 	}
 
 	return credhubClient, nil
@@ -53,7 +54,6 @@ func newCredhubClient(cfg *config.Config, clientId string, clientSecret string, 
 		usingClientCredentials,
 	)),
 		credhub.AuthURL(cfg.AuthURL))
-
 	return credhubClient, err
 }
 

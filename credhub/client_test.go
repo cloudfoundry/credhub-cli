@@ -14,7 +14,7 @@ import (
 
 var _ = Describe("Client()", func() {
 	It("should return a simple http.Client", func() {
-		ch, _ := New("http://example.com")
+		ch, _ := New("http://example.com", ServerVersion("2.2.2"))
 		client := ch.Client()
 
 		Expect(client).ToNot(BeNil())
@@ -40,7 +40,7 @@ var _ = Describe("Client()", func() {
 				expectedRootCAs.AppendCertsFromPEM(caCertBytes)
 			}
 
-			ch, _ := New("https://example.com", CaCerts(caCerts...))
+			ch, _ := New("https://example.com", CaCerts(caCerts...), ServerVersion("2.2.2"))
 
 			client := ch.Client()
 
@@ -57,7 +57,7 @@ var _ = Describe("Client()", func() {
 
 	Context("With InsecureSkipVerify", func() {
 		It("should return a http.Client with tls.Config without RootCAs", func() {
-			ch, _ := New("https://example.com", SkipTLSValidation(true))
+			ch, _ := New("https://example.com", SkipTLSValidation(true), ServerVersion("2.2.2"))
 			client := ch.Client()
 
 			transport := client.Transport.(*http.Transport)

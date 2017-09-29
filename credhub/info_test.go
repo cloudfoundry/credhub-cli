@@ -31,7 +31,7 @@ var _ = Describe("Info", func() {
 
 			defer testServer.Close()
 
-			ch, _ := New(testServer.URL)
+			ch, _ := New(testServer.URL, ServerVersion("1.2.3"))
 
 			info, err := ch.Info()
 			Expect(err).To(BeNil())
@@ -51,7 +51,7 @@ var _ = Describe("Info", func() {
 
 				defer testServer.Close()
 
-				ch, _ := New(testServer.URL)
+				ch, _ := New(testServer.URL, ServerVersion("1.2.3"))
 
 				info, err := ch.Info()
 
@@ -65,7 +65,7 @@ var _ = Describe("Info", func() {
 		Context("Errors", func() {
 
 			Specify("when ApiURL is inaccessible", func() {
-				ch, _ := New("http://localhost:1")
+				ch, _ := New("http://localhost:1", ServerVersion("1.2.3"))
 				_, err := ch.AuthURL()
 				Expect(err).ToNot(BeNil())
 			})
@@ -78,7 +78,7 @@ var _ = Describe("Info", func() {
 				}))
 				defer testServer.Close()
 
-				ch, _ := New(testServer.URL)
+				ch, _ := New(testServer.URL, ServerVersion("1.2.3"))
 				_, err := ch.AuthURL()
 
 				Expect(err).ToNot(BeNil())

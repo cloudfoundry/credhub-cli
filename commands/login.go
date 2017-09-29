@@ -5,10 +5,10 @@ import (
 
 	"github.com/cloudfoundry-incubator/credhub-cli/client"
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
-	"github.com/cloudfoundry-incubator/credhub-cli/errors"
-	"github.com/howeyc/gopass"
-	"github.com/cloudfoundry-incubator/credhub-cli/util"
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/auth/uaa"
+	"github.com/cloudfoundry-incubator/credhub-cli/errors"
+	"github.com/cloudfoundry-incubator/credhub-cli/util"
+	"github.com/howeyc/gopass"
 )
 
 type LoginCommand struct {
@@ -23,9 +23,9 @@ type LoginCommand struct {
 
 func (cmd LoginCommand) Execute([]string) error {
 	var (
-		accessToken string
+		accessToken  string
 		refreshToken string
-		err   error
+		err          error
 	)
 	cfg := config.ReadConfig()
 
@@ -64,7 +64,7 @@ func (cmd LoginCommand) Execute([]string) error {
 
 	uaaClient := uaa.Client{
 		AuthURL: cfg.AuthURL,
-		Client: client.NewHttpClient(cfg),
+		Client:  client.NewHttpClient(cfg),
 	}
 
 	if cmd.ClientName != "" || cmd.ClientSecret != "" {

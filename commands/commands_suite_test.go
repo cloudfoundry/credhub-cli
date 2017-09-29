@@ -135,6 +135,12 @@ func login() {
 		),
 	)
 
+	server.RouteToHandler("GET", "/info",
+		RespondWith(http.StatusOK, `{
+				"app":{"version":"my-version","name":"CredHub"}
+				}`),
+	)
+
 	runCommand("login", "-u", "test-username", "-p", "test-password")
 
 	authServer.Reset()
