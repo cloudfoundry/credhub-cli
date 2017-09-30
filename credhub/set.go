@@ -64,6 +64,7 @@ func (ch *CredHub) SetSSH(name string, value values.SSH, overwrite bool) (creden
 	return cred, err
 }
 
+// SetCredential sets a credential of any type with a user-provided value. 
 func (ch *CredHub) SetCredential(name, credType string, value interface{}, overwrite bool) (credentials.Credential, error) {
 	var cred credentials.Credential
 	err := ch.setCredential(name, credType, value, overwrite, &cred)
