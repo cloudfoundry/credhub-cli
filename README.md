@@ -1,7 +1,7 @@
 # <div align="center"><img src="https://raw.githubusercontent.com/cloudfoundry-incubator/credhub/master/docs/images/logo.png" alt="CredHub"></div>
 
 [![slack.cloudfoundry.org](https://slack.cloudfoundry.org/badge.svg)](https://slack.cloudfoundry.org)
-[![GoDoc](https://godoc.org/github.com/golang/gddo?status.svg)](http://godoc.org/github.com/cloudfoundry-incubator/credhub-cli)
+[![GoDoc](https://godoc.org/github.com/golang/gddo?status.svg)](http://godoc.org/github.com/cloudfoundry-incubator/credhub-cli/credhub)
 
 CredHub manages credentials like passwords, certificates, certificate authorities, ssh keys, rsa keys and arbitrary values (strings and JSON blobs). CredHub provides a CLI and API to get, set, generate and securely store such credentials.
 
