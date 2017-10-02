@@ -1,12 +1,6 @@
 package commands
 
-import (
-	"github.com/cloudfoundry-incubator/credhub-cli/actions"
-	"github.com/cloudfoundry-incubator/credhub-cli/client"
-	"github.com/cloudfoundry-incubator/credhub-cli/config"
-	"github.com/cloudfoundry-incubator/credhub-cli/models"
-	"github.com/cloudfoundry-incubator/credhub-cli/repositories"
-)
+import "github.com/cloudfoundry-incubator/credhub-cli/config"
 
 type RegenerateCommand struct {
 	CredentialIdentifier string `required:"yes" short:"n" long:"name" description:"Selects the credential to regenerate"`
@@ -15,15 +9,15 @@ type RegenerateCommand struct {
 
 func (cmd RegenerateCommand) Execute([]string) error {
 	cfg := config.ReadConfig()
-	repository := repositories.NewCredentialRepository(client.NewHttpClient(cfg))
-	action := actions.NewAction(repository, &cfg)
 
-	credential, err := action.DoAction(client.NewRegenerateCredentialRequest(cfg, cmd.CredentialIdentifier), cmd.CredentialIdentifier)
+	credhub, err := initializeCredhubClient(cfg)
 	if err != nil {
 		return err
 	}
 
-	models.Println(credential, cmd.OutputJson)
+	credential, err := credhub.Regenerate(cmd.CredentialIdentifier)
+
+	printCredential(cmd.OutputJson, credential)
 
 	return nil
 }

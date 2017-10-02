@@ -267,7 +267,7 @@ func ItRequiresAnAPIToBeSet(args ...string) {
 	})
 }
 
-func ItAutomaticallyLogsIn(method string, responseFixtureFile string, args ...string) {
+func ItAutomaticallyLogsIn(method string, responseFixtureFile string, endpoint string, args ...string) {
 	var serverResponse string
 	Describe("automatic authentication", func() {
 		BeforeEach(func() {
@@ -282,7 +282,7 @@ func ItAutomaticallyLogsIn(method string, responseFixtureFile string, args ...st
 			BeforeEach(func() {
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(method, "/api/v1/data"),
+						VerifyRequest(method, endpoint),
 						VerifyHeader(http.Header{
 							"Authorization": []string{"Bearer 2YotnFZFEjr1zCsicMWpAA"},
 						}),
@@ -320,7 +320,7 @@ func ItAutomaticallyLogsIn(method string, responseFixtureFile string, args ...st
 			BeforeEach(func() {
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(method, "/api/v1/data"),
+						VerifyRequest(method, endpoint),
 						VerifyHeader(http.Header{
 							"Authorization": []string{"Bearer test-access-token"},
 						}),
@@ -343,7 +343,7 @@ func ItAutomaticallyLogsIn(method string, responseFixtureFile string, args ...st
 
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(method, "/api/v1/data"),
+						VerifyRequest(method, endpoint),
 						VerifyHeader(http.Header{
 							"Authorization": []string{"Bearer new-token"},
 						}),
