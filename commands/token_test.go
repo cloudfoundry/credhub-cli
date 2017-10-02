@@ -32,7 +32,7 @@ var _ = Describe("Token", func() {
 
 			uaaServer.RouteToHandler("POST", "/oauth/token",
 				CombineHandlers(
-					VerifyBody([]byte(`grant_type=refresh_token&refresh_token=revoked`)),
+					VerifyBody([]byte(`client_id=credhub_cli&client_secret=&grant_type=refresh_token&refresh_token=revoked&response_type=token`)),
 					RespondWith(http.StatusOK, `{
 						"access_token":"2YotnFZFEjr1zCsicMWpAA",
 						"refresh_token":"erousflkajqwer",
