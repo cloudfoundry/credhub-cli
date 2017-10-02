@@ -220,13 +220,13 @@ var _ = Describe("Get", func() {
 		Eventually(session).Should(Exit(0))
 		Eventually(session.Out).Should(Say(`versions:
 - id: ` + UUID + `
-  version_created_at: ` + TIMESTAMP + `
   name: my-password
+  version_created_at: ` + TIMESTAMP + `
   type: password
   value: old-password
 - id: ` + UUID + `
-  version_created_at: ` + TIMESTAMP + `
   name: my-password
+  version_created_at: ` + TIMESTAMP + `
   type: password
   value: new-password
 `))

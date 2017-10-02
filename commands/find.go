@@ -1,11 +1,9 @@
 package commands
 
 import (
-	"github.com/cloudfoundry-incubator/credhub-cli/actions"
-	"github.com/cloudfoundry-incubator/credhub-cli/client"
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
-	"github.com/cloudfoundry-incubator/credhub-cli/models"
-	"github.com/cloudfoundry-incubator/credhub-cli/repositories"
+	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials"
+	"github.com/cloudfoundry-incubator/credhub-cli/errors"
 )
 
 type FindCommand struct {
@@ -16,32 +14,39 @@ type FindCommand struct {
 }
 
 func (cmd FindCommand) Execute([]string) error {
-	var credentials models.Printable
+	var output interface{}
 	var err error
-	var repository repositories.Repository
 
 	cfg := config.ReadConfig()
 
-	if cmd.AllPaths {
-		repository = repositories.NewAllPathRepository(client.NewHttpClient(cfg))
-	} else {
-		repository = repositories.NewCredentialQueryRepository(client.NewHttpClient(cfg))
-	}
-
-	action := actions.NewAction(repository, &cfg)
-
-	if cmd.AllPaths {
-		credentials, err = action.DoAction(client.NewFindAllCredentialPathsRequest(cfg), "")
-	} else if cmd.PartialCredentialIdentifier != "" {
-		credentials, err = action.DoAction(client.NewFindCredentialsBySubstringRequest(cfg, cmd.PartialCredentialIdentifier), cmd.PartialCredentialIdentifier)
-	} else {
-		credentials, err = action.DoAction(client.NewFindCredentialsByPathRequest(cfg, cmd.PathIdentifier), cmd.PartialCredentialIdentifier)
-	}
+	credhubClient, err := initializeCredhubClient(cfg)
 	if err != nil {
 		return err
 	}
 
-	models.Println(credentials, cmd.OutputJson)
+	if cmd.AllPaths {
+		var paths credentials.Paths
+		paths, err = credhubClient.FindAllPaths()
+		if len(paths.Paths) == 0 {
+			return errors.NewNoMatchingCredentialsFoundError()
+		}
+		output = paths
+	} else if cmd.PartialCredentialIdentifier != "" {
+		var results credentials.FindResults
+		results, err = credhubClient.FindByPartialName(cmd.PartialCredentialIdentifier)
+		if len(results.Credentials) == 0 {
+			return errors.NewNoMatchingCredentialsFoundError()
+		}
+		output = results
+	} else {
+		output, err = credhubClient.FindByPath(cmd.PathIdentifier)
+	}
+
+	if err != nil {
+		return err
+	}
+
+	printCredential(cmd.OutputJson, output)
 
 	return nil
 }

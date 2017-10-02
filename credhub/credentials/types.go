@@ -7,8 +7,8 @@ import (
 
 // Base fields of a credential
 type Base struct {
-	VersionCreatedAt string `json:"version_created_at" yaml:"version_created_at"`
 	Name             string `json:"name" yaml:"name"`
+	VersionCreatedAt string `json:"version_created_at" yaml:"version_created_at"`
 }
 
 type Metadata struct {

@@ -26,36 +26,36 @@ var _ = Describe("Import", func() {
 
 			Eventually(session).Should(Exit(0))
 
-			Eventually(session.Out).Should(Say(`name: /test/password
-type: password
-value: test-password-value`))
-			Eventually(session.Out).Should(Say(`name: /test/value
-type: value
-value: test-value`))
-			Eventually(session.Out).Should(Say(`name: /test/certificate
-type: certificate
+			Eventually(session.Out).Should(Say(`name: /test/password`))
+			Eventually(session.Out).Should(Say(`type: password`))
+			Eventually(session.Out).Should(Say(`value: test-password-value`))
+			Eventually(session.Out).Should(Say(`name: /test/value`))
+			Eventually(session.Out).Should(Say(`type: value`))
+			Eventually(session.Out).Should(Say(`value: test-value`))
+			Eventually(session.Out).Should(Say(`name: /test/certificate`))
+			Eventually(session.Out).Should(Say(`type: certificate
 value:
   ca: ca-certificate
   certificate: certificate
   private_key: private-key`))
-			Eventually(session.Out).Should(Say(`name: /test/rsa
-type: rsa
+			Eventually(session.Out).Should(Say(`name: /test/rsa`))
+			Eventually(session.Out).Should(Say(`type: rsa
 value:
   private_key: private-key
   public_key: public-key`))
-			Eventually(session.Out).Should(Say(`name: /test/ssh
-type: ssh
+			Eventually(session.Out).Should(Say(`name: /test/ssh`))
+			Eventually(session.Out).Should(Say(`type: ssh
 value:
   private_key: private-key
   public_key: ssh-public-key`))
-			Eventually(session.Out).Should(Say(`name: /test/user
-type: user
+			Eventually(session.Out).Should(Say(`name: /test/user`))
+			Eventually(session.Out).Should(Say(`type: user
 value:
   password: test-user-password
   password_hash: P455W0rd-H45H
   username: covfefe`))
-			Eventually(session.Out).Should(Say(`name: /test/json
-type: json
+			Eventually(session.Out).Should(Say(`name: /test/json`))
+			Eventually(session.Out).Should(Say(`type: json
 value:
   "1": key is not a string
   "3.14": pi
@@ -80,36 +80,36 @@ Failed to set: 0
 
 			Eventually(session).Should(Exit(0))
 
-			Eventually(session.Out).Should(Say(`name: /test/password
-type: password
-value: test-password-value`))
-			Eventually(session.Out).Should(Say(`name: /test/value
-type: value
-value: test-value`))
-			Eventually(session.Out).Should(Say(`name: /test/certificate
-type: certificate
+			Eventually(session.Out).Should(Say(`name: /test/password`))
+			Eventually(session.Out).Should(Say(`type: password`))
+			Eventually(session.Out).Should(Say(`value: test-password-value`))
+			Eventually(session.Out).Should(Say(`name: /test/value`))
+			Eventually(session.Out).Should(Say(`type: value`))
+			Eventually(session.Out).Should(Say(`value: test-value`))
+			Eventually(session.Out).Should(Say(`name: /test/certificate`))
+			Eventually(session.Out).Should(Say(`type: certificate
 value:
   ca: ca-certificate
   certificate: certificate
   private_key: private-key`))
-			Eventually(session.Out).Should(Say(`name: /test/rsa
-type: rsa
+			Eventually(session.Out).Should(Say(`name: /test/rsa`))
+			Eventually(session.Out).Should(Say(`type: rsa
 value:
   private_key: private-key
   public_key: public-key`))
-			Eventually(session.Out).Should(Say(`name: /test/ssh
-type: ssh
+			Eventually(session.Out).Should(Say(`name: /test/ssh`))
+			Eventually(session.Out).Should(Say(`type: ssh
 value:
   private_key: private-key
   public_key: ssh-public-key`))
-			Eventually(session.Out).Should(Say(`name: /test/user
-type: user
+			Eventually(session.Out).Should(Say(`name: /test/user`))
+			Eventually(session.Out).Should(Say(`type: user
 value:
   password: test-user-password
   password_hash: P455W0rd-H45H
   username: covfefe`))
-			Eventually(session.Out).Should(Say(`name: /test/json
-type: json
+			Eventually(session.Out).Should(Say(`name: /test/json`))
+			Eventually(session.Out).Should(Say(`type: json
 value:
   "1": key is not a string
   "3.14": pi
@@ -134,36 +134,36 @@ Failed to set: 0
 
 			Eventually(session).Should(Exit(0))
 
-			Eventually(session.Out).Should(Say(`name: /test/password
-type: password
-value: test-password-value`))
-			Eventually(session.Out).Should(Say(`name: /test/value
-type: value
-value: test-value`))
-			Eventually(session.Out).Should(Say(`name: /test/certificate
-type: certificate
+			Eventually(session.Out).Should(Say(`name: /test/password`))
+			Eventually(session.Out).Should(Say(`type: password`))
+			Eventually(session.Out).Should(Say(`value: test-password-value`))
+			Eventually(session.Out).Should(Say(`name: /test/value`))
+			Eventually(session.Out).Should(Say(`type: value`))
+			Eventually(session.Out).Should(Say(`value: test-value`))
+			Eventually(session.Out).Should(Say(`name: /test/certificate`))
+			Eventually(session.Out).Should(Say(`type: certificate
 value:
   ca: ca-certificate
   certificate: certificate
   private_key: private-key`))
-			Eventually(session.Out).Should(Say(`name: /test/rsa
-type: rsa
+			Eventually(session.Out).Should(Say(`name: /test/rsa`))
+			Eventually(session.Out).Should(Say(`type: rsa
 value:
   private_key: private-key
   public_key: public-key`))
-			Eventually(session.Out).Should(Say(`name: /test/ssh
-type: ssh
+			Eventually(session.Out).Should(Say(`name: /test/ssh`))
+			Eventually(session.Out).Should(Say(`type: ssh
 value:
   private_key: private-key
   public_key: ssh-public-key`))
-			Eventually(session.Out).Should(Say(`name: /test/user
-type: user
+			Eventually(session.Out).Should(Say(`name: /test/user`))
+			Eventually(session.Out).Should(Say(`type: user
 value:
   password: test-user-password
   password_hash: P455W0rd-H45H
   username: covfefe`))
-			Eventually(session.Out).Should(Say(`name: /test/json
-type: json
+			Eventually(session.Out).Should(Say(`name: /test/json`))
+			Eventually(session.Out).Should(Say(`type: json
 value:
   "1": key is not a string
   "3.14": pi
@@ -225,8 +225,8 @@ Failed to set: 0
 Credential '/test/invalid_type1' at index 1 could not be set: The request does not include a valid type. Valid values include 'value', 'json', 'password', 'user', 'certificate', 'ssh' and 'rsa'.
 
 id: 5a2edd4f-1686-4c8d-80eb-5daa866f9f86
-version_created_at: 2016-01-01T12:00:00Z
 name: /test/user
+version_created_at: 2016-01-01T12:00:00Z
 type: user
 value:
   password: test-user-password
