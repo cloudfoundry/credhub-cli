@@ -28,6 +28,10 @@ Download and install the desired release from the [release page](https://github.
 
 `make build`
 
+### Go Client
+
+This repository contains a Go client library that can be used independently of the CredHub CLI.  Documentation for this library can be found [here](https://godoc.org/github.com/cloudfoundry-incubator/credhub-cli/credhub).
+
 
 ### Usage:
 
