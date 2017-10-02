@@ -5,8 +5,6 @@ import (
 
 	"net/url"
 
-	"github.com/cloudfoundry-incubator/credhub-cli/actions"
-	"github.com/cloudfoundry-incubator/credhub-cli/client"
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub"
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/server"
@@ -63,7 +61,7 @@ func (cmd ApiCommand) Execute([]string) error {
 		cfg.InsecureSkipVerify = cmd.SkipTlsValidation
 		cfg.CaCerts = caCerts
 
-		err = VerifyAuthServerConnection(cfg, cmd.SkipTlsValidation)
+		err = verifyAuthServerConnection(cfg, cmd.SkipTlsValidation)
 		if err != nil {
 			return errors.NewNetworkError(err)
 		}
@@ -132,14 +130,4 @@ func targetUrl(cmd ApiCommand) string {
 	} else {
 		return cmd.ServerFlagUrl
 	}
-}
-
-func VerifyAuthServerConnection(cfg config.Config, skipTlsValidation bool) error {
-	var err error
-
-	if !skipTlsValidation {
-		err = actions.VerifyAuthServerConnection(client.NewHttpClient(cfg), cfg)
-	}
-
-	return err
 }
