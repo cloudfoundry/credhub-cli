@@ -77,7 +77,7 @@ var _ = Describe("Find", func() {
 			It("returns an error", func() {
 				dummy := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusOK,
-					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
+					Body:       ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
 				}}
 
 				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
@@ -151,7 +151,7 @@ var _ = Describe("Find", func() {
 			It("returns an error", func() {
 				dummy := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusOK,
-					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
+					Body:       ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
 				}}
 
 				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
@@ -162,7 +162,7 @@ var _ = Describe("Find", func() {
 		})
 	})
 
-	Describe("ShowAllPaths()", func() {
+	Describe("FindAllPaths()", func() {
 		It("requests credentials for a all paths", func() {
 			dummy := &DummyAuth{Response: &http.Response{
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
@@ -170,7 +170,7 @@ var _ = Describe("Find", func() {
 
 			ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
 
-			ch.ShowAllPaths()
+			ch.FindAllPaths()
 			url := dummy.Request.URL
 			Expect(url.String()).To(Equal("https://example.com/api/v1/data?paths=true"))
 			Expect(dummy.Request.Method).To(Equal(http.MethodGet))
@@ -195,7 +195,7 @@ var _ = Describe("Find", func() {
 
 				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
 
-				creds, err := ch.ShowAllPaths()
+				creds, err := ch.FindAllPaths()
 
 				Expect(err).ToNot(HaveOccurred())
 				Expect(creds.Paths[0].Path).To(Equal("/some/example/path/example-cred-0"))
@@ -210,7 +210,7 @@ var _ = Describe("Find", func() {
 
 				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
 
-				_, err := ch.ShowAllPaths()
+				_, err := ch.FindAllPaths()
 
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(ContainSubstring("Network error occurred"))
@@ -221,12 +221,12 @@ var _ = Describe("Find", func() {
 			It("returns an error", func() {
 				dummy := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusOK,
-					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
+					Body:       ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
 				}}
 
 				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
 
-				_, err := ch.ShowAllPaths()
+				_, err := ch.FindAllPaths()
 				Expect(err).To(HaveOccurred())
 			})
 		})
