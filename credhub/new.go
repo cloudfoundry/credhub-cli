@@ -37,14 +37,5 @@ func New(target string, options ...Option) (*CredHub, error) {
 		return nil, err
 	}
 
-	if credhub.ServerVersion == "" {
-		info, err := credhub.Info()
-		if err != nil {
-			return nil, err
-		}
-
-		credhub.ServerVersion = info.App.Version
-	}
-
 	return credhub, nil
 }

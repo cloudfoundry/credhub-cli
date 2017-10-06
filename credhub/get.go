@@ -101,7 +101,7 @@ func (ch *CredHub) GetLatestSSH(name string) (credentials.SSH, error) {
 func (ch *CredHub) getCurrentCredential(name string, cred interface{}) error {
 	query := url.Values{}
 
-	serverVersion, err := version.NewVersion(ch.ServerVersion)
+	serverVersion, err := ch.ServerVersion()
 	if err != nil {
 		return err
 	}

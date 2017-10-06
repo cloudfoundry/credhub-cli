@@ -61,7 +61,7 @@ func SkipTLSValidation(skipTLSvalidation bool) Option {
 // ServerVersion will set the version of server API to use (e.g. "1.2.3")
 func ServerVersion(serverVersion string) Option {
 	return func(c *CredHub) error {
-		c.ServerVersion = serverVersion
+		c.cachedServerVersion = serverVersion
 		return nil
 	}
 }
