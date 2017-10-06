@@ -17,8 +17,8 @@ func (ch *CredHub) Regenerate(name string) (credentials.Credential, error) {
 	requestBody := map[string]interface{}{}
 	requestBody["name"] = name
 
-	if ch.ServerVersion != "" {
-		serverVersion, err := version.NewVersion(ch.ServerVersion)
+	if ch.cachedServerVersion != "" {
+		serverVersion, err := ch.ServerVersion()
 		if err != nil {
 			return credentials.Credential{}, err
 		}

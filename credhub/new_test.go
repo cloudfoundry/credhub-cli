@@ -7,6 +7,7 @@ import (
 
 	. "github.com/cloudfoundry-incubator/credhub-cli/credhub"
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/auth"
+	version "github.com/hashicorp/go-version"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -110,7 +111,7 @@ var _ = Describe("New()", func() {
 		It("stores that server version in the client", func() {
 			ch, _ := New("https://example.com", ServerVersion("2.2.2"))
 
-			Expect(ch.ServerVersion).To(Equal("2.2.2"))
+			Expect(ch.ServerVersion()).To(Equal(version.Must(version.NewVersion("2.2.2"))))
 		})
 	})
 
@@ -138,7 +139,7 @@ var _ = Describe("New()", func() {
 			ch, err := New(credHubServer.URL, AuthURL("https://some-auth-url.com"), Auth(authBuilder))
 			Expect(err).ToNot(HaveOccurred())
 
-			Expect(ch.ServerVersion).To(Equal("4.4.4"))
+			Expect(ch.ServerVersion()).To(Equal(version.Must(version.NewVersion("4.4.4"))))
 		})
 	})
 })
