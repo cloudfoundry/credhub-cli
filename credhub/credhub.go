@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"crypto/tls"
 	"crypto/x509"
 
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/auth"
@@ -34,6 +35,9 @@ type CredHub struct {
 
 	// Trusted CA certificates in PEM format for making TLS connections to CredHub and auth servers
 	caCerts *x509.CertPool
+
+	// client certificates
+	clientCertificate *tls.Certificate
 
 	// Skip certificate verification of TLS connections to CredHub and auth servers. Not recommended!
 	insecureSkipVerify bool

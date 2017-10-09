@@ -24,13 +24,6 @@ var Noop Builder = func(config Config) (Strategy, error) {
 	return &NoopStrategy{config.Client()}, nil
 }
 
-// MutualTLS builds a MutualTLSStrategy
-func MutualTLS(certificate string) Builder {
-	return func(config Config) (Strategy, error) {
-		panic("Not implemented")
-	}
-}
-
 // UaaPassword builds an OauthStrategy for UAA using password_grant token requests
 func UaaPassword(clientId, clientSecret, username, password string) Builder {
 	return Uaa(clientId, clientSecret, username, password, "", "", false)

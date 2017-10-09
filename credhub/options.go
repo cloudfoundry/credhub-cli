@@ -1,6 +1,7 @@
 package credhub
 
 import (
+	"crypto/tls"
 	"crypto/x509"
 	"errors"
 	"net/url"
@@ -54,6 +55,19 @@ func CaCerts(certs ...string) Option {
 func SkipTLSValidation(skipTLSvalidation bool) Option {
 	return func(c *CredHub) error {
 		c.insecureSkipVerify = skipTLSvalidation
+		return nil
+	}
+}
+
+// ClientCert will use a certificate for authentication
+func ClientCert(certificate, key string) Option {
+	return func(c *CredHub) error {
+		cert, err := tls.LoadX509KeyPair(certificate, key)
+		if err != nil {
+			return err
+		}
+		c.clientCertificate = &cert
+
 		return nil
 	}
 }
