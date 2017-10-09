@@ -19,6 +19,8 @@ type LoginCommand struct {
 	ServerUrl         string   `short:"s" long:"server" description:"URI of API server to target" env:"CREDHUB_SERVER"`
 	CaCerts           []string `long:"ca-cert" description:"Trusted CA for API and UAA TLS connections" env:"CREDHUB_CA_CERT"`
 	SkipTlsValidation bool     `long:"skip-tls-validation" description:"Skip certificate validation of the API endpoint. Not recommended!"`
+	SSO               bool     `long:"sso" description:"Prompt for a one-time passcode to login"`
+	SSOPasscode       string   `long:"sso-passcode" description:"One-time passcode"`
 }
 
 func (cmd LoginCommand) Execute([]string) error {
@@ -72,8 +74,14 @@ func (cmd LoginCommand) Execute([]string) error {
 	if cmd.ClientName != "" || cmd.ClientSecret != "" {
 		accessToken, err = uaaClient.ClientCredentialGrant(cmd.ClientName, cmd.ClientSecret)
 	} else {
-		promptForMissingCredentials(&cmd)
-		accessToken, refreshToken, err = uaaClient.PasswordGrant(config.AuthClient, config.AuthPassword, cmd.Username, cmd.Password)
+		err = promptForMissingCredentials(&cmd, &uaaClient)
+		if err == nil {
+			if cmd.SSOPasscode != "" {
+				accessToken, refreshToken, err = uaaClient.PasscodeGrant(config.AuthClient, config.AuthPassword, cmd.SSOPasscode)
+			} else {
+				accessToken, refreshToken, err = uaaClient.PasswordGrant(config.AuthClient, config.AuthPassword, cmd.Username, cmd.Password)
+			}
+		}
 	}
 
 	if err != nil {
@@ -115,7 +123,27 @@ func validateParameters(cmd *LoginCommand) error {
 	return nil
 }
 
-func promptForMissingCredentials(cmd *LoginCommand) {
+func promptForMissingCredentials(cmd *LoginCommand, uaa *uaa.Client) error {
+	if cmd.SSO || cmd.SSOPasscode != "" {
+		if cmd.SSOPasscode == "" {
+			md, err := uaa.Metadata()
+			if err != nil {
+				return err
+			}
+			// Give default in case server doesn't tell us
+			prompt := "get passcode from https://login.system.example.com/passcode"
+			if len(md.Prompts.Passcode) == 2 {
+				prompt = md.Prompts.Passcode[1]
+			}
+			fmt.Printf("%s : ", prompt)
+			code, err := gopass.GetPasswdMasked()
+			if err != nil {
+				return err
+			}
+			cmd.SSOPasscode = string(code)
+		}
+		return nil
+	}
 	if cmd.Username == "" {
 		fmt.Printf("username: ")
 		fmt.Scanln(&cmd.Username)
@@ -125,4 +153,5 @@ func promptForMissingCredentials(cmd *LoginCommand) {
 		pass, _ := gopass.GetPasswdMasked()
 		cmd.Password = string(pass)
 	}
+	return nil
 }

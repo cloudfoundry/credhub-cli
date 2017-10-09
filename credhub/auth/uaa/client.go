@@ -29,12 +29,47 @@ type responseError struct {
 	Description string `json:"error_description"`
 }
 
+type UAAMetadata struct {
+	Prompts struct {
+		Passcode []string `json:"passcode"`
+	} `json:"prompts"`
+}
+
 func (e *responseError) Error() string {
 	if e.Description == "" {
 		return e.Name
 	}
 
 	return fmt.Sprintf("%s %s", e.Name, e.Description)
+}
+
+func (u *Client) Metadata() (*UAAMetadata, error) {
+	request, err := http.NewRequest("GET", u.AuthURL+"/info", nil)
+	if err != nil {
+		return nil, err
+	}
+
+	request.Header.Add("Accept", "application/json")
+	response, err := u.Client.Do(request)
+	if err != nil {
+		return nil, err
+	}
+
+	if response.Body != nil {
+		defer response.Body.Close()
+	}
+
+	if response.StatusCode != 200 {
+		return nil, errors.New("unable to fetch metadata successfully")
+	}
+
+	var rv UAAMetadata
+	err = json.NewDecoder(response.Body).Decode(&rv)
+	if err != nil {
+		return nil, err
+	}
+
+	return &rv, nil
 }
 
 // ClientCredentialGrant requests a token using client_credentials grant type
@@ -58,6 +93,21 @@ func (u *Client) PasswordGrant(clientId, clientSecret, username, password string
 		"response_type": {"token"},
 		"username":      {username},
 		"password":      {password},
+		"client_id":     {clientId},
+		"client_secret": {clientSecret},
+	}
+
+	token, err := u.tokenGrantRequest(values)
+
+	return token.AccessToken, token.RefreshToken, err
+}
+
+// PasscodeGrant requests an access token and refresh token using passcode grant type
+func (u *Client) PasscodeGrant(clientId, clientSecret, passcode string) (string, string, error) {
+	values := url.Values{
+		"grant_type":    {"password"},
+		"response_type": {"token"},
+		"passcode":      {passcode},
 		"client_id":     {clientId},
 		"client_secret": {clientSecret},
 	}
