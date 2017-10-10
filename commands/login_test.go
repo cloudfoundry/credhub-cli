@@ -46,7 +46,7 @@ var _ = Describe("Login", func() {
 
 				Expect(uaaServer.ReceivedRequests()).Should(HaveLen(0))
 				Eventually(session).Should(Exit(1))
-				Eventually(session.Err).Should(Say("Client and password credentials may not be combined. Please update and retry your request with a single login method."))
+				Eventually(session.Err).Should(Say("Client, password, SSO and/or SSO passcode credentials may not be combined. Please update and retry your request with a single login method."))
 			})
 		})
 
@@ -56,7 +56,7 @@ var _ = Describe("Login", func() {
 
 				Expect(uaaServer.ReceivedRequests()).Should(HaveLen(0))
 				Eventually(session).Should(Exit(1))
-				Eventually(session.Err).Should(Say("Client and password credentials may not be combined. Please update and retry your request with a single login method."))
+				Eventually(session.Err).Should(Say("Client, password, SSO and/or SSO passcode credentials may not be combined. Please update and retry your request with a single login method."))
 			})
 		})
 
@@ -66,7 +66,7 @@ var _ = Describe("Login", func() {
 
 				Expect(uaaServer.ReceivedRequests()).Should(HaveLen(0))
 				Eventually(session).Should(Exit(1))
-				Eventually(session.Err).Should(Say("Client and password credentials may not be combined. Please update and retry your request with a single login method."))
+				Eventually(session.Err).Should(Say("Client, password, SSO and/or SSO passcode credentials may not be combined. Please update and retry your request with a single login method."))
 			})
 		})
 
@@ -76,7 +76,17 @@ var _ = Describe("Login", func() {
 
 				Expect(uaaServer.ReceivedRequests()).Should(HaveLen(0))
 				Eventually(session).Should(Exit(1))
-				Eventually(session.Err).Should(Say("Client and password credentials may not be combined. Please update and retry your request with a single login method."))
+				Eventually(session.Err).Should(Say("Client, password, SSO and/or SSO passcode credentials may not be combined. Please update and retry your request with a single login method."))
+			})
+		})
+
+		Context("with SSO and password", func() {
+			It("fails with an error message", func() {
+				session := runCommand("login", "--sso", "--password", "test-password")
+
+				Expect(uaaServer.ReceivedRequests()).Should(HaveLen(0))
+				Eventually(session).Should(Exit(1))
+				Eventually(session.Err).Should(Say("Client, password, SSO and/or SSO passcode credentials may not be combined. Please update and retry your request with a single login method."))
 			})
 		})
 
@@ -86,7 +96,7 @@ var _ = Describe("Login", func() {
 
 				Expect(uaaServer.ReceivedRequests()).Should(HaveLen(0))
 				Eventually(session).Should(Exit(1))
-				Eventually(session.Err).Should(Say("Client and password credentials may not be combined. Please update and retry your request with a single login method."))
+				Eventually(session.Err).Should(Say("Client, password, SSO and/or SSO passcode credentials may not be combined. Please update and retry your request with a single login method."))
 			})
 		})
 	})
@@ -259,6 +269,98 @@ var _ = Describe("Login", func() {
 				Expect(uaaServer.ReceivedRequests()).Should(HaveLen(0))
 				Eventually(session).Should(Exit(1))
 				Eventually(session.Err).Should(Say("Both client name and client secret must be provided to authenticate. Please update and retry your request."))
+			})
+		})
+	})
+
+	Describe("sso flow", func() {
+		BeforeEach(func() {
+			uaaServer.RouteToHandler("POST", "/oauth/token",
+				CombineHandlers(
+					VerifyBody([]byte(`client_id=`+config.AuthClient+`&client_secret=`+config.AuthPassword+`&grant_type=password&passcode=passcode&response_type=token`)),
+					RespondWith(http.StatusOK, `{
+						"access_token":"2YotnFZFEjr1zCsicMWpAA",
+						"refresh_token":"erousflkajqwer",
+						"token_type":"bearer",
+						"expires_in":3600}`),
+				),
+			)
+			uaaServer.RouteToHandler("GET", "/info",
+				CombineHandlers(
+					RespondWith(http.StatusOK, `{
+						"prompts": {
+							"passcode": ["password", "foobar"]
+						}
+					}`),
+				),
+			)
+
+			setConfigAuthUrl(uaaServer.URL())
+		})
+
+		Context("with a passcode", func() {
+			It("authenticates with the UAA server and saves a token", func() {
+				session := runCommand("login", "--sso-passcode", "passcode")
+
+				Expect(uaaServer.ReceivedRequests()).Should(HaveLen(1))
+				Eventually(session).Should(Exit(0))
+				Eventually(session.Out).Should(Say("Login Successful"))
+				Eventually(session.Out.Contents()).ShouldNot(ContainSubstring("Setting the target url:"))
+				cfg := config.ReadConfig()
+				Expect(cfg.AccessToken).To(Equal("2YotnFZFEjr1zCsicMWpAA"))
+			})
+		})
+
+		Context("prompting for passcode", func() {
+			It("prompts for a passcode", func() {
+				session := runCommandWithStdin(strings.NewReader("passcode\n"), "login", "--sso")
+				Eventually(session.Out).Should(Say("foobar :"))
+				Eventually(session.Wait("10s").Out).Should(Say("Login Successful"))
+				Eventually(session).Should(Exit(0))
+				cfg := config.ReadConfig()
+				Expect(cfg.AccessToken).To(Equal("2YotnFZFEjr1zCsicMWpAA"))
+			})
+		})
+
+		Context("with both specified", func() {
+			It("fails with an error message", func() {
+				session := runCommand("login", "--sso", "--sso-passcode", "passcode")
+
+				Eventually(session).Should(Exit(1))
+				Eventually(session.Err).Should(Say("Client, password, SSO and/or SSO passcode credentials may not be combined. Please update and retry your request with a single login method."))
+			})
+		})
+	})
+
+	Describe("sso flow with server that doesn't give prompt", func() {
+		BeforeEach(func() {
+			uaaServer.RouteToHandler("POST", "/oauth/token",
+				CombineHandlers(
+					VerifyBody([]byte(`client_id=`+config.AuthClient+`&client_secret=`+config.AuthPassword+`&grant_type=password&passcode=passcode&response_type=token`)),
+					RespondWith(http.StatusOK, `{
+						"access_token":"2YotnFZFEjr1zCsicMWpAA",
+						"refresh_token":"erousflkajqwer",
+						"token_type":"bearer",
+						"expires_in":3600}`),
+				),
+			)
+			uaaServer.RouteToHandler("GET", "/info",
+				CombineHandlers(
+					RespondWith(http.StatusOK, `{}`),
+				),
+			)
+
+			setConfigAuthUrl(uaaServer.URL())
+		})
+
+		Context("prompting for passcode", func() {
+			It("prompts for a passcode", func() {
+				session := runCommandWithStdin(strings.NewReader("passcode\n"), "login", "--sso")
+				Eventually(session.Out).Should(Say("passcode :"))
+				Eventually(session.Wait("10s").Out).Should(Say("Login Successful"))
+				Eventually(session).Should(Exit(0))
+				cfg := config.ReadConfig()
+				Expect(cfg.AccessToken).To(Equal("2YotnFZFEjr1zCsicMWpAA"))
 			})
 		})
 	})

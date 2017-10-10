@@ -29,7 +29,10 @@ type responseError struct {
 	Description string `json:"error_description"`
 }
 
-type UAAMetadata struct {
+// Metadata captures the data returned by the GET /info on a UAA server
+// This fields are not exhaustive and can added to over time.
+// See: https://docs.cloudfoundry.org/api/uaa/version/4.6.0/index.html#server-information
+type Metadata struct {
 	Prompts struct {
 		Passcode []string `json:"passcode"`
 	} `json:"prompts"`
@@ -43,7 +46,7 @@ func (e *responseError) Error() string {
 	return fmt.Sprintf("%s %s", e.Name, e.Description)
 }
 
-func (u *Client) Metadata() (*UAAMetadata, error) {
+func (u *Client) Metadata() (*Metadata, error) {
 	request, err := http.NewRequest("GET", u.AuthURL+"/info", nil)
 	if err != nil {
 		return nil, err
@@ -63,7 +66,7 @@ func (u *Client) Metadata() (*UAAMetadata, error) {
 		return nil, errors.New("unable to fetch metadata successfully")
 	}
 
-	var rv UAAMetadata
+	var rv Metadata
 	err = json.NewDecoder(response.Body).Decode(&rv)
 	if err != nil {
 		return nil, err

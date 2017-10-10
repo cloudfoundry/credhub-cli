@@ -106,21 +106,53 @@ func (cmd LoginCommand) Execute([]string) error {
 }
 
 func validateParameters(cmd *LoginCommand) error {
-	if cmd.ClientName != "" || cmd.ClientSecret != "" {
-		if cmd.Username != "" || cmd.Password != "" {
+	switch {
+	// Intent is client credentials
+	case cmd.ClientName != "" || cmd.ClientSecret != "":
+		// Make sure nothing else is specified
+		if cmd.Username != "" || cmd.Password != "" || cmd.SSO || cmd.SSOPasscode != "" {
 			return errors.NewMixedAuthorizationParametersError()
 		}
 
+		// Make sure all required fields are specified
 		if cmd.ClientName == "" || cmd.ClientSecret == "" {
 			return errors.NewClientAuthorizationParametersError()
 		}
-	}
 
-	if cmd.Username == "" && cmd.Password != "" {
-		return errors.NewPasswordAuthorizationParametersError()
-	}
+		return nil
 
-	return nil
+	// Intent is SSO passcode
+	case cmd.SSOPasscode != "":
+		// Make sure nothing else is specified
+		if cmd.ClientName != "" || cmd.ClientSecret != "" || cmd.Username != "" || cmd.Password != "" || cmd.SSO {
+			return errors.NewMixedAuthorizationParametersError()
+		}
+
+		return nil
+
+	// Intent is to be prompted for token
+	case cmd.SSO:
+		// Make sure nothing else is specified
+		if cmd.ClientName != "" || cmd.ClientSecret != "" || cmd.Username != "" || cmd.Password != "" || cmd.SSOPasscode != "" {
+			return errors.NewMixedAuthorizationParametersError()
+		}
+
+		return nil
+
+	// Intent is username/password
+	default:
+		// Make sure nothing else is specified
+		if cmd.ClientName != "" || cmd.ClientSecret != "" || cmd.SSO || cmd.SSOPasscode != "" {
+			return errors.NewMixedAuthorizationParametersError()
+		}
+
+		// Make sure all required fields are specified
+		if cmd.Username == "" && cmd.Password != "" {
+			return errors.NewPasswordAuthorizationParametersError()
+		}
+
+		return nil
+	}
 }
 
 func promptForMissingCredentials(cmd *LoginCommand, uaa *uaa.Client) error {
