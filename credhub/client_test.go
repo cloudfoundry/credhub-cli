@@ -20,6 +20,39 @@ var _ = Describe("Client()", func() {
 		Expect(client).ToNot(BeNil())
 	})
 
+	Context("With ClientCert", func() {
+		It("should return a http.Client with tls.Config with client cert", func() {
+			ch, err := New("https://example.com", ClientCert("./fixtures/auth-tls-cert.pem", "./fixtures/auth-tls-key.pem"), ServerVersion("2.2.2"))
+			Expect(err).NotTo(HaveOccurred())
+
+			client := ch.Client()
+
+			transport := client.Transport.(*http.Transport)
+			tlsConfig := transport.TLSClientConfig
+			Expect(len(tlsConfig.Certificates)).To(Equal(1))
+			clientCert := tlsConfig.Certificates[0]
+			x509Cert, err := x509.ParseCertificate(clientCert.Certificate[0])
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(x509Cert.Subject.CommonName).To(Equal("example.com"))
+		})
+
+		It("doesnt set any client certs if not used", func() {
+			ch, err := New("https://example.com", ServerVersion("2.2.2"))
+			Expect(err).NotTo(HaveOccurred())
+
+			client := ch.Client()
+			transport := client.Transport.(*http.Transport)
+			tlsConfig := transport.TLSClientConfig
+			Expect(tlsConfig.Certificates).To(BeEmpty())
+		})
+
+		It("fails creation with invalid cert,key pair", func() {
+			_, err := New("https://example.com", ClientCert("./fixtures/auth-tls-key.pem", "./fixtures/auth-tls-cert.pem"), ServerVersion("2.2.2"))
+			Expect(err).To(HaveOccurred())
+		})
+	})
+
 	Context("With CaCerts", func() {
 		It("should return a http.Client with tls.Config with RootCAs", func() {
 			fixturePath := "./fixtures/"
