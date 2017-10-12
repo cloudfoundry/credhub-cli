@@ -114,13 +114,13 @@ func Example() {
 			CommonName: "pivotal",
 			KeyLength:  2048,
 		}
-		cert, err = ch.GenerateCertificate(path+name, gen, false)
+		cert, err = ch.GenerateCertificate(path+name, gen, credhub.NoOverwrite)
 		if err != nil {
 			panic("couldn't generate certificate")
 		}
 
 		// Use the generated certificate's values to create a new certificate
-		dupCert, err := ch.SetCertificate(path+"dup-cert", cert.Value, false)
+		dupCert, err := ch.SetCertificate(path+"dup-cert", cert.Value, credhub.NoOverwrite)
 		if err != nil {
 			panic("couldn't create certificate")
 		}

@@ -9,7 +9,7 @@ import (
 )
 
 // SetValue sets a value credential with a user-provided value.
-func (ch *CredHub) SetValue(name string, value values.Value, overwrite bool) (credentials.Value, error) {
+func (ch *CredHub) SetValue(name string, value values.Value, overwrite mode) (credentials.Value, error) {
 	var cred credentials.Value
 	err := ch.setCredential(name, "value", value, overwrite, &cred)
 
@@ -17,7 +17,7 @@ func (ch *CredHub) SetValue(name string, value values.Value, overwrite bool) (cr
 }
 
 // SetJSON sets a JSON credential with a user-provided value.
-func (ch *CredHub) SetJSON(name string, value values.JSON, overwrite bool) (credentials.JSON, error) {
+func (ch *CredHub) SetJSON(name string, value values.JSON, overwrite mode) (credentials.JSON, error) {
 	var cred credentials.JSON
 	err := ch.setCredential(name, "json", value, overwrite, &cred)
 
@@ -25,7 +25,7 @@ func (ch *CredHub) SetJSON(name string, value values.JSON, overwrite bool) (cred
 }
 
 // SetPassword sets a password credential with a user-provided value.
-func (ch *CredHub) SetPassword(name string, value values.Password, overwrite bool) (credentials.Password, error) {
+func (ch *CredHub) SetPassword(name string, value values.Password, overwrite mode) (credentials.Password, error) {
 	var cred credentials.Password
 	err := ch.setCredential(name, "password", value, overwrite, &cred)
 
@@ -33,7 +33,7 @@ func (ch *CredHub) SetPassword(name string, value values.Password, overwrite boo
 }
 
 // SetUser sets a user credential with a user-provided value.
-func (ch *CredHub) SetUser(name string, value values.User, overwrite bool) (credentials.User, error) {
+func (ch *CredHub) SetUser(name string, value values.User, overwrite mode) (credentials.User, error) {
 	var cred credentials.User
 	err := ch.setCredential(name, "user", value, overwrite, &cred)
 
@@ -41,7 +41,7 @@ func (ch *CredHub) SetUser(name string, value values.User, overwrite bool) (cred
 }
 
 // SetCertificate sets a certificate credential with a user-provided value.
-func (ch *CredHub) SetCertificate(name string, value values.Certificate, overwrite bool) (credentials.Certificate, error) {
+func (ch *CredHub) SetCertificate(name string, value values.Certificate, overwrite mode) (credentials.Certificate, error) {
 	var cred credentials.Certificate
 	err := ch.setCredential(name, "certificate", value, overwrite, &cred)
 
@@ -49,7 +49,7 @@ func (ch *CredHub) SetCertificate(name string, value values.Certificate, overwri
 }
 
 // SetRSA sets an RSA credential with a user-provided value.
-func (ch *CredHub) SetRSA(name string, value values.RSA, overwrite bool) (credentials.RSA, error) {
+func (ch *CredHub) SetRSA(name string, value values.RSA, overwrite mode) (credentials.RSA, error) {
 	var cred credentials.RSA
 	err := ch.setCredential(name, "rsa", value, overwrite, &cred)
 
@@ -57,7 +57,7 @@ func (ch *CredHub) SetRSA(name string, value values.RSA, overwrite bool) (creden
 }
 
 // SetSSH sets an SSH credential with a user-provided value.
-func (ch *CredHub) SetSSH(name string, value values.SSH, overwrite bool) (credentials.SSH, error) {
+func (ch *CredHub) SetSSH(name string, value values.SSH, overwrite mode) (credentials.SSH, error) {
 	var cred credentials.SSH
 	err := ch.setCredential(name, "ssh", value, overwrite, &cred)
 
@@ -65,19 +65,23 @@ func (ch *CredHub) SetSSH(name string, value values.SSH, overwrite bool) (creden
 }
 
 // SetCredential sets a credential of any type with a user-provided value. 
-func (ch *CredHub) SetCredential(name, credType string, value interface{}, overwrite bool) (credentials.Credential, error) {
+func (ch *CredHub) SetCredential(name, credType string, value interface{}, overwrite mode) (credentials.Credential, error) {
 	var cred credentials.Credential
 	err := ch.setCredential(name, credType, value, overwrite, &cred)
 
 	return cred, err
 }
 
-func (ch *CredHub) setCredential(name, credType string, value interface{}, overwrite bool, cred interface{}) error {
+func (ch *CredHub) setCredential(name, credType string, value interface{}, overwrite mode, cred interface{}) error {
+	isOverwrite := true
+	if overwrite == NoOverwrite {
+		isOverwrite = false
+	}
 	requestBody := map[string]interface{}{}
 	requestBody["name"] = name
 	requestBody["type"] = credType
 	requestBody["value"] = value
-	requestBody["overwrite"] = overwrite
+	requestBody["overwrite"] = isOverwrite
 	resp, err := ch.Request(http.MethodPut, "/api/v1/data", nil, requestBody)
 
 	if err != nil {

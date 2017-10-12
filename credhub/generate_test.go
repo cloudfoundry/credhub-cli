@@ -27,7 +27,7 @@ var _ = Describe("Generate", func() {
 			cert := generate.Certificate{
 				Ca: "some-ca",
 			}
-			ch.GenerateCertificate("/example-certificate", cert, false)
+			ch.GenerateCertificate("/example-certificate", cert, NoOverwrite)
 			urlPath := dummy.Request.URL.Path
 			Expect(urlPath).To(Equal("/api/v1/data"))
 			Expect(dummy.Request.Method).To(Equal(http.MethodPost))
@@ -65,7 +65,7 @@ var _ = Describe("Generate", func() {
 					Ca: "some-ca",
 				}
 
-				generatedCert, err := ch.GenerateCertificate("/example-certificate", cert, false)
+				generatedCert, err := ch.GenerateCertificate("/example-certificate", cert, NoOverwrite)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(generatedCert.Id).To(Equal("some-id"))
 				Expect(generatedCert.Name).To(Equal("/example-certificate"))
@@ -87,7 +87,7 @@ var _ = Describe("Generate", func() {
 					Ca: "some-ca",
 				}
 
-				_, err = ch.GenerateCertificate("/example-certificate", cert, false)
+				_, err = ch.GenerateCertificate("/example-certificate", cert, NoOverwrite)
 
 				Expect(err).To(HaveOccurred())
 			})
@@ -105,7 +105,7 @@ var _ = Describe("Generate", func() {
 					Ca: "some-ca",
 				}
 
-				_, err := ch.GenerateCertificate("/example-certificate", cert, false)
+				_, err := ch.GenerateCertificate("/example-certificate", cert, NoOverwrite)
 
 				Expect(err).To(HaveOccurred())
 			})
@@ -124,7 +124,7 @@ var _ = Describe("Generate", func() {
 			passwordOptions := generate.Password{
 				Length: 12,
 			}
-			ch.GeneratePassword("/example-password", passwordOptions, true)
+			ch.GeneratePassword("/example-password", passwordOptions, Overwrite)
 			urlPath := dummy.Request.URL.Path
 			Expect(urlPath).To(Equal("/api/v1/data"))
 
@@ -159,7 +159,7 @@ var _ = Describe("Generate", func() {
 					Length: 12,
 				}
 
-				generatedPassword, err := ch.GeneratePassword("/example-password", p, false)
+				generatedPassword, err := ch.GeneratePassword("/example-password", p, NoOverwrite)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(generatedPassword.Id).To(Equal("some-id"))
 				Expect(generatedPassword.Type).To(Equal("password"))
@@ -175,7 +175,7 @@ var _ = Describe("Generate", func() {
 				dummy := &DummyAuth{Error: networkError}
 				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
 
-				_, err = ch.GeneratePassword("/example-password", generate.Password{}, false)
+				_, err = ch.GeneratePassword("/example-password", generate.Password{}, NoOverwrite)
 
 				Expect(err).To(HaveOccurred())
 			})
@@ -189,7 +189,7 @@ var _ = Describe("Generate", func() {
 				}}
 				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
 
-				_, err := ch.GeneratePassword("/example-password", generate.Password{}, false)
+				_, err := ch.GeneratePassword("/example-password", generate.Password{}, NoOverwrite)
 
 				Expect(err).To(HaveOccurred())
 			})
@@ -210,7 +210,7 @@ var _ = Describe("Generate", func() {
 				Length:   12,
 			}
 
-			ch.GenerateUser("/example-user", userOptions, true)
+			ch.GenerateUser("/example-user", userOptions, Overwrite)
 			urlPath := dummy.Request.URL.Path
 			Expect(urlPath).To(Equal("/api/v1/data"))
 
@@ -250,7 +250,7 @@ var _ = Describe("Generate", func() {
 					Length: 12,
 				}
 
-				generatedUser, err := ch.GenerateUser("/example-user", p, false)
+				generatedUser, err := ch.GenerateUser("/example-user", p, NoOverwrite)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(generatedUser.Id).To(Equal("some-id"))
 				Expect(generatedUser.Type).To(Equal("user"))
@@ -267,7 +267,7 @@ var _ = Describe("Generate", func() {
 				dummy := &DummyAuth{Error: networkError}
 				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
 
-				_, err = ch.GenerateUser("/example-user", generate.User{}, false)
+				_, err = ch.GenerateUser("/example-user", generate.User{}, NoOverwrite)
 
 				Expect(err).To(HaveOccurred())
 			})
@@ -281,7 +281,7 @@ var _ = Describe("Generate", func() {
 				}}
 				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
 
-				_, err := ch.GenerateUser("/example-user", generate.User{}, false)
+				_, err := ch.GenerateUser("/example-user", generate.User{}, NoOverwrite)
 
 				Expect(err).To(HaveOccurred())
 			})
@@ -301,7 +301,7 @@ var _ = Describe("Generate", func() {
 				KeyLength: 2048,
 			}
 
-			ch.GenerateRSA("/example-rsa", rsaOptions, true)
+			ch.GenerateRSA("/example-rsa", rsaOptions, Overwrite)
 			urlPath := dummy.Request.URL.Path
 			Expect(urlPath).To(Equal("/api/v1/data"))
 
@@ -342,7 +342,7 @@ var _ = Describe("Generate", func() {
 					KeyLength: 2048,
 				}
 
-				generatedRSA, err := ch.GenerateRSA("/example-rsa", p, false)
+				generatedRSA, err := ch.GenerateRSA("/example-rsa", p, NoOverwrite)
 
 				Expect(err).ToNot(HaveOccurred())
 				Expect(generatedRSA.Id).To(Equal("some-id"))
@@ -360,7 +360,7 @@ var _ = Describe("Generate", func() {
 				dummy := &DummyAuth{Error: networkError}
 				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
 
-				_, err = ch.GenerateRSA("/example-rsa", generate.RSA{}, false)
+				_, err = ch.GenerateRSA("/example-rsa", generate.RSA{}, NoOverwrite)
 
 				Expect(err).To(HaveOccurred())
 			})
@@ -374,7 +374,7 @@ var _ = Describe("Generate", func() {
 				}}
 				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
 
-				_, err := ch.GenerateRSA("/example-rsa", generate.RSA{}, false)
+				_, err := ch.GenerateRSA("/example-rsa", generate.RSA{}, NoOverwrite)
 
 				Expect(err).To(HaveOccurred())
 			})
@@ -394,7 +394,7 @@ var _ = Describe("Generate", func() {
 				KeyLength: 2048,
 			}
 
-			ch.GenerateSSH("/example-ssh", sshOptions, true)
+			ch.GenerateSSH("/example-ssh", sshOptions, Overwrite)
 			urlPath := dummy.Request.URL.Path
 			Expect(urlPath).To(Equal("/api/v1/data"))
 
@@ -435,7 +435,7 @@ var _ = Describe("Generate", func() {
 					KeyLength: 2048,
 				}
 
-				generatedSSH, err := ch.GenerateSSH("/example-ssh", p, false)
+				generatedSSH, err := ch.GenerateSSH("/example-ssh", p, NoOverwrite)
 
 				Expect(err).ToNot(HaveOccurred())
 				Expect(generatedSSH.Id).To(Equal("some-id"))
@@ -453,7 +453,7 @@ var _ = Describe("Generate", func() {
 				dummy := &DummyAuth{Error: networkError}
 				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
 
-				_, err = ch.GenerateSSH("/example-ssh", generate.SSH{}, false)
+				_, err = ch.GenerateSSH("/example-ssh", generate.SSH{}, NoOverwrite)
 
 				Expect(err).To(HaveOccurred())
 			})
@@ -467,7 +467,7 @@ var _ = Describe("Generate", func() {
 				}}
 				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
 
-				_, err := ch.GenerateSSH("/example-ssh", generate.SSH{}, false)
+				_, err := ch.GenerateSSH("/example-ssh", generate.SSH{}, NoOverwrite)
 
 				Expect(err).To(HaveOccurred())
 			})

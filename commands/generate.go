@@ -7,6 +7,7 @@ import (
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials/generate"
 	"github.com/cloudfoundry-incubator/credhub-cli/errors"
 	"github.com/cloudfoundry-incubator/credhub-cli/models"
+	"github.com/cloudfoundry-incubator/credhub-cli/credhub"
 )
 
 type GenerateCommand struct {
@@ -91,7 +92,13 @@ func (cmd GenerateCommand) Execute([]string) error {
 		return err
 	}
 
-	credential, err := credhubClient.GenerateCredential(cmd.CredentialIdentifier, cmd.CredentialType, parameters, !cmd.NoOverwrite)
+	mode := credhub.Overwrite
+
+	if cmd.NoOverwrite {
+		mode = credhub.NoOverwrite
+	}
+
+	credential, err := credhubClient.GenerateCredential(cmd.CredentialIdentifier, cmd.CredentialType, parameters, mode)
 
 	if err != nil {
 		return err

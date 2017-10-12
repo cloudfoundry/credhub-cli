@@ -62,7 +62,7 @@ func (cmd SetCommand) Execute([]string) error {
 		}
 	}
 
-	credential, err := MakeRequest(cmd, cfg, credhubClient)
+	credential, err := MakeRequest(cmd, credhubClient)
 	if err != nil {
 		return err
 	}
@@ -72,9 +72,15 @@ func (cmd SetCommand) Execute([]string) error {
 	return nil
 }
 
-func MakeRequest(cmd SetCommand, config config.Config, credhubClient *credhub.CredHub) (interface{}, error) {
+func MakeRequest(cmd SetCommand, credhubClient *credhub.CredHub) (interface{}, error) {
 	var output interface{}
 	var responseError error
+
+	mode := credhub.Overwrite
+
+	if cmd.NoOverwrite {
+		mode = credhub.NoOverwrite
+	}
 
 	if cmd.Type == "ssh" || cmd.Type == "rsa" {
 		publicKey, err := util.ReadFileOrStringFromField(cmd.Public)
@@ -91,14 +97,14 @@ func MakeRequest(cmd SetCommand, config config.Config, credhubClient *credhub.Cr
 			value.PublicKey = publicKey
 			value.PrivateKey = privateKey
 			var sshCredential credentials.SSH
-			sshCredential, responseError = credhubClient.SetSSH(cmd.CredentialIdentifier, value, !cmd.NoOverwrite)
+			sshCredential, responseError = credhubClient.SetSSH(cmd.CredentialIdentifier, value, mode)
 			output = interface{}(sshCredential)
 		} else {
 			value := values.RSA{}
 			value.PublicKey = publicKey
 			value.PrivateKey = privateKey
 			var rsaCredential credentials.RSA
-			rsaCredential, responseError = credhubClient.SetRSA(cmd.CredentialIdentifier, value, !cmd.NoOverwrite)
+			rsaCredential, responseError = credhubClient.SetRSA(cmd.CredentialIdentifier, value, mode)
 			output = interface{}(rsaCredential)
 		}
 	} else if cmd.Type == "certificate" {
@@ -124,7 +130,7 @@ func MakeRequest(cmd SetCommand, config config.Config, credhubClient *credhub.Cr
 		value.Ca = root
 		value.CaName = cmd.CaName
 		var certificateCredential credentials.Certificate
-		certificateCredential, responseError = credhubClient.SetCertificate(cmd.CredentialIdentifier, value, !cmd.NoOverwrite)
+		certificateCredential, responseError = credhubClient.SetCertificate(cmd.CredentialIdentifier, value, mode)
 		output = interface{}(certificateCredential)
 	} else if cmd.Type == "user" {
 		value := values.User{}
@@ -133,22 +139,22 @@ func MakeRequest(cmd SetCommand, config config.Config, credhubClient *credhub.Cr
 		}
 		value.Password = cmd.Password
 		var userCredential credentials.User
-		userCredential, responseError = credhubClient.SetUser(cmd.CredentialIdentifier, value, !cmd.NoOverwrite)
+		userCredential, responseError = credhubClient.SetUser(cmd.CredentialIdentifier, value, mode)
 		output = interface{}(userCredential)
 
 	} else if cmd.Type == "password" {
 		var passwordCredential credentials.Password
-		passwordCredential, responseError = credhubClient.SetPassword(cmd.CredentialIdentifier, values.Password(cmd.Password), !cmd.NoOverwrite)
+		passwordCredential, responseError = credhubClient.SetPassword(cmd.CredentialIdentifier, values.Password(cmd.Password), mode)
 		output = interface{}(passwordCredential)
 	} else if cmd.Type == "json" {
 		var jsonCredential credentials.JSON
 		var unmarshalled values.JSON
 		json.Unmarshal([]byte(cmd.Value), &unmarshalled)
-		jsonCredential, responseError = credhubClient.SetJSON(cmd.CredentialIdentifier, unmarshalled, !cmd.NoOverwrite)
+		jsonCredential, responseError = credhubClient.SetJSON(cmd.CredentialIdentifier, unmarshalled, mode)
 		output = interface{}(jsonCredential)
 	} else {
 		var valueCredential credentials.Value
-		valueCredential, responseError = credhubClient.SetValue(cmd.CredentialIdentifier, values.Value(cmd.Value), !cmd.NoOverwrite)
+		valueCredential, responseError = credhubClient.SetValue(cmd.CredentialIdentifier, values.Value(cmd.Value), mode)
 		output = interface{}(valueCredential)
 	}
 

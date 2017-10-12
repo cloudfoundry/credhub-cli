@@ -10,6 +10,7 @@ import (
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	"github.com/cloudfoundry-incubator/credhub-cli/errors"
 	"github.com/cloudfoundry-incubator/credhub-cli/models"
+	"github.com/cloudfoundry-incubator/credhub-cli/credhub"
 )
 
 type ImportCommand struct {
@@ -56,7 +57,7 @@ func setCredentials(bulkImport models.CredentialBulkImport) error {
 			name = ""
 		}
 
-		result, err := credhubClient.SetCredential(name, credential["type"].(string), credential["value"], true)
+		result, err := credhubClient.SetCredential(name, credential["type"].(string), credential["value"], credhub.Overwrite)
 
 		if err != nil {
 			if isAuthenticationError(err) {

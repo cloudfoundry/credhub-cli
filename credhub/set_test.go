@@ -28,7 +28,7 @@ var _ = Describe("Set", func() {
 				Ca:     "some-ca",
 				CaName: "/some-ca-name",
 			}
-			ch.SetCertificate("/example-certificate", certificate, true)
+			ch.SetCertificate("/example-certificate", certificate, Overwrite)
 
 			urlPath := dummy.Request.URL.Path
 			Expect(urlPath).To(Equal("/api/v1/data"))
@@ -68,7 +68,7 @@ var _ = Describe("Set", func() {
 				certificate := values.Certificate{
 					Certificate: "some-cert",
 				}
-				cred, _ := ch.SetCertificate("/example-certificate", certificate, false)
+				cred, _ := ch.SetCertificate("/example-certificate", certificate, NoOverwrite)
 
 				Expect(cred.Name).To(Equal("/example-certificate"))
 				Expect(cred.Type).To(Equal("certificate"))
@@ -84,7 +84,7 @@ var _ = Describe("Set", func() {
 				certificate := values.Certificate{
 					Ca: "some-ca",
 				}
-				_, err := ch.SetCertificate("/example-certificate", certificate, false)
+				_, err := ch.SetCertificate("/example-certificate", certificate, NoOverwrite)
 
 				Expect(err).To(HaveOccurred())
 			})
@@ -99,7 +99,7 @@ var _ = Describe("Set", func() {
 				certificate := values.Certificate{
 					Ca: "some-ca",
 				}
-				_, err := ch.SetCertificate("/example-certificate", certificate, false)
+				_, err := ch.SetCertificate("/example-certificate", certificate, NoOverwrite)
 
 				Expect(err).To(HaveOccurred())
 			})
@@ -115,7 +115,7 @@ var _ = Describe("Set", func() {
 			ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
 			password := values.Password("some-password")
 
-			ch.SetPassword("/example-password", password, false)
+			ch.SetPassword("/example-password", password, NoOverwrite)
 
 			urlPath := dummy.Request.URL.Path
 			Expect(urlPath).To(Equal("/api/v1/data"))
@@ -148,7 +148,7 @@ var _ = Describe("Set", func() {
 
 				password := values.Password("some-password")
 
-				cred, _ := ch.SetPassword("/example-password", password, false)
+				cred, _ := ch.SetPassword("/example-password", password, NoOverwrite)
 
 				Expect(cred.Name).To(Equal("/example-password"))
 				Expect(cred.Type).To(Equal("password"))
@@ -163,7 +163,7 @@ var _ = Describe("Set", func() {
 				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
 				password := values.Password("some-password")
 
-				_, err := ch.SetPassword("/example-password", password, false)
+				_, err := ch.SetPassword("/example-password", password, NoOverwrite)
 
 				Expect(err).To(HaveOccurred())
 			})
@@ -178,7 +178,7 @@ var _ = Describe("Set", func() {
 				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
 				password := values.Password("some-password")
 
-				_, err := ch.SetPassword("/example-password", password, false)
+				_, err := ch.SetPassword("/example-password", password, NoOverwrite)
 
 				Expect(err).To(HaveOccurred())
 			})
@@ -195,7 +195,7 @@ var _ = Describe("Set", func() {
 			ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
 			user := values.User{Username: &username, Password: "some-password"}
 
-			ch.SetUser("/example-user", user, false)
+			ch.SetUser("/example-user", user, NoOverwrite)
 
 			urlPath := dummy.Request.URL.Path
 			Expect(urlPath).To(Equal("/api/v1/data"))
@@ -236,7 +236,7 @@ var _ = Describe("Set", func() {
 				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
 
 				user := values.User{Username: &user, Password: "some-password"}
-				cred, _ := ch.SetUser("/example-user", user, false)
+				cred, _ := ch.SetUser("/example-user", user, NoOverwrite)
 
 				Expect(cred.Name).To(Equal("/example-user"))
 				Expect(cred.Type).To(Equal("user"))
@@ -256,7 +256,7 @@ var _ = Describe("Set", func() {
 				dummy := &DummyAuth{Error: errors.New("Network error occurred")}
 				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
 				user := values.User{Username: &user, Password: "some-password"}
-				_, err := ch.SetUser("/example-user", user, false)
+				_, err := ch.SetUser("/example-user", user, NoOverwrite)
 				Expect(err).To(HaveOccurred())
 			})
 		})
@@ -269,7 +269,7 @@ var _ = Describe("Set", func() {
 				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
 
 				user := values.User{Username: &user, Password: "some-password"}
-				_, err := ch.SetUser("/example-user", user, false)
+				_, err := ch.SetUser("/example-user", user, NoOverwrite)
 				Expect(err).To(HaveOccurred())
 			})
 		})
@@ -284,7 +284,7 @@ var _ = Describe("Set", func() {
 			ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
 			RSA := values.RSA{PrivateKey: "private-key", PublicKey: "public-key"}
 
-			ch.SetRSA("/example-rsa", RSA, false)
+			ch.SetRSA("/example-rsa", RSA, NoOverwrite)
 
 			urlPath := dummy.Request.URL.Path
 			Expect(urlPath).To(Equal("/api/v1/data"))
@@ -322,7 +322,7 @@ var _ = Describe("Set", func() {
 
 				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
 
-				cred, _ := ch.SetRSA("/example-rsa", values.RSA{}, false)
+				cred, _ := ch.SetRSA("/example-rsa", values.RSA{}, NoOverwrite)
 
 				Expect(cred.Name).To(Equal("/example-rsa"))
 				Expect(cred.Type).To(Equal("rsa"))
@@ -337,7 +337,7 @@ var _ = Describe("Set", func() {
 			It("returns an error", func() {
 				dummy := &DummyAuth{Error: errors.New("Network error occurred")}
 				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
-				_, err := ch.SetRSA("/example-rsa", values.RSA{}, false)
+				_, err := ch.SetRSA("/example-rsa", values.RSA{}, NoOverwrite)
 				Expect(err).To(HaveOccurred())
 			})
 		})
@@ -349,7 +349,7 @@ var _ = Describe("Set", func() {
 				}}
 
 				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
-				_, err := ch.SetRSA("/example-rsa", values.RSA{}, false)
+				_, err := ch.SetRSA("/example-rsa", values.RSA{}, NoOverwrite)
 				Expect(err).To(HaveOccurred())
 			})
 		})
@@ -364,7 +364,7 @@ var _ = Describe("Set", func() {
 			ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
 			SSH := values.SSH{PrivateKey: "private-key", PublicKey: "public-key"}
 
-			ch.SetSSH("/example-ssh", SSH, false)
+			ch.SetSSH("/example-ssh", SSH, NoOverwrite)
 
 			urlPath := dummy.Request.URL.Path
 			Expect(urlPath).To(Equal("/api/v1/data"))
@@ -402,7 +402,7 @@ var _ = Describe("Set", func() {
 
 				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
 
-				cred, _ := ch.SetSSH("/example-ssh", values.SSH{}, false)
+				cred, _ := ch.SetSSH("/example-ssh", values.SSH{}, NoOverwrite)
 
 				Expect(cred.Name).To(Equal("/example-ssh"))
 				Expect(cred.Type).To(Equal("ssh"))
@@ -417,7 +417,7 @@ var _ = Describe("Set", func() {
 			It("returns an error", func() {
 				dummy := &DummyAuth{Error: errors.New("Network error occurred")}
 				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
-				_, err := ch.SetSSH("/example-ssh", values.SSH{}, false)
+				_, err := ch.SetSSH("/example-ssh", values.SSH{}, NoOverwrite)
 				Expect(err).To(HaveOccurred())
 			})
 		})
@@ -429,7 +429,7 @@ var _ = Describe("Set", func() {
 				}}
 
 				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
-				_, err := ch.SetSSH("/example-ssh", values.SSH{}, false)
+				_, err := ch.SetSSH("/example-ssh", values.SSH{}, NoOverwrite)
 				Expect(err).To(HaveOccurred())
 			})
 		})
@@ -453,7 +453,7 @@ var _ = Describe("Set", func() {
 			JSON := make(map[string]interface{})
 			json.Unmarshal([]byte(JSONValue), &JSON)
 
-			ch.SetJSON("/example-json", JSON, false)
+			ch.SetJSON("/example-json", JSON, NoOverwrite)
 
 			urlPath := dummy.Request.URL.Path
 			Expect(urlPath).To(Equal("/api/v1/data"))
@@ -499,7 +499,7 @@ var _ = Describe("Set", func() {
 
 				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
 
-				cred, _ := ch.SetJSON("/example-json", nil, false)
+				cred, _ := ch.SetJSON("/example-json", nil, NoOverwrite)
 
 				var unmarshalled values.JSON
 				json.Unmarshal([]byte(JSONValue), &unmarshalled)
@@ -514,7 +514,7 @@ var _ = Describe("Set", func() {
 			It("returns an error", func() {
 				dummy := &DummyAuth{Error: errors.New("Network error occurred")}
 				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
-				_, err := ch.SetJSON("/example-json", nil, false)
+				_, err := ch.SetJSON("/example-json", nil, NoOverwrite)
 				Expect(err).To(HaveOccurred())
 			})
 		})
@@ -526,7 +526,7 @@ var _ = Describe("Set", func() {
 				}}
 
 				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
-				_, err := ch.SetJSON("/example-json", nil, false)
+				_, err := ch.SetJSON("/example-json", nil, NoOverwrite)
 				Expect(err).To(HaveOccurred())
 			})
 		})
@@ -541,7 +541,7 @@ var _ = Describe("Set", func() {
 			ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
 			value := values.Value("some string value")
 
-			ch.SetValue("/example-value", value, false)
+			ch.SetValue("/example-value", value, NoOverwrite)
 
 			urlPath := dummy.Request.URL.Path
 			Expect(urlPath).To(Equal("/api/v1/data"))
@@ -573,7 +573,7 @@ var _ = Describe("Set", func() {
 
 				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
 
-				cred, _ := ch.SetValue("/example-value", values.Value(""), false)
+				cred, _ := ch.SetValue("/example-value", values.Value(""), NoOverwrite)
 
 				Expect(cred.Name).To(Equal("/example-value"))
 				Expect(cred.Type).To(Equal("value"))
@@ -585,7 +585,7 @@ var _ = Describe("Set", func() {
 			It("returns an error", func() {
 				dummy := &DummyAuth{Error: errors.New("Network error occurred")}
 				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
-				_, err := ch.SetValue("/example-value", values.Value(""), false)
+				_, err := ch.SetValue("/example-value", values.Value(""), NoOverwrite)
 				Expect(err).To(HaveOccurred())
 			})
 		})
@@ -597,7 +597,7 @@ var _ = Describe("Set", func() {
 				}}
 
 				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
-				_, err := ch.SetValue("/example-value", values.Value(""), false)
+				_, err := ch.SetValue("/example-value", values.Value(""), NoOverwrite)
 				Expect(err).To(HaveOccurred())
 			})
 		})
