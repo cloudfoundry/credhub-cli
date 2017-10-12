@@ -51,10 +51,8 @@ func (ch *CredHub) GenerateCredential(name, credType string, gen interface{}, ov
 }
 
 func (ch *CredHub) generateCredential(name, credType string, gen interface{}, overwrite mode, cred interface{}) error {
-	isOverwrite := true
-	if overwrite == NoOverwrite {
-		isOverwrite = false
-	}
+	isOverwrite := overwrite == Overwrite
+	
 	requestBody := map[string]interface{}{}
 	requestBody["name"] = name
 	requestBody["type"] = credType

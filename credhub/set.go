@@ -73,10 +73,8 @@ func (ch *CredHub) SetCredential(name, credType string, value interface{}, overw
 }
 
 func (ch *CredHub) setCredential(name, credType string, value interface{}, overwrite mode, cred interface{}) error {
-	isOverwrite := true
-	if overwrite == NoOverwrite {
-		isOverwrite = false
-	}
+	isOverwrite := overwrite == Overwrite
+
 	requestBody := map[string]interface{}{}
 	requestBody["name"] = name
 	requestBody["type"] = credType
