@@ -29,11 +29,8 @@ func initializeCredhubClient(cfg config.Config) (*credhub.CredHub, error) {
 	} else {
 		credhubClient, err = newCredhubClient(&cfg, config.AuthClient, config.AuthPassword, false)
 	}
-	if err != nil {
-		return nil, err
-	}
 
-	return credhubClient, nil
+	return credhubClient, err
 }
 
 func printCredential(outputJson bool, v interface{}) {

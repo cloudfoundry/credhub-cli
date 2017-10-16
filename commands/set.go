@@ -12,7 +12,6 @@ import (
 	"encoding/json"
 
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub"
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials"
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials/values"
 	"github.com/cloudfoundry-incubator/credhub-cli/errors"
 	"github.com/cloudfoundry-incubator/credhub-cli/util"
@@ -40,12 +39,11 @@ func (cmd SetCommand) Execute([]string) error {
 		return errors.NewSetEmptyTypeError()
 	}
 
-	if cmd.Value == "" && (cmd.Type == "value" || cmd.Type == "json") {
-		promptForInput("value: ", &cmd.Value)
-	}
+	cmd.setFieldsFromInteractiveUserInput()
 
-	if cmd.Password == "" && (cmd.Type == "password" || cmd.Type == "user") {
-		promptForInput("password: ", &cmd.Password)
+	err := cmd.setFieldsFromFileOrString()
+	if err != nil {
+		return err
 	}
 
 	cfg := config.ReadConfig()
@@ -55,14 +53,7 @@ func (cmd SetCommand) Execute([]string) error {
 		return err
 	}
 
-	err = config.ValidateConfig(cfg)
-	if err != nil {
-		if !clientCredentialsInEnvironment() || config.ValidateConfigApi(cfg) != nil {
-			return err
-		}
-	}
-
-	credential, err := MakeRequest(cmd, credhubClient)
+	credential, err := cmd.setCredential(credhubClient)
 	if err != nil {
 		return err
 	}
@@ -72,97 +63,85 @@ func (cmd SetCommand) Execute([]string) error {
 	return nil
 }
 
-func MakeRequest(cmd SetCommand, credhubClient *credhub.CredHub) (interface{}, error) {
-	var output interface{}
-	var responseError error
+func (cmd *SetCommand) setFieldsFromInteractiveUserInput() {
+	if cmd.Value == "" && (cmd.Type == "value" || cmd.Type == "json") {
+		promptForInput("value: ", &cmd.Value)
+	}
 
+	if cmd.Password == "" && (cmd.Type == "password" || cmd.Type == "user") {
+		promptForInput("password: ", &cmd.Password)
+	}
+}
+
+func (cmd *SetCommand) setFieldsFromFileOrString() error {
+	var err error
+
+	cmd.Public, err = util.ReadFileOrStringFromField(cmd.Public)
+	if err != nil {
+		return err
+	}
+
+	cmd.Private, err = util.ReadFileOrStringFromField(cmd.Private)
+	if err != nil {
+		return err
+	}
+
+	cmd.Root, err = util.ReadFileOrStringFromField(cmd.Root)
+	if err != nil {
+		return err
+	}
+
+	cmd.Certificate, err = util.ReadFileOrStringFromField(cmd.Certificate)
+
+	return err
+}
+
+func (cmd SetCommand) setCredential(credhubClient *credhub.CredHub) (interface{}, error) {
 	mode := credhub.Overwrite
 
 	if cmd.NoOverwrite {
 		mode = credhub.NoOverwrite
 	}
 
-	if cmd.Type == "ssh" || cmd.Type == "rsa" {
-		publicKey, err := util.ReadFileOrStringFromField(cmd.Public)
-		if err != nil {
-			return nil, err
+	switch cmd.Type {
+	case "password":
+		return credhubClient.SetPassword(cmd.CredentialIdentifier, values.Password(cmd.Password), mode)
+	case "certificate":
+		value := values.Certificate{
+			Ca: cmd.Root,
+			Certificate: cmd.Certificate,
+			PrivateKey: cmd.Private,
+			CaName: cmd.CaName,
 		}
-
-		privateKey, err := util.ReadFileOrStringFromField(cmd.Private)
-		if err != nil {
-			return nil, err
+		return credhubClient.SetCertificate(cmd.CredentialIdentifier, value, mode)
+	case "ssh":
+		value := values.SSH{
+			PublicKey: cmd.Public,
+			PrivateKey: cmd.Private,
 		}
-		if cmd.Type == "ssh" {
-			value := values.SSH{}
-			value.PublicKey = publicKey
-			value.PrivateKey = privateKey
-			var sshCredential credentials.SSH
-			sshCredential, responseError = credhubClient.SetSSH(cmd.CredentialIdentifier, value, mode)
-			output = interface{}(sshCredential)
-		} else {
-			value := values.RSA{}
-			value.PublicKey = publicKey
-			value.PrivateKey = privateKey
-			var rsaCredential credentials.RSA
-			rsaCredential, responseError = credhubClient.SetRSA(cmd.CredentialIdentifier, value, mode)
-			output = interface{}(rsaCredential)
+		return credhubClient.SetSSH(cmd.CredentialIdentifier, value, mode)
+	case "rsa":
+		value := values.RSA{
+			PublicKey: cmd.Public,
+			PrivateKey: cmd.Private,
 		}
-	} else if cmd.Type == "certificate" {
-
-		root, err := util.ReadFileOrStringFromField(cmd.Root)
-		if err != nil {
-			return nil, err
-		}
-
-		certificate, err := util.ReadFileOrStringFromField(cmd.Certificate)
-		if err != nil {
-			return nil, err
-		}
-
-		privateKey, err := util.ReadFileOrStringFromField(cmd.Private)
-		if err != nil {
-			return nil, err
-		}
-
-		value := values.Certificate{}
-		value.Certificate = certificate
-		value.PrivateKey = privateKey
-		value.Ca = root
-		value.CaName = cmd.CaName
-		var certificateCredential credentials.Certificate
-		certificateCredential, responseError = credhubClient.SetCertificate(cmd.CredentialIdentifier, value, mode)
-		output = interface{}(certificateCredential)
-	} else if cmd.Type == "user" {
-		value := values.User{}
+		return credhubClient.SetRSA(cmd.CredentialIdentifier, value, mode)
+	case "user":
+		value := values.User{Password: cmd.Password}
 		if cmd.Username != "" {
 			value.Username = &cmd.Username
 		}
-		value.Password = cmd.Password
-		var userCredential credentials.User
-		userCredential, responseError = credhubClient.SetUser(cmd.CredentialIdentifier, value, mode)
-		output = interface{}(userCredential)
-
-	} else if cmd.Type == "password" {
-		var passwordCredential credentials.Password
-		passwordCredential, responseError = credhubClient.SetPassword(cmd.CredentialIdentifier, values.Password(cmd.Password), mode)
-		output = interface{}(passwordCredential)
-	} else if cmd.Type == "json" {
-		var jsonCredential credentials.JSON
-		var unmarshalled values.JSON
-		json.Unmarshal([]byte(cmd.Value), &unmarshalled)
-		jsonCredential, responseError = credhubClient.SetJSON(cmd.CredentialIdentifier, unmarshalled, mode)
-		output = interface{}(jsonCredential)
-	} else {
-		var valueCredential credentials.Value
-		valueCredential, responseError = credhubClient.SetValue(cmd.CredentialIdentifier, values.Value(cmd.Value), mode)
-		output = interface{}(valueCredential)
+		return credhubClient.SetUser(cmd.CredentialIdentifier, value, mode)
+	case "json":
+		value := values.JSON{}
+		err := json.Unmarshal([]byte(cmd.Value), &value)
+		if err != nil {
+			return nil, err
+		}
+		return credhubClient.SetJSON(cmd.CredentialIdentifier, value, mode)
+	default:
+		return credhubClient.SetValue(cmd.CredentialIdentifier, values.Value(cmd.Value), mode)
 	}
-
-	if responseError != nil {
-		return nil, responseError
-	}
-
-	return &output, nil
 }
 
 func promptForInput(prompt string, value *string) {
