@@ -9,48 +9,48 @@ import (
 )
 
 // GeneratePassword generates a password credential based on the provided parameters.
-func (ch *CredHub) GeneratePassword(name string, gen generate.Password, overwrite mode) (credentials.Password, error) {
+func (ch *CredHub) GeneratePassword(name string, gen generate.Password, overwrite Mode) (credentials.Password, error) {
 	var cred credentials.Password
 	err := ch.generateCredential(name, "password", gen, overwrite, &cred)
 	return cred, err
 }
 
 // GenerateUser generates a user credential based on the provided parameters.
-func (ch *CredHub) GenerateUser(name string, gen generate.User, overwrite mode) (credentials.User, error) {
+func (ch *CredHub) GenerateUser(name string, gen generate.User, overwrite Mode) (credentials.User, error) {
 	var cred credentials.User
 	err := ch.generateCredential(name, "user", gen, overwrite, &cred)
 	return cred, err
 }
 
 // GenerateCertificate generates a certificate credential based on the provided parameters.
-func (ch *CredHub) GenerateCertificate(name string, gen generate.Certificate, overwrite mode) (credentials.Certificate, error) {
+func (ch *CredHub) GenerateCertificate(name string, gen generate.Certificate, overwrite Mode) (credentials.Certificate, error) {
 	var cred credentials.Certificate
 	err := ch.generateCredential(name, "certificate", gen, overwrite, &cred)
 	return cred, err
 }
 
 // GenerateRSA generates an RSA credential based on the provided parameters.
-func (ch *CredHub) GenerateRSA(name string, gen generate.RSA, overwrite mode) (credentials.RSA, error) {
+func (ch *CredHub) GenerateRSA(name string, gen generate.RSA, overwrite Mode) (credentials.RSA, error) {
 	var cred credentials.RSA
 	err := ch.generateCredential(name, "rsa", gen, overwrite, &cred)
 	return cred, err
 }
 
 // GenerateSSH generates an SSH credential based on the provided parameters.
-func (ch *CredHub) GenerateSSH(name string, gen generate.SSH, overwrite mode) (credentials.SSH, error) {
+func (ch *CredHub) GenerateSSH(name string, gen generate.SSH, overwrite Mode) (credentials.SSH, error) {
 	var cred credentials.SSH
 	err := ch.generateCredential(name, "ssh", gen, overwrite, &cred)
 	return cred, err
 }
 
 // GenerateCredential generates any credential type based on the credType given provided parameters.
-func (ch *CredHub) GenerateCredential(name, credType string, gen interface{}, overwrite mode) (credentials.Credential, error) {
+func (ch *CredHub) GenerateCredential(name, credType string, gen interface{}, overwrite Mode) (credentials.Credential, error) {
 	var cred credentials.Credential
 	err := ch.generateCredential(name, credType, gen, overwrite, &cred)
 	return cred, err
 }
 
-func (ch *CredHub) generateCredential(name, credType string, gen interface{}, overwrite mode, cred interface{}) error {
+func (ch *CredHub) generateCredential(name, credType string, gen interface{}, overwrite Mode, cred interface{}) error {
 	isOverwrite := overwrite == Overwrite
 	
 	requestBody := map[string]interface{}{}

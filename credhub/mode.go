@@ -1,8 +1,8 @@
 package credhub
 
-type mode string
+type Mode string
 
 const (
-	Overwrite  mode = "overwrite"
-	NoOverwrite mode = "no-overwrite"
+	Overwrite   Mode = "overwrite"
+	NoOverwrite Mode = "no-overwrite"
 )
