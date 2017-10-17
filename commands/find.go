@@ -2,7 +2,6 @@ package commands
 
 import (
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials"
 	"github.com/cloudfoundry-incubator/credhub-cli/errors"
 )
 
@@ -14,9 +13,6 @@ type FindCommand struct {
 }
 
 func (cmd FindCommand) Execute([]string) error {
-	var output interface{}
-	var err error
-
 	cfg := config.ReadConfig()
 
 	credhubClient, err := initializeCredhubClient(cfg)
@@ -25,28 +21,37 @@ func (cmd FindCommand) Execute([]string) error {
 	}
 
 	if cmd.AllPaths {
-		var paths credentials.Paths
-		paths, err = credhubClient.FindAllPaths()
+		paths, err := credhubClient.FindAllPaths()
+
+		if err != nil {
+			return err
+		}
+
 		if len(paths.Paths) == 0 {
 			return errors.NewNoMatchingCredentialsFoundError()
 		}
-		output = paths
+
+		printCredential(cmd.OutputJson, paths)
+
 	} else if cmd.PartialCredentialIdentifier != "" {
-		var results credentials.FindResults
-		results, err = credhubClient.FindByPartialName(cmd.PartialCredentialIdentifier)
+		results, err := credhubClient.FindByPartialName(cmd.PartialCredentialIdentifier)
+		if err != nil {
+			return err
+		}
+
 		if len(results.Credentials) == 0 {
 			return errors.NewNoMatchingCredentialsFoundError()
 		}
-		output = results
+
+		printCredential(cmd.OutputJson, results)
 	} else {
-		output, err = credhubClient.FindByPath(cmd.PathIdentifier)
-	}
+		output, err := credhubClient.FindByPath(cmd.PathIdentifier)
+		if err != nil {
+			return err
+		}
 
-	if err != nil {
-		return err
+		printCredential(cmd.OutputJson, output)
 	}
-
-	printCredential(cmd.OutputJson, output)
 
 	return nil
 }

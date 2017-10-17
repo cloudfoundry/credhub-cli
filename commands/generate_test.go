@@ -148,7 +148,9 @@ var _ = Describe("Generate", func() {
 			session := runCommand("generate", "-n", "foo-ssh-key", "-t", "ssh")
 
 			Eventually(session).Should(Exit(0))
-			Expect(session.Out).To(Say(responseMySSHFooYaml))
+			Eventually(session.Out).Should(Say("name: foo-ssh-key"))
+			Eventually(session.Out).Should(Say("private_key: some-private-key"))
+			Eventually(session.Out).Should(Say("public_key: some-public-key"))
 		})
 
 		It("allows the type to be any case", func() {
@@ -157,7 +159,7 @@ var _ = Describe("Generate", func() {
 			session := runCommand("generate", "-n", "foo-ssh-key", "-t", "SSH")
 
 			Eventually(session).Should(Exit(0))
-			Expect(session.Out).To(Say(responseMySSHFooYaml))
+			Eventually(session.Out).Should(Say("name: foo-ssh-key"))
 		})
 
 		It("can print the SSH key as JSON", func() {
@@ -205,7 +207,9 @@ var _ = Describe("Generate", func() {
 			session := runCommand("generate", "-n", "foo-rsa-key", "-t", "rsa")
 
 			Eventually(session).Should(Exit(0))
-			Expect(session.Out).To(Say(responseMyRSAFooYaml))
+			Eventually(session.Out).Should(Say("name: foo-rsa-key"))
+			Eventually(session.Out).Should(Say("private_key: some-private-key"))
+			Eventually(session.Out).Should(Say("public_key: some-public-key"))
 		})
 
 		It("allows the type to be any case", func() {
@@ -214,7 +218,7 @@ var _ = Describe("Generate", func() {
 			session := runCommand("generate", "-n", "foo-rsa-key", "-t", "RSA")
 
 			Eventually(session).Should(Exit(0))
-			Expect(session.Out).To(Say(responseMyRSAFooYaml))
+			Eventually(session.Out).Should(Say("name: foo-rsa-key"))
 		})
 
 		It("can print the RSA key as JSON", func() {
@@ -256,7 +260,11 @@ var _ = Describe("Generate", func() {
 			session := runCommand("generate", "-n", "my-secret", "-t", "certificate", "--common-name", "common.name.io")
 
 			Eventually(session).Should(Exit(0))
-			Expect(session.Out).To(Say(responseMyCertificateYaml))
+			Eventually(session.Out).Should(Say("name: my-secret"))
+			Eventually(session.Out).Should(Say("type: certificate"))
+			Eventually(session.Out).Should(Say("ca: my-ca"))
+			Eventually(session.Out).Should(Say("certificate: my-cert"))
+			Eventually(session.Out).Should(Say("private_key: my-priv"))
 		})
 
 		It("allows the type to be any case", func() {
@@ -266,7 +274,7 @@ var _ = Describe("Generate", func() {
 			session := runCommand("generate", "-n", "my-secret", "-t", "CERTIFICATE", "--common-name", "common.name.io")
 
 			Eventually(session).Should(Exit(0))
-			Expect(session.Out).To(Say(responseMyCertificateYaml))
+			Eventually(session.Out).Should(Say("name: my-secret"))
 		})
 
 		It("can print the certificate as JSON", func() {
@@ -409,7 +417,11 @@ var _ = Describe("Generate", func() {
 			session := runCommand("generate", "-n", name, "-t", "user")
 
 			Eventually(session).Should(Exit(0))
-			Expect(session.Out.Contents()).To(ContainSubstring(responseMyUsernameYaml))
+			Expect(session.Out.Contents()).To(ContainSubstring("name: my-username-credential"))
+			Expect(session.Out.Contents()).To(ContainSubstring("type: user"))
+			Expect(session.Out.Contents()).To(ContainSubstring("password: test-password"))
+			Expect(session.Out.Contents()).To(ContainSubstring("password_hash: passw0rd-H4$h"))
+			Expect(session.Out.Contents()).To(ContainSubstring("username: my-username"))
 		})
 
 		It("allows the type to be any case", func() {
@@ -424,7 +436,7 @@ var _ = Describe("Generate", func() {
 			session := runCommand("generate", "-n", name, "-t", "USER")
 
 			Eventually(session).Should(Exit(0))
-			Expect(session.Out.Contents()).To(ContainSubstring(responseMyUsernameYaml))
+			Eventually(session.Out).Should(Say("name: my-username-credential"))
 		})
 
 		It("should accept a statically provided username", func() {
@@ -439,7 +451,10 @@ var _ = Describe("Generate", func() {
 			session := runCommand("generate", "-n", name, "-t", "user", "-z", "my-username")
 
 			Eventually(session).Should(Exit(0))
-			Expect(session.Out.Contents()).To(ContainSubstring(responseMyUsernameYaml))
+			Expect(string(session.Out.Contents())).To(ContainSubstring("name: my-username-credential"))
+			Expect(string(session.Out.Contents())).To(ContainSubstring("password: test-password"))
+			Expect(string(session.Out.Contents())).To(ContainSubstring("password_hash: passw0rd-H4$h"))
+			Expect(string(session.Out.Contents())).To(ContainSubstring("username: my-username"))
 		})
 
 		It("with with no-overwrite", func() {

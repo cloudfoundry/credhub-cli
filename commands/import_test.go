@@ -220,25 +220,19 @@ Failed to set: 0
 			SetupPutUserServer("/test/user", `{"username": "covfefe", "password": "test-user-password"}`, "covfefe", "test-user-password", "P455W0rd-H45H", true)
 
 			session := runCommand("import", "-f", "../test/test_import_partial_fail_set.yml")
-			successfulSetMessage := `Credential '/test/invalid_type' at index 0 could not be set: The request does not include a valid type. Valid values include 'value', 'json', 'password', 'user', 'certificate', 'ssh' and 'rsa'.
-
-Credential '/test/invalid_type1' at index 1 could not be set: The request does not include a valid type. Valid values include 'value', 'json', 'password', 'user', 'certificate', 'ssh' and 'rsa'.
-
-id: 5a2edd4f-1686-4c8d-80eb-5daa866f9f86
-name: /test/user
-version_created_at: 2016-01-01T12:00:00Z
-type: user
-value:
-  password: test-user-password
-  password_hash: P455W0rd-H45H
-  username: covfefe`
 			summaryMessage := `Import complete.
 Successfully set: 1
 Failed to set: 2
- - Credential '/test/invalid_type' at index 0 could not be set: The request does not include a valid type. Valid values include 'value', 'json', 'password', 'user', 'certificate', 'ssh' and 'rsa'.
- - Credential '/test/invalid_type1' at index 1 could not be set: The request does not include a valid type. Valid values include 'value', 'json', 'password', 'user', 'certificate', 'ssh' and 'rsa'.
 `
-			Eventually(session.Out).Should(Say(successfulSetMessage))
+			Eventually(session.Out).Should(Say(`Credential '/test/invalid_type' at index 0 could not be set: The request does not include a valid type. Valid values include 'value', 'json', 'password', 'user', 'certificate', 'ssh' and 'rsa'.`))
+			Eventually(session.Out).Should(Say(`Credential '/test/invalid_type1' at index 1 could not be set: The request does not include a valid type. Valid values include 'value', 'json', 'password', 'user', 'certificate', 'ssh' and 'rsa'.`))
+			Expect(session.Out.Contents()).To(ContainSubstring(`id: 5a2edd4f-1686-4c8d-80eb-5daa866f9f86`))
+			Expect(session.Out.Contents()).To(ContainSubstring(`name: /test/user`))
+			Expect(session.Out.Contents()).To(ContainSubstring(`version_created_at: 2016-01-01T12:00:00Z`))
+			Expect(session.Out.Contents()).To(ContainSubstring(`type: user`))
+			Expect(session.Out.Contents()).To(ContainSubstring(`password: test-user-password`))
+			Expect(session.Out.Contents()).To(ContainSubstring(`password_hash: P455W0rd-H45H`))
+			Expect(session.Out.Contents()).To(ContainSubstring(`username: covfefe`))
 			Eventually(session.Out).Should(Say(summaryMessage))
 		})
 	})

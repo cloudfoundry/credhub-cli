@@ -53,19 +53,10 @@ const CERTIFICATE_CREDENTIAL_ARRAY_RESPONSE_JSON = `{"data":[` + CERTIFICATE_CRE
 const RSA_SSH_CREDENTIAL_ARRAY_RESPONSE_JSON = `{"data":[` + RSA_SSH_CREDENTIAL_RESPONSE_JSON + `]}`
 const USER_CREDENTIAL_ARRAY_RESPONSE_JSON = `{"data":[` + USER_CREDENTIAL_RESPONSE_JSON + `]}`
 
-const CERTIFICATE_CREDENTIAL_RESPONSE_YAML = "id: " + UUID + "\nname: %s" + "\nversion_created_at: " + TIMESTAMP + "\ntype: certificate\nvalue:\n  ca: %s\n  certificate: %s\n  private_key: %s"
-const SSH_CREDENTIAL_RESPONSE_YAML = "id: " + UUID + "\nname: %s" + "\nversion_created_at: " + TIMESTAMP + "\ntype: ssh\nvalue:\n  private_key: %s\n  public_key: %s"
-const RSA_CREDENTIAL_RESPONSE_YAML = "id: " + UUID + "\nname: %s" + "\nversion_created_at: " + TIMESTAMP + "\ntype: rsa\nvalue:\n  private_key: %s\n  public_key: %s"
-const USER_CREDENTIAL_RESPONSE_YAML = "id: " + UUID + "\nname: %s" + "\nversion_created_at: " + TIMESTAMP + "\ntype: user\nvalue:\n  password: %s\n  password_hash: %s\n  username: %s"
-
 var responseMyValuePotatoesJson = fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_JSON, "value", "my-value", "potatoes")
 var responseMyPasswordPotatoesJson = fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_JSON, "password", "my-password", "potatoes")
-var responseMyCertificateYaml = fmt.Sprintf(CERTIFICATE_CREDENTIAL_RESPONSE_YAML, "my-secret", "my-ca", "my-cert", "my-priv")
 var responseMyCertificateWithNewlinesJson = fmt.Sprintf(CERTIFICATE_CREDENTIAL_RESPONSE_JSON, "my-secret", `my\nca`, `my\ncert`, `my\npriv`)
-var responseMySSHFooYaml = fmt.Sprintf(SSH_CREDENTIAL_RESPONSE_YAML, "foo-ssh-key", "some-private-key", "some-public-key")
-var responseMyRSAFooYaml = fmt.Sprintf(RSA_CREDENTIAL_RESPONSE_YAML, "foo-rsa-key", "some-private-key", "some-public-key")
 var responseMyRSAWithNewlinesJson = fmt.Sprintf(RSA_SSH_CREDENTIAL_RESPONSE_JSON, "rsa", "foo-rsa-key", `some\npublic\nkey`, `some\nprivate\nkey`)
-var responseMyUsernameYaml = fmt.Sprintf(USER_CREDENTIAL_RESPONSE_YAML, "my-username-credential", "test-password", "passw0rd-H4$h", "my-username")
 
 func TestCommands(t *testing.T) {
 	RegisterFailHandler(Fail)
