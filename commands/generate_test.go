@@ -601,7 +601,7 @@ func setupRsaSshPostServer(name, credentialType, publicKey, privateKey, requestJ
 	server.RouteToHandler("POST", "/api/v1/data",
 		CombineHandlers(
 			VerifyJSON(requestJson),
-			RespondWith(http.StatusOK, fmt.Sprintf(RSA_SSH_CREDENTIAL_RESPONSE_JSON, credentialType, name, publicKey, privateKey)),
+			RespondWith(http.StatusOK, fmt.Sprintf(RSA_CREDENTIAL_RESPONSE_JSON, credentialType, name, publicKey, privateKey)),
 		),
 	)
 }

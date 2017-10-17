@@ -254,8 +254,8 @@ func setUpImportRequests() {
 		`ca-certificate`,
 		`certificate`,
 		`private-key`)
-	SetupPutRsaSshServer("/test/rsa", "rsa", "public-key", "private-key", true)
-	SetupPutRsaSshServer("/test/ssh", "ssh", "ssh-public-key", "private-key", true)
+	SetupPutRsaServer("/test/rsa", "rsa", "public-key", "private-key", true)
+	SetupPutRsaServer("/test/ssh", "ssh", "ssh-public-key", "private-key", true)
 	SetupPutUserServer("/test/user", `{"username": "covfefe", "password": "test-user-password"}`, "covfefe", "test-user-password", "P455W0rd-H45H", true)
 	setupPutJsonServer("/test/json", `{"1":"key is not a string","3.14":"pi","true":"key is a bool","arbitrary_object":{"nested_array":["array_val1",{"array_object_subvalue":"covfefe"}]}}`)
 }

@@ -43,20 +43,21 @@ const USER_SET_CREDENTIAL_REQUEST_JSON = `{"type":"user","name":"%s","value":%s,
 const JSON_CREDENTIAL_RESPONSE_JSON = `{"type":"json","id":"` + UUID + `","name":"%s","version_created_at":"` + TIMESTAMP + `","value":%s}`
 const STRING_CREDENTIAL_RESPONSE_JSON = `{"type":"%s","id":"` + UUID + `","name":"%s","version_created_at":"` + TIMESTAMP + `","value":"%s"}`
 const CERTIFICATE_CREDENTIAL_RESPONSE_JSON = `{"type":"certificate","id":"` + UUID + `","name":"%s","version_created_at":"` + TIMESTAMP + `","value":{"ca":"%s","certificate":"%s","private_key":"%s"}}`
-const RSA_SSH_CREDENTIAL_RESPONSE_JSON = `{"type":"%s","id":"` + UUID + `","name":"%s","version_created_at":"` + TIMESTAMP + `","value":{"public_key":"%s","private_key":"%s"},"version_created_at":"` + TIMESTAMP + `"}`
+const RSA_CREDENTIAL_RESPONSE_JSON = `{"type":"%s","id":"` + UUID + `","name":"%s","version_created_at":"` + TIMESTAMP + `","value":{"public_key":"%s","private_key":"%s"},"version_created_at":"` + TIMESTAMP + `"}`
+const SSH_CREDENTIAL_RESPONSE_JSON = `{"type":"%s","id":"` + UUID + `","name":"%s","version_created_at":"` + TIMESTAMP + `","value":{"public_key":"%s","private_key":"%s", "public_key_fingerprint":"fingerprint"},"version_created_at":"` + TIMESTAMP + `"}`
 const USER_CREDENTIAL_RESPONSE_JSON = `{"type":"user","id":"` + UUID + `","name":"%s","version_created_at":"` + TIMESTAMP + `","value":{"username":"%s", "password":"%s", "password_hash":"%s"}}`
 const USER_WITHOUT_USERNAME_CREDENTIAL_RESPONSE_JSON = `{"type":"user","id":"` + UUID + `","name":"%s","version_created_at":"` + TIMESTAMP + `","value":{"username":null, "password":"%s", "password_hash":"%s"}}`
 
 const STRING_CREDENTIAL_ARRAY_RESPONSE_JSON = `{"data":[` + STRING_CREDENTIAL_RESPONSE_JSON + `]}`
 const JSON_CREDENTIAL_ARRAY_RESPONSE_JSON = `{"data":[` + JSON_CREDENTIAL_RESPONSE_JSON + `]}`
 const CERTIFICATE_CREDENTIAL_ARRAY_RESPONSE_JSON = `{"data":[` + CERTIFICATE_CREDENTIAL_RESPONSE_JSON + `]}`
-const RSA_SSH_CREDENTIAL_ARRAY_RESPONSE_JSON = `{"data":[` + RSA_SSH_CREDENTIAL_RESPONSE_JSON + `]}`
+const RSA_SSH_CREDENTIAL_ARRAY_RESPONSE_JSON = `{"data":[` + RSA_CREDENTIAL_RESPONSE_JSON + `]}`
 const USER_CREDENTIAL_ARRAY_RESPONSE_JSON = `{"data":[` + USER_CREDENTIAL_RESPONSE_JSON + `]}`
 
 var responseMyValuePotatoesJson = fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_JSON, "value", "my-value", "potatoes")
 var responseMyPasswordPotatoesJson = fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_JSON, "password", "my-password", "potatoes")
 var responseMyCertificateWithNewlinesJson = fmt.Sprintf(CERTIFICATE_CREDENTIAL_RESPONSE_JSON, "my-secret", `my\nca`, `my\ncert`, `my\npriv`)
-var responseMyRSAWithNewlinesJson = fmt.Sprintf(RSA_SSH_CREDENTIAL_RESPONSE_JSON, "rsa", "foo-rsa-key", `some\npublic\nkey`, `some\nprivate\nkey`)
+var responseMyRSAWithNewlinesJson = fmt.Sprintf(RSA_CREDENTIAL_RESPONSE_JSON, "rsa", "foo-rsa-key", `some\npublic\nkey`, `some\nprivate\nkey`)
 
 func TestCommands(t *testing.T) {
 	RegisterFailHandler(Fail)

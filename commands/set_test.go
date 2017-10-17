@@ -45,9 +45,9 @@ var _ = Describe("Set", func() {
 			session := runCommand("set", "-n", "my-value", "-v", "potatoes", "-t", "value")
 
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say("name: my-value"))
-			Eventually(session.Out).Should(Say("type: value"))
-			Eventually(session.Out).Should(Say("value: potatoes"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("name: my-value"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("type: value"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("value: potatoes"))
 		})
 
 		It("escapes special characters in the value", func() {
@@ -56,9 +56,9 @@ var _ = Describe("Set", func() {
 			session := runCommand("set", "-t", "value", "-n", "my-character-test", "-v", `{"password":"some-still-bad-password"}`)
 
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say("name: my-character-test"))
-			Eventually(session.Out).Should(Say("type: value"))
-			Eventually(session.Out).Should(Say(`value: '{"password":"some-still-bad-password"}'`))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("name: my-character-test"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("type: value"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring(`value: '{"password":"some-still-bad-password"}'`))
 		})
 
 		It("puts a secret using explicit value type and returns in json format", func() {
@@ -88,14 +88,14 @@ var _ = Describe("Set", func() {
 			session := runCommand("set", "-n", "json-secret", "-v", jsonValue, "-t", "json")
 
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say("name: json-secret"))
-			Eventually(session.Out).Should(Say("type: json"))
-			Eventually(session.Out).Should(Say("value:"))
-			Eventually(session.Out).Should(Say("an:"))
-			Eventually(session.Out).Should(Say("- array"))
-			Eventually(session.Out).Should(Say("foo: bar"))
-			Eventually(session.Out).Should(Say("nested:"))
-			Eventually(session.Out).Should(Say("a: 1"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("name: json-secret"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("type: json"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("value:"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("an:"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("- array"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("foo: bar"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("nested:"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("a: 1"))
 		})
 
 		It("escapes special characters in the json", func() {
@@ -104,10 +104,10 @@ var _ = Describe("Set", func() {
 			session := runCommand("set", "-t", "json", "-n", "my-character-test", "-v", `{"foo":"b\"ar"}`)
 
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say("name: my-character-test"))
-			Eventually(session.Out).Should(Say("type: json"))
-			Eventually(session.Out).Should(Say("value:"))
-			Eventually(session.Out).Should(Say("foo: b\"ar"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("name: my-character-test"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("type: json"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("value:"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("foo: b\"ar"))
 		})
 
 		It("puts a secret using explicit json type and returns in json format", func() {
@@ -117,15 +117,22 @@ var _ = Describe("Set", func() {
 			session := runCommand("set", "-n", "json-secret", "-v", jsonValue, "-t", "json", "--output-json")
 
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say(`"name": "json-secret"`))
-			Eventually(session.Out).Should(Say(`"type": "json"`))
-			Eventually(session.Out).Should(Say(`"value":`))
-			Eventually(session.Out).Should(Say(`"an":`))
-			Eventually(session.Out).Should(Say(`["array"]`))
-			Eventually(session.Out).Should(Say(`"foo": "bar"`))
-			Eventually(session.Out).Should(Say(`"nested": {`))
-			Eventually(session.Out).Should(Say(`"a": 1`))
-			Eventually(session.Out).Should(Say(`}`))
+			responseJson := `{
+			"id": "5a2edd4f-1686-4c8d-80eb-5daa866f9f86",
+			"name": "json-secret",
+			"type": "json",
+			"value": {
+				"an": [
+					"array"
+				],
+				"foo": "bar",
+				"nested": {
+					"a": 1
+				}
+			},
+			"version_created_at": "2016-01-01T12:00:00Z"
+			}`
+			Eventually(string(session.Out.Contents())).Should(MatchJSON(responseJson))
 		})
 
 		It("accepts case-insensitive type", func() {
@@ -135,33 +142,33 @@ var _ = Describe("Set", func() {
 			session := runCommand("set", "-n", "json-secret", "-v", jsonValue, "-t", "JSON")
 
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say("name: json-secret"))
-			Eventually(session.Out).Should(Say("type: json"))
-			Eventually(session.Out).Should(Say("value:"))
-			Eventually(session.Out).Should(Say("an:"))
-			Eventually(session.Out).Should(Say("- array"))
-			Eventually(session.Out).Should(Say("foo: bar"))
-			Eventually(session.Out).Should(Say("nested:"))
-			Eventually(session.Out).Should(Say("a: 1"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("name: json-secret"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("type: json"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("value:"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("an:"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("- array"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("foo: bar"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("nested:"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("a: 1"))
 		})
 	})
 
 	Describe("setting SSH secrets", func() {
 		It("puts a secret using explicit ssh type", func() {
-			SetupPutRsaSshServer("foo-ssh-key", "ssh", "some-public-key", "some-private-key", true)
+			SetupPutSshServer("foo-ssh-key", "ssh", "some-public-key", "some-private-key", true)
 
 			session := runCommand("set", "-n", "foo-ssh-key", "-u", "some-public-key", "-p", "some-private-key", "-t", "ssh")
 
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say("name: foo-ssh-key"))
-			Eventually(session.Out).Should(Say("type: ssh"))
-			Eventually(session.Out).Should(Say("value:"))
-			Eventually(session.Out).Should(Say("public_key: some-public-key"))
-			Eventually(session.Out).Should(Say("private_key: some-private-key"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("name: foo-ssh-key"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("type: ssh"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("value:"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("public_key: some-public-key"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("private_key: some-private-key"))
 		})
 
 		It("puts a secret using values read from files", func() {
-			SetupPutRsaSshServer("foo-ssh-key", "ssh", "some-public-key", "some-private-key", true)
+			SetupPutSshServer("foo-ssh-key", "ssh", "some-public-key", "some-private-key", true)
 
 			tempDir := test.CreateTempDir("sshFilesForTesting")
 			publicFileName := test.CreateCredentialFile(tempDir, "rsa.pub", "some-public-key")
@@ -174,15 +181,15 @@ var _ = Describe("Set", func() {
 
 			os.RemoveAll(tempDir)
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say("name: foo-ssh-key"))
-			Eventually(session.Out).Should(Say("type: ssh"))
-			Eventually(session.Out).Should(Say("value:"))
-			Eventually(session.Out).Should(Say("public_key: some-public-key"))
-			Eventually(session.Out).Should(Say("private_key: some-private-key"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("name: foo-ssh-key"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("type: ssh"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("value:"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("public_key: some-public-key"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("private_key: some-private-key"))
 		})
 
 		It("puts a secret specifying no-overwrite", func() {
-			SetupPutRsaSshServer("foo-ssh-key", "ssh", "some-public-key", "some-private-key", false)
+			SetupPutSshServer("foo-ssh-key", "ssh", "some-public-key", "some-private-key", false)
 
 			session := runCommand("set", "-n", "foo-ssh-key", "-t", "ssh", "-u", "some-public-key", "-p", "some-private-key", "--no-overwrite")
 
@@ -190,64 +197,75 @@ var _ = Describe("Set", func() {
 		})
 
 		It("puts a secret using explicit ssh type and returns in json format", func() {
-			SetupPutRsaSshServer("foo-ssh-key", "ssh", "some-public-key", "some-private-key", true)
+			SetupPutSshServer("foo-ssh-key", "ssh", "some-public-key", "some-private-key", true)
 
 			session := runCommand("set", "-n", "foo-ssh-key", "-u", "some-public-key", "-p", "some-private-key", "-t", "ssh", "--output-json")
 
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say(`"name": "foo-ssh-key"`))
-			Eventually(session.Out).Should(Say(`"type": "ssh"`))
-			Eventually(session.Out).Should(Say(`"value": {`))
-			Eventually(session.Out).Should(Say(`"public_key": "some-public-key"`))
-			Eventually(session.Out).Should(Say(`"private_key": "some-private-key"`))
-			Eventually(session.Out).Should(Say(`"public_key_fingerprint": ""`))
-			Eventually(session.Out).Should(Say(`}`))
+			responseJson := `{
+        	"id": "5a2edd4f-1686-4c8d-80eb-5daa866f9f86",
+        	"name": "foo-ssh-key",
+        	"type": "ssh",
+        	"value": {
+        		"private_key": "some-private-key",
+        		"public_key": "some-public-key",
+        		"public_key_fingerprint": "fingerprint"
+        	},
+        	"version_created_at": "2016-01-01T12:00:00Z"
+        	}`
+			Eventually(string(session.Out.Contents())).Should(MatchJSON(responseJson))
 		})
 
 		It("accepts case-insensitive type", func() {
-			SetupPutRsaSshServer("foo-ssh-key", "ssh", "some-public-key", "some-private-key", true)
+			SetupPutSshServer("foo-ssh-key", "ssh", "some-public-key", "some-private-key", true)
 
 			session := runCommand("set", "-n", "foo-ssh-key", "-u", "some-public-key", "-p", "some-private-key", "-t", "SSH")
 
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say("name: foo-ssh-key"))
-			Eventually(session.Out).Should(Say("type: ssh"))
-			Eventually(session.Out).Should(Say("value:"))
-			Eventually(session.Out).Should(Say("public_key: some-public-key"))
-			Eventually(session.Out).Should(Say("private_key: some-private-key"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("name: foo-ssh-key"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("type: ssh"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("value:"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("public_key: some-public-key"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("private_key: some-private-key"))
 		})
 
 		It("handles newline characters", func() {
-			SetupPutRsaSshServer("foo-ssh-key", "ssh", `some\npublic\nkey`, `some\nprivate\nkey`, true)
+			SetupPutSshServer("foo-ssh-key", "ssh", `some\npublic\nkey`, `some\nprivate\nkey`, true)
 			session := runCommand("set", "-n", "foo-ssh-key", "-u", `some\npublic\nkey`, "-p", `some\nprivate\nkey`, "-t", "ssh", "--output-json")
 
+			responseJson := `{
+        	"id": "5a2edd4f-1686-4c8d-80eb-5daa866f9f86",
+        	"name": "foo-ssh-key",
+        	"type": "ssh",
+        	"value": {
+        		"private_key": "some\nprivate\nkey",
+        		"public_key": "some\npublic\nkey",
+        		"public_key_fingerprint": "fingerprint"
+        	},
+        	"version_created_at": "2016-01-01T12:00:00Z"
+        	}`
+
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say(`"name": "foo-ssh-key"`))
-			Eventually(session.Out).Should(Say(`"type": "ssh"`))
-			Eventually(session.Out).Should(Say(`"value": {`))
-			Eventually(session.Out).Should(Say(`"public_key": "some\\npublic\\nkey"`))
-			Eventually(session.Out).Should(Say(`"private_key": "some\\nprivate\\nkey"`))
-			Eventually(session.Out).Should(Say(`"public_key_fingerprint": ""`))
-			Eventually(session.Out).Should(Say(`}`))
+			Eventually(string(session.Out.Contents())).Should(MatchJSON(responseJson))
 		})
 	})
 
 	Describe("setting RSA secrets", func() {
 		It("puts a secret using explicit rsa type", func() {
-			SetupPutRsaSshServer("foo-rsa-key", "rsa", "some-public-key", "some-private-key", true)
+			SetupPutRsaServer("foo-rsa-key", "rsa", "some-public-key", "some-private-key", true)
 
 			session := runCommand("set", "-n", "foo-rsa-key", "-u", "some-public-key", "-p", "some-private-key", "-t", "rsa")
 
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say("name: foo-rsa-key"))
-			Eventually(session.Out).Should(Say("type: rsa"))
-			Eventually(session.Out).Should(Say("value:"))
-			Eventually(session.Out).Should(Say("public_key: some-public-key"))
-			Eventually(session.Out).Should(Say("private_key: some-private-key"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("name: foo-rsa-key"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("type: rsa"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("value:"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("private_key: some-private-key"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("public_key: some-public-key"))
 		})
 
 		It("puts a secret using values read from files", func() {
-			SetupPutRsaSshServer("foo-rsa-key", "rsa", "some-public-key", "some-private-key", true)
+			SetupPutRsaServer("foo-rsa-key", "rsa", "some-public-key", "some-private-key", true)
 
 			tempDir := test.CreateTempDir("rsaFilesForTesting")
 			publicFileName := test.CreateCredentialFile(tempDir, "rsa.pub", "some-public-key")
@@ -260,16 +278,15 @@ var _ = Describe("Set", func() {
 
 			os.RemoveAll(tempDir)
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say("name: foo-rsa-key"))
-			Eventually(session.Out).Should(Say("type: rsa"))
-			Eventually(session.Out).Should(Say("value:"))
-			Eventually(session.Out).Should(Say("public_key: some-public-key"))
-			Eventually(session.Out).Should(Say("private_key: some-private-key"))
-
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("name: foo-rsa-key"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("type: rsa"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("value:"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("private_key: some-private-key"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("public_key: some-public-key"))
 		})
 
 		It("puts a secret specifying no-overwrite", func() {
-			SetupPutRsaSshServer("foo-rsa-key", "rsa", "some-public-key", "some-private-key", false)
+			SetupPutRsaServer("foo-rsa-key", "rsa", "some-public-key", "some-private-key", false)
 
 			session := runCommand("set", "-n", "foo-rsa-key", "-t", "rsa", "-u", "some-public-key", "-p", "some-private-key", "--no-overwrite")
 
@@ -277,36 +294,35 @@ var _ = Describe("Set", func() {
 		})
 
 		It("puts a secret using explicit rsa type and returns in json format", func() {
-			SetupPutRsaSshServer("foo-rsa-key", "rsa", "some-public-key", "some-private-key", true)
+			SetupPutRsaServer("foo-rsa-key", "rsa", "some-public-key", "some-private-key", true)
 
 			session := runCommand("set", "-n", "foo-rsa-key", "-u", "some-public-key", "-p", "some-private-key", "-t", "rsa", "--output-json")
 
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say(`"name": "foo-rsa-key"`))
-			Eventually(session.Out).Should(Say(`"type": "rsa"`))
-			Eventually(session.Out).Should(Say(`"value": {`))
-			Eventually(session.Out).Should(Say(`"public_key": "some-public-key"`))
-			Eventually(session.Out).Should(Say(`"private_key": "some-private-key"`))
-			Eventually(session.Out).Should(Say(`}`))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring(`"name": "foo-rsa-key"`))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring(`"type": "rsa"`))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring(`"value": {`))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring(`"public_key": "some-public-key"`))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring(`"private_key": "some-private-key"`))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring(`}`))
 
 		})
 
 		It("accepts case-insensitive type", func() {
-			SetupPutRsaSshServer("foo-rsa-key", "rsa", "some-public-key", "some-private-key", true)
+			SetupPutRsaServer("foo-rsa-key", "rsa", "some-public-key", "some-private-key", true)
 
 			session := runCommand("set", "-n", "foo-rsa-key", "-u", "some-public-key", "-p", "some-private-key", "-t", "RSA")
 
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say("name: foo-rsa-key"))
-			Eventually(session.Out).Should(Say("type: rsa"))
-			Eventually(session.Out).Should(Say("value:"))
-			Eventually(session.Out).Should(Say("public_key: some-public-key"))
-			Eventually(session.Out).Should(Say("private_key: some-private-key"))
-
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("name: foo-rsa-key"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("type: rsa"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("value:"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("private_key: some-private-key"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("public_key: some-public-key"))
 		})
 
 		It("handles newline characters", func() {
-			SetupPutRsaSshServer("foo-rsa-key", "rsa", `some\npublic\nkey`, `some\nprivate\nkey`, true)
+			SetupPutRsaServer("foo-rsa-key", "rsa", `some\npublic\nkey`, `some\nprivate\nkey`, true)
 			session := runCommand("set", "-n", "foo-rsa-key", "-u", `some\npublic\nkey`, "-p", `some\nprivate\nkey`, "-t", "rsa", "--output-json")
 
 			Eventually(session).Should(Exit(0))
@@ -329,9 +345,9 @@ var _ = Describe("Set", func() {
 			session := runCommand("set", "-n", "my-password", "-w", "potatoes", "-t", "password")
 
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say("name: my-password"))
-			Eventually(session.Out).Should(Say("type: password"))
-			Eventually(session.Out).Should(Say("value: potatoes"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("name: my-password"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("type: password"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("value: potatoes"))
 		})
 
 		It("prompts for value if value is not provided", func() {
@@ -339,11 +355,11 @@ var _ = Describe("Set", func() {
 
 			session := runCommandWithStdin(strings.NewReader("potatoes\n"), "set", "-n", "my-password", "-t", "password")
 
-			Eventually(session.Out).Should(Say("password:"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("password:"))
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say("name: my-password"))
-			Eventually(session.Out).Should(Say("type: password"))
-			Eventually(session.Out).Should(Say("value: potatoes"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("name: my-password"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("type: password"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("value: potatoes"))
 		})
 
 		It("can set password that contains spaces interactively", func() {
@@ -351,11 +367,11 @@ var _ = Describe("Set", func() {
 
 			session := runCommandWithStdin(strings.NewReader("potatoes potatoes\n"), "set", "-n", "my-password", "-t", "password")
 
-			Eventually(session.Out).Should(Say("password:"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("password:"))
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say("name: my-password"))
-			Eventually(session.Out).Should(Say("type: password"))
-			Eventually(session.Out).Should(Say("value: potatoes potatoes"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("name: my-password"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("type: password"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("value: potatoes potatoes"))
 		})
 
 		It("escapes special characters in the password", func() {
@@ -364,7 +380,7 @@ var _ = Describe("Set", func() {
 			session := runCommand("set", "-t", "password", "-n", "my-character-test", "-w", `{"password":"some-still-bad-password"}`)
 
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say(`value: '{"password":"some-still-bad-password"}'`))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring(`value: '{"password":"some-still-bad-password"}'`))
 		})
 
 		It("puts a secret using explicit password type and returns in json format", func() {
@@ -382,9 +398,9 @@ var _ = Describe("Set", func() {
 			session := runCommand("set", "-n", "my-password", "-w", "potatoes", "-t", "PASSWORD")
 
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say("name: my-password"))
-			Eventually(session.Out).Should(Say("type: password"))
-			Eventually(session.Out).Should(Say("value: potatoes"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("name: my-password"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("type: password"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("value: potatoes"))
 		})
 	})
 
@@ -397,12 +413,12 @@ var _ = Describe("Set", func() {
 				"--certificate", "my-cert", "--private", "my-priv")
 
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say("name: my-secret"))
-			Eventually(session.Out).Should(Say("type: certificate"))
-			Eventually(session.Out).Should(Say("value:"))
-			Eventually(session.Out).Should(Say("ca: my-ca"))
-			Eventually(session.Out).Should(Say("certificate: my-cert"))
-			Eventually(session.Out).Should(Say("private_key: my-priv"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("name: my-secret"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("type: certificate"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("value:"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("ca: my-ca"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("certificate: my-cert"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("private_key: my-priv"))
 		})
 
 		It("puts a secret using explicit certificate type, string values, and certificate authority name", func() {
@@ -413,12 +429,12 @@ var _ = Describe("Set", func() {
 				"--certificate", "my-cert", "--private", "my-priv")
 
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say("name: my-secret"))
-			Eventually(session.Out).Should(Say("type: certificate"))
-			Eventually(session.Out).Should(Say("value:"))
-			Eventually(session.Out).Should(Say("ca: known-ca-value"))
-			Eventually(session.Out).Should(Say("certificate: my-cert"))
-			Eventually(session.Out).Should(Say("private_key: my-priv"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("name: my-secret"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("type: certificate"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("value:"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("ca: known-ca-value"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("certificate: my-cert"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("private_key: my-priv"))
 		})
 
 		It("puts a secret using explicit certificate type and string values with no-overwrite", func() {
@@ -444,12 +460,12 @@ var _ = Describe("Set", func() {
 
 			os.RemoveAll(tempDir)
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say("name: my-secret"))
-			Eventually(session.Out).Should(Say("type: certificate"))
-			Eventually(session.Out).Should(Say("value:"))
-			Eventually(session.Out).Should(Say("ca: my-ca"))
-			Eventually(session.Out).Should(Say("certificate: my-cert"))
-			Eventually(session.Out).Should(Say("private_key: my-priv"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("name: my-secret"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("type: certificate"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("value:"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("ca: my-ca"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("certificate: my-cert"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("private_key: my-priv"))
 		})
 
 		if runtime.GOOS != "windows" {
@@ -468,13 +484,13 @@ var _ = Describe("Set", func() {
 				"--certificate", "my-cert", "--private", "my-priv", "--output-json")
 
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say(`"name": "my-secret"`))
-			Eventually(session.Out).Should(Say(`"type": "certificate"`))
-			Eventually(session.Out).Should(Say(`"value": {`))
-			Eventually(session.Out).Should(Say(`"ca": "my-ca",`))
-			Eventually(session.Out).Should(Say(`"certificate": "my-cert",`))
-			Eventually(session.Out).Should(Say(`"private_key": "my-priv"`))
-			Eventually(session.Out).Should(Say(`}`))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring(`"name": "my-secret"`))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring(`"type": "certificate"`))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring(`"value": {`))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring(`"ca": "my-ca",`))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring(`"certificate": "my-cert",`))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring(`"private_key": "my-priv"`))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring(`}`))
 		})
 
 		It("accepts case insensitive type", func() {
@@ -485,12 +501,12 @@ var _ = Describe("Set", func() {
 				"--certificate", "my-cert", "--private", "my-priv")
 
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say("name: my-secret"))
-			Eventually(session.Out).Should(Say("type: certificate"))
-			Eventually(session.Out).Should(Say("value:"))
-			Eventually(session.Out).Should(Say("ca: my-ca"))
-			Eventually(session.Out).Should(Say("certificate: my-cert"))
-			Eventually(session.Out).Should(Say("private_key: my-priv"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("name: my-secret"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("type: certificate"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("value:"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("ca: my-ca"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("certificate: my-cert"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("private_key: my-priv"))
 		})
 
 		It("handles newline characters", func() {
@@ -635,14 +651,26 @@ var _ = Describe("Set", func() {
 	})
 })
 
-func SetupPutRsaSshServer(name, keyType, publicKey, privateKey string, overwrite bool) {
+func SetupPutRsaServer(name, keyType, publicKey, privateKey string, overwrite bool) {
 	var jsonRequest string
 	jsonRequest = fmt.Sprintf(RSA_SSH_CREDENTIAL_REQUEST_JSON, keyType, name, publicKey, privateKey, overwrite)
 	server.AppendHandlers(
 		CombineHandlers(
 			VerifyRequest("PUT", "/api/v1/data"),
 			VerifyJSON(jsonRequest),
-			RespondWith(http.StatusOK, fmt.Sprintf(RSA_SSH_CREDENTIAL_RESPONSE_JSON, keyType, name, publicKey, privateKey)),
+			RespondWith(http.StatusOK, fmt.Sprintf(RSA_CREDENTIAL_RESPONSE_JSON, keyType, name, publicKey, privateKey)),
+		),
+	)
+}
+
+func SetupPutSshServer(name, keyType, publicKey, privateKey string, overwrite bool) {
+	var jsonRequest string
+	jsonRequest = fmt.Sprintf(RSA_SSH_CREDENTIAL_REQUEST_JSON, keyType, name, publicKey, privateKey, overwrite)
+	server.AppendHandlers(
+		CombineHandlers(
+			VerifyRequest("PUT", "/api/v1/data"),
+			VerifyJSON(jsonRequest),
+			RespondWith(http.StatusOK, fmt.Sprintf(SSH_CREDENTIAL_RESPONSE_JSON, keyType, name, publicKey, privateKey)),
 		),
 	)
 }

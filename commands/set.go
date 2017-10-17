@@ -103,45 +103,43 @@ func (cmd SetCommand) setCredential(credhubClient *credhub.CredHub) (interface{}
 		mode = credhub.NoOverwrite
 	}
 
+	var value interface{}
+
 	switch cmd.Type {
 	case "password":
-		return credhubClient.SetPassword(cmd.CredentialIdentifier, values.Password(cmd.Password), mode)
+		value = values.Password(cmd.Password)
 	case "certificate":
-		value := values.Certificate{
-			Ca: cmd.Root,
+		value = values.Certificate{
+			Ca:          cmd.Root,
 			Certificate: cmd.Certificate,
-			PrivateKey: cmd.Private,
-			CaName: cmd.CaName,
+			PrivateKey:  cmd.Private,
+			CaName:      cmd.CaName,
 		}
-		return credhubClient.SetCertificate(cmd.CredentialIdentifier, value, mode)
 	case "ssh":
-		value := values.SSH{
-			PublicKey: cmd.Public,
+		value = values.SSH{
+			PublicKey:  cmd.Public,
 			PrivateKey: cmd.Private,
 		}
-		return credhubClient.SetSSH(cmd.CredentialIdentifier, value, mode)
 	case "rsa":
-		value := values.RSA{
-			PublicKey: cmd.Public,
+		value = values.RSA{
+			PublicKey:  cmd.Public,
 			PrivateKey: cmd.Private,
 		}
-		return credhubClient.SetRSA(cmd.CredentialIdentifier, value, mode)
 	case "user":
-		value := values.User{
+		value = values.User{
 			Password: cmd.Password,
 			Username: cmd.Username,
 		}
-		return credhubClient.SetUser(cmd.CredentialIdentifier, value, mode)
 	case "json":
-		value := values.JSON{}
+		value = values.JSON{}
 		err := json.Unmarshal([]byte(cmd.Value), &value)
 		if err != nil {
 			return nil, err
 		}
-		return credhubClient.SetJSON(cmd.CredentialIdentifier, value, mode)
 	default:
-		return credhubClient.SetValue(cmd.CredentialIdentifier, values.Value(cmd.Value), mode)
+		value = values.Value(cmd.Value)
 	}
+	return credhubClient.SetCredential(cmd.CredentialIdentifier, cmd.Type, value, mode)
 }
 
 func promptForInput(prompt string, value *string) {
