@@ -42,6 +42,49 @@ var _ = Describe("Generate", func() {
 			Expect(requestBody["parameters"].(map[string]interface{})["ca"]).To(Equal("some-ca"))
 		})
 
+		It("requests to set the certificate with the correct overwrite mode if server version isn't less than 1.6.0", func() {
+			dummy := &DummyAuth{Response: &http.Response{
+				Body: ioutil.NopCloser(bytes.NewBufferString("")),
+			}}
+
+			ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.6.0"))
+
+			certificate := generate.Certificate{
+				Ca:         "some-ca",
+				CommonName: "/some-ca-name",
+			}
+			ch.GenerateCertificate("/example-certificate", certificate, Converge)
+
+			urlPath := dummy.Request.URL.Path
+			Expect(urlPath).To(Equal("/api/v1/data"))
+			Expect(dummy.Request.Method).To(Equal(http.MethodPost))
+
+			var requestBody map[string]interface{}
+			body, _ := ioutil.ReadAll(dummy.Request.Body)
+			json.Unmarshal(body, &requestBody)
+
+			Expect(requestBody["name"]).To(Equal("/example-certificate"))
+			Expect(requestBody["type"]).To(Equal("certificate"))
+			Expect(requestBody["mode"]).To(Equal("converge"))
+			Expect(requestBody["parameters"].(map[string]interface{})["ca"]).To(Equal("some-ca"))
+		})
+
+		It("errors out  when converge mode is requested and server version is less than 1.6.0", func() {
+			dummy := &DummyAuth{Response: &http.Response{
+				Body: ioutil.NopCloser(bytes.NewBufferString("")),
+			}}
+
+			ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
+
+			certificate := generate.Certificate{
+				Ca:         "some-ca",
+				CommonName: "/some-ca-name",
+			}
+			_, err := ch.GenerateCertificate("/example-certificate", certificate, Converge)
+
+			Expect(err.Error()).To(Equal("Interaction Mode 'converge' not supported on target server (version: <1.2.3>)"))
+		})
+
 		Context("when successful", func() {
 			It("returns the generated certificate", func() {
 				dummy := &DummyAuth{Response: &http.Response{
