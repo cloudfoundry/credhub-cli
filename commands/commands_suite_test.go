@@ -69,6 +69,7 @@ var (
 	homeDir     string
 	server      *Server
 	authServer  *Server
+	credhubEnv map[string]string
 )
 
 var _ = BeforeEach(func() {
@@ -107,11 +108,12 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	return []byte(executable_path)
 }, func(data []byte) {
 	commandPath = string(data)
-	test_util.CleanEnv()
+	credhubEnv = test_util.UnsetAndCacheCredHubEnvVars()
 })
 
 var _ = SynchronizedAfterSuite(func() {}, func() {
 	CleanupBuildArtifacts()
+	test_util.RestoreEnv(credhubEnv)
 })
 
 func login() {
