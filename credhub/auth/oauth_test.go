@@ -220,6 +220,29 @@ var _ = Describe("OAuthStrategy", func() {
 					Expect(err).To(MatchError("failed to refresh"))
 				})
 			})
+
+			Context("when refreshing token fails because token is expired", func() {
+				It("returns an error prompting user to log in", func() {
+					mockUaaClient.Error = errors.New("invalid_token")
+					apiServer := fixedResponseServer(573, []byte(`{"error": "access_token_expired"}`))
+					defer apiServer.Close()
+
+					oauth := auth.OAuthStrategy{
+						OAuthClient:  mockUaaClient,
+						ApiClient:    http.DefaultClient,
+						ClientId:     "client-id",
+						ClientSecret: "client-secret",
+						Username:     "user-name",
+						Password:     "user-password",
+					}
+					oauth.SetTokens("some-access-token", "some-refresh-token")
+					request, _ := http.NewRequest("GET", apiServer.URL, nil)
+
+					_, err := oauth.Do(request)
+
+					Expect(err).To(MatchError("You are not currently authenticated. Please log in to continue."))
+				})
+			})
 		})
 
 		Context("when cloning the request fails", func() {

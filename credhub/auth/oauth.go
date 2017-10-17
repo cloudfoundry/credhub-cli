@@ -2,6 +2,7 @@ package auth
 
 import (
 	"bytes"
+	"strings"
 	"encoding/json"
 	"errors"
 	"io/ioutil"
@@ -90,6 +91,9 @@ func (a *OAuthStrategy) Refresh() error {
 	}
 
 	if err != nil {
+		if strings.Contains(err.Error(), "invalid_token") {
+			return errors.New("You are not currently authenticated. Please log in to continue.")
+		}
 		return err
 	}
 
