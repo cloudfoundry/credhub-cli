@@ -14,12 +14,18 @@ import (
 
 var _ = Describe("Config", func() {
 	var cfg config.Config
+	var cachedConfig config.Config
 
 	BeforeEach(func() {
+		cachedConfig = config.ReadConfig()
 		cfg = config.Config{
 			ApiURL:  "http://api.example.com",
 			AuthURL: "http://auth.example.com",
 		}
+	})
+
+	AfterEach(func() {
+		config.WriteConfig(cachedConfig)
 	})
 
 	It("set appropriate permissions for persisted files", func() {
