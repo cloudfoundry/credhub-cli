@@ -100,7 +100,7 @@ version_created_at: '2017-01-05T01:01:01Z'`
 			Expect(cred.Id).To(Equal("some-id"))
 			Expect(cred.Name).To(Equal("/example-user"))
 			Expect(cred.Type).To(Equal("user"))
-			Expect(*cred.Value.Username).To(Equal("some-username"))
+			Expect(cred.Value.Username).To(Equal("some-username"))
 			Expect(cred.Value.Password).To(Equal("some-password"))
 			Expect(cred.Value.PasswordHash).To(Equal("some-password-hash"))
 			Expect(cred.VersionCreatedAt).To(Equal("2017-01-05T01:01:01Z"))

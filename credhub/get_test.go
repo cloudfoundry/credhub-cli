@@ -578,7 +578,7 @@ var _ = Describe("Get", func() {
 				Expect(cred.Value.PasswordHash).To(Equal("some-hash"))
 				username := "some-username"
 				Expect(cred.Value.User).To(Equal(values.User{
-					Username: &username,
+					Username: username,
 					Password: "some-password",
 				}))
 			})

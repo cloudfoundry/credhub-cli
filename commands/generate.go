@@ -84,9 +84,6 @@ func (cmd GenerateCommand) Execute([]string) error {
 		}
 	}
 
-	if len(cmd.Username) > 0 {
-	}
-
 	credhubClient, err := initializeCredhubClient(cfg)
 	if err != nil {
 		return err

@@ -8,15 +8,15 @@ type JSON map[string]interface{}
 type Password string
 
 type User struct {
-	Username *string `json:"username,omitempty"`
+	Username string `json:"username"`
 	Password string `json:"password"`
 }
 
 type Certificate struct {
-	Ca          string `json:"ca,omitempty"`
+	Ca          string `json:"ca"`
 	CaName      string `json:"ca_name,omitempty" yaml:"ca_name,omitempty"`
-	Certificate string `json:"certificate,omitempty"`
-	PrivateKey  string `json:"private_key,omitempty" yaml:"private_key,omitempty"`
+	Certificate string `json:"certificate"`
+	PrivateKey  string `json:"private_key" yaml:"private_key"`
 }
 
 type RSA struct {

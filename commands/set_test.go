@@ -543,7 +543,7 @@ var _ = Describe("Set", func() {
 		})
 
 		It("should set null username when it isn't provided", func() {
-			SetupPutUserWithoutUsernameServer("my-username-credential", `{"password": "test-password"}`, "test-password", "passw0rd-H4$h", true)
+			SetupPutUserWithoutUsernameServer("my-username-credential", `{"username":"","password": "test-password"}`, "test-password", "passw0rd-H4$h", true)
 
 			session := runCommandWithStdin(strings.NewReader("test-password\n"), "set", "-n", "my-username-credential", "-t", "user")
 
@@ -556,7 +556,7 @@ var _ = Describe("Set", func() {
 			Eventually(string(session.Out.Contents())).Should(ContainSubstring("value:"))
 			Eventually(string(session.Out.Contents())).Should(ContainSubstring("password: test-password"))
 			Eventually(string(session.Out.Contents())).Should(ContainSubstring("password_hash: passw0rd-H4$h"))
-			Eventually(string(session.Out.Contents())).Should(ContainSubstring("username: null"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring(`username: ""`))
 		})
 
 		It("puts a secret using explicit user type in json format", func() {

@@ -127,9 +127,9 @@ func (cmd SetCommand) setCredential(credhubClient *credhub.CredHub) (interface{}
 		}
 		return credhubClient.SetRSA(cmd.CredentialIdentifier, value, mode)
 	case "user":
-		value := values.User{Password: cmd.Password}
-		if cmd.Username != "" {
-			value.Username = &cmd.Username
+		value := values.User{
+			Password: cmd.Password,
+			Username: cmd.Username,
 		}
 		return credhubClient.SetUser(cmd.CredentialIdentifier, value, mode)
 	case "json":

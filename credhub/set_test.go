@@ -193,7 +193,7 @@ var _ = Describe("Set", func() {
 			}}
 
 			ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
-			user := values.User{Username: &username, Password: "some-password"}
+			user := values.User{Username: username, Password: "some-password"}
 
 			ch.SetUser("/example-user", user, NoOverwrite)
 
@@ -235,14 +235,14 @@ var _ = Describe("Set", func() {
 
 				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
 
-				user := values.User{Username: &user, Password: "some-password"}
+				user := values.User{Username: user, Password: "some-password"}
 				cred, _ := ch.SetUser("/example-user", user, NoOverwrite)
 
 				Expect(cred.Name).To(Equal("/example-user"))
 				Expect(cred.Type).To(Equal("user"))
 				alternateUsername := "FQnwWoxgSrDuqDLmeLpU"
 				Expect(cred.Value.User).To(Equal(values.User{
-					Username: &alternateUsername,
+					Username: alternateUsername,
 					Password: "6mRPZB3bAfb8lRpacnXsHfDhlPqFcjH2h9YDvLpL",
 				}))
 
@@ -255,7 +255,7 @@ var _ = Describe("Set", func() {
 			It("returns an error", func() {
 				dummy := &DummyAuth{Error: errors.New("Network error occurred")}
 				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
-				user := values.User{Username: &user, Password: "some-password"}
+				user := values.User{Username: user, Password: "some-password"}
 				_, err := ch.SetUser("/example-user", user, NoOverwrite)
 				Expect(err).To(HaveOccurred())
 			})
@@ -268,7 +268,7 @@ var _ = Describe("Set", func() {
 				}}
 				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
 
-				user := values.User{Username: &user, Password: "some-password"}
+				user := values.User{Username: user, Password: "some-password"}
 				_, err := ch.SetUser("/example-user", user, NoOverwrite)
 				Expect(err).To(HaveOccurred())
 			})
