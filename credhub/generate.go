@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"fmt"
+
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials"
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials/generate"
-	version "github.com/hashicorp/go-version"
-	"fmt"
+	"github.com/hashicorp/go-version"
 )
 
 // GeneratePassword generates a password credential based on the provided parameters.
@@ -54,26 +55,25 @@ func (ch *CredHub) GenerateCredential(name, credType string, gen interface{}, ov
 
 func (ch *CredHub) generateCredential(name, credType string, gen interface{}, overwrite Mode, cred interface{}) error {
 	isOverwrite := overwrite == Overwrite
-	
+
 	requestBody := map[string]interface{}{}
 	requestBody["name"] = name
 	requestBody["type"] = credType
 	requestBody["parameters"] = gen
-	if ch.cachedServerVersion != "" {
-		serverVersion, err := ch.ServerVersion()
-		if err != nil {
-			return err
-		}
 
-		constraints, err := version.NewConstraint("< 1.6.0")
-		if constraints.Check(serverVersion) {
-			if overwrite == Converge {
-				return fmt.Errorf("Interaction Mode 'converge' not supported on target server (version: <%s>)", serverVersion.String())
-			}
-			requestBody["overwrite"] = isOverwrite
-		} else {
-			requestBody["mode"] = overwrite
+	serverVersion, err := ch.ServerVersion()
+	if err != nil {
+		return err
+	}
+
+	constraints, err := version.NewConstraint("< 1.6.0")
+	if constraints.Check(serverVersion) {
+		if overwrite == Converge {
+			return fmt.Errorf("Interaction Mode 'converge' not supported on target server (version: <%s>)", serverVersion.String())
 		}
+		requestBody["overwrite"] = isOverwrite
+	} else {
+		requestBody["mode"] = overwrite
 	}
 
 	if user, ok := gen.(generate.User); ok {

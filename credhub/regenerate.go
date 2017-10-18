@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials"
-	version "github.com/hashicorp/go-version"
+	"github.com/hashicorp/go-version"
 )
 
 // Regenerate generates and returns a new credential version using the same parameters existing credential. The returned credential may be of any type.
