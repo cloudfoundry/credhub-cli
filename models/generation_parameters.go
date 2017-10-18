@@ -1,12 +1,5 @@
 package models
 
-type GenerateRequest struct {
-	Name           string                `json:"name"`
-	CredentialType string                `json:"type"`
-	Overwrite      *bool                 `json:"overwrite"`
-	Parameters     *GenerationParameters `json:"parameters"`
-}
-
 type GenerationParameters struct {
 	IncludeSpecial   bool     `json:"include_special,omitempty"`
 	ExcludeNumber    bool     `json:"exclude_number,omitempty"`

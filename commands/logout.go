@@ -26,7 +26,7 @@ func RevokeTokenIfNecessary(cfg config.Config) {
 		Client: client.NewHttpClient(cfg),
 	}
 
-	err = uaaClient.RevokeToken(cfg.AccessToken)
+	uaaClient.RevokeToken(cfg.AccessToken)
 }
 
 func MarkTokensAsRevokedInConfig(cfg *config.Config) {

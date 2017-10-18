@@ -17,7 +17,7 @@ func init() {
 
 			authObject := credhubClient.Auth
 			oauth := authObject.(*auth.OAuthStrategy)
-			err = oauth.Refresh()
+			err := oauth.Refresh()
 
 			if err != nil {
 				fmt.Println("Bearer " + cfg.AccessToken)

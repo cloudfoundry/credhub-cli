@@ -17,19 +17,15 @@ type ImportCommand struct {
 	File string `short:"f" long:"file" description:"File containing credentials to import" required:"true"`
 }
 
-var (
-	err        error
-	bulkImport models.CredentialBulkImport
-)
-
 func (cmd ImportCommand) Execute([]string) error {
-	err = bulkImport.ReadFile(cmd.File)
+	var bulkImport models.CredentialBulkImport
+	err := bulkImport.ReadFile(cmd.File)
 
 	if err != nil {
 		return err
 	}
 
-	err := setCredentials(bulkImport)
+	err = setCredentials(bulkImport)
 
 	return err
 }
