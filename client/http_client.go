@@ -15,12 +15,6 @@ import (
 
 const TIMEOUT_SECS = 45
 
-//go:generate counterfeiter . HttpClient
-
-type HttpClient interface {
-	Do(req *http.Request) (resp *http.Response, err error)
-}
-
 func NewHttpClient(cfg config.Config) *http.Client {
 	parsedUrl, _ := url.Parse(cfg.ApiURL)
 	if parsedUrl.Scheme == "https" {
