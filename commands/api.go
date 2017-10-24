@@ -63,7 +63,7 @@ func (cmd ApiCommand) Execute([]string) error {
 
 		err = verifyAuthServerConnection(cfg, cmd.SkipTlsValidation)
 		if err != nil {
-			return errors.NewNetworkError(err)
+			return errors.NewAuthServerNetworkError(err)
 		}
 
 		err = PrintWarnings(serverUrl, cmd.SkipTlsValidation)

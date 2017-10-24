@@ -9,6 +9,10 @@ func NewNetworkError(e error) error {
 	return errors.New(fmt.Sprintf("Error connecting to the targeted API: %#v. Please validate your target and retry your request.", e.Error()))
 }
 
+func NewAuthServerNetworkError(e error) error {
+	return errors.New(fmt.Sprintf("Error connecting to the auth server: %#v. Please validate your target and retry your request.", e.Error()))
+}
+
 func NewCatchAllError() error {
 	return errors.New("The targeted API was unable to perform the request. Please validate and retry your request.")
 }
@@ -24,7 +28,6 @@ func NewFileLoadError() error {
 func NewMissingGetParametersError() error {
 	return errors.New("A name or ID must be provided. Please update and retry your request.")
 }
-
 
 func NewAuthorizationError() error {
 	return errors.New("The provided username and password combination are incorrect. Please validate your input and retry your request.")
