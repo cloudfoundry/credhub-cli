@@ -10,7 +10,7 @@ type GetCommand struct {
 	Name             string `short:"n" long:"name" description:"Name of the credential to retrieve"`
 	Id               string `long:"id" description:"ID of the credential to retrieve"`
 	NumberOfVersions int    `long:"versions" description:"Number of versions of the credential to retrieve"`
-	OutputJson       bool   `long:"output-json" description:"Return response in JSON format"`
+	OutputJson       bool   `short:"j" long:"output-json" description:"Return response in JSON format"`
 }
 
 func (cmd GetCommand) Execute([]string) error {

@@ -4,7 +4,7 @@ import "github.com/cloudfoundry-incubator/credhub-cli/config"
 
 type RegenerateCommand struct {
 	CredentialIdentifier string `required:"yes" short:"n" long:"name" description:"Selects the credential to regenerate"`
-	OutputJson           bool   `long:"output-json" description:"Return response in JSON format"`
+	OutputJson           bool   `short:"j" long:"output-json" description:"Return response in JSON format"`
 }
 
 func (cmd RegenerateCommand) Execute([]string) error {

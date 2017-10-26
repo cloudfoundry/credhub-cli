@@ -14,7 +14,7 @@ type GenerateCommand struct {
 	CredentialIdentifier string   `short:"n" required:"yes" long:"name" description:"Name of the credential to generate"`
 	CredentialType       string   `short:"t" long:"type" description:"Sets the credential type to generate. Valid types include 'password', 'user', 'certificate', 'ssh' and 'rsa'."`
 	NoOverwrite          bool     `short:"O" long:"no-overwrite" description:"Credential is not modified if stored value already exists"`
-	OutputJson           bool     `long:"output-json" description:"Return response in JSON format"`
+	OutputJson           bool     `short:"j" long:"output-json" description:"Return response in JSON format"`
 	Username             string   `short:"z" long:"username" description:"Sets the username value of the credential"`
 	Length               int      `short:"l" long:"length" description:"[Password, User] Length of the generated value (Default: 30)"`
 	IncludeSpecial       bool     `short:"S" long:"include-special" description:"[Password, User] Include special characters in the generated value"`

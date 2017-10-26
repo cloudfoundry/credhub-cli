@@ -29,7 +29,7 @@ type SetCommand struct {
 	Public               string `short:"u" long:"public" description:"[SSH, RSA] Sets the public key from file or value"`
 	Username             string `short:"z" long:"username" description:"[User] Sets the username value of the credential"`
 	Password             string `short:"w" long:"password" description:"[Password, User] Sets the password value of the credential"`
-	OutputJson           bool   `          long:"output-json" description:"Return response in JSON format"`
+	OutputJson           bool   `short:"j" long:"output-json" description:"Return response in JSON format"`
 }
 
 func (cmd SetCommand) Execute([]string) error {
