@@ -55,6 +55,20 @@ var _ = Describe("Regenerate", func() {
 			Eventually(session).Should(Exit(0))
 			Expect(string(session.Out.Contents())).To(MatchJSON(fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_JSON, "password", "my-password-stuffs", "nu-potatoes")))
 		})
+
+		It("prints error when server returns an error", func() {
+			server.RouteToHandler("POST", "/api/v1/regenerate",
+				CombineHandlers(
+					VerifyJSON(REGENERATE_CREDENTIAL_REQUEST_JSON),
+					RespondWith(http.StatusBadRequest, `{"error":"The password could not be regenerated because the value was statically set. Only generated passwords may be regenerated."}`),
+				),
+			)
+
+			session := runCommand("regenerate", "--name", "my-password-stuffs")
+
+			Eventually(session).Should(Exit(1))
+			Expect(string(session.Err.Contents())).To(ContainSubstring("The password could not be regenerated because the value was statically set. Only generated passwords may be regenerated."))
+		})
 	})
 
 	Describe("help", func() {

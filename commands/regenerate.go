@@ -17,6 +17,10 @@ func (cmd RegenerateCommand) Execute([]string) error {
 
 	credential, err := credhub.Regenerate(cmd.CredentialIdentifier)
 
+	if err != nil {
+		return err
+	}
+
 	printCredential(cmd.OutputJson, credential)
 
 	return nil
