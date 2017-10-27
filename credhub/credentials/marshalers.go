@@ -34,11 +34,6 @@ func (c Credential) convertToMap() (map[string]interface{}, error) {
 		if !ok {
 			return nil, errors.NewCatchAllError()
 		}
-		for k, v := range value {
-			if v == nil {
-				value[k] = ""
-			}
-		}
 		result["value"] = value
 	}
 	return result, nil

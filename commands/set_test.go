@@ -573,7 +573,7 @@ var _ = Describe("Set", func() {
 			Eventually(string(session.Out.Contents())).Should(ContainSubstring("value:"))
 			Eventually(string(session.Out.Contents())).Should(ContainSubstring("password: test-password"))
 			Eventually(string(session.Out.Contents())).Should(ContainSubstring("password_hash: passw0rd-H4$h"))
-			Eventually(string(session.Out.Contents())).Should(ContainSubstring(`username: ""`))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring(`username: null`))
 		})
 
 		It("puts a secret using explicit user type in json format", func() {
