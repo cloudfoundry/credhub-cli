@@ -2,6 +2,6 @@
 package permissions
 
 type Permission struct {
-	Actor      string
-	Operations []string
+	Actor      string   `json:"actor"`
+	Operations []string `json:"operations"`
 }
