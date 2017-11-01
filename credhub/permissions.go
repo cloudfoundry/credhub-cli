@@ -3,12 +3,36 @@ package credhub
 import (
 	"net/http"
 
+	"net/url"
+
+	"encoding/json"
+
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/permissions"
 )
 
+type permissionsResponse struct {
+	CredentialName string                   `json:"credential_name"`
+	Permissions    []permissions.Permission `json:"permissions"`
+}
+
 // GetPermissions returns the permissions of a credential.
 func (ch *CredHub) GetPermissions(credName string) ([]permissions.Permission, error) {
-	panic("Not implemented")
+	query := url.Values{}
+	query.Set("credential_name", credName)
+
+	resp, err := ch.Request(http.MethodGet, "/api/v1/permissions", query, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+	var response permissionsResponse
+
+	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
+		return nil, err
+	}
+
+	return response.Permissions, nil
 }
 
 // AddPermissions adds permissions to a credential.
