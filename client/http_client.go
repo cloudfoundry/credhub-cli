@@ -49,6 +49,7 @@ func newHttpsClient(cfg config.Config) *http.Client {
 
 	tr := &http.Transport{
 		TLSClientConfig: tlsConfig,
+		Proxy: http.ProxyFromEnvironment,
 	}
 
 	client := &http.Client{

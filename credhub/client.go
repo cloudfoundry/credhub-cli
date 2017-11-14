@@ -45,6 +45,7 @@ func httpsClient(insecureSkipVerify bool, rootCAs *x509.CertPool, cert *tls.Cert
 			Certificates:             certs,
 			RootCAs:                  rootCAs,
 		},
+		Proxy: http.ProxyFromEnvironment,
 	}
 
 	return client
