@@ -654,7 +654,7 @@ var _ = Describe("Set", func() {
 
 func SetupPutRsaServer(name, keyType, publicKey, privateKey string, overwrite credhub.Mode) {
 	var jsonRequest string
-	jsonRequest = fmt.Sprintf(RSA_SSH_CREDENTIAL_REQUEST_JSON, keyType, name, publicKey, privateKey, overwrite)
+	jsonRequest = fmt.Sprintf(RSA_SSH_CREDENTIAL_REQUEST_JSON, keyType, name, publicKey, privateKey, overwrite == credhub.Overwrite)
 	server.AppendHandlers(
 		CombineHandlers(
 			VerifyRequest("PUT", "/api/v1/data"),
@@ -666,7 +666,7 @@ func SetupPutRsaServer(name, keyType, publicKey, privateKey string, overwrite cr
 
 func SetupPutSshServer(name, keyType, publicKey, privateKey string, overwrite credhub.Mode) {
 	var jsonRequest string
-	jsonRequest = fmt.Sprintf(RSA_SSH_CREDENTIAL_REQUEST_JSON, keyType, name, publicKey, privateKey, overwrite)
+	jsonRequest = fmt.Sprintf(RSA_SSH_CREDENTIAL_REQUEST_JSON, keyType, name, publicKey, privateKey, overwrite == credhub.Overwrite)
 	server.AppendHandlers(
 		CombineHandlers(
 			VerifyRequest("PUT", "/api/v1/data"),
@@ -682,7 +682,7 @@ func SetupPutValueServer(name, credentialType, value string) {
 
 func SetupOverwritePutValueServer(name, credentialType, value string, overwrite credhub.Mode) {
 	var jsonRequest string
-	jsonRequest = fmt.Sprintf(STRING_CREDENTIAL_OVERWRITE_REQUEST_JSON, credentialType, name, value, overwrite)
+	jsonRequest = fmt.Sprintf(STRING_CREDENTIAL_OVERWRITE_REQUEST_JSON, credentialType, name, value, overwrite == credhub.Overwrite)
 	server.AppendHandlers(
 		CombineHandlers(
 			VerifyRequest("PUT", "/api/v1/data"),
@@ -698,7 +698,7 @@ func setupPutJsonServer(name, value string) {
 
 func setupOverwritePutJsonServer(name, value string, overwrite credhub.Mode) {
 	var jsonRequest string
-	jsonRequest = fmt.Sprintf(JSON_CREDENTIAL_OVERWRITE_REQUEST_JSON, name, overwrite, value)
+	jsonRequest = fmt.Sprintf(JSON_CREDENTIAL_OVERWRITE_REQUEST_JSON, name, overwrite == credhub.Overwrite, value)
 	server.AppendHandlers(
 		CombineHandlers(
 			VerifyRequest("PUT", "/api/v1/data"),
@@ -718,7 +718,7 @@ func SetupPutCertificateWithCaNameServer(name, caName, cert, priv string) {
 
 func SetupOverwritePutCertificateServer(name, ca, cert, priv string, overwrite credhub.Mode) {
 	var jsonRequest string
-	jsonRequest = fmt.Sprintf(CERTIFICATE_CREDENTIAL_REQUEST_JSON, name, ca, cert, priv, overwrite)
+	jsonRequest = fmt.Sprintf(CERTIFICATE_CREDENTIAL_REQUEST_JSON, name, ca, cert, priv, overwrite == credhub.Overwrite)
 	server.AppendHandlers(
 		CombineHandlers(
 			VerifyRequest("PUT", "/api/v1/data"),
@@ -730,7 +730,7 @@ func SetupOverwritePutCertificateServer(name, ca, cert, priv string, overwrite c
 
 func SetupOverwritePutCertificateWithCaNameServer(name, caName, cert, priv string, overwrite credhub.Mode) {
 	var jsonRequest string
-	jsonRequest = fmt.Sprintf(CERTIFICATE_CREDENTIAL_WITH_NAMED_CA_REQUEST_JSON, name, caName, cert, priv, overwrite)
+	jsonRequest = fmt.Sprintf(CERTIFICATE_CREDENTIAL_WITH_NAMED_CA_REQUEST_JSON, name, caName, cert, priv, overwrite == credhub.Overwrite)
 	server.AppendHandlers(
 		CombineHandlers(
 			VerifyRequest("PUT", "/api/v1/data"),
@@ -742,7 +742,7 @@ func SetupOverwritePutCertificateWithCaNameServer(name, caName, cert, priv strin
 
 func SetupPutUserServer(name, value, username, password, passwordHash string, overwrite credhub.Mode) {
 	var jsonRequest string
-	jsonRequest = fmt.Sprintf(USER_SET_CREDENTIAL_REQUEST_JSON, name, value, overwrite)
+	jsonRequest = fmt.Sprintf(USER_SET_CREDENTIAL_REQUEST_JSON, name, value, overwrite == credhub.Overwrite)
 	server.AppendHandlers(
 		CombineHandlers(
 			VerifyRequest("PUT", "/api/v1/data"),
@@ -754,7 +754,7 @@ func SetupPutUserServer(name, value, username, password, passwordHash string, ov
 
 func SetupPutUserWithoutUsernameServer(name, value, password, passwordHash string, overwrite credhub.Mode) {
 	var jsonRequest string
-	jsonRequest = fmt.Sprintf(USER_SET_CREDENTIAL_REQUEST_JSON, name, value, overwrite)
+	jsonRequest = fmt.Sprintf(USER_SET_CREDENTIAL_REQUEST_JSON, name, value, overwrite == credhub.Overwrite)
 	server.AppendHandlers(
 		CombineHandlers(
 			VerifyRequest("PUT", "/api/v1/data"),

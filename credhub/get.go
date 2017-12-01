@@ -9,7 +9,6 @@ import (
 	"strconv"
 
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials"
-	version "github.com/hashicorp/go-version"
 )
 
 // GetById returns a credential version by ID. The returned credential will be encoded as a map and may be of any type.
@@ -101,18 +100,7 @@ func (ch *CredHub) GetLatestSSH(name string) (credentials.SSH, error) {
 func (ch *CredHub) getCurrentCredential(name string, cred interface{}) error {
 	query := url.Values{}
 
-	serverVersion, err := ch.ServerVersion()
-	if err != nil {
-		return err
-	}
-
-	constraints, _ := version.NewConstraint("< 1.4.0")
-	if constraints.Check(serverVersion) {
-		query.Set("current", "true")
-	} else {
-		query.Set("versions", "1")
-	}
-
+	query.Set("current", "true")
 	query.Set("name", name)
 
 	return ch.makeCredentialGetRequest(query, cred)

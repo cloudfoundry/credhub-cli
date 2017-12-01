@@ -4,11 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"fmt"
-
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials"
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials/generate"
-	"github.com/hashicorp/go-version"
 )
 
 // GeneratePassword generates a password credential based on the provided parameters.
@@ -61,19 +58,10 @@ func (ch *CredHub) generateCredential(name, credType string, gen interface{}, ov
 	requestBody["type"] = credType
 	requestBody["parameters"] = gen
 
-	serverVersion, err := ch.ServerVersion()
-	if err != nil {
-		return err
-	}
-
-	constraints, err := version.NewConstraint("< 1.6.0")
-	if constraints.Check(serverVersion) {
-		if overwrite == Converge {
-			return fmt.Errorf("Interaction Mode 'converge' not supported on target server (version: <%s>)", serverVersion.String())
-		}
-		requestBody["overwrite"] = isOverwrite
-	} else {
+	if overwrite == Converge {
 		requestBody["mode"] = overwrite
+	} else {
+		requestBody["overwrite"] = isOverwrite
 	}
 
 	if user, ok := gen.(generate.User); ok {

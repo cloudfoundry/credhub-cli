@@ -4,11 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"fmt"
-
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials"
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials/values"
-	"github.com/hashicorp/go-version"
 )
 
 // SetValue sets a value credential with a user-provided value.
@@ -67,7 +64,7 @@ func (ch *CredHub) SetSSH(name string, value values.SSH, overwrite Mode) (creden
 	return cred, err
 }
 
-// SetCredential sets a credential of any type with a user-provided value. 
+// SetCredential sets a credential of any type with a user-provided value.
 func (ch *CredHub) SetCredential(name, credType string, value interface{}, overwrite Mode) (credentials.Credential, error) {
 	var cred credentials.Credential
 	err := ch.setCredential(name, credType, value, overwrite, &cred)
@@ -75,27 +72,18 @@ func (ch *CredHub) SetCredential(name, credType string, value interface{}, overw
 	return cred, err
 }
 
-func (ch *CredHub) setCredential(name, credType string, value interface{}, overwrite Mode, cred interface{}) error {
-	isOverwrite := overwrite == Overwrite
+func (ch *CredHub) setCredential(name, credType string, value interface{}, mode Mode, cred interface{}) error {
+	isOverwrite := mode == Overwrite
 
 	requestBody := map[string]interface{}{}
 	requestBody["name"] = name
 	requestBody["type"] = credType
 	requestBody["value"] = value
 
-	serverVersion, err := ch.ServerVersion()
-	if err != nil {
-		return err
-	}
-
-	constraints, err := version.NewConstraint("< 1.6.0")
-	if constraints.Check(serverVersion) {
-		if overwrite == Converge {
-			return fmt.Errorf("Interaction Mode 'converge' not supported on target server (version: <%s>)", serverVersion.String())
-		}
-		requestBody["overwrite"] = isOverwrite
+	if mode == Converge {
+		requestBody["mode"] = Converge
 	} else {
-		requestBody["mode"] = overwrite
+		requestBody["overwrite"] = isOverwrite
 	}
 	resp, err := ch.Request(http.MethodPut, "/api/v1/data", nil, requestBody)
 

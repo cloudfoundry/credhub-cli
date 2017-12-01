@@ -46,7 +46,7 @@ var _ = Describe("Set", func() {
 			Expect(requestBody["value"].(map[string]interface{})["ca_name"]).To(Equal("/some-ca-name"))
 		})
 
-		It("requests to set the certificate with the correct overwrite mode if server version isn't less than 1.6.0", func() {
+		It("requests to set the certificate with the correct overwrite mode", func() {
 			dummy := &DummyAuth{Response: &http.Response{
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
@@ -73,22 +73,6 @@ var _ = Describe("Set", func() {
 
 			Expect(requestBody["value"].(map[string]interface{})["ca"]).To(Equal("some-ca"))
 			Expect(requestBody["value"].(map[string]interface{})["ca_name"]).To(Equal("/some-ca-name"))
-		})
-
-		It("errors out  when converge mode is requested and server version is less than 1.6.0", func() {
-			dummy := &DummyAuth{Response: &http.Response{
-				Body: ioutil.NopCloser(bytes.NewBufferString("")),
-			}}
-
-			ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
-
-			certificate := values.Certificate{
-				Ca:     "some-ca",
-				CaName: "/some-ca-name",
-			}
-			_, err := ch.SetCertificate("/example-certificate", certificate, Converge)
-
-			Expect(err.Error()).To(Equal("Interaction Mode 'converge' not supported on target server (version: <1.2.3>)"))
 		})
 
 		Context("when successful", func() {

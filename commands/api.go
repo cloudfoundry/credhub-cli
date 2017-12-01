@@ -57,7 +57,6 @@ func (cmd ApiCommand) Execute([]string) error {
 
 		cfg.ApiURL = serverUrl
 		cfg.AuthURL = credhubInfo.AuthServer.URL
-		cfg.ServerVersion = credhubInfo.App.Version
 		cfg.InsecureSkipVerify = cmd.SkipTlsValidation
 		cfg.CaCerts = caCerts
 

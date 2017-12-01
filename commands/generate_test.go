@@ -8,12 +8,12 @@ import (
 	"fmt"
 
 	"github.com/cloudfoundry-incubator/credhub-cli/commands"
+	"github.com/cloudfoundry-incubator/credhub-cli/credhub"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
 	. "github.com/onsi/gomega/ghttp"
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub"
 )
 
 var _ = Describe("Generate", func() {
@@ -617,13 +617,13 @@ func setupCertificatePostServer(name, ca, certificate, privateKey, requestJson s
 }
 
 func generateRequestJson(credentialType, name, params string, overwrite credhub.Mode) string {
-	return fmt.Sprintf(GENERATE_CREDENTIAL_REQUEST_JSON, name, credentialType, overwrite, params)
+	return fmt.Sprintf(GENERATE_CREDENTIAL_REQUEST_JSON, name, credentialType, overwrite == credhub.Overwrite, params)
 }
 
 func generateUserRequestJson(name, params, value string, overwrite credhub.Mode) string {
-	return fmt.Sprintf(USER_GENERATE_CREDENTIAL_REQUEST_JSON, name, overwrite, params, value)
+	return fmt.Sprintf(USER_GENERATE_CREDENTIAL_REQUEST_JSON, name, overwrite == credhub.Overwrite, params, value)
 }
 
 func generateDefaultTypeRequestJson(name, params string, overwrite credhub.Mode) string {
-	return fmt.Sprintf(GENERATE_DEFAULT_TYPE_REQUEST_JSON, name, overwrite, params)
+	return fmt.Sprintf(GENERATE_DEFAULT_TYPE_REQUEST_JSON, name, overwrite == credhub.Overwrite, params)
 }

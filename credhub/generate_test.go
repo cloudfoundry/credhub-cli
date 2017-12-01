@@ -69,22 +69,6 @@ var _ = Describe("Generate", func() {
 			Expect(requestBody["parameters"].(map[string]interface{})["ca"]).To(Equal("some-ca"))
 		})
 
-		It("errors out  when converge mode is requested and server version is less than 1.6.0", func() {
-			dummy := &DummyAuth{Response: &http.Response{
-				Body: ioutil.NopCloser(bytes.NewBufferString("")),
-			}}
-
-			ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
-
-			certificate := generate.Certificate{
-				Ca:         "some-ca",
-				CommonName: "/some-ca-name",
-			}
-			_, err := ch.GenerateCertificate("/example-certificate", certificate, Converge)
-
-			Expect(err.Error()).To(Equal("Interaction Mode 'converge' not supported on target server (version: <1.2.3>)"))
-		})
-
 		Context("when successful", func() {
 			It("returns the generated certificate", func() {
 				dummy := &DummyAuth{Response: &http.Response{

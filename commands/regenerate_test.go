@@ -13,7 +13,7 @@ import (
 	. "github.com/onsi/gomega/ghttp"
 )
 
-const REGENERATE_CREDENTIAL_REQUEST_JSON = `{"name":"my-password-stuffs"}`
+const REGENERATE_CREDENTIAL_REQUEST_JSON = `{"name":"my-password-stuffs", "regenerate":true}`
 
 var _ = Describe("Regenerate", func() {
 	BeforeEach(func() {
@@ -22,11 +22,11 @@ var _ = Describe("Regenerate", func() {
 
 	ItRequiresAuthentication("regenerate", "-n", "test-credential")
 	ItRequiresAnAPIToBeSet("regenerate", "-n", "test-credential")
-	ItAutomaticallyLogsIn("POST", "regenerate_response.json", "/api/v1/regenerate", "regenerate", "-n", "test-credential")
+	ItAutomaticallyLogsIn("POST", "regenerate_response.json", "/api/v1/data", "regenerate", "-n", "test-credential")
 
 	Describe("Regenerating password", func() {
 		It("prints the regenerated password secret in yaml format", func() {
-			server.RouteToHandler("POST", "/api/v1/regenerate",
+			server.RouteToHandler("POST", "/api/v1/data",
 				CombineHandlers(
 					VerifyJSON(REGENERATE_CREDENTIAL_REQUEST_JSON),
 					RespondWith(http.StatusOK, fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_JSON, "password", "my-password-stuffs", "nu-potatoes")),
@@ -43,7 +43,7 @@ var _ = Describe("Regenerate", func() {
 		})
 
 		It("prints the regenerated password secret in json format", func() {
-			server.RouteToHandler("POST", "/api/v1/regenerate",
+			server.RouteToHandler("POST", "/api/v1/data",
 				CombineHandlers(
 					VerifyJSON(REGENERATE_CREDENTIAL_REQUEST_JSON),
 					RespondWith(http.StatusOK, fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_JSON, "password", "my-password-stuffs", "nu-potatoes")),
@@ -57,7 +57,7 @@ var _ = Describe("Regenerate", func() {
 		})
 
 		It("prints error when server returns an error", func() {
-			server.RouteToHandler("POST", "/api/v1/regenerate",
+			server.RouteToHandler("POST", "/api/v1/data",
 				CombineHandlers(
 					VerifyJSON(REGENERATE_CREDENTIAL_REQUEST_JSON),
 					RespondWith(http.StatusBadRequest, `{"error":"The password could not be regenerated because the value was statically set. Only generated passwords may be regenerated."}`),

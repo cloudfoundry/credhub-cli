@@ -3,12 +3,12 @@ package commands_test
 import (
 	"net/http"
 
+	"github.com/cloudfoundry-incubator/credhub-cli/credhub"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
 	. "github.com/onsi/gomega/ghttp"
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub"
 )
 
 var _ = Describe("Import", func() {
@@ -183,7 +183,7 @@ Failed to set: 0
 
 	Describe("when importing file with no name specified", func() {
 		It("passes through the server error", func() {
-			jsonBody := `{"name":"","type":"password","value":"test-password","mode": "overwrite"}`
+			jsonBody := `{"name":"","type":"password","value":"test-password","overwrite":true}`
 			SetupPutBadRequestServer(jsonBody)
 
 			session := runCommand("import", "-f", "../test/test_import_missing_name.yml")
@@ -206,8 +206,8 @@ Failed to set: 0
 		It("should display error message", func() {
 			error := "The request does not include a valid type. Valid values include 'value', 'json', 'password', 'user', 'certificate', 'ssh' and 'rsa'."
 
-			request := `{"type":"invalid_type","name":"/test/invalid_type","value":"some string","mode": "overwrite"}`
-			request1 := `{"type":"invalid_type","name":"/test/invalid_type1","value":"some string","mode": "overwrite"}`
+			request := `{"type":"invalid_type","name":"/test/invalid_type","value":"some string","overwrite":true}`
+			request1 := `{"type":"invalid_type","name":"/test/invalid_type1","value":"some string","overwrite":true}`
 			server.AppendHandlers(
 				CombineHandlers(
 					VerifyRequest("PUT", "/api/v1/data"),
