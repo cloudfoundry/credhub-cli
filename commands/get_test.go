@@ -49,7 +49,7 @@ var _ = Describe("Get", func() {
 
 		server.RouteToHandler("GET", "/api/v1/data",
 			CombineHandlers(
-				VerifyRequest("GET", "/api/v1/data", "name=my-value&versions=1"),
+				VerifyRequest("GET", "/api/v1/data", "current=true&name=my-value"),
 				RespondWith(http.StatusOK, responseJson),
 			),
 		)
@@ -67,7 +67,7 @@ var _ = Describe("Get", func() {
 
 		server.RouteToHandler("GET", "/api/v1/data",
 			CombineHandlers(
-				VerifyRequest("GET", "/api/v1/data", "name=my-password&versions=1"),
+				VerifyRequest("GET", "/api/v1/data", "current=true&name=my-password"),
 				RespondWith(http.StatusOK, responseJson),
 			),
 		)
@@ -85,7 +85,7 @@ var _ = Describe("Get", func() {
 
 		server.RouteToHandler("GET", "/api/v1/data",
 			CombineHandlers(
-				VerifyRequest("GET", "/api/v1/data", "name=json-secret&versions=1"),
+				VerifyRequest("GET", "/api/v1/data", "current=true&name=json-secret"),
 				RespondWith(http.StatusOK, serverResponse),
 			),
 		)
@@ -109,7 +109,7 @@ var _ = Describe("Get", func() {
 
 		server.RouteToHandler("GET", "/api/v1/data",
 			CombineHandlers(
-				VerifyRequest("GET", "/api/v1/data", "name=my-secret&versions=1"),
+				VerifyRequest("GET", "/api/v1/data", "current=true&name=my-secret"),
 				RespondWith(http.StatusOK, responseJson),
 			),
 		)
@@ -129,7 +129,7 @@ var _ = Describe("Get", func() {
 
 		server.RouteToHandler("GET", "/api/v1/data",
 			CombineHandlers(
-				VerifyRequest("GET", "/api/v1/data", "name=foo-rsa-key&versions=1"),
+				VerifyRequest("GET", "/api/v1/data", "current=true&name=foo-rsa-key"),
 				RespondWith(http.StatusOK, responseJson),
 			),
 		)
@@ -148,7 +148,7 @@ var _ = Describe("Get", func() {
 
 		server.RouteToHandler("GET", "/api/v1/data",
 			CombineHandlers(
-				VerifyRequest("GET", "/api/v1/data", "name=my-password&versions=1"),
+				VerifyRequest("GET", "/api/v1/data", "current=true&name=my-password"),
 				RespondWith(http.StatusOK, responseJson),
 			),
 		)
@@ -170,7 +170,7 @@ var _ = Describe("Get", func() {
 
 		server.RouteToHandler("GET", "/api/v1/data",
 			CombineHandlers(
-				VerifyRequest("GET", "/api/v1/data", "name=my-username-credential&versions=1"),
+				VerifyRequest("GET", "/api/v1/data", "current=true&name=my-username-credential"),
 				RespondWith(http.StatusOK, responseJson),
 			),
 		)
@@ -238,7 +238,7 @@ var _ = Describe("Get", func() {
 
 		server.RouteToHandler("GET", "/api/v1/data",
 			CombineHandlers(
-				VerifyRequest("GET", "/api/v1/data", "name=injected&versions=1"),
+				VerifyRequest("GET", "/api/v1/data", "current=true&name=injected"),
 				RespondWith(http.StatusOK, responseJson),
 			),
 		)
