@@ -27,7 +27,7 @@ var _ = Describe("Login", func() {
 
 		server.RouteToHandler("GET", "/info",
 			RespondWith(http.StatusOK, `{
-				"app":{"version":"9.9.9","name":"CredHub"},
+				"app":{"name":"CredHub"},
 				"auth-server":{"url":"`+authServer.URL()+`"}
 				}`),
 		)
@@ -309,7 +309,7 @@ var _ = Describe("Login", func() {
 			It("sets a default scheme", func() {
 				server := NewTLSServer()
 				server.RouteToHandler("GET", "/info", RespondWith(http.StatusOK, `{
-						"app":{"version":"9.9.9","name":"CredHub"},
+						"app":{"name":"CredHub"},
 						"auth-server":{"url":"`+uaaServer.URL()+`"}
 						}`),
 				)
@@ -619,7 +619,7 @@ func setConfigAuthUrl(authUrl string) {
 func setupServer(theServer *Server, uaaUrl string) {
 	theServer.RouteToHandler("GET", "/info",
 		RespondWith(http.StatusOK, fmt.Sprintf(`{
-					"app":{"version":"0.1.0 build DEV","name":"CredHub"},
+					"app":{"name":"CredHub"},
 					"auth-server":{"url":"%s"}
 					}`, uaaUrl)),
 	)

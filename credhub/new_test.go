@@ -28,7 +28,7 @@ var _ = Describe("New()", func() {
 				apiHit = true
 				w.Write([]byte(`{
 					"auth-server": {"url": "https://uaa.example.com:8443"},
-					"app": {"name": "CredHub", "version": "0.7.0"}
+					"app": {"name": "CredHub"}
 				}`))
 			}))
 
@@ -121,10 +121,16 @@ var _ = Describe("New()", func() {
 
 			credHubServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 				apiHit = true
-				w.Write([]byte(`{
-					"auth-server": {"url": "https://uaa.example.com:8443"},
-					"app": {"name": "CredHub", "version": "4.4.4"}
-				}`))
+				if req.URL.Path == "/info" {
+					w.Write([]byte(`{
+						"auth-server": {"url": "https://uaa.example.com:8443"},
+						"app": {"name": "CredHub"}
+					}`))
+				} else if req.URL.Path == "/version" {
+					w.Write([]byte(`{
+						"version": "4.4.4"
+					}`))
+				}
 			}))
 
 			defer credHubServer.Close()

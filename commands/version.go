@@ -22,9 +22,9 @@ func PrintVersion() error {
 		_, err := credhubClient.FindAllPaths()
 
 		if err == nil {
-			credhubInfo, err := GetApiInfo(cfg.ApiURL, cfg.CaCerts, cfg.InsecureSkipVerify)
+			version, err := credhubClient.ServerVersion()
 			if err == nil {
-				credHubServerVersion = credhubInfo.App.Version
+				credHubServerVersion = version.String()
 			}
 		}
 	}

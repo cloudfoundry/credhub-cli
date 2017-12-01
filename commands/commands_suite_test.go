@@ -69,7 +69,7 @@ var (
 	homeDir     string
 	server      *Server
 	authServer  *Server
-	credhubEnv map[string]string
+	credhubEnv  map[string]string
 )
 
 var _ = BeforeEach(func() {
@@ -131,13 +131,23 @@ func login() {
 
 	server.RouteToHandler("GET", "/info",
 		RespondWith(http.StatusOK, `{
-				"app":{"version":"9.9.9","name":"CredHub"}
+				"app":{"name":"CredHub"}
 				}`),
+	)
+
+	server.RouteToHandler("GET", "/version",
+		RespondWith(http.StatusOK, `{"version":"9.9.9"}`),
 	)
 
 	runCommand("login", "-u", "test-username", "-p", "test-password")
 
 	authServer.Reset()
+}
+
+func resetCachedServerVersion() {
+	cfg := config.ReadConfig()
+	cfg.ServerVersion = ""
+	config.WriteConfig(cfg)
 }
 
 func runCommand(args ...string) *Session {
@@ -196,9 +206,13 @@ func NewTlsServer(certPath, keyPath string) *Server {
 func SetupServers(chServer, uaaServer *Server) {
 	chServer.RouteToHandler("GET", "/info",
 		RespondWith(http.StatusOK, `{
-				"app":{"version":"9.9.9","name":"CredHub"},
+				"app":{"name":"CredHub"},
 				"auth-server":{"url":"`+uaaServer.URL()+`"}
 				}`),
+	)
+
+	chServer.RouteToHandler("GET", "/version",
+		RespondWith(http.StatusOK, `{"version":"9.9.9"}`),
 	)
 
 	uaaServer.RouteToHandler("GET", "/info", RespondWith(http.StatusOK, ""))

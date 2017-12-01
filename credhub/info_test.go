@@ -21,8 +21,7 @@ var _ = Describe("Info", func() {
 								"url": "https://uaa.example.com:8443"
 							},
 							"app": {
-								"name": "CredHub",
-								"version": "0.7.0"
+								"name": "CredHub"
 							}
 						}`,
 					))
@@ -37,7 +36,6 @@ var _ = Describe("Info", func() {
 			Expect(err).To(BeNil())
 
 			Expect(info.App.Name).To(Equal("CredHub"))
-			Expect(info.App.Version).To(Equal("0.7.0"))
 			Expect(info.AuthServer.URL).To(Equal("https://uaa.example.com:8443"))
 		})
 

@@ -19,7 +19,7 @@ var _ = Describe("API", func() {
 	BeforeEach(func() {
 		server.RouteToHandler("GET", "/info",
 			RespondWith(http.StatusOK, `{
-					"app":{"version":"9.9.9","name":"CredHub"},
+					"app":{"name":"CredHub"},
 					"auth-server":{"url":"`+authServer.URL()+`"}
 					}`),
 		)
@@ -60,7 +60,7 @@ var _ = Describe("API", func() {
 
 			apiServer := NewServer()
 			apiServer.RouteToHandler("GET", "/info", RespondWith(http.StatusOK, `{
-						"app":{"version":"0.1.0 build DEV","name":"CredHub"},
+						"app":{"name":"CredHub"},
 						"auth-server":{"url":"`+newAuthServer.URL()+`"}
 						}`),
 			)
@@ -87,7 +87,7 @@ var _ = Describe("API", func() {
 			apiServer := NewServer()
 			apiServer.RouteToHandler("GET", "/info",
 				RespondWith(http.StatusOK, `{
-						"app":{"version":"9.9.9","name":"CredHub"},
+						"app":{"name":"CredHub"},
 						"auth-server":{"url":"`+authServer.URL()+`"}
 						}`),
 			)
@@ -141,7 +141,7 @@ var _ = Describe("API", func() {
 				apiServer := NewTLSServer()
 
 				apiServer.RouteToHandler("GET", "/info", RespondWith(http.StatusOK, `{
-						"app":{"version":"9.9.9","name":"CredHub"},
+						"app":{"name":"CredHub"},
 						"auth-server":{"url":"`+authServer.URL()+`"}
 						}`),
 				)
@@ -433,7 +433,7 @@ var _ = Describe("API", func() {
 
 				httpServer.RouteToHandler("GET", "/info",
 					RespondWith(http.StatusOK, `{
-						"app":{"version":"9.9.9","name":"CredHub"},
+						"app":{"name":"CredHub"},
 						"auth-server":{"url":"https://example.com"}
 						}`),
 				)
@@ -469,7 +469,7 @@ func setUpServer(aServer *Server) string {
 
 	aServer.RouteToHandler("GET", "/info",
 		RespondWith(http.StatusOK, `{
-					"app":{"version":"0.1.0 build DEV","name":"CredHub"},
+					"app":{"name":"CredHub"},
 					"auth-server":{"url":"https://example.com"}
 					}`),
 	)

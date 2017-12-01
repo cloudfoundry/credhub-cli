@@ -14,13 +14,14 @@ var _ = Describe("Version", func() {
 	Context("when the user is authenticated", func() {
 		BeforeEach(func() {
 			login()
+			resetCachedServerVersion()
 
 			server.RouteToHandler("GET", "/api/v1/data",
 				RespondWith(http.StatusOK, `{"data": []}`),
 			)
 		})
 
-		Context("when the request succeeds", func() {
+		Context("when the info endpoint returns the server version", func() {
 			BeforeEach(func() {
 				responseJson := `{"app":{"name":"CredHub","version":"0.2.0"}}`
 
@@ -36,6 +37,30 @@ var _ = Describe("Version", func() {
 				sout := string(session.Out.Contents())
 				testVersion(sout)
 				Expect(sout).To(ContainSubstring("Server Version: 0.2.0"))
+			})
+		})
+
+		Context("when the info endpoint does not return the server version", func() {
+			BeforeEach(func() {
+				infoResponseJson := `{"app":{"name":"CredHub"}}`
+				versionResponseJson := `{"version":"1.2.3"}`
+
+				server.RouteToHandler("GET", "/info",
+					RespondWith(http.StatusOK, infoResponseJson),
+				)
+
+				server.RouteToHandler("GET", "/version",
+					RespondWith(http.StatusOK, versionResponseJson),
+				)
+			})
+
+			It("displays the version with --version", func() {
+				session := runCommand("--version")
+
+				Eventually(session).Should(Exit(0))
+				sout := string(session.Out.Contents())
+				testVersion(sout)
+				Expect(sout).To(ContainSubstring("Server Version: 1.2.3"))
 			})
 		})
 

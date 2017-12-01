@@ -106,7 +106,7 @@ func (ch *CredHub) getCurrentCredential(name string, cred interface{}) error {
 		return err
 	}
 
-	constraints, err := version.NewConstraint("< 1.4.0")
+	constraints, _ := version.NewConstraint("< 1.4.0")
 	if constraints.Check(serverVersion) {
 		query.Set("current", "true")
 	} else {

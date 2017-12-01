@@ -10,3 +10,7 @@ type Info struct {
 		URL string
 	} `json:"auth-server"`
 }
+
+type VersionData struct {
+	Version string
+}
