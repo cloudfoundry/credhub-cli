@@ -35,7 +35,7 @@ var _ = Describe("ServerVersion()", func() {
 			)
 		})
 
-		It("should obtain the server version from the /version endpoint for the first request", func() {
+		It("should obtain the server version from the /info endpoint", func() {
 			expectedVersion, err := version.NewVersion("1.2.3")
 			Expect(err).To(BeNil())
 
@@ -45,12 +45,6 @@ var _ = Describe("ServerVersion()", func() {
 			serverVersion, err := ch.ServerVersion()
 			Expect(err).To(BeNil())
 			Expect(serverVersion).To(Equal(expectedVersion))
-
-			serverVersion, err = ch.ServerVersion()
-			Expect(err).To(BeNil())
-			Expect(serverVersion).To(Equal(expectedVersion))
-
-			Expect(server.ReceivedRequests()).Should(HaveLen(1))
 		})
 	})
 
@@ -75,7 +69,7 @@ var _ = Describe("ServerVersion()", func() {
 			)
 		})
 
-		It("should obtain the server version from the /version endpoint for the first request", func() {
+		It("should obtain the server version from the /version endpoint", func() {
 			expectedVersion, err := version.NewVersion("1.2.3")
 			Expect(err).To(BeNil())
 
@@ -85,12 +79,6 @@ var _ = Describe("ServerVersion()", func() {
 			serverVersion, err := ch.ServerVersion()
 			Expect(err).To(BeNil())
 			Expect(serverVersion).To(Equal(expectedVersion))
-
-			serverVersion, err = ch.ServerVersion()
-			Expect(err).To(BeNil())
-			Expect(serverVersion).To(Equal(expectedVersion))
-
-			Expect(server.ReceivedRequests()).Should(HaveLen(2))
 		})
 	})
 

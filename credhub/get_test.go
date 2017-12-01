@@ -19,34 +19,17 @@ import (
 var _ = Describe("Get", func() {
 
 	Describe("GetLatestVersion()", func() {
-		Context("when the Credhub server version is 1.4.0 or newer", func() {
-			It("requests the credential by name using the 'versions' query parameter", func() {
-				dummyAuth := &DummyAuth{Response: &http.Response{
-					Body: ioutil.NopCloser(bytes.NewBufferString("")),
-				}}
+		It("requests the credential by name using the 'current' query parameter", func() {
+			dummyAuth := &DummyAuth{Response: &http.Response{
+				Body: ioutil.NopCloser(bytes.NewBufferString("")),
+			}}
 
-				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()), ServerVersion("4.4.4"))
+			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()), ServerVersion("1.1.1"))
 
-				ch.GetLatestVersion("/example-password")
-				url := dummyAuth.Request.URL.String()
-				Expect(url).To(Equal("https://example.com/api/v1/data?name=%2Fexample-password&versions=1"))
-				Expect(dummyAuth.Request.Method).To(Equal(http.MethodGet))
-			})
-		})
-
-		Context("when the Credhub server version is older than 1.4.0", func() {
-			It("requests the credential by name using the 'versions' query parameter", func() {
-				dummyAuth := &DummyAuth{Response: &http.Response{
-					Body: ioutil.NopCloser(bytes.NewBufferString("")),
-				}}
-
-				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()), ServerVersion("1.1.1"))
-
-				ch.GetLatestVersion("/example-password")
-				url := dummyAuth.Request.URL.String()
-				Expect(url).To(Equal("https://example.com/api/v1/data?current=true&name=%2Fexample-password"))
-				Expect(dummyAuth.Request.Method).To(Equal(http.MethodGet))
-			})
+			ch.GetLatestVersion("/example-password")
+			url := dummyAuth.Request.URL.String()
+			Expect(url).To(Equal("https://example.com/api/v1/data?current=true&name=%2Fexample-password"))
+			Expect(dummyAuth.Request.Method).To(Equal(http.MethodGet))
 		})
 
 		Context("when successful", func() {
@@ -435,7 +418,7 @@ var _ = Describe("Get", func() {
 			url := dummyAuth.Request.URL
 			Expect(url.String()).To(ContainSubstring("https://example.com/api/v1/data"))
 			Expect(url.String()).To(ContainSubstring("name=%2Fexample-password"))
-			Expect(url.String()).To(ContainSubstring("versions=1"))
+			Expect(url.String()).To(ContainSubstring("current=true"))
 			Expect(dummyAuth.Request.Method).To(Equal(http.MethodGet))
 		})
 
@@ -486,7 +469,7 @@ var _ = Describe("Get", func() {
 			url := dummyAuth.Request.URL
 			Expect(url.String()).To(ContainSubstring("https://example.com/api/v1/data"))
 			Expect(url.String()).To(ContainSubstring("name=%2Fexample-certificate"))
-			Expect(url.String()).To(ContainSubstring("versions=1"))
+			Expect(url.String()).To(ContainSubstring("current=true"))
 
 			Expect(dummyAuth.Request.Method).To(Equal(http.MethodGet))
 		})
@@ -545,7 +528,7 @@ var _ = Describe("Get", func() {
 			url := dummyAuth.Request.URL
 			Expect(url.String()).To(ContainSubstring("https://example.com/api/v1/data"))
 			Expect(url.String()).To(ContainSubstring("name=%2Fexample-user"))
-			Expect(url.String()).To(ContainSubstring("versions=1"))
+			Expect(url.String()).To(ContainSubstring("current=true"))
 
 			Expect(dummyAuth.Request.Method).To(Equal(http.MethodGet))
 		})
@@ -608,7 +591,7 @@ var _ = Describe("Get", func() {
 			url := dummyAuth.Request.URL
 			Expect(url.String()).To(ContainSubstring("https://example.com/api/v1/data"))
 			Expect(url.String()).To(ContainSubstring("name=%2Fexample-rsa"))
-			Expect(url.String()).To(ContainSubstring("versions=1"))
+			Expect(url.String()).To(ContainSubstring("current=true"))
 
 			Expect(dummyAuth.Request.Method).To(Equal(http.MethodGet))
 		})
@@ -669,7 +652,7 @@ var _ = Describe("Get", func() {
 			url := dummyAuth.Request.URL
 			Expect(url.String()).To(ContainSubstring("https://example.com/api/v1/data"))
 			Expect(url.String()).To(ContainSubstring("name=%2Fexample-ssh"))
-			Expect(url.String()).To(ContainSubstring("versions=1"))
+			Expect(url.String()).To(ContainSubstring("current=true"))
 
 			Expect(dummyAuth.Request.Method).To(Equal(http.MethodGet))
 		})
@@ -732,7 +715,7 @@ var _ = Describe("Get", func() {
 			url := dummyAuth.Request.URL
 			Expect(url.String()).To(ContainSubstring("https://example.com/api/v1/data"))
 			Expect(url.String()).To(ContainSubstring("name=%2Fexample-json"))
-			Expect(url.String()).To(ContainSubstring("versions=1"))
+			Expect(url.String()).To(ContainSubstring("current=true"))
 
 			Expect(dummyAuth.Request.Method).To(Equal(http.MethodGet))
 		})
@@ -807,7 +790,7 @@ var _ = Describe("Get", func() {
 			url := dummyAuth.Request.URL
 			Expect(url.String()).To(ContainSubstring("https://example.com/api/v1/data"))
 			Expect(url.String()).To(ContainSubstring("name=%2Fexample-value"))
-			Expect(url.String()).To(ContainSubstring("versions=1"))
+			Expect(url.String()).To(ContainSubstring("current=true"))
 
 			Expect(dummyAuth.Request.Method).To(Equal(http.MethodGet))
 		})

@@ -7,7 +7,6 @@ import (
 
 	. "github.com/cloudfoundry-incubator/credhub-cli/credhub"
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/auth"
-	version "github.com/hashicorp/go-version"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -105,47 +104,5 @@ var _ = Describe("New()", func() {
 
 		_, err := New("https://example.com", CaCerts(caCerts...), ServerVersion("2.2.2"))
 		Expect(err).To(HaveOccurred())
-	})
-
-	Context("With ServerVersion option provided", func() {
-		It("stores that server version in the client", func() {
-			ch, _ := New("https://example.com", ServerVersion("2.2.2"))
-
-			Expect(ch.ServerVersion()).To(Equal(version.Must(version.NewVersion("2.2.2"))))
-		})
-	})
-
-	Context("Without ServerVersion option provided", func() {
-		It("fetches the server version from the Credhub server", func() {
-			var apiHit bool
-
-			credHubServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-				apiHit = true
-				if req.URL.Path == "/info" {
-					w.Write([]byte(`{
-						"auth-server": {"url": "https://uaa.example.com:8443"},
-						"app": {"name": "CredHub"}
-					}`))
-				} else if req.URL.Path == "/version" {
-					w.Write([]byte(`{
-						"version": "4.4.4"
-					}`))
-				}
-			}))
-
-			defer credHubServer.Close()
-
-			var authConfig auth.Config
-
-			authBuilder := func(config auth.Config) (auth.Strategy, error) {
-				authConfig = config
-				return http.DefaultClient, nil
-			}
-
-			ch, err := New(credHubServer.URL, AuthURL("https://some-auth-url.com"), Auth(authBuilder))
-			Expect(err).ToNot(HaveOccurred())
-
-			Expect(ch.ServerVersion()).To(Equal(version.Must(version.NewVersion("4.4.4"))))
-		})
 	})
 })
