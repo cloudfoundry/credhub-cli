@@ -71,10 +71,3 @@ func ClientCert(certificate, key string) Option {
 		return nil
 	}
 }
-
-// ServerVersion will set the version of server API to use (e.g. "1.2.3")
-func ServerVersion(serverVersion string) Option {
-	return func(c *CredHub) error {
-		return nil
-	}
-}

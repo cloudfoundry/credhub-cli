@@ -20,7 +20,7 @@ var _ = Describe("Interpolate", func() {
 					StatusCode: http.StatusOK,
 					Body:       ioutil.NopCloser(bytes.NewBufferString("{}")),
 				}}
-				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
+				ch, _ := New("https://example.com", Auth(dummy.Builder()))
 
 				payloadWithoutRefs := `{"my-server":[{"credentials":{"dont-need-no-credhub-refs-here":""}}]}`
 				returnedValue, err := ch.InterpolateString(payloadWithoutRefs)
@@ -38,7 +38,7 @@ var _ = Describe("Interpolate", func() {
 					Body: ioutil.NopCloser(bytes.NewBufferString("")),
 				}}
 
-				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
+				ch, _ := New("https://example.com", Auth(dummy.Builder()))
 
 				ch.InterpolateString(validPayload)
 
@@ -56,7 +56,7 @@ var _ = Describe("Interpolate", func() {
 						Body:       ioutil.NopCloser(bytes.NewBufferString(interpolatedResponse)),
 					}}
 
-					ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
+					ch, _ := New("https://example.com", Auth(dummy.Builder()))
 
 					interpolatedServices, err := ch.InterpolateString(validPayload)
 					Expect(err).ToNot(HaveOccurred())
@@ -69,7 +69,7 @@ var _ = Describe("Interpolate", func() {
 				It("returns an error", func() {
 					networkError := errors.New("Network error occurred")
 					dummy := &DummyAuth{Error: networkError}
-					ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
+					ch, _ := New("https://example.com", Auth(dummy.Builder()))
 
 					_, err := ch.InterpolateString(validPayload)
 
@@ -83,7 +83,7 @@ var _ = Describe("Interpolate", func() {
 						Body: ioutil.NopCloser(bytes.NewBufferString("")),
 					}}
 
-					ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
+					ch, _ := New("https://example.com", Auth(dummy.Builder()))
 
 					_, err := ch.InterpolateString(`{ "my-server": [{"credentials":{"credhub-ref":"oh no invalid json with"text outside quotes}}]`)
 					Expect(err).To(HaveOccurred())

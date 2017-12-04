@@ -14,7 +14,7 @@ import (
 
 var _ = Describe("New()", func() {
 	It("sets Auth to some default value", func() {
-		ch, err := New("http://example.com", ServerVersion("2.2.2"))
+		ch, err := New("http://example.com")
 		Expect(err).ToNot(HaveOccurred())
 		Expect(ch.Auth).ToNot(BeNil())
 	})
@@ -40,7 +40,7 @@ var _ = Describe("New()", func() {
 				return http.DefaultClient, nil
 			}
 
-			ch, err := New(credHubServer.URL, AuthURL("https://some-auth-url.com"), Auth(authBuilder), ServerVersion("2.2.2"))
+			ch, err := New(credHubServer.URL, AuthURL("https://some-auth-url.com"), Auth(authBuilder))
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(apiHit).To(BeFalse())
@@ -54,7 +54,7 @@ var _ = Describe("New()", func() {
 
 		Context("when the url is invalid", func() {
 			It("returns an error", func() {
-				ch, err := New("http://example.com", AuthURL("://some-auth-url.com"), ServerVersion("2.2.2"))
+				ch, err := New("http://example.com", AuthURL("://some-auth-url.com"))
 				Expect(ch).To(BeNil())
 				Expect(err).To(HaveOccurred())
 			})
@@ -67,7 +67,7 @@ var _ = Describe("New()", func() {
 				return &DummyAuth{Config: config}, nil
 			}
 
-			ch, err := New("http://example.com", Auth(dummyBuilder), ServerVersion("2.2.2"))
+			ch, err := New("http://example.com", Auth(dummyBuilder))
 			Expect(err).ToNot(HaveOccurred())
 
 			da, ok := ch.Auth.(*DummyAuth)
@@ -102,7 +102,7 @@ var _ = Describe("New()", func() {
 		}
 		caCerts = append(caCerts, "invalid certificate")
 
-		_, err := New("https://example.com", CaCerts(caCerts...), ServerVersion("2.2.2"))
+		_, err := New("https://example.com", CaCerts(caCerts...))
 		Expect(err).To(HaveOccurred())
 	})
 })

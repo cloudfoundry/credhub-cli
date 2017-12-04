@@ -21,7 +21,7 @@ var _ = Describe("Request()", func() {
 
 	BeforeEach(func() {
 		mockAuth = &DummyAuth{}
-		ch, _ = New("http://example.com/", Auth(mockAuth.Builder()), ServerVersion("1.2.3"))
+		ch, _ = New("http://example.com/", Auth(mockAuth.Builder()))
 	})
 
 	It("should send the requested using the provided auth to the ApiURL", func() {
@@ -65,7 +65,7 @@ var _ = Describe("Request()", func() {
 				Body:       ioutil.NopCloser(bytes.NewBufferString(`{"error" : "error occurred" }`)),
 			}}
 
-			ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
+			ch, _ := New("https://example.com", Auth(dummy.Builder()))
 
 			_, err = ch.Request("GET", "/example-password", nil, nil)
 

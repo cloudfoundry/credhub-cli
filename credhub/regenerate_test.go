@@ -19,7 +19,7 @@ var _ = Describe("Regenerate", func() {
 			Body: ioutil.NopCloser(bytes.NewBufferString("")),
 		}}
 
-		ch, _ := New("https://example.com", Auth(dummyAuth.Builder()), ServerVersion("1.3.0"))
+		ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
 
 		ch.Regenerate("/example-password")
 		url := dummyAuth.Request.URL.String()
@@ -48,7 +48,7 @@ var _ = Describe("Regenerate", func() {
 				Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
 			}}
 
-			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()), ServerVersion("4.4.4"))
+			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
 
 			cred, err := ch.Regenerate("/example-password")
 			Expect(err).To(BeNil())
@@ -66,7 +66,7 @@ var _ = Describe("Regenerate", func() {
 				Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
 			}}
 
-			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()), ServerVersion("4.4.4"))
+			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
 			_, err := ch.Regenerate("/example-password")
 
 			Expect(err).To(HaveOccurred())

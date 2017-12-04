@@ -28,7 +28,7 @@ var _ = Describe("Permissions", func() {
 				Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
 			}}
 
-			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()), ServerVersion("1.2.3"))
+			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
 			actualPermissions, err := ch.GetPermissions("/example-password")
 			Expect(err).NotTo(HaveOccurred())
 
@@ -52,7 +52,7 @@ var _ = Describe("Permissions", func() {
 				Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
 			}}
 
-			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()), ServerVersion("1.2.3"))
+			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
 			actualPermissions, err := ch.GetPermissions("/example-password")
 			Expect(err).NotTo(HaveOccurred())
 
@@ -67,7 +67,7 @@ var _ = Describe("Permissions", func() {
 					StatusCode: http.StatusCreated,
 					Body:       ioutil.NopCloser(bytes.NewBufferString("")),
 				}}
-				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
+				ch, _ := New("https://example.com", Auth(dummy.Builder()))
 
 				_, err := ch.AddPermissions("/example-password", []permissions.Permission{
 					{
@@ -103,7 +103,7 @@ var _ = Describe("Permissions", func() {
 					StatusCode: http.StatusNotFound,
 					Body:       ioutil.NopCloser(bytes.NewBufferString(`{"error":"The request could not be completed because the credential does not exist or you do not have sufficient authorization."}`)),
 				}}
-				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
+				ch, _ := New("https://example.com", Auth(dummy.Builder()))
 
 				_, err := ch.AddPermissions("/example-password", []permissions.Permission{
 					{

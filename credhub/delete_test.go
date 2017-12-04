@@ -19,7 +19,7 @@ var _ = Describe("Delete", func() {
 			Body:       ioutil.NopCloser(bytes.NewBufferString("")),
 		}}
 
-		ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
+		ch, _ := New("https://example.com", Auth(dummy.Builder()))
 		ch.Delete("/example-password")
 
 		url := dummy.Request.URL.String()
@@ -35,7 +35,7 @@ var _ = Describe("Delete", func() {
 				Body:       ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
 
-			ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
+			ch, _ := New("https://example.com", Auth(dummy.Builder()))
 			err := ch.Delete("/example-password")
 			Expect(err).ToNot(HaveOccurred())
 		})
@@ -48,7 +48,7 @@ var _ = Describe("Delete", func() {
 				Body:       ioutil.NopCloser(bytes.NewBufferString(`{"error":"The request could not be completed because the credential does not exist or you do not have sufficient authorization."}`)),
 			}}
 
-			ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
+			ch, _ := New("https://example.com", Auth(dummy.Builder()))
 			err := ch.Delete("/example-password")
 			Expect(err).To(MatchError("The request could not be completed because the credential does not exist or you do not have sufficient authorization."))
 		})

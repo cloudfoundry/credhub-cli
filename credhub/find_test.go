@@ -20,7 +20,7 @@ var _ = Describe("Find", func() {
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
 
-			ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
+			ch, _ := New("https://example.com", Auth(dummy.Builder()))
 
 			ch.FindByPath("/some/example/path")
 			url := dummy.Request.URL
@@ -47,7 +47,7 @@ var _ = Describe("Find", func() {
 					Body:       ioutil.NopCloser(bytes.NewBufferString(expectedResponse)),
 				}}
 
-				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
+				ch, _ := New("https://example.com", Auth(dummy.Builder()))
 
 				creds, err := ch.FindByPath("/some/example/path")
 
@@ -64,7 +64,7 @@ var _ = Describe("Find", func() {
 			It("returns an error", func() {
 				dummy := &DummyAuth{Error: errors.New("Network error occurred")}
 
-				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
+				ch, _ := New("https://example.com", Auth(dummy.Builder()))
 
 				_, err := ch.FindByPath("/some/example/path")
 
@@ -80,7 +80,7 @@ var _ = Describe("Find", func() {
 					Body:       ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
 				}}
 
-				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
+				ch, _ := New("https://example.com", Auth(dummy.Builder()))
 
 				_, err := ch.FindByPath("/some/example/path")
 				Expect(err).To(HaveOccurred())
@@ -94,7 +94,7 @@ var _ = Describe("Find", func() {
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
 
-			ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
+			ch, _ := New("https://example.com", Auth(dummy.Builder()))
 
 			ch.FindByPartialName("/some/example/name")
 			url := dummy.Request.URL
@@ -121,7 +121,7 @@ var _ = Describe("Find", func() {
 					Body:       ioutil.NopCloser(bytes.NewBufferString(expectedResponse)),
 				}}
 
-				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
+				ch, _ := New("https://example.com", Auth(dummy.Builder()))
 
 				creds, err := ch.FindByPartialName("example-cred")
 
@@ -138,7 +138,7 @@ var _ = Describe("Find", func() {
 			It("returns an error", func() {
 				dummy := &DummyAuth{Error: errors.New("Network error occurred")}
 
-				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
+				ch, _ := New("https://example.com", Auth(dummy.Builder()))
 
 				_, err := ch.FindByPartialName("/some/example/path")
 
@@ -154,7 +154,7 @@ var _ = Describe("Find", func() {
 					Body:       ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
 				}}
 
-				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
+				ch, _ := New("https://example.com", Auth(dummy.Builder()))
 
 				_, err := ch.FindByPartialName("/some/example/path")
 				Expect(err).To(HaveOccurred())
@@ -168,7 +168,7 @@ var _ = Describe("Find", func() {
 				Body: ioutil.NopCloser(bytes.NewBufferString("")),
 			}}
 
-			ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
+			ch, _ := New("https://example.com", Auth(dummy.Builder()))
 
 			ch.FindAllPaths()
 			url := dummy.Request.URL
@@ -193,7 +193,7 @@ var _ = Describe("Find", func() {
 					Body:       ioutil.NopCloser(bytes.NewBufferString(expectedResponse)),
 				}}
 
-				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
+				ch, _ := New("https://example.com", Auth(dummy.Builder()))
 
 				creds, err := ch.FindAllPaths()
 
@@ -208,7 +208,7 @@ var _ = Describe("Find", func() {
 			It("returns an error", func() {
 				dummy := &DummyAuth{Error: errors.New("Network error occurred")}
 
-				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
+				ch, _ := New("https://example.com", Auth(dummy.Builder()))
 
 				_, err := ch.FindAllPaths()
 
@@ -224,7 +224,7 @@ var _ = Describe("Find", func() {
 					Body:       ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
 				}}
 
-				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.2.3"))
+				ch, _ := New("https://example.com", Auth(dummy.Builder()))
 
 				_, err := ch.FindAllPaths()
 				Expect(err).To(HaveOccurred())
