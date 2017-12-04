@@ -14,13 +14,14 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
+	"runtime"
 	"testing"
 
 	"golang.org/x/sys/unix"
 )
 
 func TestSysctlUint64(t *testing.T) {
-	_, err := unix.SysctlUint64("security.mac.labeled")
+	_, err := unix.SysctlUint64("vm.swap_total")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -157,6 +158,9 @@ func init() {
 }
 
 func TestCapEnter(t *testing.T) {
+	if runtime.GOARCH != "amd64" {
+		t.Skipf("skipping test on %s", runtime.GOARCH)
+	}
 	ExitsCorrectly(t, "cap_enter")
 }
 
@@ -253,6 +257,9 @@ func init() {
 }
 
 func TestOpenat(t *testing.T) {
+	if runtime.GOARCH != "amd64" {
+		t.Skipf("skipping test on %s", runtime.GOARCH)
+	}
 	ExitsCorrectly(t, "openat")
 }
 
@@ -287,4 +294,14 @@ func TestCapRightsSetAndClear(t *testing.T) {
 	if !b {
 		t.Fatalf("Wrong rights set")
 	}
+}
+
+func TestUname(t *testing.T) {
+	var utsname unix.Utsname
+	err := unix.Uname(&utsname)
+	if err != nil {
+		t.Fatalf("Uname: %v", err)
+	}
+
+	t.Logf("OS: %s/%s %s", utsname.Sysname[:], utsname.Machine[:], utsname.Release[:])
 }
