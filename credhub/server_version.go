@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/server"
-	version "github.com/hashicorp/go-version"
+	"github.com/hashicorp/go-version"
 )
 
 func (ch *CredHub) ServerVersion() (*version.Version, error) {
@@ -23,7 +23,7 @@ func (ch *CredHub) ServerVersion() (*version.Version, error) {
 }
 
 func (ch *CredHub) getVersion() (string, error) {
-	response, err := ch.request(ch.Client(), "GET", "/version", nil, nil)
+	response, err := ch.Request("GET", "/version", nil, nil)
 	if err != nil {
 		return "", err
 	}
