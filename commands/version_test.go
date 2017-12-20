@@ -119,7 +119,24 @@ var _ = Describe("Version", func() {
 			config.WriteConfig(cfg)
 		})
 
-		It("returns the CLI version but not the server version", func() {
+		It("returns the CLI version and the server version", func() {
+			session := runCommand("--version")
+
+			Eventually(session).Should(Exit(0))
+			sout := string(session.Out.Contents())
+			testVersion(sout)
+			Expect(sout).To(ContainSubstring("Server Version: 0.2.0"))
+		})
+	})
+
+	Context("when no server is targeted", func() {
+		BeforeEach(func() {
+			cfg := config.ReadConfig()
+			cfg.ApiURL = ""
+			config.WriteConfig(cfg)
+		})
+
+		It("returns the CLI version and no server version", func() {
 			session := runCommand("--version")
 
 			Eventually(session).Should(Exit(0))
