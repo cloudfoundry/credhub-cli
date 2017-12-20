@@ -119,13 +119,13 @@ var _ = Describe("Version", func() {
 			config.WriteConfig(cfg)
 		})
 
-		It("returns the CLI version but not the server version", func() {
+		It("returns the CLI version and the server version", func() {
 			session := runCommand("--version")
 
 			Eventually(session).Should(Exit(0))
 			sout := string(session.Out.Contents())
 			testVersion(sout)
-			Expect(sout).To(ContainSubstring("Server Version: Not Found. Have you targeted and authenticated against a CredHub server?"))
+			Expect(sout).To(ContainSubstring("Server Version: 0.2.0"))
 		})
 	})
 
