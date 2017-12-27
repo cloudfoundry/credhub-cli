@@ -40,6 +40,23 @@ var _ = Describe("Version", func() {
 			})
 		})
 
+		Context("when the user has not provided an API URL", func() {
+			BeforeEach(func() {
+				cfg := config.ReadConfig()
+				cfg.ApiURL = ""
+				config.WriteConfig(cfg)
+			})
+
+			It("displays the version with --version", func() {
+				session := runCommand("--version")
+
+				Eventually(session).Should(Exit(0))
+				sout := string(session.Out.Contents())
+				testVersion(sout)
+				Expect(sout).To(ContainSubstring("Server Version: Not Found. Have you targeted and authenticated against a CredHub server?"))
+			})
+		})
+
 		Context("when the info endpoint does not return the server version", func() {
 			BeforeEach(func() {
 				infoResponseJson := `{"app":{"name":"CredHub"}}`
