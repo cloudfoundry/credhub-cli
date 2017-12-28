@@ -2,6 +2,12 @@
 
 
 [[projects]]
+  branch = "master"
+  name = "github.com/armon/go-socks5"
+  packages = ["."]
+  revision = "e75332964ef517daa070d7c38a9466a0d687e0a5"
+
+[[projects]]
   name = "github.com/fatih/color"
   packages = ["."]
   revision = "570b54cabe6b8eb0bc2dfce68d964677d63b5260"
@@ -64,7 +70,7 @@
 [[projects]]
   branch = "master"
   name = "golang.org/x/net"
-  packages = ["html","html/atom","html/charset"]
+  packages = ["context","html","html/atom","html/charset"]
   revision = "a8b9294777976932365dabb6640cf1468d95c70f"
 
 [[projects]]
@@ -88,6 +94,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "7d9a4562578dbd481242b06f3caf506a2f3586181ac673be6672db8fde6a4af7"
+  inputs-digest = "b8140c5d0ab30efd3d8606e659cacdcfba9fddb69138e0e2b2bc51fe5daa0d37"
   solver-name = "gps-cdcl"
   solver-version = 1
