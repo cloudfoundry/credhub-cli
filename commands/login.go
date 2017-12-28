@@ -3,8 +3,8 @@ package commands
 import (
 	"fmt"
 
-	"github.com/cloudfoundry-incubator/credhub-cli/client"
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
+	"github.com/cloudfoundry-incubator/credhub-cli/credhub"
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/auth/uaa"
 	"github.com/cloudfoundry-incubator/credhub-cli/errors"
 	"github.com/cloudfoundry-incubator/credhub-cli/util"
@@ -63,10 +63,11 @@ func (cmd LoginCommand) Execute([]string) error {
 	if err != nil {
 		return err
 	}
+	credhubClient, err := credhub.New(cfg.ApiURL, credhub.CaCerts(cfg.CaCerts...), credhub.SkipTLSValidation(cfg.InsecureSkipVerify))
 
 	uaaClient := uaa.Client{
 		AuthURL: cfg.AuthURL,
-		Client:  client.NewHttpClient(cfg),
+		Client:  credhubClient.Client(),
 	}
 
 	if cmd.ClientName != "" || cmd.ClientSecret != "" {
@@ -85,7 +86,9 @@ func (cmd LoginCommand) Execute([]string) error {
 
 	cfg.AccessToken = accessToken
 	cfg.RefreshToken = refreshToken
-	config.WriteConfig(cfg)
+	if err := config.WriteConfig(cfg); err != nil {
+		return err
+	}
 
 	if cmd.ServerUrl != "" {
 		PrintWarnings(cmd.ServerUrl, cmd.SkipTlsValidation)

@@ -7,7 +7,6 @@ import (
 
 	"net/http"
 
-	"github.com/cloudfoundry-incubator/credhub-cli/client"
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub"
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/auth"
@@ -62,13 +61,14 @@ func clientCredentialsInEnvironment() bool {
 }
 
 func verifyAuthServerConnection(cfg config.Config, skipTlsValidation bool) error {
-	var err error
-
+	credhubClient, err := credhub.New(cfg.ApiURL, credhub.CaCerts(cfg.CaCerts...), credhub.SkipTLSValidation(skipTlsValidation))
+	if err != nil {
+		return err
+	}
 	if !skipTlsValidation {
 		request, _ := http.NewRequest("GET", cfg.AuthURL+"/info", nil)
 		request.Header.Add("Accept", "application/json")
-		_, err := client.NewHttpClient(cfg).Do(request)
-		return err
+		_, err = credhubClient.Client().Do(request)
 	}
 
 	return err
