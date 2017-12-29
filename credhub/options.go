@@ -38,7 +38,11 @@ func AuthURL(authURL string) Option {
 // connections with the OAuth server.
 func CaCerts(certs ...string) Option {
 	return func(c *CredHub) error {
-		c.caCerts = x509.NewCertPool()
+		sysCerts, err := x509.SystemCertPool()
+		if err != nil {
+			return err
+		}
+		c.caCerts = sysCerts
 
 		for _, cert := range certs {
 			ok := c.caCerts.AppendCertsFromPEM([]byte(cert))

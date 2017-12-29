@@ -62,7 +62,8 @@ var _ = Describe("Client()", func() {
 				"extra-ca.pem",
 			}
 			var caCerts []string
-			expectedRootCAs := x509.NewCertPool()
+			expectedRootCAs, err := x509.SystemCertPool()
+			Expect(err).NotTo(HaveOccurred())
 			for _, caCertFile := range caCertFiles {
 				caCertBytes, err := ioutil.ReadFile(fixturePath + caCertFile)
 				if err != nil {
