@@ -4,6 +4,7 @@ import (
 	"crypto/x509"
 	"io/ioutil"
 	"net/http"
+	"runtime"
 	"time"
 
 	. "github.com/onsi/ginkgo"
@@ -62,8 +63,15 @@ var _ = Describe("Client()", func() {
 				"extra-ca.pem",
 			}
 			var caCerts []string
-			expectedRootCAs, err := x509.SystemCertPool()
-			Expect(err).NotTo(HaveOccurred())
+			var expectedRootCAs *x509.CertPool
+			if runtime.GOOS != "windows" {
+				var err error
+				expectedRootCAs, err = x509.SystemCertPool()
+				Expect(err).NotTo(HaveOccurred())
+			} else {
+				expectedRootCAs = x509.NewCertPool()
+			}
+
 			for _, caCertFile := range caCertFiles {
 				caCertBytes, err := ioutil.ReadFile(fixturePath + caCertFile)
 				if err != nil {
