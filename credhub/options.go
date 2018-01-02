@@ -5,6 +5,7 @@ import (
 	"crypto/x509"
 	"errors"
 	"net/url"
+	"runtime"
 
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/auth"
 )
@@ -38,11 +39,19 @@ func AuthURL(authURL string) Option {
 // connections with the OAuth server.
 func CaCerts(certs ...string) Option {
 	return func(c *CredHub) error {
-		sysCerts, err := x509.SystemCertPool()
-		if err != nil {
-			return err
+		// TODO: remove else block once x509.SystemCertPool is supported on Windows
+		// see: https://github.com/golang/go/issues/16736
+		var pool *x509.CertPool
+		if runtime.GOOS != "windows" {
+			var err error
+			pool, err = x509.SystemCertPool()
+			if err != nil {
+				return err
+			}
+		} else {
+			pool = x509.NewCertPool()
 		}
-		c.caCerts = sysCerts
+		c.caCerts = pool
 
 		for _, cert := range certs {
 			ok := c.caCerts.AppendCertsFromPEM([]byte(cert))
