@@ -162,12 +162,7 @@ func promptForMissingCredentials(cmd *LoginCommand, uaa *uaa.Client) error {
 			if err != nil {
 				return err
 			}
-			// Give default in case server doesn't tell us
-			prompt := "get passcode from https://login.system.example.com/passcode"
-			if len(md.Prompts.Passcode) == 2 {
-				prompt = md.Prompts.Passcode[1]
-			}
-			fmt.Printf("%s : ", prompt)
+			fmt.Printf("%s : ", md.PasscodePrompt())
 			code, err := gopass.GetPasswdMasked()
 			if err != nil {
 				return err

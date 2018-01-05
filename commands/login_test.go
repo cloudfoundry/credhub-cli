@@ -356,7 +356,7 @@ var _ = Describe("Login", func() {
 		Context("prompting for passcode", func() {
 			It("prompts for a passcode", func() {
 				session := runCommandWithStdin(strings.NewReader("passcode\n"), "login", "--sso")
-				Eventually(session.Out).Should(Say("passcode :"))
+				Eventually(session.Out).Should(Say("One Time Code \\( Get one at https://login.system.example.com/passcode \\) :"))
 				Eventually(session.Wait("10s").Out).Should(Say("Login Successful"))
 				Eventually(session).Should(Exit(0))
 				cfg := config.ReadConfig()
@@ -643,7 +643,7 @@ var _ = Describe("Login", func() {
 			It("fails to login", func() {
 				session = runCommand("login", "-u", "user", "-p", "pass")
 				Eventually(session).Should(Exit(1))
-				Eventually(session.Err).Should(Say("The provided username and password combination are incorrect. Please validate your input and retry your request."))
+				Eventually(session.Err).Should(Say("The provided credentials are incorrect. Please validate your input and retry your request."))
 				Expect(badUaaServer.ReceivedRequests()).Should(HaveLen(2))
 			})
 

@@ -30,7 +30,7 @@ func NewMissingGetParametersError() error {
 }
 
 func NewAuthorizationError() error {
-	return errors.New("The provided username and password combination are incorrect. Please validate your input and retry your request.")
+	return errors.New("The provided credentials are incorrect. Please validate your input and retry your request.")
 }
 
 func NewMixedAuthorizationParametersError() error {

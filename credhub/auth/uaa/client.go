@@ -33,9 +33,29 @@ type responseError struct {
 // This fields are not exhaustive and can added to over time.
 // See: https://docs.cloudfoundry.org/api/uaa/version/4.6.0/index.html#server-information
 type Metadata struct {
+	Links struct {
+		Login string `json:"login"`
+	} `json:"links"`
 	Prompts struct {
 		Passcode []string `json:"passcode"`
 	} `json:"prompts"`
+}
+
+// PasscodePrompt returns a prompt to tell the user where to get a passcode from.
+// If not present in the metadata (PCF installation don't seem to return it), will attempt to
+// contruct a plausible URL.
+func (md *Metadata) PasscodePrompt() string {
+	// Give default in case server doesn't tell us
+	if len(md.Prompts.Passcode) == 2 && md.Prompts.Passcode[1] != "" {
+		return md.Prompts.Passcode[1]
+	}
+	var loginURL string
+	if md.Links.Login != "" {
+		loginURL = md.Links.Login
+	} else {
+		loginURL = "https://login.system.example.com"
+	}
+	return fmt.Sprintf("One Time Code ( Get one at %s/passcode )", loginURL)
 }
 
 func (e *responseError) Error() string {
@@ -57,10 +77,7 @@ func (u *Client) Metadata() (*Metadata, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	if response.Body != nil {
-		defer response.Body.Close()
-	}
+	defer response.Body.Close()
 
 	if response.StatusCode != 200 {
 		return nil, errors.New("unable to fetch metadata successfully")

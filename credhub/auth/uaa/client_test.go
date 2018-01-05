@@ -151,7 +151,7 @@ var _ = Describe("Client", func() {
 					"prompts" : {
 					  "username" : [ "text", "Email" ],
 					  "password" : [ "password", "Password" ],
-					  "passcode" : [ "password", "One Time Code ( Get one at http://localhost:8080/uaa/passcode )" ]
+					  "passcode" : [ "password", "One Time Code ( Get one at http://fromprompt:8080/uaa/passcode )" ]
 					},
 					"timestamp" : "2017-09-08T23:11:58+0000"
 				  }`))
@@ -167,7 +167,58 @@ var _ = Describe("Client", func() {
 
 			Expect(err).To(BeNil())
 			Expect(md).NotTo(BeNil())
-			Expect(md.Prompts.Passcode).To(Equal([]string{"password", "One Time Code ( Get one at http://localhost:8080/uaa/passcode )"}))
+			Expect(md.PasscodePrompt()).To(Equal("One Time Code ( Get one at http://fromprompt:8080/uaa/passcode )"))
+		})
+		It("should be OK with no prompt field", func() {
+			uaaServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				Expect(r.Method).To(Equal(http.MethodGet))
+
+				Expect(r.URL.Path).To(Equal("/info"))
+
+				Expect(r.Header.Get("Accept")).To(Equal("application/json"))
+
+				w.Write([]byte(`{
+					"links" : {
+					  "login" : "http://foobar:8080/uaa"
+					}
+				  }`))
+			}))
+			defer uaaServer.Close()
+
+			client := Client{
+				AuthURL: uaaServer.URL,
+				Client:  http.DefaultClient,
+			}
+
+			md, err := client.Metadata()
+
+			Expect(err).To(BeNil())
+			Expect(md).NotTo(BeNil())
+			Expect(md.PasscodePrompt()).To(Equal("One Time Code ( Get one at http://foobar:8080/uaa/passcode )"))
+		})
+		It("should be OK with no prompt field or links", func() {
+			uaaServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				Expect(r.Method).To(Equal(http.MethodGet))
+
+				Expect(r.URL.Path).To(Equal("/info"))
+
+				Expect(r.Header.Get("Accept")).To(Equal("application/json"))
+
+				w.Write([]byte(`{
+				  }`))
+			}))
+			defer uaaServer.Close()
+
+			client := Client{
+				AuthURL: uaaServer.URL,
+				Client:  http.DefaultClient,
+			}
+
+			md, err := client.Metadata()
+
+			Expect(err).To(BeNil())
+			Expect(md).NotTo(BeNil())
+			Expect(md.PasscodePrompt()).To(Equal("One Time Code ( Get one at https://login.system.example.com/passcode )"))
 		})
 	})
 
