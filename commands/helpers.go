@@ -3,18 +3,20 @@ package commands
 import (
 	"encoding/json"
 	"fmt"
-	"os"
-
 	"net/http"
+	"os"
 
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub"
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/auth"
+	"github.com/cloudfoundry-incubator/credhub-cli/errors"
 	"gopkg.in/yaml.v2"
 )
 
 func initializeCredhubClient(cfg config.Config) (*credhub.CredHub, error) {
 	var credhubClient *credhub.CredHub
+
+	readConfigFromEnvironmentVariables(&cfg)
 
 	err := config.ValidateConfig(cfg)
 	if err != nil {
@@ -40,6 +42,32 @@ func printCredential(outputJson bool, v interface{}) {
 		s, _ := yaml.Marshal(v)
 		fmt.Println(string(s))
 	}
+}
+
+func readConfigFromEnvironmentVariables(cfg *config.Config) error {
+	if cfg.CaCerts == nil && os.Getenv("CREDHUB_CA_CERT") != "" {
+		caCerts, err := ReadOrGetCaCerts([]string{os.Getenv("CREDHUB_CA_CERT")})
+		if err != nil {
+			return err
+		}
+
+		cfg.CaCerts = caCerts
+	}
+
+	if cfg.ApiURL == "" && os.Getenv("CREDHUB_SERVER") != "" {
+		cfg.ApiURL = os.Getenv("CREDHUB_SERVER")
+	}
+
+	if cfg.AuthURL == "" {
+		credhubInfo, err := GetApiInfo(cfg.ApiURL, cfg.CaCerts, cfg.InsecureSkipVerify)
+		if err != nil {
+			return errors.NewNetworkError(err)
+		}
+
+		cfg.AuthURL = credhubInfo.AuthServer.URL
+	}
+
+	return config.WriteConfig(*cfg)
 }
 
 func newCredhubClient(cfg *config.Config, clientId string, clientSecret string, usingClientCredentials bool) (*credhub.CredHub, error) {
