@@ -69,5 +69,27 @@ var _ = Describe("Token", func() {
 			sout := string(session.Out.Contents())
 			Expect(sout).To(Equal(""))
 		})
+
+		It("gets a new token if using client creds from environment", func() {
+			uaaServer.RouteToHandler("POST", "/oauth/token",
+				CombineHandlers(
+					VerifyBody([]byte(`client_id=credhub_cli&client_secret=secret&grant_type=client_credentials&response_type=token`)),
+					RespondWith(http.StatusOK, `{
+						"access_token":"2YotnFZFEjr1zCsicMWpAA",
+						"refresh_token":"erousflkajqwer",
+						"token_type":"bearer",
+						"expires_in":3600}`),
+				),
+			)
+
+			setConfigAuthUrl(uaaServer.URL())
+			session := runCommandWithEnv([]string{"CREDHUB_CLIENT=credhub_cli", "CREDHUB_SECRET=secret"}, "--token")
+
+			Expect(uaaServer.ReceivedRequests()).Should(HaveLen(1))
+
+			Eventually(session).Should(Exit(0))
+			sout := string(session.Out.Contents())
+			Expect(sout).To(ContainSubstring("Bearer 2YotnFZFEjr1zCsicMWpAA"))
+		})
 	})
 })

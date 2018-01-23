@@ -12,7 +12,9 @@ func init() {
 	CredHub.Token = func() {
 		cfg := config.ReadConfig()
 
-		if cfg.AccessToken != "" && cfg.AccessToken != "revoked" {
+		if (cfg.AccessToken != "" && cfg.AccessToken != "revoked") ||
+			(os.Getenv("CREDHUB_CLIENT") != "" && os.Getenv("CREDHUB_SECRET") != "") {
+
 			credhubClient, _ := initializeCredhubClient(cfg)
 
 			authObject := credhubClient.Auth
