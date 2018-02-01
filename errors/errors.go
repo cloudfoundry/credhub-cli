@@ -30,11 +30,11 @@ func NewMissingGetParametersError() error {
 }
 
 func NewAuthorizationError() error {
-	return errors.New("The provided username and password combination are incorrect. Please validate your input and retry your request.")
+	return errors.New("The provided credentials are incorrect. Please validate your input and retry your request.")
 }
 
 func NewMixedAuthorizationParametersError() error {
-	return errors.New("Client and password credentials may not be combined. Please update and retry your request with a single login method.")
+	return errors.New("Client, password, SSO and/or SSO passcode credentials may not be combined. Please update and retry your request with a single login method.")
 }
 
 func NewPasswordAuthorizationParametersError() error {

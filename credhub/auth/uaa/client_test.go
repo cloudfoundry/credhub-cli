@@ -84,6 +84,144 @@ var _ = Describe("Client", func() {
 		})
 	})
 
+	Context("PasscodeGrant()", func() {
+		It("should make a passcode grant token request", func() {
+			uaaServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				r.ParseForm()
+
+				Expect(r.Method).To(Equal(http.MethodPost))
+
+				Expect(r.URL.Path).To(Equal("/oauth/token"))
+
+				Expect(r.Header.Get("Accept")).To(Equal("application/json"))
+				Expect(r.Header.Get("Content-Type")).To(Equal("application/x-www-form-urlencoded"))
+
+				Expect(r.PostForm.Get("grant_type")).To(Equal("password"))
+				Expect(r.PostForm.Get("response_type")).To(Equal("token"))
+
+				Expect(r.PostForm.Get("passcode")).To(Equal("passcode"))
+
+				Expect(r.PostForm.Get("client_id")).To(Equal("some-client-id"))
+				Expect(r.PostForm.Get("client_secret")).To(Equal("some-client-secret"))
+
+				w.Write([]byte(`{"access_token": "some-access-token", "refresh_token": "some-refresh-token", "token_type": "bearer"}`))
+			}))
+			defer uaaServer.Close()
+
+			client := Client{
+				AuthURL: uaaServer.URL,
+				Client:  http.DefaultClient,
+			}
+
+			accessToken, refreshToken, err := client.PasscodeGrant("some-client-id", "some-client-secret", "passcode")
+
+			Expect(err).To(BeNil())
+			Expect(accessToken).To(Equal("some-access-token"))
+			Expect(refreshToken).To(Equal("some-refresh-token"))
+		})
+	})
+
+	Context("Metadata()", func() {
+		It("should make a metadata request", func() {
+			uaaServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				Expect(r.Method).To(Equal(http.MethodGet))
+
+				Expect(r.URL.Path).To(Equal("/info"))
+
+				Expect(r.Header.Get("Accept")).To(Equal("application/json"))
+
+				w.Write([]byte(`{
+					"app" : {
+					  "version" : "4.7.0-SNAPSHOT"
+					},
+					"showLoginLinks" : true,
+					"links" : {
+					  "uaa" : "http://localhost:8080/uaa",
+					  "passwd" : "/forgot_password",
+					  "login" : "http://localhost:8080/uaa",
+					  "register" : "/create_account"
+					},
+					"zone_name" : "uaa",
+					"entityID" : "cloudfoundry-saml-login",
+					"commit_id" : "4bba13c",
+					"idpDefinitions" : {
+					  "SAMLMetadataUrl" : "http://localhost:8080/uaa/saml/discovery?returnIDParam=idp&entityID=cloudfoundry-saml-login&idp=SAMLMetadataUrl&isPassive=true",
+					  "SAML" : "http://localhost:8080/uaa/saml/discovery?returnIDParam=idp&entityID=cloudfoundry-saml-login&idp=SAML&isPassive=true"
+					},
+					"prompts" : {
+					  "username" : [ "text", "Email" ],
+					  "password" : [ "password", "Password" ],
+					  "passcode" : [ "password", "One Time Code ( Get one at http://fromprompt:8080/uaa/passcode )" ]
+					},
+					"timestamp" : "2017-09-08T23:11:58+0000"
+				  }`))
+			}))
+			defer uaaServer.Close()
+
+			client := Client{
+				AuthURL: uaaServer.URL,
+				Client:  http.DefaultClient,
+			}
+
+			md, err := client.Metadata()
+
+			Expect(err).To(BeNil())
+			Expect(md).NotTo(BeNil())
+			Expect(md.PasscodePrompt()).To(Equal("One Time Code ( Get one at http://fromprompt:8080/uaa/passcode )"))
+		})
+		It("should be OK with no prompt field", func() {
+			uaaServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				Expect(r.Method).To(Equal(http.MethodGet))
+
+				Expect(r.URL.Path).To(Equal("/info"))
+
+				Expect(r.Header.Get("Accept")).To(Equal("application/json"))
+
+				w.Write([]byte(`{
+					"links" : {
+					  "login" : "http://foobar:8080/uaa"
+					}
+				  }`))
+			}))
+			defer uaaServer.Close()
+
+			client := Client{
+				AuthURL: uaaServer.URL,
+				Client:  http.DefaultClient,
+			}
+
+			md, err := client.Metadata()
+
+			Expect(err).To(BeNil())
+			Expect(md).NotTo(BeNil())
+			Expect(md.PasscodePrompt()).To(Equal("One Time Code ( Get one at http://foobar:8080/uaa/passcode )"))
+		})
+		It("should be OK with no prompt field or links", func() {
+			uaaServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				Expect(r.Method).To(Equal(http.MethodGet))
+
+				Expect(r.URL.Path).To(Equal("/info"))
+
+				Expect(r.Header.Get("Accept")).To(Equal("application/json"))
+
+				w.Write([]byte(`{
+				  }`))
+			}))
+			defer uaaServer.Close()
+
+			client := Client{
+				AuthURL: uaaServer.URL,
+				Client:  http.DefaultClient,
+			}
+
+			md, err := client.Metadata()
+
+			Expect(err).To(BeNil())
+			Expect(md).NotTo(BeNil())
+			Expect(md.PasscodePrompt()).To(Equal("One Time Code ( Get one at https://login.system.example.com/passcode )"))
+		})
+	})
+
 	Context("RefreshTokenGrant()", func() {
 		It("should make a refresh grant token request", func() {
 			uaaServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

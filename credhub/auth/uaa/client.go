@@ -29,12 +29,67 @@ type responseError struct {
 	Description string `json:"error_description"`
 }
 
+// Metadata captures the data returned by the GET /info on a UAA server
+// This fields are not exhaustive and can added to over time.
+// See: https://docs.cloudfoundry.org/api/uaa/version/4.6.0/index.html#server-information
+type Metadata struct {
+	Links struct {
+		Login string `json:"login"`
+	} `json:"links"`
+	Prompts struct {
+		Passcode []string `json:"passcode"`
+	} `json:"prompts"`
+}
+
+// PasscodePrompt returns a prompt to tell the user where to get a passcode from.
+// If not present in the metadata (PCF installation don't seem to return it), will attempt to
+// contruct a plausible URL.
+func (md *Metadata) PasscodePrompt() string {
+	// Give default in case server doesn't tell us
+	if len(md.Prompts.Passcode) == 2 && md.Prompts.Passcode[1] != "" {
+		return md.Prompts.Passcode[1]
+	}
+	var loginURL string
+	if md.Links.Login != "" {
+		loginURL = md.Links.Login
+	} else {
+		loginURL = "https://login.system.example.com"
+	}
+	return fmt.Sprintf("One Time Code ( Get one at %s/passcode )", loginURL)
+}
+
 func (e *responseError) Error() string {
 	if e.Description == "" {
 		return e.Name
 	}
 
 	return fmt.Sprintf("%s %s", e.Name, e.Description)
+}
+
+func (u *Client) Metadata() (*Metadata, error) {
+	request, err := http.NewRequest("GET", u.AuthURL+"/info", nil)
+	if err != nil {
+		return nil, err
+	}
+
+	request.Header.Add("Accept", "application/json")
+	response, err := u.Client.Do(request)
+	if err != nil {
+		return nil, err
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != 200 {
+		return nil, errors.New("unable to fetch metadata successfully")
+	}
+
+	var rv Metadata
+	err = json.NewDecoder(response.Body).Decode(&rv)
+	if err != nil {
+		return nil, err
+	}
+
+	return &rv, nil
 }
 
 // ClientCredentialGrant requests a token using client_credentials grant type
@@ -58,6 +113,21 @@ func (u *Client) PasswordGrant(clientId, clientSecret, username, password string
 		"response_type": {"token"},
 		"username":      {username},
 		"password":      {password},
+		"client_id":     {clientId},
+		"client_secret": {clientSecret},
+	}
+
+	token, err := u.tokenGrantRequest(values)
+
+	return token.AccessToken, token.RefreshToken, err
+}
+
+// PasscodeGrant requests an access token and refresh token using passcode grant type
+func (u *Client) PasscodeGrant(clientId, clientSecret, passcode string) (string, string, error) {
+	values := url.Values{
+		"grant_type":    {"password"},
+		"response_type": {"token"},
+		"passcode":      {passcode},
 		"client_id":     {clientId},
 		"client_secret": {clientSecret},
 	}
