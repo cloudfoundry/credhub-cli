@@ -8,10 +8,22 @@
   revision = "e75332964ef517daa070d7c38a9466a0d687e0a5"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/cloudfoundry/socks5-proxy"
+  packages = ["."]
+  revision = "a5dbd34501d246ab6c004c9afebb5bd0dd9d7d22"
+
+[[projects]]
   name = "github.com/fatih/color"
   packages = ["."]
   revision = "570b54cabe6b8eb0bc2dfce68d964677d63b5260"
   version = "v1.5.0"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/genevievelesperance/go-socks5"
+  packages = ["."]
+  revision = "f07e0bb84629ba30f60da69274cd1d9dbb4a1d08"
 
 [[projects]]
   branch = "master"
@@ -64,13 +76,13 @@
 [[projects]]
   branch = "master"
   name = "golang.org/x/crypto"
-  packages = ["ssh/terminal"]
+  packages = ["curve25519","ed25519","ed25519/internal/edwards25519","ssh","ssh/terminal"]
   revision = "94eea52f7b742c7cbe0b03b22f0c4c8631ece122"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/net"
-  packages = ["context","html","html/atom","html/charset"]
+  packages = ["context","html","html/atom","html/charset","proxy"]
   revision = "a8b9294777976932365dabb6640cf1468d95c70f"
 
 [[projects]]
@@ -94,6 +106,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "b8140c5d0ab30efd3d8606e659cacdcfba9fddb69138e0e2b2bc51fe5daa0d37"
+  inputs-digest = "ef558670e79a05df44b870b0584b24c0ae53a974e1d4013a912993053c5edb9f"
   solver-name = "gps-cdcl"
   solver-version = 1

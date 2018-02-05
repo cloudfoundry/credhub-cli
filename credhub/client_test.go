@@ -21,6 +21,18 @@ var _ = Describe("Client()", func() {
 		Expect(client).ToNot(BeNil())
 	})
 
+	Context("When a SOCKS5Proxy is set in the environment", func() {
+		It("returns an http.Client with a Dial function", func() {
+			ch, _ := New("https://example.com")
+
+			client := ch.Client()
+			transport := client.Transport.(*http.Transport)
+			dialer := transport.Dial
+
+			Expect(dialer).NotTo(BeNil())
+		})
+	})
+
 	Context("With ClientCert", func() {
 		It("should return a http.Client with tls.Config with client cert", func() {
 			ch, err := New("https://example.com", ClientCert("./fixtures/auth-tls-cert.pem", "./fixtures/auth-tls-key.pem"))
@@ -109,6 +121,17 @@ var _ = Describe("Client()", func() {
 
 			Expect(tlsConfig.InsecureSkipVerify).To(BeTrue())
 			Expect(tlsConfig.PreferServerCipherSuites).To(BeTrue())
+		})
+	})
+
+	Context("With Dial", func() {
+		It("should return a http.Client with a dial function", func() {
+			ch, _ := New("https://example.com")
+			client := ch.Client()
+
+			transport := client.Transport.(*http.Transport)
+			dial := transport.Dial
+			Expect(dial).NotTo(BeNil())
 		})
 	})
 })

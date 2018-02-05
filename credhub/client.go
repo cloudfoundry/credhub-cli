@@ -3,8 +3,11 @@ package credhub
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"net"
 	"net/http"
 	"time"
+
+	"github.com/cloudfoundry/socks5-proxy"
 )
 
 // Client provides an unauthenticated http.Client to the CredHub server
@@ -30,6 +33,8 @@ func httpClient() *http.Client {
 	}
 }
 
+var defaultDialer net.Dialer
+
 func httpsClient(insecureSkipVerify bool, rootCAs *x509.CertPool, cert *tls.Certificate) *http.Client {
 	client := httpClient()
 
@@ -46,6 +51,10 @@ func httpsClient(insecureSkipVerify bool, rootCAs *x509.CertPool, cert *tls.Cert
 			RootCAs:                  rootCAs,
 		},
 		Proxy: http.ProxyFromEnvironment,
+		Dial: SOCKS5DialFuncFromEnvironment((&net.Dialer{
+			Timeout:   30 * time.Second,
+			KeepAlive: 30 * time.Second,
+		}).Dial, proxy.NewSocks5Proxy(proxy.NewHostKeyGetter(""))),
 	}
 
 	return client
