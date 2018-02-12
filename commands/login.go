@@ -3,6 +3,8 @@ package commands
 import (
 	"fmt"
 
+	"os"
+
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub"
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/auth/uaa"
@@ -92,8 +94,14 @@ func (cmd LoginCommand) Execute([]string) error {
 		return errors.NewAuthorizationError()
 	}
 
-	cfg.AccessToken = accessToken
+	if os.Getenv("CREDHUB_CLIENT") == "" || os.Getenv("CREDHUB_SECRET") == "" {
+		cfg.AccessToken = accessToken
+	} else {
+		cfg.AccessToken = ""
+	}
+
 	cfg.RefreshToken = refreshToken
+
 	if err := config.WriteConfig(cfg); err != nil {
 		return err
 	}

@@ -194,7 +194,7 @@ var _ = Describe("Login", func() {
 		})
 
 		Context("with the client name and secret from the env", func() {
-			It("authenticates with the UAA server and saves a token", func() {
+			It("authenticates with the UAA server and does not save the access token", func() {
 				session := runCommandWithEnv([]string{"CREDHUB_CLIENT=test_client", "CREDHUB_SECRET=test_secret"}, "login")
 
 				Expect(uaaServer.ReceivedRequests()).Should(HaveLen(1))
@@ -202,7 +202,7 @@ var _ = Describe("Login", func() {
 				Eventually(session.Out).Should(Say("Login Successful"))
 				Eventually(session.Out.Contents()).ShouldNot(ContainSubstring("Setting the target url:"))
 				cfg := config.ReadConfig()
-				Expect(cfg.AccessToken).To(Equal("2YotnFZFEjr1zCsicMWpAA"))
+				Expect(cfg.AccessToken).To(Equal(""))
 			})
 		})
 
