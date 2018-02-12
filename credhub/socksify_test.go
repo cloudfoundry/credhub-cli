@@ -24,6 +24,8 @@ var _ = Describe("Socksify", func() {
 	)
 
 	BeforeEach(func() {
+		os.Unsetenv("CREDHUB_PROXY")
+		os.Unsetenv("https_proxy")
 		proxyDialer = &FakeProxyDialer{}
 		origDial = credhub.DialFunc(func(x, y string) (net.Conn, error) {
 			return nil, errors.New("original dialer")
@@ -50,7 +52,6 @@ var _ = Describe("Socksify", func() {
 				err = ioutil.WriteFile(privateKeyPath, []byte("some-key"), 0600)
 				Expect(err).NotTo(HaveOccurred())
 				os.Setenv("CREDHUB_PROXY", fmt.Sprintf("ssh+socks5://localhost:12345?private-key=%s", privateKeyPath))
-
 				dialFunc = credhub.SOCKS5DialFuncFromEnvironment(origDial, proxyDialer)
 			})
 
@@ -60,6 +61,7 @@ var _ = Describe("Socksify", func() {
 				Expect(proxyDialer.DialerCall.CallCount).To(Equal(1))
 				Expect(proxyDialer.DialerCall.Receives.Key).To(Equal("some-key"))
 				Expect(proxyDialer.DialerCall.Receives.URL).To(Equal("localhost:12345"))
+				os.Unsetenv("CREDHUB_PROXY")
 			})
 
 			It("Can be called multiple times and only create the dialer once", func() {
@@ -70,6 +72,7 @@ var _ = Describe("Socksify", func() {
 				Expect(proxyDialer.DialerCall.CallCount).To(Equal(1))
 				Expect(proxyDialer.DialerCall.Receives.Key).To(Equal("some-key"))
 				Expect(proxyDialer.DialerCall.Receives.URL).To(Equal("localhost:12345"))
+				os.Unsetenv("CREDHUB_PROXY")
 			})
 
 			It("Can be concurrently (run ginkgo with -race flag)", func() {
@@ -87,6 +90,7 @@ var _ = Describe("Socksify", func() {
 				Expect(proxyDialer.DialerCall.CallCount).To(Equal(1))
 				Expect(proxyDialer.DialerCall.Receives.Key).To(Equal("some-key"))
 				Expect(proxyDialer.DialerCall.Receives.URL).To(Equal("localhost:12345"))
+				os.Unsetenv("CREDHUB_PROXY")
 			})
 
 			Context("when the URL after the ssh+ prefix cannot be parsed", func() {
@@ -97,6 +101,7 @@ var _ = Describe("Socksify", func() {
 				It("returns the dialer that was passed in", func() {
 					_, err := dialFunc("", "")
 					Expect(err).To(MatchError("original dialer"))
+					os.Unsetenv("CREDHUB_PROXY")
 				})
 			})
 
@@ -108,6 +113,7 @@ var _ = Describe("Socksify", func() {
 				It("returns the dialer that was passed in", func() {
 					_, err := dialFunc("", "")
 					Expect(err).To(MatchError("original dialer"))
+					os.Unsetenv("CREDHUB_PROXY")
 				})
 			})
 
@@ -119,6 +125,7 @@ var _ = Describe("Socksify", func() {
 				It("returns the dialer that was passed in", func() {
 					_, err := dialFunc("", "")
 					Expect(err).To(MatchError("original dialer"))
+					os.Unsetenv("CREDHUB_PROXY")
 				})
 			})
 
@@ -130,6 +137,7 @@ var _ = Describe("Socksify", func() {
 				It("returns the dialer that was passed in", func() {
 					_, err := dialFunc("", "")
 					Expect(err).To(MatchError("original dialer"))
+					os.Unsetenv("CREDHUB_PROXY")
 				})
 			})
 		})
@@ -144,6 +152,7 @@ var _ = Describe("Socksify", func() {
 				It("returns the dialer that was passed in", func() {
 					_, err := dialFunc("", "")
 					Expect(err).To(MatchError("original dialer"))
+					os.Unsetenv("CREDHUB_PROXY")
 				})
 			})
 
@@ -155,6 +164,7 @@ var _ = Describe("Socksify", func() {
 				It("returns the dialer that was passed in", func() {
 					_, err := dialFunc("", "")
 					Expect(err).To(MatchError("original dialer"))
+					os.Unsetenv("CREDHUB_PROXY")
 				})
 			})
 		})
