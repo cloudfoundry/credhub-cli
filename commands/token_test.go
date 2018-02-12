@@ -52,6 +52,8 @@ var _ = Describe("Token", func() {
 			Eventually(session).Should(Exit(0))
 			sout := string(session.Out.Contents())
 			Expect(sout).To(ContainSubstring("Bearer 2YotnFZFEjr1zCsicMWpAA"))
+			cfg := config.ReadConfig()
+			Expect(cfg.AccessToken).To(ContainSubstring("2YotnFZFEjr1zCsicMWpAA"))
 		})
 	})
 
@@ -90,6 +92,8 @@ var _ = Describe("Token", func() {
 			Eventually(session).Should(Exit(0))
 			sout := string(session.Out.Contents())
 			Expect(sout).To(ContainSubstring("Bearer 2YotnFZFEjr1zCsicMWpAA"))
+			cfg := config.ReadConfig()
+			Expect(cfg.AccessToken).To(Equal(""))
 		})
 	})
 })
