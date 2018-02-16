@@ -75,6 +75,11 @@ type SSH struct {
 	} `json:"value"`
 }
 
+// Type needed for Bulk Regenerate functionality
+type BulkRegenerateResults struct {
+	Certificates []string `json:"regenerated_credentials" yaml:"regenerated_credentials"`
+}
+
 // Types needed for Find functionality
 type FindResults struct {
 	Credentials []Base `json:"credentials" yaml:"credentials"`
