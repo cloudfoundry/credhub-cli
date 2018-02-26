@@ -29,12 +29,18 @@ func (ch *CredHub) request(client requester, method string, pathStr string, quer
 	u.Path = pathStr
 	u.RawQuery = query.Encode()
 
+	var req *http.Request
+
 	jsonBody, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 
-	req, err := http.NewRequest(method, u.String(), bytes.NewReader(jsonBody))
+	if body != nil {
+		req, err = http.NewRequest(method, u.String(), bytes.NewReader(jsonBody))
+	} else {
+		req, err = http.NewRequest(method, u.String(), nil)
+	}
 	if err != nil {
 		return nil, err
 	}
