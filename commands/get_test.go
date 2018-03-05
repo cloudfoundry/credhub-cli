@@ -233,6 +233,84 @@ var _ = Describe("Get", func() {
 
 	})
 
+	Context("when a key is specified", func() {
+		Context("when the key is valid", func() {
+			It("only returns the request field from the value object", func() {
+				responseJson := fmt.Sprintf(CERTIFICATE_CREDENTIAL_ARRAY_RESPONSE_JSON, "my-secret", "my-ca", "my-cert", "my-priv")
+
+				server.RouteToHandler("GET", "/api/v1/data",
+					CombineHandlers(
+						VerifyRequest("GET", "/api/v1/data", "current=true&name=my-secret"),
+						RespondWith(http.StatusOK, responseJson),
+					),
+				)
+
+				session := runCommand("get", "-n", "my-secret", "-k", "ca")
+
+				Eventually(session).Should(Exit(0))
+				Eventually(string(session.Out.Contents())).Should(Equal(`my-ca
+
+`))
+			})
+
+			Context("when there is nested JSON", func() {
+				It("returns only the requested JSON field from the value object", func() {
+					responseJson := fmt.Sprintf(JSON_CREDENTIAL_ARRAY_RESPONSE_JSON, "json-secret", `{"foo":"bar","nested":{"a":1},"an":["array"]}`)
+
+					server.RouteToHandler("GET", "/api/v1/data",
+						CombineHandlers(
+							VerifyRequest("GET", "/api/v1/data", "current=true&name=json-secret"),
+							RespondWith(http.StatusOK, responseJson),
+						),
+					)
+
+					session := runCommand("get", "-n", "json-secret", "-k", "nested")
+
+					Eventually(session).Should(Exit(0))
+					Eventually(string(session.Out.Contents())).Should(Equal(`a: 1
+
+`))
+				})
+			})
+		})
+
+		Context("when the key is invalid", func() {
+			It("returns nothing", func() {
+				responseJson := fmt.Sprintf(CERTIFICATE_CREDENTIAL_ARRAY_RESPONSE_JSON, "my-secret", "my-ca", "my-cert", "my-priv")
+
+				server.RouteToHandler("GET", "/api/v1/data",
+					CombineHandlers(
+						VerifyRequest("GET", "/api/v1/data", "current=true&name=my-secret"),
+						RespondWith(http.StatusOK, responseJson),
+					),
+				)
+
+				session := runCommand("get", "-n", "my-secret", "-k", "invalidkey")
+
+				Eventually(session).Should(Exit(0))
+				Eventually(string(session.Out.Contents())).Should(Equal(``))
+
+			})
+		})
+
+		Context("when there are a specified number of versions", func() {
+			It("returns an error", func() {
+				responseJson := `{"data":[{"type":"password","id":"` + UUID + `","name":"my-password","version_created_at":"` + TIMESTAMP + `","value":"old-password"},{"type":"password","id":"` + UUID + `","name":"my-password","version_created_at":"` + TIMESTAMP + `","value":"new-password"}]}`
+
+				server.RouteToHandler("GET", "/api/v1/data",
+					CombineHandlers(
+						VerifyRequest("GET", "/api/v1/data", "name=my-password&versions=2"),
+						RespondWith(http.StatusOK, responseJson),
+					),
+				)
+
+				session := runCommand("get", "-n", "my-password", "--versions", "2", "-k", "someflag")
+				Eventually(session).Should(Exit(1))
+				Eventually(session.Err).Should(Say("The --version flag and --key flag are incompatible"))
+			})
+		})
+	})
+
 	It("does not use Printf on user-supplied data", func() {
 		responseJson := fmt.Sprintf(STRING_CREDENTIAL_ARRAY_RESPONSE_JSON, "password", "injected", "et''%/7(V&`|?m|Ckih$")
 
