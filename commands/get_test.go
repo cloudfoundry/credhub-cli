@@ -236,7 +236,7 @@ var _ = Describe("Get", func() {
 	Context("when a key is specified", func() {
 		Context("when the key is valid", func() {
 			It("only returns the request field from the value object", func() {
-				responseJson := fmt.Sprintf(CERTIFICATE_CREDENTIAL_ARRAY_RESPONSE_JSON, "my-secret", "my-ca", "my-cert", "my-priv")
+				responseJson := fmt.Sprintf(CERTIFICATE_CREDENTIAL_ARRAY_RESPONSE_JSON, "my-secret", "----begin----\\nmy-ca\\n-----end------", "my-cert", "my-priv")
 
 				server.RouteToHandler("GET", "/api/v1/data",
 					CombineHandlers(
@@ -248,8 +248,9 @@ var _ = Describe("Get", func() {
 				session := runCommand("get", "-n", "my-secret", "-k", "ca")
 
 				Eventually(session).Should(Exit(0))
-				Eventually(string(session.Out.Contents())).Should(Equal(`my-ca
-
+				Eventually(string(session.Out.Contents())).Should(Equal(`----begin----
+my-ca
+-----end------
 `))
 			})
 

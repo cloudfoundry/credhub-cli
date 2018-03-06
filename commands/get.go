@@ -1,6 +1,8 @@
 package commands
 
 import (
+	"fmt"
+
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials"
 	"github.com/cloudfoundry-incubator/credhub-cli/errors"
@@ -63,7 +65,13 @@ func (cmd GetCommand) Execute([]string) error {
 			if cred[cmd.Key] == nil {
 				return nil
 			} else {
-				printCredential(cmd.OutputJson, cred[cmd.Key])
+				switch cred[cmd.Key].(type) {
+				case string:
+					fmt.Println(cred[cmd.Key])
+
+				default:
+					printCredential(cmd.OutputJson, cred[cmd.Key])
+				}
 			}
 		} else {
 			printCredential(cmd.OutputJson, credential)
