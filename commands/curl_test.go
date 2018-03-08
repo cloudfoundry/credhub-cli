@@ -16,9 +16,9 @@ var _ = Describe("Curl", func() {
 		login()
 	})
 
-	ItRequiresAuthentication("curl", "-p", "/api/v1/data")
-	ItRequiresAnAPIToBeSet("curl", "-p", "/api/v1/data")
-	ItAutomaticallyLogsIn("GET", "find_response.json", "/api/v1/data", "curl", "-p", "/api/v1/data")
+	ItRequiresAuthentication("curl", "-p", "api/v1/data")
+	ItRequiresAnAPIToBeSet("curl", "-p", "api/v1/data")
+	ItAutomaticallyLogsIn("GET", "find_response.json", "/api/v1/data", "curl", "-p", "api/v1/data")
 
 	ItBehavesLikeHelp("curl", "curl", func(session *Session) {
 		Expect(session.Err).To(Say("Usage"))
@@ -34,11 +34,7 @@ var _ = Describe("Curl", func() {
 
 		Eventually(session).Should(Exit(1))
 
-		if runtime.GOOS == "windows" {
-			Expect(session.Err).To(Say("A path must be provided. Please update and retry your request."))
-		} else {
-			Expect(session.Err).To(Say("A path must be provided. Please update and retry your request."))
-		}
+		Expect(session.Err).To(Say("A path must be provided. Please update and retry your request."))
 	})
 
 	Context("the user provides an invalid path", func() {
