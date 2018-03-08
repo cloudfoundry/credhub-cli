@@ -10,10 +10,6 @@ import (
 
 type CurlCommand struct {
 	Path string `short:"p" long:"path" description:"The server endpoint to make the request against"`
-	//Id               string `long:"id" description:"ID of the credential to retrieve"`
-	//NumberOfVersions int    `long:"versions" description:"Number of versions of the credential to retrieve"`
-	//OutputJson       bool   `short:"j" long:"output-json" description:"Return response in JSON format"`
-	//Key              string `short:"k" long:"key" description:"Return only the specified field of the requested credential"`
 }
 
 func (cmd CurlCommand) Execute([]string) error {

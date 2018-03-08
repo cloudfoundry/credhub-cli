@@ -52,7 +52,7 @@ var _ = Describe("Curl", func() {
 				),
 			)
 
-			session := runCommand("curl", "-p", "/api/v1/data/bogus")
+			session := runCommand("curl", "-p", "api/v1/data/bogus")
 
 			Eventually(session).Should(Exit(0))
 			Eventually(session.Out).Should(Say(responseJson))
@@ -69,7 +69,7 @@ var _ = Describe("Curl", func() {
 				),
 			)
 
-			session := runCommand("curl", "-p", "/api/v1/data/valid-credential-id")
+			session := runCommand("curl", "-p", "api/v1/data/valid-credential-id")
 
 			Eventually(session).Should(Exit(0))
 			Eventually(session.Out).Should(Say(responseJson))
