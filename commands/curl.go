@@ -1,12 +1,12 @@
 package commands
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/url"
-	"os"
 
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
 )
@@ -58,8 +58,12 @@ func (cmd CurlCommand) Execute([]string) error {
 	}
 
 	if cmd.IncludeHeader {
-		header := response.Header
-		fmt.Println(header.Write(os.Stdout))
+		headers := new(bytes.Buffer)
+		err = response.Header.Write(headers)
+		if err != nil {
+			return err
+		}
+		fmt.Println(headers.String())
 	}
 
 	body, err := ioutil.ReadAll(response.Body)
