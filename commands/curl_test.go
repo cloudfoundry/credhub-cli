@@ -104,6 +104,23 @@ var _ = Describe("Curl", func() {
 				Eventually(string(session.Out.Contents())).Should(Equal(responseJson + "\n"))
 			})
 		})
-	})
 
+		Context("the user specifies a method with -X", func() {
+			It("returns what the server returns", func() {
+				responseJson := `{"error":"The request could not be fulfilled because the request path or body did not meet expectation. Please check the documentation for required formatting and retry your request."}`
+				server.RouteToHandler("PUT", "/api/v1/data",
+					CombineHandlers(
+						VerifyRequest("PUT", "/api/v1/data"),
+						RespondWith(http.StatusOK, responseJson),
+					),
+				)
+
+				session := runCommand("curl", "-X", "PUT", "-p", "api/v1/data")
+
+				Eventually(session).Should(Exit(0))
+				Eventually(session.Out).Should(Say(responseJson))
+			})
+
+		})
+	})
 })

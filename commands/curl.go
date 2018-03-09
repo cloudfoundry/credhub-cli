@@ -10,7 +10,8 @@ import (
 )
 
 type CurlCommand struct {
-	Path string `short:"p" long:"path" description:"The server endpoint to make the request against"`
+	Path   string `short:"p" long:"path" description:"The server endpoint to make the request against"`
+	Method string `short:"X" description:"HTTP method (default: GET)"`
 }
 
 func (cmd CurlCommand) Execute([]string) error {
@@ -40,7 +41,7 @@ func (cmd CurlCommand) Execute([]string) error {
 		}
 	}
 
-	response, err := credhubClient.Request("GET", u.Path, query, nil, false)
+	response, err := credhubClient.Request(cmd.Method, u.Path, query, nil, false)
 	if err != nil {
 		return err
 	}
