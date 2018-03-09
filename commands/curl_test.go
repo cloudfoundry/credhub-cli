@@ -145,5 +145,24 @@ var _ = Describe("Curl", func() {
 				Eventually(session.Out).Should(Say(responseJson))
 			})
 		})
+
+		Context("the user provides a -i flag", func() {
+			It("displays the response headers to the user", func() {
+				responseJson := `{"id":"2993f622-cb1e-4e00-a267-4b23c273bf3d","name":"/example-password","type":"password","value":"6mRPZB3bAfb8lRpacnXsHfDhlPqFcjH2h9YDvLpL","version_created_at":"2017-01-05T01:01:01Z"}`
+				server.RouteToHandler("GET", "/api/v1/data/valid-credential-id",
+					CombineHandlers(
+						VerifyRequest("GET", "/api/v1/data/valid-credential-id"),
+						RespondWith(http.StatusOK, responseJson, http.Header{"Test1": []string{"test1"}, "Test2": []string{"test2"}}),
+					),
+				)
+
+				session := runCommand("curl", "-p", "api/v1/data/valid-credential-id", "-i")
+
+				Eventually(session).Should(Exit(0))
+				Eventually(session.Out).Should(Say("Test1: test1"))
+				Eventually(session.Out).Should(Say("Test2: test2"))
+				Eventually(session.Out).Should(Say(responseJson))
+			})
+		})
 	})
 })

@@ -6,14 +6,16 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/url"
+	"os"
 
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
 )
 
 type CurlCommand struct {
-	Path   string `short:"p" long:"path" description:"The server endpoint to make the request against"`
-	Method string `short:"X" description:"HTTP method (default: GET)"`
-	Data   string `short:"d" description:"HTTP data to include in the request body"`
+	Path          string `short:"p" long:"path" description:"The server endpoint to make the request against"`
+	Method        string `short:"X" description:"HTTP method (default: GET)"`
+	Data          string `short:"d" description:"HTTP data to include in the request body"`
+	IncludeHeader bool   `short:"i" description:"Include the response headers in the output"`
 }
 
 func (cmd CurlCommand) Execute([]string) error {
@@ -53,6 +55,11 @@ func (cmd CurlCommand) Execute([]string) error {
 	response, err := credhubClient.Request(cmd.Method, u.Path, query, dat, false)
 	if err != nil {
 		return err
+	}
+
+	if cmd.IncludeHeader {
+		header := response.Header
+		fmt.Println(header.Write(os.Stdout))
 	}
 
 	body, err := ioutil.ReadAll(response.Body)
