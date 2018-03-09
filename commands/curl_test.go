@@ -41,7 +41,6 @@ var _ = Describe("Curl", func() {
 	Context("the user provides an invalid path", func() {
 		It("receives what the server returns", func() {
 			responseJson := `{"error":"An application error occurred. Please contact your CredHub administrator."}`
-
 			server.RouteToHandler("GET", "/api/v1/data/bogus",
 				CombineHandlers(
 					VerifyRequest("GET", "/api/v1/data/bogus"),
@@ -52,7 +51,9 @@ var _ = Describe("Curl", func() {
 			session := runCommand("curl", "-p", "api/v1/data/bogus")
 
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say(responseJson))
+			Eventually(session.Out).Should(Say(`{
+  "error": "An application error occurred. Please contact your CredHub administrator."
+}`))
 		})
 	})
 
@@ -69,7 +70,13 @@ var _ = Describe("Curl", func() {
 			session := runCommand("curl", "-p", "api/v1/data/valid-credential-id")
 
 			Eventually(session).Should(Exit(0))
-			Eventually(session.Out).Should(Say(responseJson))
+			Eventually(session.Out).Should(Say(`{
+  "id": "2993f622-cb1e-4e00-a267-4b23c273bf3d",
+  "name": "/example-password",
+  "type": "password",
+  "value": "6mRPZB3bAfb8lRpacnXsHfDhlPqFcjH2h9YDvLpL",
+  "version_created_at": "2017-01-05T01:01:01Z"
+}`))
 		})
 
 		Context("the user does not specify required parameters", func() {
@@ -85,7 +92,9 @@ var _ = Describe("Curl", func() {
 				session := runCommand("curl", "-p", "api/v1/data")
 
 				Eventually(session).Should(Exit(0))
-				Eventually(session.Out).Should(Say(responseJson))
+				Eventually(session.Out).Should(Say(`{
+  "error": "The query parameter name is required for this request."
+}`))
 			})
 		})
 
@@ -104,7 +113,18 @@ var _ = Describe("Curl", func() {
 				session := runCommand("curl", "-p", "api/v1/data?name=/example-password&current=true")
 
 				Eventually(session).Should(Exit(0))
-				Eventually(string(session.Out.Contents())).Should(Equal(responseJson + "\n"))
+				Eventually(string(session.Out.Contents())).Should(Equal(`{
+  "data": [
+    {
+      "id": "some-id",
+      "name": "example-password",
+      "type": "password",
+      "value": "secret",
+      "version_created_at": "time"
+    }
+  ]
+}
+`))
 			})
 		})
 
@@ -121,9 +141,10 @@ var _ = Describe("Curl", func() {
 				session := runCommand("curl", "-X", "PUT", "-p", "api/v1/data")
 
 				Eventually(session).Should(Exit(0))
-				Eventually(session.Out).Should(Say(responseJson))
+				Eventually(session.Out).Should(Say(`{
+  "error": "The request could not be fulfilled because the request path or body did not meet expectation. Please check the documentation for required formatting and retry your request."
+}`))
 			})
-
 		})
 
 		Context("the user provides a request body", func() {
@@ -142,7 +163,13 @@ var _ = Describe("Curl", func() {
 				session := runCommand("curl", "-p", "api/v1/data", "-X", "PUT", "-d", body)
 
 				Eventually(session).Should(Exit(0))
-				Eventually(session.Out).Should(Say(responseJson))
+				Eventually(session.Out).Should(Say(`{
+  "id": "93959091-0fcd-4a2a-bedb-97d3ee0d0e87",
+  "name": "/some/cred",
+  "type": "password",
+  "value": "XbD5KGiLB4pBi24WEYq857psfvMMww",
+  "version_created_at": "2018-03-06T09:10:18Z"
+}`))
 			})
 		})
 
@@ -161,7 +188,13 @@ var _ = Describe("Curl", func() {
 				Eventually(session).Should(Exit(0))
 				Eventually(session.Out).Should(Say("Test1: test1"))
 				Eventually(session.Out).Should(Say("Test2: test2"))
-				Eventually(session.Out).Should(Say(responseJson))
+				Eventually(session.Out).Should(Say(`{
+  "id": "2993f622-cb1e-4e00-a267-4b23c273bf3d",
+  "name": "/example-password",
+  "type": "password",
+  "value": "6mRPZB3bAfb8lRpacnXsHfDhlPqFcjH2h9YDvLpL",
+  "version_created_at": "2017-01-05T01:01:01Z"
+}`))
 			})
 		})
 	})

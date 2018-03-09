@@ -67,7 +67,18 @@ func (cmd CurlCommand) Execute([]string) error {
 		return err
 	}
 
-	fmt.Println(string(body))
+	var bod map[string]interface{}
+	err = json.Unmarshal(body, &bod)
+	if err != nil {
+		return err
+	}
+
+	formattedBody, err := json.MarshalIndent(bod, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(string(formattedBody))
 
 	return err
 }
