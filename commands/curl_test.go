@@ -2,6 +2,7 @@ package commands_test
 
 import (
 	"net/http"
+	"net/url"
 	"runtime"
 
 	. "github.com/onsi/ginkgo"
@@ -94,6 +95,8 @@ var _ = Describe("Curl", func() {
 				server.RouteToHandler("GET", "/api/v1/data",
 					CombineHandlers(
 						VerifyRequest("GET", "/api/v1/data"),
+						VerifyForm(url.Values{"name": []string{"/example-password"},
+							"current": []string{"true"}}),
 						RespondWith(http.StatusOK, responseJson),
 					),
 				)
@@ -121,6 +124,26 @@ var _ = Describe("Curl", func() {
 				Eventually(session.Out).Should(Say(responseJson))
 			})
 
+		})
+
+		Context("the user provides a request body", func() {
+			It("receives what the server returns", func() {
+				responseJson := `{"type":"password","version_created_at":"2018-03-06T09:10:18Z","id":"93959091-0fcd-4a2a-bedb-97d3ee0d0e87","name":"/some/cred","value":"XbD5KGiLB4pBi24WEYq857psfvMMww"}`
+				body := `{"name":"/some/cred","type":"password"}`
+
+				server.RouteToHandler("PUT", "/api/v1/data",
+					CombineHandlers(
+						VerifyRequest("PUT", "/api/v1/data"),
+						VerifyBody([]byte(body)),
+						RespondWith(http.StatusOK, responseJson),
+					),
+				)
+
+				session := runCommand("curl", "-p", "api/v1/data", "-X", "PUT", "-d", body)
+
+				Eventually(session).Should(Exit(0))
+				Eventually(session.Out).Should(Say(responseJson))
+			})
 		})
 	})
 })

@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -12,6 +13,7 @@ import (
 type CurlCommand struct {
 	Path   string `short:"p" long:"path" description:"The server endpoint to make the request against"`
 	Method string `short:"X" description:"HTTP method (default: GET)"`
+	Data   string `short:"d" description:"HTTP data to include in the request body"`
 }
 
 func (cmd CurlCommand) Execute([]string) error {
@@ -41,7 +43,14 @@ func (cmd CurlCommand) Execute([]string) error {
 		}
 	}
 
-	response, err := credhubClient.Request(cmd.Method, u.Path, query, nil, false)
+	var dat map[string]interface{}
+	if cmd.Data != "" {
+		if err := json.Unmarshal([]byte(cmd.Data), &dat); err != nil {
+			return err
+		}
+	}
+
+	response, err := credhubClient.Request(cmd.Method, u.Path, query, dat, false)
 	if err != nil {
 		return err
 	}
