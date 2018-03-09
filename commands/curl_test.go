@@ -87,5 +87,23 @@ var _ = Describe("Curl", func() {
 				Eventually(session.Out).Should(Say(responseJson))
 			})
 		})
+
+		Context("when parameters are provided by the user", func() {
+			It("returns what the server returns", func() {
+				responseJson := `{"data":[{"id":"some-id","name":"example-password","type":"password","value":"secret","version_created_at":"time"}]}`
+				server.RouteToHandler("GET", "/api/v1/data",
+					CombineHandlers(
+						VerifyRequest("GET", "/api/v1/data"),
+						RespondWith(http.StatusOK, responseJson),
+					),
+				)
+
+				session := runCommand("curl", "-p", "api/v1/data?name=/example-password&current=true")
+
+				Eventually(session).Should(Exit(0))
+				Eventually(string(session.Out.Contents())).Should(Equal(responseJson + "\n"))
+			})
+		})
 	})
+
 })

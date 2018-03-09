@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"net/url"
 
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
 )
@@ -26,7 +27,20 @@ func (cmd CurlCommand) Execute([]string) error {
 		return errors.New("A path must be provided. Please update and retry your request.")
 	}
 
-	response, err := credhubClient.Request("GET", cmd.Path, nil, nil, false)
+	query := url.Values{}
+	u, err := url.Parse(cmd.Path)
+	if err != nil {
+		return err
+	}
+
+	if u.RawQuery != "" {
+		query, err = url.ParseQuery(u.RawQuery)
+		if err != nil {
+			return err
+		}
+	}
+
+	response, err := credhubClient.Request("GET", u.Path, query, nil, false)
 	if err != nil {
 		return err
 	}
