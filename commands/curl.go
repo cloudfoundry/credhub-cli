@@ -26,7 +26,7 @@ func (cmd CurlCommand) Execute([]string) error {
 		return errors.New("A path must be provided. Please update and retry your request.")
 	}
 
-	response, err := credhubClient.Request("GET", cmd.Path, nil, nil)
+	response, err := credhubClient.Request("GET", cmd.Path, nil, nil, false)
 	if err != nil {
 		return err
 	}

@@ -68,7 +68,7 @@ func (ch *CredHub) generateCredential(name, credType string, gen interface{}, ov
 		requestBody["value"] = map[string]string{"username": user.Username}
 	}
 
-	resp, err := ch.Request(http.MethodPost, "/api/v1/data", nil, requestBody)
+	resp, err := ch.Request(http.MethodPost, "/api/v1/data", nil, requestBody, true)
 
 	if err != nil {
 		return err

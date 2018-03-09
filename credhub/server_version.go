@@ -23,7 +23,7 @@ func (ch *CredHub) ServerVersion() (*version.Version, error) {
 }
 
 func (ch *CredHub) getVersion() (string, error) {
-	response, err := ch.Request("GET", "/version", nil, nil)
+	response, err := ch.Request("GET", "/version", nil, nil, true)
 	if err != nil {
 		return "", err
 	}

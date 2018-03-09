@@ -107,7 +107,7 @@ func (ch *CredHub) getCurrentCredential(name string, cred interface{}) error {
 }
 
 func (ch *CredHub) makeCredentialGetRequest(query url.Values, cred interface{}) error {
-	resp, err := ch.Request(http.MethodGet, "/api/v1/data", query, nil)
+	resp, err := ch.Request(http.MethodGet, "/api/v1/data", query, nil, true)
 
 	if err != nil {
 		return err
@@ -135,7 +135,7 @@ func (ch *CredHub) makeCredentialGetRequest(query url.Values, cred interface{}) 
 }
 
 func (ch *CredHub) makeCredentialGetByIdRequest(id string, cred *credentials.Credential) error {
-	resp, err := ch.Request(http.MethodGet, "/api/v1/data/"+id, nil, nil)
+	resp, err := ch.Request(http.MethodGet, "/api/v1/data/"+id, nil, nil, true)
 
 	if err != nil {
 		return err
@@ -160,7 +160,7 @@ func (ch *CredHub) getNVersionsOfCredential(name string, numberOfVersions int) (
 }
 
 func (ch *CredHub) makeMultiCredentialGetRequest(query url.Values) ([]credentials.Credential, error) {
-	resp, err := ch.Request(http.MethodGet, "/api/v1/data", query, nil)
+	resp, err := ch.Request(http.MethodGet, "/api/v1/data", query, nil, true)
 
 	if err != nil {
 		return nil, err

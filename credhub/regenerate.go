@@ -17,7 +17,7 @@ func (ch *CredHub) Regenerate(name string) (credentials.Credential, error) {
 	requestBody["name"] = name
 	requestBody["regenerate"] = true
 
-	resp, err := ch.Request(http.MethodPost, regenerateEndpoint, nil, requestBody)
+	resp, err := ch.Request(http.MethodPost, regenerateEndpoint, nil, requestBody, true)
 
 	if err != nil {
 		return credentials.Credential{}, err

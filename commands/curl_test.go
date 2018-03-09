@@ -70,5 +70,22 @@ var _ = Describe("Curl", func() {
 			Eventually(session).Should(Exit(0))
 			Eventually(session.Out).Should(Say(responseJson))
 		})
+
+		Context("the user does not specify required parameters", func() {
+			It("returns a wrapped error", func() {
+				responseJson := `{"error":"The query parameter name is required for this request."}`
+				server.RouteToHandler("GET", "/api/v1/data",
+					CombineHandlers(
+						VerifyRequest("GET", "/api/v1/data"),
+						RespondWith(http.StatusBadRequest, responseJson),
+					),
+				)
+
+				session := runCommand("curl", "-p", "api/v1/data")
+
+				Eventually(session).Should(Exit(0))
+				Eventually(session.Out).Should(Say(responseJson))
+			})
+		})
 	})
 })

@@ -20,7 +20,7 @@ func (ch *CredHub) GetPermissions(credName string) ([]permissions.Permission, er
 	query := url.Values{}
 	query.Set("credential_name", credName)
 
-	resp, err := ch.Request(http.MethodGet, "/api/v1/permissions", query, nil)
+	resp, err := ch.Request(http.MethodGet, "/api/v1/permissions", query, nil, true)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +41,7 @@ func (ch *CredHub) AddPermissions(credName string, perms []permissions.Permissio
 	requestBody["credential_name"] = credName
 	requestBody["permissions"] = perms
 
-	_, err := ch.Request(http.MethodPost, "/api/v1/permissions", nil, requestBody)
+	_, err := ch.Request(http.MethodPost, "/api/v1/permissions", nil, requestBody, true)
 	if err != nil {
 		return nil, err
 	}

@@ -2,8 +2,9 @@ package credhub
 
 import (
 	"encoding/json"
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials"
 	"net/http"
+
+	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials"
 )
 
 func (ch *CredHub) BulkRegenerate(signedBy string) (credentials.BulkRegenerateResults, error) {
@@ -14,7 +15,7 @@ func (ch *CredHub) BulkRegenerate(signedBy string) (credentials.BulkRegenerateRe
 	requestBody := map[string]interface{}{}
 	requestBody["signed_by"] = signedBy
 
-	resp, err := ch.Request(http.MethodPost, bulkRegenerateEndpoint, nil, requestBody)
+	resp, err := ch.Request(http.MethodPost, bulkRegenerateEndpoint, nil, requestBody, true)
 
 	if err != nil {
 		return credentials.BulkRegenerateResults{}, err

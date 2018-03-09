@@ -33,7 +33,7 @@ var _ = Describe("Request()", func() {
 		mockAuth.Response = &http.Response{}
 		mockAuth.Error = errors.New("Some error")
 
-		response, err := ch.Request("PATCH", "/api/v1/some-endpoint", nil, payload)
+		response, err := ch.Request("PATCH", "/api/v1/some-endpoint", nil, payload, true)
 
 		Expect(response).To(Equal(mockAuth.Response))
 		Expect(err).To(Equal(mockAuth.Error))
@@ -48,28 +48,47 @@ var _ = Describe("Request()", func() {
 	})
 
 	It("fails to send the request when the body cannot be marshalled to JSON", func() {
-		_, err := ch.Request("PATCH", "/api/v1/some-endpoint", nil, &NotMarshallable{})
+		_, err := ch.Request("PATCH", "/api/v1/some-endpoint", nil, &NotMarshallable{}, true)
 		Expect(err).To(HaveOccurred())
 	})
 
 	It("fails to send when the request method is invalid", func() {
-		_, err := ch.Request(" ", "/api/v1/some-endpoint", nil, nil)
+		_, err := ch.Request(" ", "/api/v1/some-endpoint", nil, nil, true)
 		Expect(err).To(HaveOccurred())
 	})
 
 	Context("when response body is an error ", func() {
-		var err error
-		It("returns an error", func() {
-			dummy := &DummyAuth{Response: &http.Response{
-				StatusCode: 400,
-				Body:       ioutil.NopCloser(bytes.NewBufferString(`{"error" : "error occurred" }`)),
-			}}
+		Context("when checkServerError is true", func() {
+			var err error
+			It("returns an error", func() {
+				dummy := &DummyAuth{Response: &http.Response{
+					StatusCode: 400,
+					Body:       ioutil.NopCloser(bytes.NewBufferString(`{"error" : "error occurred" }`)),
+				}}
 
-			ch, _ := New("https://example.com", Auth(dummy.Builder()))
+				ch, _ := New("https://example.com", Auth(dummy.Builder()))
 
-			_, err = ch.Request("GET", "/example-password", nil, nil)
+				_, err = ch.Request("GET", "/example-password", nil, nil, true)
 
-			Expect(err).To(MatchError("error occurred"))
+				Expect(err).To(MatchError("error occurred"))
+			})
+		})
+
+		Context("when checkServerError is false", func() {
+			It("returns the raw response json", func() {
+				dummy := &DummyAuth{Response: &http.Response{
+					StatusCode: 400,
+					Body:       ioutil.NopCloser(bytes.NewBufferString(`{"error" : "error occurred" }`)),
+				}}
+
+				ch, _ := New("https://example.com", Auth(dummy.Builder()))
+
+				r, err := ch.Request("GET", "/example-password", nil, nil, false)
+				resp, err := ioutil.ReadAll(r.Body)
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(string(resp)).To(Equal(`{"error" : "error occurred" }`))
+			})
 		})
 	})
 })

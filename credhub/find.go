@@ -51,7 +51,7 @@ func (ch *CredHub) find(key, value string) ([]byte, error) {
 	query := url.Values{}
 	query.Set(key, value)
 
-	resp, err := ch.Request(http.MethodGet, "/api/v1/data", query, nil)
+	resp, err := ch.Request(http.MethodGet, "/api/v1/data", query, nil, true)
 
 	if err != nil {
 		return nil, err

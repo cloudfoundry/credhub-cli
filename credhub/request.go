@@ -16,15 +16,15 @@ import (
 //
 // Use Request() directly to send authenticated requests to the CredHub server.
 // For unauthenticated requests (eg. /health), use Config.Client() instead.
-func (ch *CredHub) Request(method string, pathStr string, query url.Values, body interface{}) (*http.Response, error) {
-	return ch.request(ch.Auth, method, pathStr, query, body)
+func (ch *CredHub) Request(method string, pathStr string, query url.Values, body interface{}, checkServerErr bool) (*http.Response, error) {
+	return ch.request(ch.Auth, method, pathStr, query, body, checkServerErr)
 }
 
 type requester interface {
 	Do(req *http.Request) (*http.Response, error)
 }
 
-func (ch *CredHub) request(client requester, method string, pathStr string, query url.Values, body interface{}) (*http.Response, error) {
+func (ch *CredHub) request(client requester, method string, pathStr string, query url.Values, body interface{}, checkServerErr bool) (*http.Response, error) {
 	u := *ch.baseURL // clone
 	u.Path = pathStr
 	u.RawQuery = query.Encode()
@@ -53,8 +53,10 @@ func (ch *CredHub) request(client requester, method string, pathStr string, quer
 		return resp, err
 	}
 
-	if err := ch.checkForServerError(resp); err != nil {
-		return nil, err
+	if checkServerErr {
+		if err := ch.checkForServerError(resp); err != nil {
+			return nil, err
+		}
 	}
 
 	return resp, err

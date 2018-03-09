@@ -18,7 +18,7 @@ func (ch *CredHub) InterpolateString(vcapServicesBody string) (string, error) {
 		return "", err
 	}
 
-	resp, err := ch.Request(http.MethodPost, "/api/v1/interpolate", nil, requestBody)
+	resp, err := ch.Request(http.MethodPost, "/api/v1/interpolate", nil, requestBody, true)
 	if err != nil {
 		return "", err
 	}
