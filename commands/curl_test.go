@@ -186,6 +186,7 @@ var _ = Describe("Curl", func() {
 				session := runCommand("curl", "-p", "api/v1/data/valid-credential-id", "-i")
 
 				Eventually(session).Should(Exit(0))
+				Eventually(session.Out).Should(Say("HTTP/1.1 200"))
 				Eventually(session.Out).Should(Say("Test1: test1"))
 				Eventually(session.Out).Should(Say("Test2: test2"))
 				Eventually(session.Out).Should(Say(`{

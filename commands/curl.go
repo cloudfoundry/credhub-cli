@@ -56,13 +56,18 @@ func (cmd CurlCommand) Execute([]string) error {
 	if err != nil {
 		return err
 	}
-
 	if cmd.IncludeHeader {
 		headers := new(bytes.Buffer)
 		err = response.Header.Write(headers)
+
 		if err != nil {
 			return err
 		}
+
+		fmt.Print(response.Proto)
+		fmt.Print(" ")
+		fmt.Println(response.StatusCode)
+		fmt.Println(response.TransferEncoding)
 		fmt.Println(headers.String())
 	}
 
