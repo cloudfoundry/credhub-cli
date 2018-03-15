@@ -4,10 +4,10 @@ import (
 	"strings"
 
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
+	"github.com/cloudfoundry-incubator/credhub-cli/credhub"
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials/generate"
 	"github.com/cloudfoundry-incubator/credhub-cli/errors"
 	"github.com/cloudfoundry-incubator/credhub-cli/models"
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub"
 )
 
 type GenerateCommand struct {
@@ -15,7 +15,7 @@ type GenerateCommand struct {
 	CredentialType       string   `short:"t" long:"type" description:"Sets the credential type to generate. Valid types include 'password', 'user', 'certificate', 'ssh' and 'rsa'."`
 	NoOverwrite          bool     `short:"O" long:"no-overwrite" description:"Credential is not modified if stored value already exists"`
 	OutputJson           bool     `short:"j" long:"output-json" description:"Return response in JSON format"`
-	Username             string   `short:"z" long:"username" description:"Sets the username value of the credential"`
+	Username             string   `short:"z" long:"username" description:"[User] Sets the username value of the credential"`
 	Length               int      `short:"l" long:"length" description:"[Password, User] Length of the generated value (Default: 30)"`
 	IncludeSpecial       bool     `short:"S" long:"include-special" description:"[Password, User] Include special characters in the generated value"`
 	ExcludeNumber        bool     `short:"N" long:"exclude-number" description:"[Password, User] Exclude number characters from the generated value"`

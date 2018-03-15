@@ -67,7 +67,6 @@ func (cmd CurlCommand) Execute([]string) error {
 		fmt.Print(response.Proto)
 		fmt.Print(" ")
 		fmt.Println(response.StatusCode)
-		fmt.Println(response.TransferEncoding)
 		fmt.Println(headers.String())
 	}
 
