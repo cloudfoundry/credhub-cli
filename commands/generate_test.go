@@ -525,6 +525,15 @@ var _ = Describe("Generate", func() {
 		})
 	})
 
+	Describe("When username parameter is included for non-user types", func() {
+		It("returns a sensible error", func() {
+
+			session := runCommand("generate", "-n", "test-ssh-value", "-t", "ssh", "-z", "my-username")
+			Eventually(session).Should(Exit(1))
+			Eventually(session.Err).Should(Say("Username parameter is not valid for this credential type."))
+		})
+	})
+
 	Describe("Help", func() {
 		ItBehavesLikeHelp("generate", "n", func(session *Session) {
 			Expect(session.Err).To(Say("generate"))

@@ -47,6 +47,10 @@ func (cmd GenerateCommand) Execute([]string) error {
 
 	cmd.CredentialType = strings.ToLower(cmd.CredentialType)
 
+	if cmd.CredentialType != "user" && len(cmd.Username) > 0 {
+		return errors.NewUserNameOnlyValidForUserType()
+	}
+
 	cfg := config.ReadConfig()
 
 	if len(cmd.Username) > 0 {
