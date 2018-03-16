@@ -2,6 +2,7 @@ package config
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path"
@@ -55,6 +56,7 @@ func WriteConfig(c Config) error {
 	}
 
 	configPath := ConfigPath()
+	fmt.Println("wrote config to", configPath)
 	return ioutil.WriteFile(configPath, data, 0600)
 }
 

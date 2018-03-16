@@ -1,6 +1,7 @@
 package commands_test
 
 import (
+	"fmt"
 	"net/http"
 
 	"runtime"
@@ -13,11 +14,12 @@ import (
 	. "github.com/onsi/gomega/ghttp"
 )
 
-var _ = Describe("Logout", func() {
+var _ = FDescribe("Logout", func() {
 	AfterEach(func() {
 		config.RemoveConfig()
 	})
 
+	// TODO fails
 	It("marks the access token and refresh token as revoked if no config exists", func() {
 		config.RemoveConfig()
 		runLogoutCommand()
@@ -29,12 +31,18 @@ var _ = Describe("Logout", func() {
 		runLogoutCommand()
 	})
 
-	It("asks UAA to revoke the refresh token (and UAA succeeds)", func() {
+	// TODO fails
+	FIt("asks UAA to revoke the token (and UAA succeeds)", func() {
 		doRevoke(http.StatusOK)
+		runLogoutCommand()
 	})
 
-	It("asks UAA to revoke the refresh token (and reports no error when UAA fails)", func() {
+	It("asks UAA to revoke the token (and reports error when UAA fails)", func() {
 		doRevoke(http.StatusUnauthorized)
+
+		session := runCommand("logout")
+		Eventually(session).Should(Exit(1))
+		Eventually(session).Should(Say("Logout Failed"))
 	})
 
 	ItBehavesLikeHelp("logout", "o", func(session *Session) {
@@ -50,20 +58,24 @@ var _ = Describe("Logout", func() {
 func doRevoke(uaaResponseStatus int) {
 	cfg := config.Config{
 		RefreshToken: "5b9c9fd51ba14838ac2e6b222d487106-r",
-		AccessToken:  "myAccessToken",
+		AccessToken:  "e30K.eyJqdGkiOiIxIn0K.e30K",
 		AuthURL:      authServer.URL(),
 	}
-	config.WriteConfig(cfg)
+
+	cfg.UpdateTrustedCAs([]string{"../test/auth-tls-ca.pem"})
+	Expect(config.WriteConfig(cfg)).To(Succeed())
+	fmt.Println(authServer.URL())
 
 	authServer.RouteToHandler(
 		"DELETE", "/oauth/token/revoke/5b9c9fd51ba14838ac2e6b222d487106-r",
 		RespondWith(uaaResponseStatus, ""),
 	)
-	runLogoutCommand()
 }
 
 func runLogoutCommand() {
+	fmt.Println("runLogoutCommand")
 	session := runCommand("logout")
+	fmt.Println("ranLogoutCommand")
 	Eventually(session).Should(Exit(0))
 	Eventually(session).Should(Say("Logout Successful"))
 	cfg := config.ReadConfig()
