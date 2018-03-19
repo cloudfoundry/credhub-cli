@@ -533,7 +533,7 @@ var _ = Describe("Set", func() {
 			Eventually(string(session.Out.Contents())).Should(ContainSubstring("password: test-password"))
 			Eventually(string(session.Out.Contents())).Should(ContainSubstring("password_hash: passw0rd-H4$h"))
 			Eventually(string(session.Out.Contents())).Should(ContainSubstring("username: my-username"))
-			Eventually(string(session.Out.Contents())).Should(ContainSubstring("version_created_at: 2016-01-01T12:00:00Z"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring(`version_created_at: "2016-01-01T12:00:00Z"`))
 		})
 
 		It("puts a secret specifying no-overwrite", func() {
@@ -604,7 +604,7 @@ var _ = Describe("Set", func() {
 			Eventually(string(session.Out.Contents())).Should(ContainSubstring("password: test-password"))
 			Eventually(string(session.Out.Contents())).Should(ContainSubstring("password_hash: passw0rd-H4$h"))
 			Eventually(string(session.Out.Contents())).Should(ContainSubstring("username: my-username"))
-			Eventually(string(session.Out.Contents())).Should(ContainSubstring("version_created_at: 2016-01-01T12:00:00Z"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring(`version_created_at: "2016-01-01T12:00:00Z"`))
 		})
 	})
 

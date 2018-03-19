@@ -223,12 +223,12 @@ var _ = Describe("Get", func() {
   name: my-password
   type: password
   value: old-password
-  version_created_at: ` + TIMESTAMP + `
+  version_created_at: "` + TIMESTAMP + `"
 - id: ` + UUID + `
   name: my-password
   type: password
   value: new-password
-  version_created_at: ` + TIMESTAMP + `
+  version_created_at: "` + TIMESTAMP + `"
 `))
 
 	})
