@@ -13,7 +13,9 @@ type LogoutCommand struct {
 
 func (cmd LogoutCommand) Execute([]string) error {
 	cfg := config.ReadConfig()
-	RevokeTokenIfNecessary(cfg)
+	if err := RevokeTokenIfNecessary(cfg); err != nil {
+		return err
+	}
 	MarkTokensAsRevokedInConfig(&cfg)
 	if err := config.WriteConfig(cfg); err != nil {
 		return err
@@ -33,7 +35,10 @@ func RevokeTokenIfNecessary(cfg config.Config) error {
 		Client:  credhubClient.Client(),
 	}
 
-	uaaClient.RevokeToken(cfg.AccessToken)
+	if cfg.AccessToken != "" && cfg.AccessToken != "revoked" {
+		return uaaClient.RevokeToken(cfg.AccessToken)
+	}
+
 	return nil
 }
 

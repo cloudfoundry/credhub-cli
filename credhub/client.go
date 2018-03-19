@@ -38,7 +38,7 @@ var defaultDialer net.Dialer
 func httpsClient(insecureSkipVerify bool, rootCAs *x509.CertPool, cert *tls.Certificate) *http.Client {
 	client := httpClient()
 
-	certs := []tls.Certificate{}
+	var certs []tls.Certificate
 	if cert != nil {
 		certs = []tls.Certificate{*cert}
 	}

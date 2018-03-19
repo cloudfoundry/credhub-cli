@@ -63,7 +63,7 @@ func RemoveConfig() error {
 }
 
 func (cfg *Config) UpdateTrustedCAs(caCerts []string) error {
-	certs := []string{}
+	var certs []string
 
 	for _, cert := range caCerts {
 		certContents, err := util.ReadFileOrStringFromField(cert)

@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
@@ -205,12 +206,22 @@ func (u *Client) RevokeToken(accessToken string) error {
 		return errors.New("could not parse jti from payload")
 	}
 
-	request, _ := http.NewRequest(http.MethodDelete, u.AuthURL+"/oauth/token/revoke/"+jti, nil)
+	request, err := http.NewRequest(http.MethodDelete, u.AuthURL+"/oauth/token/revoke/"+jti, nil)
+	if err != nil {
+		return err
+	}
 	request.Header.Set("Authorization", "Bearer "+accessToken)
 	resp, err := u.Client.Do(request)
 
 	if err == nil {
 		defer resp.Body.Close()
+	}
+	if resp.StatusCode >= http.StatusBadRequest {
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return err
+		}
+		return errors.New(fmt.Sprintf("Received HTTP %d error while revoking token from auth server: %q", resp.StatusCode, body))
 	}
 
 	return err

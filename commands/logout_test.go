@@ -2,7 +2,6 @@ package commands_test
 
 import (
 	"net/http"
-
 	"runtime"
 
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
@@ -10,7 +9,6 @@ import (
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
-	. "github.com/onsi/gomega/ghttp"
 )
 
 var _ = Describe("Logout", func() {
@@ -29,12 +27,17 @@ var _ = Describe("Logout", func() {
 		runLogoutCommand()
 	})
 
-	It("asks UAA to revoke the refresh token (and UAA succeeds)", func() {
-		doRevoke(http.StatusOK)
+	It("asks UAA to revoke the token (and UAA succeeds)", func() {
+		setupUAAConfig(http.StatusOK)
+		runLogoutCommand()
 	})
 
-	It("asks UAA to revoke the refresh token (and reports no error when UAA fails)", func() {
-		doRevoke(http.StatusUnauthorized)
+	It("asks UAA to revoke the token (and reports error when UAA fails)", func() {
+		setupUAAConfig(http.StatusUnauthorized)
+
+		session := runCommand("logout")
+		Eventually(session.Err).Should(Say("Received HTTP 401 error while revoking token"))
+		Eventually(session).Should(Exit(1))
 	})
 
 	ItBehavesLikeHelp("logout", "o", func(session *Session) {
@@ -46,21 +49,6 @@ var _ = Describe("Logout", func() {
 		}
 	})
 })
-
-func doRevoke(uaaResponseStatus int) {
-	cfg := config.Config{
-		RefreshToken: "5b9c9fd51ba14838ac2e6b222d487106-r",
-		AccessToken:  "myAccessToken",
-		AuthURL:      authServer.URL(),
-	}
-	config.WriteConfig(cfg)
-
-	authServer.RouteToHandler(
-		"DELETE", "/oauth/token/revoke/5b9c9fd51ba14838ac2e6b222d487106-r",
-		RespondWith(uaaResponseStatus, ""),
-	)
-	runLogoutCommand()
-}
 
 func runLogoutCommand() {
 	session := runCommand("logout")

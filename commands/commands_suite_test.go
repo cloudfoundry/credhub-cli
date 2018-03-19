@@ -1,6 +1,8 @@
 package commands_test
 
 import (
+	"crypto/tls"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -15,8 +17,6 @@ import (
 	"os/exec"
 	"runtime"
 	"testing"
-
-	"crypto/tls"
 
 	"path/filepath"
 
@@ -183,6 +183,23 @@ func runCommandWithStdin(stdin io.Reader, args ...string) *Session {
 	return session
 }
 
+func setupUAAConfig(uaaResponseStatus int) {
+	cfg := config.Config{
+		RefreshToken: "5b9c9fd51ba14838ac2e6b222d487106-r",
+		AccessToken:  "e30K.eyJqdGkiOiIxIn0K.e30K",
+		AuthURL:      authServer.URL(),
+		ApiURL:       server.URL(),
+	}
+
+	Expect(cfg.UpdateTrustedCAs([]string{"../test/auth-tls-ca.pem", "../test/server-tls-ca.pem"})).To(Succeed())
+	Expect(config.WriteConfig(cfg)).To(Succeed())
+
+	authServer.RouteToHandler(
+		"DELETE", "/oauth/token/revoke/1",
+		RespondWith(uaaResponseStatus, ""),
+	)
+}
+
 func NewTlsServer(certPath, keyPath string) *Server {
 	tlsServer := NewUnstartedServer()
 
@@ -234,9 +251,7 @@ func ItBehavesLikeHelp(command string, alias string, validate func(*Session)) {
 
 func ItRequiresAuthentication(args ...string) {
 	It("requires authentication", func() {
-		authServer.RouteToHandler("DELETE", "/oauth/token/revoke/test-refresh-token",
-			RespondWith(http.StatusOK, nil),
-		)
+		setupUAAConfig(http.StatusOK)
 
 		runCommand("logout")
 
@@ -300,10 +315,7 @@ func ItAutomaticallyLogsIn(method string, responseFixtureFile string, endpoint s
 			})
 
 			It("automatically authenticates", func() {
-				authServer.RouteToHandler(
-					"DELETE", "/oauth/token/revoke/test-refresh-token",
-					RespondWith(http.StatusOK, nil),
-				)
+				setupUAAConfig(http.StatusOK)
 
 				authServer.AppendHandlers(
 					CombineHandlers(
