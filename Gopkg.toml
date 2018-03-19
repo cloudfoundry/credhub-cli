@@ -45,6 +45,10 @@
   branch = "v2"
   name = "gopkg.in/yaml.v2"
 
+[[constraint]]
+  name = "github.com/cloudfoundry/socks5-proxy"
+  revision = "a5dbd34501d246ab6c004c9afebb5bd0dd9d7d22"
+
 [prune]
   go-tests = true
   unused-packages = true
