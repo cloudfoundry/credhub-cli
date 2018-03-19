@@ -212,17 +212,18 @@ func (u *Client) RevokeToken(accessToken string) error {
 	}
 	request.Header.Set("Authorization", "Bearer "+accessToken)
 	resp, err := u.Client.Do(request)
-
-	if err == nil {
-		defer resp.Body.Close()
+	if err != nil {
+		return err
 	}
+	defer resp.Body.Close()
+
 	if resp.StatusCode >= http.StatusBadRequest {
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			return err
 		}
-		return errors.New(fmt.Sprintf("Received HTTP %d error while revoking token from auth server: %q", resp.StatusCode, body))
+		return fmt.Errorf("Received HTTP %d error while revoking token from auth server: %q", resp.StatusCode, body)
 	}
 
-	return err
+	return nil
 }
