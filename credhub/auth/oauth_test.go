@@ -162,7 +162,7 @@ var _ = Describe("OAuthStrategy", func() {
 				apiServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					if r.Header.Get("Authorization") != "Bearer new-access-token" {
 						w.WriteHeader(573)
-						w.Write([]byte(`{"error": "access_token_expired"}`))
+						w.Write([]byte(`{"error": "Access token expired"}`))
 					} else {
 						w.Write([]byte(`Success!`))
 					}
@@ -201,7 +201,7 @@ var _ = Describe("OAuthStrategy", func() {
 			Context("when refreshing token fails", func() {
 				It("returns an error", func() {
 					mockUaaClient.Error = errors.New("failed to refresh")
-					apiServer := fixedResponseServer(573, []byte(`{"error": "access_token_expired"}`))
+					apiServer := fixedResponseServer(573, []byte(`{"error": "Access token expired"}`))
 					defer apiServer.Close()
 
 					oauth := auth.OAuthStrategy{
@@ -224,7 +224,7 @@ var _ = Describe("OAuthStrategy", func() {
 			Context("when refreshing token fails because token is expired", func() {
 				It("returns an error prompting user to log in", func() {
 					mockUaaClient.Error = errors.New("invalid_token")
-					apiServer := fixedResponseServer(573, []byte(`{"error": "access_token_expired"}`))
+					apiServer := fixedResponseServer(573, []byte(`{"error": "Access token expired"}`))
 					defer apiServer.Close()
 
 					oauth := auth.OAuthStrategy{

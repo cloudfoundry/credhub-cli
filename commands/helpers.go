@@ -16,7 +16,9 @@ import (
 func initializeCredhubClient(cfg config.Config) (*credhub.CredHub, error) {
 	var credhubClient *credhub.CredHub
 
-	readConfigFromEnvironmentVariables(&cfg)
+	if err := readConfigFromEnvironmentVariables(&cfg); err != nil {
+		return nil, err
+	}
 
 	err := config.ValidateConfig(cfg)
 	if err != nil {

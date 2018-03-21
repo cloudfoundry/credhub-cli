@@ -9,7 +9,7 @@ import (
 
 // Info returns the targeted CredHub server information.
 func (ch *CredHub) Info() (*server.Info, error) {
-	//This uses a the private 'request' as it makes an https call but it does not require authentication
+	//This uses the private 'request' as it makes an https call but it does not require authentication
 	response, err := ch.request(ch.Client(), "GET", "/info", nil, nil, true)
 	if err != nil {
 		return nil, err
