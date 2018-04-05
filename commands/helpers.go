@@ -60,7 +60,7 @@ func readConfigFromEnvironmentVariables(cfg *config.Config) error {
 		cfg.ApiURL = os.Getenv("CREDHUB_SERVER")
 	}
 
-	if cfg.AuthURL == "" {
+	if cfg.AuthURL == "" && cfg.ApiURL != "" {
 		credhubInfo, err := GetApiInfo(cfg.ApiURL, cfg.CaCerts, cfg.InsecureSkipVerify)
 		if err != nil {
 			return errors.NewNetworkError(err)
