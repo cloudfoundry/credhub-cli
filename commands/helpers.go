@@ -47,7 +47,9 @@ func printCredential(outputJson bool, v interface{}) {
 }
 
 func readConfigFromEnvironmentVariables(cfg *config.Config) error {
-	if cfg.CaCerts == nil && os.Getenv("CREDHUB_CA_CERT") != "" {
+	hasCorrectAuthURL := true
+
+	if os.Getenv("CREDHUB_CA_CERT") != "" {
 		caCerts, err := ReadOrGetCaCerts([]string{os.Getenv("CREDHUB_CA_CERT")})
 		if err != nil {
 			return err
@@ -56,16 +58,16 @@ func readConfigFromEnvironmentVariables(cfg *config.Config) error {
 		cfg.CaCerts = caCerts
 	}
 
-	if cfg.ApiURL == "" && os.Getenv("CREDHUB_SERVER") != "" {
+	if os.Getenv("CREDHUB_SERVER") != "" {
+		hasCorrectAuthURL = cfg.ApiURL == os.Getenv("CREDHUB_SERVER")
 		cfg.ApiURL = os.Getenv("CREDHUB_SERVER")
 	}
 
-	if cfg.AuthURL == "" && cfg.ApiURL != "" {
+	if cfg.ApiURL != "" && !hasCorrectAuthURL {
 		credhubInfo, err := GetApiInfo(cfg.ApiURL, cfg.CaCerts, cfg.InsecureSkipVerify)
 		if err != nil {
 			return errors.NewNetworkError(err)
 		}
-
 		cfg.AuthURL = credhubInfo.AuthServer.URL
 	}
 

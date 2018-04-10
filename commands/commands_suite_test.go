@@ -130,9 +130,10 @@ func login() {
 	)
 
 	server.RouteToHandler("GET", "/info",
-		RespondWith(http.StatusOK, `{
-				"app":{"name":"CredHub"}
-				}`),
+		RespondWith(http.StatusOK, fmt.Sprintf(`{
+				"app":{"name":"CredHub"},
+				"auth-server": {"url": %q}
+				}`, authServer.URL())),
 	)
 
 	server.RouteToHandler("GET", "/version",
@@ -165,6 +166,7 @@ func runCommandWithEnv(env []string, args ...string) *Session {
 	for _, env_var := range env {
 		existing = append(existing, env_var)
 	}
+
 	cmd.Env = existing
 	session, err := Start(cmd, GinkgoWriter, GinkgoWriter)
 	Expect(err).NotTo(HaveOccurred())
@@ -331,7 +333,6 @@ func ItAutomaticallyLogsIn(method string, responseFixtureFile string, endpoint s
 				runCommand("logout")
 
 				session := runCommandWithEnv([]string{"CREDHUB_CLIENT=test_client", "CREDHUB_SECRET=test_secret"}, args...)
-
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -367,6 +368,13 @@ func ItAutomaticallyLogsIn(method string, responseFixtureFile string, endpoint s
 						}),
 						RespondWith(http.StatusOK, serverResponse),
 					),
+				)
+
+				server.RouteToHandler("GET", "/info",
+					RespondWith(http.StatusOK, fmt.Sprintf(`{
+					"app":{"name":"CredHub"},
+					"auth-server": {"url": %q}
+					}`, authServer.URL())),
 				)
 			})
 

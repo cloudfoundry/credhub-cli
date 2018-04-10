@@ -11,6 +11,7 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
 	. "github.com/onsi/gomega/ghttp"
+	"fmt"
 )
 
 var _ = Describe("Delete", func() {
@@ -48,6 +49,7 @@ var _ = Describe("Delete", func() {
 			cfg := config.ReadConfig()
 			cfg.ApiURL = "mashed://potatoes"
 			config.WriteConfig(cfg)
+			fmt.Println(cfg)
 
 			session := runCommand("delete", "-n", "my-secret")
 

@@ -91,7 +91,7 @@ var _ = Describe("Version", func() {
 			It("displays the version with --version", func() {
 				session := runCommand("--version")
 
-				Eventually(session).Should(Exit(0))
+				Eventually(session).Should(Exit(0)) // TODO fails
 				sout := string(session.Out.Contents())
 				testVersion(sout)
 				Expect(sout).To(ContainSubstring("Server Version: Not Found"))
