@@ -21,64 +21,59 @@ type ApiCommand struct {
 	ServerFlagUrl     string            `short:"s" long:"server" description:"URI of API server to target" env:"CREDHUB_SERVER"`
 	CaCerts           []string          `long:"ca-cert" description:"Trusted CA for API and UAA TLS connections. Multiple flags may be provided." env:"CREDHUB_CA_CERT"`
 	SkipTlsValidation bool              `long:"skip-tls-validation" description:"Skip certificate validation of the API endpoint. Not recommended!"`
+	NeedsConfig
 }
 
 type ApiPositionalArgs struct {
 	ServerUrl string `positional-arg-name:"SERVER" description:"URI of API server to target"`
 }
 
-func (cmd ApiCommand) Execute([]string) error {
-	cfg := config.ReadConfig()
-	serverUrl := targetUrl(cmd)
-
-	if serverUrl == "" {
-		if cfg.ApiURL != "" {
-			fmt.Println(cfg.ApiURL)
-		} else {
-			return errors.NewNoApiUrlSetError()
-		}
+func (c *ApiCommand) Execute([]string) error {
+	var newConfig config.Config
+	if c.Server.ServerUrl != "" {
+		newConfig.ApiURL = c.Server.ServerUrl
+	} else if c.ServerFlagUrl != "" {
+		newConfig.ApiURL = c.ServerFlagUrl
+	} else if c.config.ApiURL != "" {
+		fmt.Println(c.config.ApiURL)
+		return nil
 	} else {
-		caCerts, err := ReadOrGetCaCerts(cmd.CaCerts)
-		if err != nil {
-			return err
-		}
+		return errors.NewNoApiUrlSetError()
+	}
+	newConfig.ApiURL = util.AddDefaultSchemeIfNecessary(newConfig.ApiURL)
+	fmt.Println("Setting the target url:", newConfig.ApiURL)
 
-		serverUrl = util.AddDefaultSchemeIfNecessary(serverUrl)
+	caCerts, err := ReadOrGetCaCerts(c.CaCerts)
+	if err != nil {
+		return err
+	}
+	newConfig.CaCerts = caCerts
+	newConfig.InsecureSkipVerify = c.SkipTlsValidation
 
-		credhubInfo, err := GetApiInfo(serverUrl, caCerts, cmd.SkipTlsValidation)
-		if err != nil {
-			return errors.NewNetworkError(err)
-		}
+	credhubInfo, err := GetApiInfo(newConfig.ApiURL, newConfig.CaCerts, newConfig.InsecureSkipVerify)
+	if err != nil {
+		return errors.NewNetworkError(err)
+	}
+	newConfig.AuthURL = credhubInfo.AuthServer.URL
 
-		if credhubInfo.AuthServer.URL != cfg.AuthURL {
-			RevokeTokenIfNecessary(cfg)
-			MarkTokensAsRevokedInConfig(&cfg)
-		}
+	if newConfig.AuthURL != c.config.AuthURL {
+		RevokeTokenIfNecessary(c.config)
+		MarkTokensAsRevokedInConfig(&c.config)
+	}
+	newConfig.AccessToken = c.config.AccessToken
+	newConfig.RefreshToken = c.config.RefreshToken
 
-		cfg.ApiURL = serverUrl
-		cfg.AuthURL = credhubInfo.AuthServer.URL
-		cfg.InsecureSkipVerify = cmd.SkipTlsValidation
-		cfg.CaCerts = caCerts
-
-		err = verifyAuthServerConnection(cfg, cmd.SkipTlsValidation)
-		if err != nil {
-			return errors.NewAuthServerNetworkError(err)
-		}
-
-		err = PrintWarnings(serverUrl, cmd.SkipTlsValidation)
-		if err != nil {
-			return err
-		}
-		fmt.Println("Setting the target url:", cfg.ApiURL)
-
-		err = config.WriteConfig(cfg)
-
-		if err != nil {
-			return err
-		}
+	err = verifyAuthServerConnection(newConfig, newConfig.InsecureSkipVerify)
+	if err != nil {
+		return errors.NewAuthServerNetworkError(err)
 	}
 
-	return nil
+	err = PrintWarnings(newConfig.ApiURL, newConfig.InsecureSkipVerify)
+	if err != nil {
+		return err
+	}
+
+	return config.WriteConfig(newConfig)
 }
 
 func GetApiInfo(serverUrl string, caCerts []string, skipTlsValidation bool) (*server.Info, error) {
@@ -121,12 +116,4 @@ func ReadOrGetCaCerts(caCerts []string) ([]string, error) {
 	}
 
 	return certs, nil
-}
-
-func targetUrl(cmd ApiCommand) string {
-	if cmd.Server.ServerUrl != "" {
-		return cmd.Server.ServerUrl
-	} else {
-		return cmd.ServerFlagUrl
-	}
 }

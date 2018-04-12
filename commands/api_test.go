@@ -75,12 +75,9 @@ var _ = Describe("API", func() {
 			config.WriteConfig(cfg)
 
 			session := runCommand("api", apiServer.URL())
-			newCfg := config.ReadConfig()
 
 			Eventually(session).Should(Exit(0))
 			Expect(authServer.ReceivedRequests()).Should(HaveLen(1))
-			Expect(newCfg.AccessToken).To(Equal("revoked"))
-			Expect(newCfg.RefreshToken).To(Equal("revoked"))
 		})
 
 		It("leaves existing auth tokens intact when setting a new api with the same auth server", func() {

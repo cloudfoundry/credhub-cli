@@ -20,6 +20,8 @@ type Config struct {
 	InsecureSkipVerify bool
 	CaCerts            []string
 	ServerVersion      string
+	ClientID           string
+	ClientSecret       string
 }
 
 func ConfigDir() string {
