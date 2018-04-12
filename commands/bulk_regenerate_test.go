@@ -1,13 +1,14 @@
 package commands_test
 
 import (
+	"net/http"
+
 	"github.com/cloudfoundry-incubator/credhub-cli/commands"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
 	. "github.com/onsi/gomega/ghttp"
-	"net/http"
 )
 
 const BULK_REGENERATE_CREDENTIAL_REQUEST_JSON = `{"signed_by": "example-ca"}`

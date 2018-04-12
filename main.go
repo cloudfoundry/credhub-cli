@@ -35,6 +35,9 @@ func main() {
 
 		if cmd, ok := command.(NeedsClient); ok {
 			cfg := config.ReadConfig()
+			if err := config.ValidateConfig(cfg); err != nil {
+				return err
+			}
 			client, err := credhub.New(cfg.ApiURL,
 				credhub.AuthURL(cfg.AuthURL),
 				credhub.CaCerts(cfg.CaCerts...),

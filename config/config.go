@@ -2,6 +2,7 @@ package config
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path"
@@ -42,6 +43,24 @@ func ReadConfig() Config {
 
 	json.Unmarshal(data, &c)
 
+	if server, ok := os.LookupEnv("CREDHUB_SERVER"); ok {
+		c.ApiURL = server
+	}
+	if client, ok := os.LookupEnv("CREDHUB_CLIENT"); ok {
+		c.ClientID = client
+	}
+	if clientSecret, ok := os.LookupEnv("CREDHUB_SECRET"); ok {
+		c.ClientSecret = clientSecret
+	}
+	if caCert, ok := os.LookupEnv("CREDHUB_CA_CERT"); ok {
+		certs, err := ReadOrGetCaCerts([]string{caCert})
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error parsing CA certificates: %+v", err)
+			return c
+		}
+		c.CaCerts = certs
+	}
+
 	return c
 }
 
@@ -78,4 +97,18 @@ func (cfg *Config) UpdateTrustedCAs(caCerts []string) error {
 	cfg.CaCerts = certs
 
 	return nil
+}
+
+func ReadOrGetCaCerts(caCerts []string) ([]string, error) {
+	certs := []string{}
+
+	for _, cert := range caCerts {
+		certContents, err := util.ReadFileOrStringFromField(cert)
+		if err != nil {
+			return certs, err
+		}
+		certs = append(certs, certContents)
+	}
+
+	return certs, nil
 }

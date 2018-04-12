@@ -6,7 +6,7 @@ func ValidateConfig(c Config) error {
 	err := ValidateConfigApi(c)
 	if err != nil {
 		return err
-	} else if c.AccessToken == "" || c.AccessToken == "revoked" {
+	} else if (c.AccessToken == "" || c.AccessToken == "revoked") && c.ClientID == "" {
 		return errors.NewRevokedTokenError()
 	}
 
