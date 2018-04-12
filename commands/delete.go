@@ -2,27 +2,17 @@ package commands
 
 import (
 	"fmt"
-
-	"github.com/cloudfoundry-incubator/credhub-cli/config"
 )
 
 type DeleteCommand struct {
 	CredentialIdentifier string `short:"n" long:"name" required:"yes" description:"Name of the credential to delete"`
+	ClientCommand
 }
 
-func (cmd DeleteCommand) Execute([]string) error {
-	cfg := config.ReadConfig()
-	credhubClient, err := initializeCredhubClient(cfg)
-
-	if err != nil {
+func (c *DeleteCommand) Execute([]string) error {
+	if err := c.client.Delete(c.CredentialIdentifier); err != nil {
 		return err
 	}
-
-	err = credhubClient.Delete(cmd.CredentialIdentifier)
-
-	if err == nil {
-		fmt.Println("Credential successfully deleted")
-	}
-
-	return err
+	fmt.Println("Credential successfully deleted")
+	return nil
 }

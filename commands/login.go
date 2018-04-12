@@ -23,92 +23,95 @@ type LoginCommand struct {
 	SkipTlsValidation bool     `long:"skip-tls-validation" description:"Skip certificate validation of the API endpoint. Not recommended!"`
 	SSO               bool     `long:"sso" description:"Prompt for a one-time passcode to login"`
 	SSOPasscode       string   `long:"sso-passcode" description:"One-time passcode"`
+	ConfigCommand
 }
 
-func (cmd LoginCommand) Execute([]string) error {
+func (c *LoginCommand) Execute([]string) error {
 	var (
 		accessToken  string
 		refreshToken string
 		err          error
 	)
-	cfg := config.ReadConfig()
 
-	if cfg.ApiURL == "" && cmd.ServerUrl == "" {
+	if c.config.ApiURL == "" && c.ServerUrl == "" {
 		return errors.NewNoApiUrlSetError()
 	}
 
-	if cmd.ServerUrl != "" {
-		cfg.InsecureSkipVerify = cmd.SkipTlsValidation
+	if c.ServerUrl != "" {
+		c.config.InsecureSkipVerify = c.SkipTlsValidation
 
-		serverUrl := util.AddDefaultSchemeIfNecessary(cmd.ServerUrl)
-		cfg.ApiURL = serverUrl
+		serverUrl := util.AddDefaultSchemeIfNecessary(c.ServerUrl)
+		c.config.ApiURL = serverUrl
 
-		err := cfg.UpdateTrustedCAs(cmd.CaCerts)
+		err := c.config.UpdateTrustedCAs(c.CaCerts)
 		if err != nil {
 			return err
 		}
 
-		credhubInfo, err := GetApiInfo(serverUrl, cfg.CaCerts, cmd.SkipTlsValidation)
+		credhubInfo, err := GetApiInfo(serverUrl, c.config.CaCerts, c.SkipTlsValidation)
 		if err != nil {
 			return errors.NewNetworkError(err)
 		}
-		cfg.AuthURL = credhubInfo.AuthServer.URL
+		c.config.AuthURL = credhubInfo.AuthServer.URL
 
-		cfg.ServerVersion = credhubInfo.App.Version
+		c.config.ServerVersion = credhubInfo.App.Version
 
-		err = verifyAuthServerConnection(cfg, cmd.SkipTlsValidation)
+		err = verifyAuthServerConnection(c.config, c.SkipTlsValidation)
 		if err != nil {
 			return errors.NewNetworkError(err)
 		}
 	}
 
-	err = validateParameters(&cmd)
+	err = validateParameters(c)
 
 	if err != nil {
 		return err
 	}
-	credhubClient, err := credhub.New(cfg.ApiURL, credhub.CaCerts(cfg.CaCerts...), credhub.SkipTLSValidation(cfg.InsecureSkipVerify))
+	credhubClient, err := credhub.New(c.config.ApiURL, credhub.CaCerts(c.config.CaCerts...), credhub.SkipTLSValidation(c.config.InsecureSkipVerify))
+	if err != nil {
+		return err
+	}
 
 	uaaClient := uaa.Client{
-		AuthURL: cfg.AuthURL,
+		AuthURL: c.config.AuthURL,
 		Client:  credhubClient.Client(),
 	}
 
-	if cmd.ClientName != "" || cmd.ClientSecret != "" {
-		accessToken, err = uaaClient.ClientCredentialGrant(cmd.ClientName, cmd.ClientSecret)
+	if c.ClientName != "" || c.ClientSecret != "" {
+		accessToken, err = uaaClient.ClientCredentialGrant(c.ClientName, c.ClientSecret)
 	} else {
-		err = promptForMissingCredentials(&cmd, &uaaClient)
+		err = promptForMissingCredentials(c, &uaaClient)
 		if err == nil {
-			if cmd.SSOPasscode != "" {
-				accessToken, refreshToken, err = uaaClient.PasscodeGrant(config.AuthClient, config.AuthPassword, cmd.SSOPasscode)
+			if c.SSOPasscode != "" {
+				accessToken, refreshToken, err = uaaClient.PasscodeGrant(config.AuthClient, config.AuthPassword, c.SSOPasscode)
 			} else {
-				accessToken, refreshToken, err = uaaClient.PasswordGrant(config.AuthClient, config.AuthPassword, cmd.Username, cmd.Password)
+				accessToken, refreshToken, err = uaaClient.PasswordGrant(config.AuthClient, config.AuthPassword, c.Username, c.Password)
 			}
 		}
 	}
 
 	if err != nil {
-		RevokeTokenIfNecessary(cfg)
-		MarkTokensAsRevokedInConfig(&cfg)
-		config.WriteConfig(cfg)
+		RevokeTokenIfNecessary(c.config)
+		MarkTokensAsRevokedInConfig(&c.config)
+		config.WriteConfig(c.config)
 		return errors.NewAuthorizationError()
 	}
 
 	if os.Getenv("CREDHUB_CLIENT") == "" || os.Getenv("CREDHUB_SECRET") == "" {
-		cfg.AccessToken = accessToken
+		c.config.AccessToken = accessToken
 	} else {
-		cfg.AccessToken = ""
+		c.config.AccessToken = ""
 	}
 
-	cfg.RefreshToken = refreshToken
+	c.config.RefreshToken = refreshToken
 
-	if err := config.WriteConfig(cfg); err != nil {
+	if err := config.WriteConfig(c.config); err != nil {
 		return err
 	}
 
-	if cmd.ServerUrl != "" {
-		PrintWarnings(cmd.ServerUrl, cmd.SkipTlsValidation)
-		fmt.Println("Setting the target url:", cfg.ApiURL)
+	if c.ServerUrl != "" {
+		PrintWarnings(c.ServerUrl, c.SkipTlsValidation)
+		fmt.Println("Setting the target url:", c.config.ApiURL)
 	}
 
 	fmt.Println("Login Successful")

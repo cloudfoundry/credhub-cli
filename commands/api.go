@@ -21,7 +21,7 @@ type ApiCommand struct {
 	ServerFlagUrl     string            `short:"s" long:"server" description:"URI of API server to target" env:"CREDHUB_SERVER"`
 	CaCerts           []string          `long:"ca-cert" description:"Trusted CA for API and UAA TLS connections. Multiple flags may be provided." env:"CREDHUB_CA_CERT"`
 	SkipTlsValidation bool              `long:"skip-tls-validation" description:"Skip certificate validation of the API endpoint. Not recommended!"`
-	NeedsConfig
+	ConfigCommand
 }
 
 type ApiPositionalArgs struct {

@@ -7,8 +7,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/url"
-
-	"github.com/cloudfoundry-incubator/credhub-cli/config"
 )
 
 type CurlCommand struct {
@@ -16,24 +14,16 @@ type CurlCommand struct {
 	Method        string `short:"X" description:"HTTP method (default: GET)"`
 	Data          string `short:"d" description:"HTTP data to include in the request body"`
 	IncludeHeader bool   `short:"i" description:"Include the response headers in the output"`
+	ClientCommand
 }
 
-func (cmd CurlCommand) Execute([]string) error {
-	var err error
-
-	cfg := config.ReadConfig()
-
-	credhubClient, err := initializeCredhubClient(cfg)
-	if err != nil {
-		return err
-	}
-
-	if cmd.Path == "" {
+func (c *CurlCommand) Execute([]string) error {
+	if c.Path == "" {
 		return errors.New("A path must be provided. Please update and retry your request.")
 	}
 
 	query := url.Values{}
-	u, err := url.Parse(cmd.Path)
+	u, err := url.Parse(c.Path)
 	if err != nil {
 		return err
 	}
@@ -46,17 +36,17 @@ func (cmd CurlCommand) Execute([]string) error {
 	}
 
 	var dat map[string]interface{}
-	if cmd.Data != "" {
-		if err := json.Unmarshal([]byte(cmd.Data), &dat); err != nil {
+	if c.Data != "" {
+		if err := json.Unmarshal([]byte(c.Data), &dat); err != nil {
 			return err
 		}
 	}
 
-	response, err := credhubClient.Request(cmd.Method, u.Path, query, dat, false)
+	response, err := c.client.Request(c.Method, u.Path, query, dat, false)
 	if err != nil {
 		return err
 	}
-	if cmd.IncludeHeader {
+	if c.IncludeHeader {
 		headers := new(bytes.Buffer)
 		err = response.Header.Write(headers)
 

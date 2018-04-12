@@ -7,43 +7,36 @@ import (
 
 	"reflect"
 
-	"github.com/cloudfoundry-incubator/credhub-cli/config"
+	"github.com/cloudfoundry-incubator/credhub-cli/credhub"
 	"github.com/cloudfoundry-incubator/credhub-cli/errors"
 	"github.com/cloudfoundry-incubator/credhub-cli/models"
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub"
 )
 
 type ImportCommand struct {
 	File string `short:"f" long:"file" description:"File containing credentials to import" required:"true"`
+	ClientCommand
 }
 
-func (cmd ImportCommand) Execute([]string) error {
+func (c *ImportCommand) Execute([]string) error {
 	var bulkImport models.CredentialBulkImport
-	err := bulkImport.ReadFile(cmd.File)
+	err := bulkImport.ReadFile(c.File)
 
 	if err != nil {
 		return err
 	}
 
-	err = setCredentials(bulkImport)
+	err = c.setCredentials(bulkImport)
 
 	return err
 }
 
-func setCredentials(bulkImport models.CredentialBulkImport) error {
+func (c *ImportCommand) setCredentials(bulkImport models.CredentialBulkImport) error {
 	var (
 		name       string
 		successful int
 		failed     int
 	)
 	errors := make([]string, 0)
-
-	cfg := config.ReadConfig()
-
-	credhubClient, err := initializeCredhubClient(cfg)
-	if err != nil {
-		return err
-	}
 
 	for i, credential := range bulkImport.Credentials {
 		switch credentialName := credential["name"].(type) {
@@ -53,7 +46,7 @@ func setCredentials(bulkImport models.CredentialBulkImport) error {
 			name = ""
 		}
 
-		result, err := credhubClient.SetCredential(name, credential["type"].(string), credential["value"], credhub.Overwrite)
+		result, err := c.client.SetCredential(name, credential["type"].(string), credential["value"], credhub.Overwrite)
 
 		if err != nil {
 			if isAuthenticationError(err) {

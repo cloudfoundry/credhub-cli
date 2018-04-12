@@ -20,6 +20,6 @@ type GenerationParameters struct {
 	Ca               string   `json:"ca,omitempty"`
 	SelfSign         bool     `json:"self_sign,omitempty"`
 	IsCA             bool     `json:"is_ca,omitempty"`
-	SshComment       string   `json:"ssh_comment,omitempty"`
-	Username 		 string   `json:"username,omitempty"`
+	SSHComment       string   `json:"ssh_comment,omitempty"`
+	Username         string   `json:"username,omitempty"`
 }

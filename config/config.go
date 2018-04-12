@@ -44,7 +44,10 @@ func ReadConfig() Config {
 	json.Unmarshal(data, &c)
 
 	if server, ok := os.LookupEnv("CREDHUB_SERVER"); ok {
-		c.ApiURL = server
+		c.ApiURL = util.AddDefaultSchemeIfNecessary(server)
+		c.AuthURL = ""
+		c.AccessToken = ""
+		c.RefreshToken = ""
 	}
 	if client, ok := os.LookupEnv("CREDHUB_CLIENT"); ok {
 		c.ClientID = client

@@ -3,7 +3,6 @@ package commands
 import (
 	"strings"
 
-	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub"
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials/generate"
 	"github.com/cloudfoundry-incubator/credhub-cli/errors"
@@ -14,14 +13,14 @@ type GenerateCommand struct {
 	CredentialIdentifier string   `short:"n" required:"yes" long:"name" description:"Name of the credential to generate"`
 	CredentialType       string   `short:"t" long:"type" description:"Sets the credential type to generate. Valid types include 'password', 'user', 'certificate', 'ssh' and 'rsa'."`
 	NoOverwrite          bool     `short:"O" long:"no-overwrite" description:"Credential is not modified if stored value already exists"`
-	OutputJson           bool     `short:"j" long:"output-json" description:"Return response in JSON format"`
+	OutputJSON           bool     `short:"j" long:"output-json" description:"Return response in JSON format"`
 	Username             string   `short:"z" long:"username" description:"[User] Sets the username value of the credential"`
 	Length               int      `short:"l" long:"length" description:"[Password, User] Length of the generated value (Default: 30)"`
 	IncludeSpecial       bool     `short:"S" long:"include-special" description:"[Password, User] Include special characters in the generated value"`
 	ExcludeNumber        bool     `short:"N" long:"exclude-number" description:"[Password, User] Exclude number characters from the generated value"`
 	ExcludeUpper         bool     `short:"U" long:"exclude-upper" description:"[Password, User] Exclude upper alpha characters from the generated value"`
 	ExcludeLower         bool     `short:"L" long:"exclude-lower" description:"[Password, User] Exclude lower alpha characters from the generated value"`
-	SshComment           string   `short:"m" long:"ssh-comment" description:"[SSH] Comment appended to public key to help identify in environment"`
+	SSHComment           string   `short:"m" long:"ssh-comment" description:"[SSH] Comment appended to public key to help identify in environment"`
 	KeyLength            int      `short:"k" long:"key-length" description:"[Certificate, SSH, RSA] Bit length of the generated key (Default: 2048)"`
 	Duration             int      `short:"d" long:"duration" description:"[Certificate] Valid duration (in days) of the generated certificate (Default: 365)"`
 	CommonName           string   `short:"c" long:"common-name" description:"[Certificate] Common name of the generated certificate"`
@@ -36,76 +35,70 @@ type GenerateCommand struct {
 	Ca                   string   `long:"ca" description:"[Certificate] Name of CA used to sign the generated certificate"`
 	IsCA                 bool     `long:"is-ca" description:"[Certificate] The generated certificate is a certificate authority"`
 	SelfSign             bool     `long:"self-sign" description:"[Certificate] The generated certificate will be self-signed"`
+	ClientCommand
 }
 
-func (cmd GenerateCommand) Execute([]string) error {
-	if cmd.CredentialType == "" {
+func (c GenerateCommand) Execute([]string) error {
+	if c.CredentialType == "" {
 		return errors.NewGenerateEmptyTypeError()
 	}
 
 	var parameters interface{}
 
-	cmd.CredentialType = strings.ToLower(cmd.CredentialType)
+	c.CredentialType = strings.ToLower(c.CredentialType)
 
-	if cmd.CredentialType != "user" && len(cmd.Username) > 0 {
+	if c.CredentialType != "user" && len(c.Username) > 0 {
 		return errors.NewUserNameOnlyValidForUserType()
 	}
 
-	cfg := config.ReadConfig()
-
-	if len(cmd.Username) > 0 {
+	if len(c.Username) > 0 {
 		parameters = generate.User{
-			Username:       cmd.Username,
-			Length:         cmd.Length,
-			IncludeSpecial: cmd.IncludeSpecial,
-			ExcludeNumber:  cmd.ExcludeNumber,
-			ExcludeUpper:   cmd.ExcludeUpper,
-			ExcludeLower:   cmd.ExcludeLower,
+			Username:       c.Username,
+			Length:         c.Length,
+			IncludeSpecial: c.IncludeSpecial,
+			ExcludeNumber:  c.ExcludeNumber,
+			ExcludeUpper:   c.ExcludeUpper,
+			ExcludeLower:   c.ExcludeLower,
 		}
 	} else {
 		parameters = models.GenerationParameters{
-			IncludeSpecial:   cmd.IncludeSpecial,
-			ExcludeNumber:    cmd.ExcludeNumber,
-			ExcludeUpper:     cmd.ExcludeUpper,
-			ExcludeLower:     cmd.ExcludeLower,
-			Length:           cmd.Length,
-			CommonName:       cmd.CommonName,
-			Organization:     cmd.Organization,
-			OrganizationUnit: cmd.OrganizationUnit,
-			Locality:         cmd.Locality,
-			State:            cmd.State,
-			Country:          cmd.Country,
-			AlternativeName:  cmd.AlternativeName,
-			ExtendedKeyUsage: cmd.ExtendedKeyUsage,
-			KeyUsage:         cmd.KeyUsage,
-			KeyLength:        cmd.KeyLength,
-			Duration:         cmd.Duration,
-			Ca:               cmd.Ca,
-			SelfSign:         cmd.SelfSign,
-			IsCA:             cmd.IsCA,
-			SshComment:       cmd.SshComment,
-			Username:         cmd.Username,
+			IncludeSpecial:   c.IncludeSpecial,
+			ExcludeNumber:    c.ExcludeNumber,
+			ExcludeUpper:     c.ExcludeUpper,
+			ExcludeLower:     c.ExcludeLower,
+			Length:           c.Length,
+			CommonName:       c.CommonName,
+			Organization:     c.Organization,
+			OrganizationUnit: c.OrganizationUnit,
+			Locality:         c.Locality,
+			State:            c.State,
+			Country:          c.Country,
+			AlternativeName:  c.AlternativeName,
+			ExtendedKeyUsage: c.ExtendedKeyUsage,
+			KeyUsage:         c.KeyUsage,
+			KeyLength:        c.KeyLength,
+			Duration:         c.Duration,
+			Ca:               c.Ca,
+			SelfSign:         c.SelfSign,
+			IsCA:             c.IsCA,
+			SSHComment:       c.SSHComment,
+			Username:         c.Username,
 		}
-	}
-
-	credhubClient, err := initializeCredhubClient(cfg)
-	if err != nil {
-		return err
 	}
 
 	mode := credhub.Overwrite
 
-	if cmd.NoOverwrite {
+	if c.NoOverwrite {
 		mode = credhub.NoOverwrite
 	}
 
-	credential, err := credhubClient.GenerateCredential(cmd.CredentialIdentifier, cmd.CredentialType, parameters, mode)
+	credential, err := c.client.GenerateCredential(c.CredentialIdentifier, c.CredentialType, parameters, mode)
 
 	if err != nil {
 		return err
 	}
 
-	printCredential(cmd.OutputJson, credential)
+	printCredential(c.OutputJSON, credential)
 
 	return nil
 }

@@ -9,15 +9,15 @@ import (
 )
 
 type LogoutCommand struct {
+	ConfigCommand
 }
 
-func (cmd LogoutCommand) Execute([]string) error {
-	cfg := config.ReadConfig()
-	if err := RevokeTokenIfNecessary(cfg); err != nil {
+func (c *LogoutCommand) Execute([]string) error {
+	if err := RevokeTokenIfNecessary(c.config); err != nil {
 		return err
 	}
-	MarkTokensAsRevokedInConfig(&cfg)
-	if err := config.WriteConfig(cfg); err != nil {
+	MarkTokensAsRevokedInConfig(&c.config)
+	if err := config.WriteConfig(c.config); err != nil {
 		return err
 	}
 	fmt.Println("Logout Successful")

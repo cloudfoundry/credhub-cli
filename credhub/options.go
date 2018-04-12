@@ -27,9 +27,12 @@ func Auth(method auth.Builder) Option {
 // If AuthURL provided, the AuthURL will be fetched from /info.
 func AuthURL(authURL string) Option {
 	return func(c *CredHub) error {
-		var err error
-		c.authURL, err = url.Parse(authURL)
-		return err
+		if authURL != "" {
+			var err error
+			c.authURL, err = url.Parse(authURL)
+			return err
+		}
+		return nil
 	}
 }
 
