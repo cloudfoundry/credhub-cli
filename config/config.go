@@ -38,7 +38,9 @@ func ReadConfig() Config {
 
 	data, err := ioutil.ReadFile(ConfigPath())
 	if err != nil {
-		return c
+		if !os.IsNotExist(err) {
+			return c
+		}
 	}
 
 	json.Unmarshal(data, &c)
