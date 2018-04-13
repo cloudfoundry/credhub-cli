@@ -2,11 +2,11 @@ package auth
 
 import (
 	"bytes"
+	"strings"
 	"encoding/json"
 	"errors"
 	"io/ioutil"
 	"net/http"
-	"strings"
 	"sync"
 )
 
@@ -206,7 +206,7 @@ func tokenExpired(resp *http.Response) (bool, error) {
 		return false, nil
 	}
 
-	return errResp["error"] == "Access token expired", nil
+	return errResp["error"] == "access_token_expired", nil
 }
 
 func cloneRequest(r *http.Request) (*http.Request, error) {

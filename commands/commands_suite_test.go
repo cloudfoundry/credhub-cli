@@ -344,7 +344,9 @@ func ItAutomaticallyLogsIn(method string, responseFixtureFile string, endpoint s
 						VerifyHeader(http.Header{
 							"Authorization": []string{"Bearer test-access-token"},
 						}),
-						RespondWith(http.StatusUnauthorized, `{"error":"Access token expired"}`),
+						RespondWith(http.StatusUnauthorized, `{
+						"error":"access_token_expired",
+						"error_description":"error description"}`),
 					),
 				)
 
