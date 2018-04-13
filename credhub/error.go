@@ -2,9 +2,10 @@ package credhub
 
 // Error provides errors for the CredHub client
 type Error struct {
-	Message string `json:"error"`
+	Name        string `json:"error"`
+	Description string `json:"error_description"`
 }
 
 func (e *Error) Error() string {
-	return e.Message
+	return e.Name
 }
