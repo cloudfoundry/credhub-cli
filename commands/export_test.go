@@ -5,8 +5,9 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	"runtime"
+
+	"github.com/cloudfoundry-incubator/credhub-cli/config"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -108,12 +109,12 @@ var _ = Describe("Export", func() {
 
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest("GET", "/api/v1/data", "path=/some/path"),
+						VerifyRequest("GET", "/api/v1/data", "path=some/path"),
 						RespondWith(http.StatusOK, noCredsJson),
 					),
 				)
 
-				session := runCommand("export", "-p", "/some/path")
+				session := runCommand("export", "-p", "some/path")
 
 				Eventually(session).Should(Exit(0))
 			})
@@ -169,10 +170,14 @@ var _ = Describe("Export", func() {
 				),
 			)
 
-			session := runCommand("export", "-f", "/this/should/not/exist/anywhere")
+			session := runCommand("export", "-f", "this/should/not/exist/anywhere")
 
 			Eventually(session).Should(Exit(1))
-			Eventually(string(session.Err.Contents())).Should(ContainSubstring("open /this/should/not/exist/anywhere: no such file or directory"))
+			if runtime.GOOS == "windows" {
+				Eventually(string(session.Err.Contents())).Should(ContainSubstring("open this/should/not/exist/anywhere: The system cannot find the path specified"))
+			} else {
+				Eventually(string(session.Err.Contents())).Should(ContainSubstring("open this/should/not/exist/anywhere: no such file or directory"))
+			}
 		})
 	})
 })
