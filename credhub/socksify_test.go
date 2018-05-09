@@ -51,7 +51,7 @@ var _ = Describe("Socksify", func() {
 				privateKeyPath := filepath.Join(tempDir, "test.key")
 				err = ioutil.WriteFile(privateKeyPath, []byte("some-key"), 0600)
 				Expect(err).NotTo(HaveOccurred())
-				os.Setenv("CREDHUB_PROXY", fmt.Sprintf("ssh+socks5://localhost:12345?private-key=%s", privateKeyPath))
+				os.Setenv("CREDHUB_PROXY", fmt.Sprintf("ssh+socks5://user@localhost:12345?private-key=%s", privateKeyPath))
 				dialFunc = credhub.SOCKS5DialFuncFromEnvironment(origDial, proxyDialer)
 			})
 
@@ -61,6 +61,7 @@ var _ = Describe("Socksify", func() {
 				Expect(proxyDialer.DialerCall.CallCount).To(Equal(1))
 				Expect(proxyDialer.DialerCall.Receives.Key).To(Equal("some-key"))
 				Expect(proxyDialer.DialerCall.Receives.URL).To(Equal("localhost:12345"))
+				Expect(proxyDialer.DialerCall.Receives.Username).To(Equal("user"))
 				os.Unsetenv("CREDHUB_PROXY")
 			})
 
@@ -175,6 +176,7 @@ type FakeProxyDialer struct {
 	DialerCall struct {
 		CallCount int
 		Receives  struct {
+			Username string
 			Key string
 			URL string
 		}
@@ -186,10 +188,11 @@ type FakeProxyDialer struct {
 	mut sync.Mutex
 }
 
-func (p *FakeProxyDialer) Dialer(key, url string) (proxy.DialFunc, error) {
+func (p *FakeProxyDialer) Dialer(username, key, url string) (proxy.DialFunc, error) {
 	p.mut.Lock()
 	defer p.mut.Unlock()
 	p.DialerCall.CallCount++
+	p.DialerCall.Receives.Username = username
 	p.DialerCall.Receives.Key = key
 	p.DialerCall.Receives.URL = url
 

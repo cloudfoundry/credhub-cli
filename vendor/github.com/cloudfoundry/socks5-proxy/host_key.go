@@ -6,36 +6,30 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-//go:generate counterfeiter . KeyGetter
-type KeyGetter interface {
-	Get(string, string) (ssh.PublicKey, error)
-}
-
-type HostKeyGetter struct {
+type HostKey struct {
 	publicKeyChannel chan ssh.PublicKey
 	dialErrorChannel chan error
-	username         string
 }
 
-func NewHostKeyGetter(username string) HostKeyGetter {
+func NewHostKey() HostKey {
+	return HostKey{
+		publicKeyChannel: make(chan ssh.PublicKey),
+		dialErrorChannel: make(chan error),
+	}
+}
+
+func (h HostKey) Get(username, privateKey, serverURL string) (ssh.PublicKey, error) {
 	if username == "" {
 		username = "jumpbox"
 	}
-	return HostKeyGetter{
-		publicKeyChannel: make(chan ssh.PublicKey),
-		dialErrorChannel: make(chan error),
-		username:         username,
-	}
-}
 
-func (h HostKeyGetter) Get(key, serverURL string) (ssh.PublicKey, error) {
-	signer, err := ssh.ParsePrivateKey([]byte(key))
+	signer, err := ssh.ParsePrivateKey([]byte(privateKey))
 	if err != nil {
 		return nil, err
 	}
 
 	clientConfig := &ssh.ClientConfig{
-		User: h.username,
+		User: username,
 		Auth: []ssh.AuthMethod{
 			ssh.PublicKeys(signer),
 		},
@@ -56,7 +50,7 @@ func (h HostKeyGetter) Get(key, serverURL string) (ssh.PublicKey, error) {
 	return <-h.publicKeyChannel, <-h.dialErrorChannel
 }
 
-func (h HostKeyGetter) keyScanCallback(hostname string, remote net.Addr, key ssh.PublicKey) error {
+func (h HostKey) keyScanCallback(hostname string, remote net.Addr, key ssh.PublicKey) error {
 	h.publicKeyChannel <- key
 	return nil
 }
