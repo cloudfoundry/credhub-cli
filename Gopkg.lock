@@ -8,21 +8,21 @@
   revision = "e75332964ef517daa070d7c38a9466a0d687e0a5"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/cloudfoundry/go-socks5"
+  packages = ["."]
+  revision = "54f73bdb8a8e85a6611d3d29ab9bbf98c2a060d7"
+
+[[projects]]
   name = "github.com/cloudfoundry/socks5-proxy"
   packages = ["."]
-  revision = "a5dbd34501d246ab6c004c9afebb5bd0dd9d7d22"
+  revision = "3c6b4eec9c2d16c1dac4c42bdb5f755ba09daff8"
 
 [[projects]]
   name = "github.com/fatih/color"
   packages = ["."]
   revision = "507f6050b8568533fb3f5504de8e5205fa62a114"
   version = "v1.6.0"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/genevievelesperance/go-socks5"
-  packages = ["."]
-  revision = "54f73bdb8a8e85a6611d3d29ab9bbf98c2a060d7"
 
 [[projects]]
   name = "github.com/golang/protobuf"
@@ -177,12 +177,12 @@
 [[projects]]
   name = "gopkg.in/yaml.v2"
   packages = ["."]
-  revision = "7f97868eec74b32b0982dd158a51a446d1da7eb5"
-  version = "v2.1.1"
+  revision = "5420a8b6744d3b0345ab293f6fcba19c978f1183"
+  version = "v2.2.1"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "8f75f8ef72dcbd14e08f9f4a5ea111edebaf04aa9fad31f8025c6386c15c1ac8"
+  inputs-digest = "11bc94b8a30403fa62b8a8117c7eec38b46586489a4359a658d1175c59ef8892"
   solver-name = "gps-cdcl"
   solver-version = 1

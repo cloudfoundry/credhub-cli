@@ -15,7 +15,7 @@ import (
 type DialFunc func(network, address string) (net.Conn, error)
 
 type ProxyDialer interface {
-	Dialer(string, string) (proxy.DialFunc, error)
+	Dialer(string, string, string) (proxy.DialFunc, error)
 }
 
 func (f DialFunc) Dial(network, address string) (net.Conn, error) { return f(network, address) }
@@ -44,6 +44,12 @@ func SOCKS5DialFuncFromEnvironment(origDialer DialFunc, socks5Proxy ProxyDialer)
 			return origDialer
 		}
 
+		username := ""
+		if proxyURL.User != nil {
+			username = proxyURL.User.Username()
+		}
+
+
 		if len(proxySSHKeyPath) == 0 {
 			return origDialer
 		}
@@ -69,7 +75,7 @@ func SOCKS5DialFuncFromEnvironment(origDialer DialFunc, socks5Proxy ProxyDialer)
 			mut.Lock()
 			defer mut.Unlock()
 			if dialer == nil {
-				proxyDialer, err := socks5Proxy.Dialer(string(proxySSHKey), proxyURL.Host)
+				proxyDialer, err := socks5Proxy.Dialer(username,string(proxySSHKey), proxyURL.Host)
 				if err != nil {
 					return nil, err
 				}
