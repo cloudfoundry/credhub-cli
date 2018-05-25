@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -36,8 +37,13 @@ func initializeCredhubClient(cfg config.Config) (*credhub.CredHub, error) {
 
 func printCredential(outputJson bool, v interface{}) {
 	if outputJson {
+
 		s, _ := json.MarshalIndent(v, "", "\t")
-		fmt.Println(string(s))
+		a := bytes.Replace(s, []byte("\\u003c"), []byte("<"), -1)
+		b := bytes.Replace(a, []byte("\\u003e"), []byte(">"), -1)
+
+		fmt.Println(string(b))
+
 	} else {
 		s, _ := yaml.Marshal(v)
 		fmt.Println(string(s))

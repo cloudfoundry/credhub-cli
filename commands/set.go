@@ -1,15 +1,14 @@
 package commands
 
 import (
-	"fmt"
-
 	"bufio"
+	"encoding/json"
+	"fmt"
 	"os"
 	"strings"
 
-	"encoding/json"
-
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub"
+	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials"
 	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials/values"
 	"github.com/cloudfoundry-incubator/credhub-cli/errors"
 	"github.com/cloudfoundry-incubator/credhub-cli/util"
@@ -50,6 +49,7 @@ func (c *SetCommand) Execute([]string) error {
 		return err
 	}
 
+	credential.Value = "<redacted>"
 	printCredential(c.OutputJSON, credential)
 
 	return nil
@@ -88,7 +88,7 @@ func (c *SetCommand) setFieldsFromFileOrString() error {
 	return err
 }
 
-func (c *SetCommand) setCredential() (interface{}, error) {
+func (c *SetCommand) setCredential() (credentials.Credential, error) {
 	mode := credhub.Overwrite
 
 	if c.NoOverwrite {
@@ -126,7 +126,7 @@ func (c *SetCommand) setCredential() (interface{}, error) {
 		value = values.JSON{}
 		err := json.Unmarshal([]byte(c.Value), &value)
 		if err != nil {
-			return nil, err
+			return credentials.Credential{}, err
 		}
 	default:
 		value = values.Value(c.Value)
