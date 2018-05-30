@@ -1,11 +1,9 @@
 package commands_test
 
 import (
-	"net/http"
-
-	"os"
-
 	"io/ioutil"
+	"net/http"
+	"os"
 
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	. "github.com/onsi/ginkgo"

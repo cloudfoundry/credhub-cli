@@ -47,7 +47,7 @@ var _ = Describe("Generate", func() {
 			Eventually(session).Should(Exit(0))
 			Eventually(session.Out).Should(Say("name: my-password"))
 			Eventually(session.Out).Should(Say("type: password"))
-			Eventually(session.Out).Should(Say("value: potatoes"))
+			Eventually(session.Out).Should(Say("value: <redacted>"))
 		})
 
 		It("can print the generated password secret as JSON", func() {
@@ -61,7 +61,7 @@ var _ = Describe("Generate", func() {
 				"type": "password",
 				"name": "my-password",
 				"version_created_at": "` + TIMESTAMP + `",
-				"value": "potatoes"
+				"value": "<redacted>"
 			}`))
 		})
 
@@ -82,7 +82,7 @@ var _ = Describe("Generate", func() {
 			Eventually(session).Should(Exit(0))
 			Eventually(session.Out).Should(Say("name: my-password"))
 			Eventually(session.Out).Should(Say("type: password"))
-			Eventually(session.Out).Should(Say("value: potatoes"))
+			Eventually(session.Out).Should(Say("value: <redacted>"))
 		})
 
 		It("can print the secret as JSON", func() {
@@ -101,7 +101,7 @@ var _ = Describe("Generate", func() {
 				"type": "password",
 				"name": "my-password",
 				"version_created_at": "` + TIMESTAMP + `",
-				"value": "potatoes"
+				"value": "<redacted>"
 			}`))
 		})
 
@@ -150,8 +150,7 @@ var _ = Describe("Generate", func() {
 
 			Eventually(session).Should(Exit(0))
 			Eventually(session.Out).Should(Say("name: foo-ssh-key"))
-			Eventually(session.Out).Should(Say("private_key: some-private-key"))
-			Eventually(session.Out).Should(Say("public_key: some-public-key"))
+			Eventually(session.Out).Should(Say("value: <redacted>"))
 		})
 
 		It("allows the type to be any case", func() {
@@ -174,10 +173,7 @@ var _ = Describe("Generate", func() {
 				"type": "ssh",
 				"name": "foo-ssh-key",
 				"version_created_at": "` + TIMESTAMP + `",
-				"value": {
-					"public_key": "some-public-key",
-					"private_key": "fake-private-key"
-				}
+				"value": "<redacted>"
 			}`))
 		})
 
@@ -209,8 +205,7 @@ var _ = Describe("Generate", func() {
 
 			Eventually(session).Should(Exit(0))
 			Eventually(session.Out).Should(Say("name: foo-rsa-key"))
-			Eventually(session.Out).Should(Say("private_key: some-private-key"))
-			Eventually(session.Out).Should(Say("public_key: some-public-key"))
+			Eventually(session.Out).Should(Say("value: <redacted>"))
 		})
 
 		It("allows the type to be any case", func() {
@@ -233,10 +228,7 @@ var _ = Describe("Generate", func() {
 				"type": "rsa",
 				"name": "foo-rsa-key",
 				"version_created_at": "` + TIMESTAMP + `",
-				"value": {
-					"public_key": "some-public-key",
-					"private_key": "fake-private-key"
-				}
+				"value": "<redacted>"
 			}`))
 		})
 
@@ -263,9 +255,7 @@ var _ = Describe("Generate", func() {
 			Eventually(session).Should(Exit(0))
 			Eventually(session.Out).Should(Say("name: my-secret"))
 			Eventually(session.Out).Should(Say("type: certificate"))
-			Eventually(session.Out).Should(Say("ca: my-ca"))
-			Eventually(session.Out).Should(Say("certificate: my-cert"))
-			Eventually(session.Out).Should(Say("private_key: my-priv"))
+			Eventually(session.Out).Should(Say("value: <redacted>"))
 		})
 
 		It("allows the type to be any case", func() {
@@ -290,11 +280,7 @@ var _ = Describe("Generate", func() {
 				"version_created_at": "` + TIMESTAMP + `",
 				"type": "certificate",
 				"name": "my-secret",
-				"value": {
-					"ca": "my-ca",
-					"certificate": "my-cert",
-					"private_key": "my-priv"
-				}
+				"value": "<redacted>"
 			}`))
 		})
 
@@ -420,9 +406,7 @@ var _ = Describe("Generate", func() {
 			Eventually(session).Should(Exit(0))
 			Expect(session.Out.Contents()).To(ContainSubstring("name: my-username-credential"))
 			Expect(session.Out.Contents()).To(ContainSubstring("type: user"))
-			Expect(session.Out.Contents()).To(ContainSubstring("password: test-password"))
-			Expect(session.Out.Contents()).To(ContainSubstring("password_hash: passw0rd-H4$h"))
-			Expect(session.Out.Contents()).To(ContainSubstring("username: my-username"))
+			Expect(session.Out.Contents()).To(ContainSubstring("value: <redacted>"))
 		})
 
 		It("allows the type to be any case", func() {
@@ -453,9 +437,7 @@ var _ = Describe("Generate", func() {
 
 			Eventually(session).Should(Exit(0))
 			Expect(string(session.Out.Contents())).To(ContainSubstring("name: my-username-credential"))
-			Expect(string(session.Out.Contents())).To(ContainSubstring("password: test-password"))
-			Expect(string(session.Out.Contents())).To(ContainSubstring("password_hash: passw0rd-H4$h"))
-			Expect(string(session.Out.Contents())).To(ContainSubstring("username: my-username"))
+			Expect(string(session.Out.Contents())).To(ContainSubstring("value: <redacted>"))
 		})
 
 		It("with with no-overwrite", func() {
