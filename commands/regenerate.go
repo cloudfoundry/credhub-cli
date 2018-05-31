@@ -13,6 +13,7 @@ func (c *RegenerateCommand) Execute([]string) error {
 		return err
 	}
 
+	credential.Value = "<redacted>"
 	printCredential(c.OutputJSON, credential)
 
 	return nil

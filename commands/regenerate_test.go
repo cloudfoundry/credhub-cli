@@ -38,7 +38,7 @@ var _ = Describe("Regenerate", func() {
 			Eventually(session).Should(Exit(0))
 			Eventually(session.Out).Should(Say("name: my-password-stuff"))
 			Eventually(session.Out).Should(Say("type: password"))
-			Eventually(session.Out).Should(Say("value: nu-potatoes"))
+			Eventually(session.Out).Should(Say("value: <redacted>"))
 
 		})
 
@@ -53,7 +53,7 @@ var _ = Describe("Regenerate", func() {
 			session := runCommand("regenerate", "--name", "my-password-stuffs", "--output-json")
 
 			Eventually(session).Should(Exit(0))
-			Expect(string(session.Out.Contents())).To(MatchJSON(fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_JSON, "password", "my-password-stuffs", "nu-potatoes")))
+			Expect(string(session.Out.Contents())).To(MatchJSON(fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_JSON, "password", "my-password-stuffs", "<redacted>")))
 		})
 
 		It("prints error when server returns an error", func() {
