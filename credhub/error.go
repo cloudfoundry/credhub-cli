@@ -1,5 +1,7 @@
 package credhub
 
+import "fmt"
+
 // Error provides errors for the CredHub client
 type Error struct {
 	Name        string `json:"error"`
@@ -7,5 +9,8 @@ type Error struct {
 }
 
 func (e *Error) Error() string {
-	return e.Name
+	if e.Description == "" {
+		return e.Name
+	}
+	return fmt.Sprintf("%s: %s", e.Name, e.Description)
 }

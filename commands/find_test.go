@@ -239,4 +239,18 @@ var _ = Describe("Find", func() {
 			})
 		})
 	})
+
+	Describe("when an error is received from the server", func() {
+		It("shows the error name and description", func() {
+			server.AppendHandlers(
+				RespondWith(http.StatusBadRequest, `{"error": "test error", "error_description": "test description"}`),
+			)
+
+			session := runCommand("find")
+
+			Eventually(session).Should(Exit(1))
+
+			Expect(session.Err).To(Say("test error: test description"))
+		})
+	})
 })
