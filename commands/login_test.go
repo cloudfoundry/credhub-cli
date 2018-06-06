@@ -609,57 +609,210 @@ var _ = Describe("Login", func() {
 			})
 		})
 
-		Context("when credentials are invalid", func() {
-			var (
-				apiServer    *Server
-				badUaaServer *Server
-				session      *Session
-			)
 
-			BeforeEach(func() {
-				badUaaServer = NewServer()
-				badUaaServer.RouteToHandler("POST", "/oauth/token",
-					CombineHandlers(
-						VerifyBody([]byte(`client_id=`+config.AuthClient+`&client_secret=`+config.AuthPassword+`&grant_type=password&password=pass&response_type=token&username=user`)),
-						RespondWith(http.StatusUnauthorized, `{
-						"error":"unauthorized",
-						"error_description":"An Authentication object was not found in the SecurityContext"
-						}`),
-					))
-				badUaaServer.RouteToHandler("DELETE", "/oauth/token/revoke/"+VALID_ACCESS_TOKEN_JTI,
-					RespondWith(http.StatusOK, ""),
+		Context("when UAA client returns an error", func() {
+			Context("when client credentials are invalid", func() {
+				var (
+					apiServer    *Server
+					badUaaServer *Server
+					session      *Session
 				)
-				badUaaServer.RouteToHandler("GET", "/info", RespondWith(http.StatusOK, ""))
 
-				apiServer = NewServer()
-				setupServer(apiServer, badUaaServer.URL())
+				BeforeEach(func() {
+					badUaaServer = NewServer()
+					badUaaServer.RouteToHandler("POST", "/oauth/token",
+						CombineHandlers(
+							VerifyBody([]byte(`client_id=`+config.AuthClient+`&client_secret=`+config.AuthPassword+`&grant_type=password&password=pass&response_type=token&username=user`)),
+							RespondWith(http.StatusUnauthorized, `{
+						"error":"unauthorized",
+						"error_description":"Bad credentials"
+						}`),
+						))
+					badUaaServer.RouteToHandler("DELETE", "/oauth/token/revoke/"+VALID_ACCESS_TOKEN_JTI,
+						RespondWith(http.StatusOK, ""),
+					)
+					badUaaServer.RouteToHandler("GET", "/info", RespondWith(http.StatusOK, ""))
 
-				cfg := config.ReadConfig()
-				cfg.AuthURL = badUaaServer.URL()
-				cfg.AccessToken = VALID_ACCESS_TOKEN
-				config.WriteConfig(cfg)
+					apiServer = NewServer()
+					setupServer(apiServer, badUaaServer.URL())
+
+					cfg := config.ReadConfig()
+					cfg.AuthURL = badUaaServer.URL()
+					cfg.AccessToken = VALID_ACCESS_TOKEN
+					config.WriteConfig(cfg)
+				})
+
+				It("fails to login", func() {
+					session = runCommand("login", "-u", "user", "-p", "pass")
+					Eventually(session).Should(Exit(1))
+					Eventually(session.Err).Should(Say("UAA error: unauthorized Bad credentials"))
+					Expect(badUaaServer.ReceivedRequests()).Should(HaveLen(2))
+				})
+
+				It("revokes any existing tokens", func() {
+					session = runCommand("login", "-u", "user", "-p", "pass")
+					Eventually(session).Should(Exit(1))
+					cfg := config.ReadConfig()
+					Expect(cfg.AccessToken).To(Equal("revoked"))
+					Expect(cfg.RefreshToken).To(Equal("revoked"))
+					Expect(badUaaServer.ReceivedRequests()).Should(HaveLen(2))
+				})
+
+				It("doesn't print 'Setting the target url' message with -s flag", func() {
+					session = runCommand("login", "-u", "user", "-p", "pass", "-s", apiServer.URL())
+					Eventually(session).Should(Exit(1))
+					Expect(session.Out).NotTo(Say("Setting the target url: " + apiServer.URL()))
+				})
 			})
 
-			It("fails to login", func() {
-				session = runCommand("login", "-u", "user", "-p", "pass")
-				Eventually(session).Should(Exit(1))
-				Eventually(session.Err).Should(Say("The provided credentials are incorrect. Please validate your input and retry your request."))
-				Expect(badUaaServer.ReceivedRequests()).Should(HaveLen(2))
+			Context("when client credentials do not have proper grant type", func() {
+				var (
+					apiServer    *Server
+					badUaaServer *Server
+					session      *Session
+				)
+
+				BeforeEach(func() {
+					badUaaServer = NewServer()
+					badUaaServer.RouteToHandler("POST", "/oauth/token",
+						CombineHandlers(
+							VerifyBody([]byte(`client_id=`+config.AuthClient+`&client_secret=`+config.AuthPassword+`&grant_type=password&password=pass&response_type=token&username=user`)),
+							RespondWith(http.StatusUnauthorized, `{
+						"error":"invalid_client",
+						"error_description":"Unauthorized grant type: password"
+						}`),
+						))
+					badUaaServer.RouteToHandler("DELETE", "/oauth/token/revoke/"+VALID_ACCESS_TOKEN_JTI,
+						RespondWith(http.StatusOK, ""),
+					)
+					badUaaServer.RouteToHandler("GET", "/info", RespondWith(http.StatusOK, ""))
+
+					apiServer = NewServer()
+					setupServer(apiServer, badUaaServer.URL())
+
+					cfg := config.ReadConfig()
+					cfg.AuthURL = badUaaServer.URL()
+					cfg.AccessToken = VALID_ACCESS_TOKEN
+					config.WriteConfig(cfg)
+				})
+
+				It("fails to login", func() {
+					session = runCommand("login", "-u", "user", "-p", "pass")
+					Eventually(session).Should(Exit(1))
+					Eventually(session.Err).Should(Say("UAA error: invalid_client Unauthorized grant type: password"))
+					Expect(badUaaServer.ReceivedRequests()).Should(HaveLen(2))
+				})
+
+				It("revokes any existing tokens", func() {
+					session = runCommand("login", "-u", "user", "-p", "pass")
+					Eventually(session).Should(Exit(1))
+					cfg := config.ReadConfig()
+					Expect(cfg.AccessToken).To(Equal("revoked"))
+					Expect(cfg.RefreshToken).To(Equal("revoked"))
+					Expect(badUaaServer.ReceivedRequests()).Should(HaveLen(2))
+				})
+
+				It("doesn't print 'Setting the target url' message with -s flag", func() {
+					session = runCommand("login", "-u", "user", "-p", "pass", "-s", apiServer.URL())
+					Eventually(session).Should(Exit(1))
+					Expect(session.Out).NotTo(Say("Setting the target url: " + apiServer.URL()))
+				})
 			})
 
-			It("revokes any existing tokens", func() {
-				session = runCommand("login", "-u", "user", "-p", "pass")
-				Eventually(session).Should(Exit(1))
-				cfg := config.ReadConfig()
-				Expect(cfg.AccessToken).To(Equal("revoked"))
-				Expect(cfg.RefreshToken).To(Equal("revoked"))
-				Expect(badUaaServer.ReceivedRequests()).Should(HaveLen(2))
+			Context("when uaa token endpoint 500s", func() {
+				var (
+					apiServer    *Server
+					badUaaServer *Server
+					session      *Session
+				)
+
+				BeforeEach(func() {
+					badUaaServer = NewServer()
+					badUaaServer.RouteToHandler("POST", "/oauth/token",
+						CombineHandlers(
+							VerifyBody([]byte(`client_id=`+config.AuthClient+`&client_secret=`+config.AuthPassword+`&grant_type=password&password=pass&response_type=token&username=user`)),
+							RespondWith(http.StatusInternalServerError, ``),
+						))
+					badUaaServer.RouteToHandler("DELETE", "/oauth/token/revoke/"+VALID_ACCESS_TOKEN_JTI,
+						RespondWith(http.StatusOK, ""),
+					)
+					badUaaServer.RouteToHandler("GET", "/info", RespondWith(http.StatusOK, ""))
+
+					apiServer = NewServer()
+					setupServer(apiServer, badUaaServer.URL())
+
+					cfg := config.ReadConfig()
+					cfg.AuthURL = badUaaServer.URL()
+					cfg.AccessToken = VALID_ACCESS_TOKEN
+					config.WriteConfig(cfg)
+				})
+
+				It("fails to login", func() {
+					session = runCommand("login", "-u", "user", "-p", "pass")
+					Eventually(session).Should(Exit(1))
+					Eventually(session.Err).Should(Say("UAA error: EOF"))
+					Expect(badUaaServer.ReceivedRequests()).Should(HaveLen(2))
+				})
+
+				It("revokes any existing tokens", func() {
+					session = runCommand("login", "-u", "user", "-p", "pass")
+					Eventually(session).Should(Exit(1))
+					cfg := config.ReadConfig()
+					Expect(cfg.AccessToken).To(Equal("revoked"))
+					Expect(cfg.RefreshToken).To(Equal("revoked"))
+					Expect(badUaaServer.ReceivedRequests()).Should(HaveLen(2))
+				})
+
+				It("doesn't print 'Setting the target url' message with -s flag", func() {
+					session = runCommand("login", "-u", "user", "-p", "pass", "-s", apiServer.URL())
+					Eventually(session).Should(Exit(1))
+					Expect(session.Out).NotTo(Say("Setting the target url: " + apiServer.URL()))
+				})
 			})
 
-			It("doesn't print 'Setting the target url' message with -s flag", func() {
-				session = runCommand("login", "-u", "user", "-p", "pass", "-s", apiServer.URL())
-				Eventually(session).Should(Exit(1))
-				Expect(session.Out).NotTo(Say("Setting the target url: " + apiServer.URL()))
+			Context("when uaa info endpoint 500s", func() {
+				var (
+					apiServer    *Server
+					badUaaServer *Server
+					session      *Session
+				)
+
+				BeforeEach(func() {
+					badUaaServer = NewServer()
+					badUaaServer.RouteToHandler("POST", "/oauth/token",
+						CombineHandlers(
+							VerifyBody([]byte(`client_id=`+config.AuthClient+`&client_secret=`+config.AuthPassword+`&grant_type=password&password=pass&response_type=token&username=user`)),
+							RespondWith(http.StatusOK, `{
+						"access_token":"2YotnFZFEjr1zCsicMWpAA",
+						"refresh_token":"erousflkajqwer",
+						"token_type":"bearer",
+						"expires_in":3600}`),
+							))
+					badUaaServer.RouteToHandler("DELETE", "/oauth/token/revoke/"+VALID_ACCESS_TOKEN_JTI,
+						RespondWith(http.StatusOK, ""),
+					)
+					badUaaServer.RouteToHandler("GET", "/info", RespondWith(http.StatusInternalServerError, ""))
+					apiServer = NewServer()
+					setupServer(apiServer, badUaaServer.URL())
+
+					cfg := config.ReadConfig()
+					cfg.AuthURL = badUaaServer.URL()
+					cfg.AccessToken = VALID_ACCESS_TOKEN
+					config.WriteConfig(cfg)
+				})
+
+				It("fails to login", func() {
+					session = runCommand("login",  "--sso")
+					Eventually(session).Should(Exit(1))
+					Eventually(session.Err).Should(Say("UAA error: unable to fetch metadata successfully"))
+					Expect(badUaaServer.ReceivedRequests()).Should(HaveLen(2))
+				})
+
+				It("doesn't print 'Setting the target url' message with -s flag", func() {
+					session = runCommand("login", "--sso", "-s", apiServer.URL())
+					Eventually(session).Should(Exit(1))
+					Expect(session.Out).NotTo(Say("Setting the target url: " + apiServer.URL()))
+				})
 			})
 		})
 	})

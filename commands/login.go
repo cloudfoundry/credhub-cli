@@ -94,7 +94,7 @@ func (c *LoginCommand) Execute([]string) error {
 		RevokeTokenIfNecessary(c.config)
 		MarkTokensAsRevokedInConfig(&c.config)
 		config.WriteConfig(c.config)
-		return errors.NewAuthorizationError()
+		return errors.NewUAAError(err)
 	}
 
 	if os.Getenv("CREDHUB_CLIENT") == "" || os.Getenv("CREDHUB_SECRET") == "" {

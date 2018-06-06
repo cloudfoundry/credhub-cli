@@ -29,10 +29,6 @@ func NewMissingGetParametersError() error {
 	return errors.New("A name or ID must be provided. Please update and retry your request.")
 }
 
-func NewAuthorizationError() error {
-	return errors.New("The provided credentials are incorrect. Please validate your input and retry your request.")
-}
-
 func NewMixedAuthorizationParametersError() error {
 	return errors.New("Client, password, SSO and/or SSO passcode credentials may not be combined. Please update and retry your request with a single login method.")
 }
@@ -79,4 +75,8 @@ func NewGetVersionAndKeyError() error {
 
 func NewUserNameOnlyValidForUserType() error {
 	return errors.New("Username parameter is not valid for this credential type.")
+}
+
+func NewUAAError(err error) error {
+	return errors.New("UAA error: " + err.Error())
 }
