@@ -310,7 +310,7 @@ var _ = Describe("Set", func() {
 
 			session := runCommandWithStdin(strings.NewReader("potatoes\n"), "set", "-n", "my-password", "-t", "password")
 
-			Eventually(string(session.Out.Contents())).Should(ContainSubstring("password:"))
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring("password: ********"))
 			Eventually(session).Should(Exit(0))
 			Eventually(string(session.Out.Contents())).Should(ContainSubstring("name: my-password"))
 			Eventually(string(session.Out.Contents())).Should(ContainSubstring("type: password"))
