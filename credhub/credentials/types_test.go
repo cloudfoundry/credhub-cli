@@ -5,11 +5,11 @@ import (
 
 	"gopkg.in/yaml.v2"
 
-	. "github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials"
+	. "code.cloudfoundry.org/credhub-cli/credhub/credentials"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials/values"
+	"code.cloudfoundry.org/credhub-cli/credhub/credentials/values"
 )
 
 var _ = Describe("Types", func() {

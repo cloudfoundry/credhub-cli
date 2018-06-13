@@ -1,7 +1,7 @@
 # <div align="center"><img src="https://raw.githubusercontent.com/cloudfoundry-incubator/credhub/master/docs/images/logo.png" alt="CredHub"></div>
 
 [![slack.cloudfoundry.org](https://slack.cloudfoundry.org/badge.svg)](https://slack.cloudfoundry.org)
-[![GoDoc](https://godoc.org/github.com/golang/gddo?status.svg)](http://godoc.org/github.com/cloudfoundry-incubator/credhub-cli/credhub)
+[![GoDoc](https://godoc.org/github.com/golang/gddo?status.svg)](http://godoc.org/code.cloudfoundry.org/credhub-cli/credhub)
 
 CredHub manages credentials like passwords, certificates, certificate authorities, ssh keys, rsa keys and arbitrary values (strings and JSON blobs). CredHub provides a CLI and API to get, set, generate and securely store such credentials.
 
@@ -9,7 +9,7 @@ CredHub manages credentials like passwords, certificates, certificate authoritie
 
 See additional repos for more info:
 
-* [credhub](https://github.com/cloudfoundry-incubator/credhub) :     CredHub server code
+* [credhub](https://code.cloudfoundry.org/credhub) :     CredHub server code
 * [credhub-acceptance-tests](https://github.com/cloudfoundry-incubator/credhub-acceptance-tests) : Integration tests
 * [credhub-release](https://github.com/pivotal-cf/credhub-release) : BOSH release of CredHub server
 
@@ -31,7 +31,7 @@ Download and install the desired release from the [release page](https://github.
 
 ### Go Client
 
-This repository contains a Go client library that can be used independently of the CredHub CLI.  Documentation for this library can be found [here](https://godoc.org/github.com/cloudfoundry-incubator/credhub-cli/credhub).
+This repository contains a Go client library that can be used independently of the CredHub CLI.  Documentation for this library can be found [here](https://godoc.org/code.cloudfoundry.org/credhub-cli/credhub).
 
 
 ### Usage:

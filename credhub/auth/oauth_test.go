@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"strings"
 
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub/auth"
+	"code.cloudfoundry.org/credhub-cli/credhub/auth"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

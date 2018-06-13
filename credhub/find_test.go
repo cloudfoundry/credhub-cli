@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	. "github.com/cloudfoundry-incubator/credhub-cli/credhub"
+	. "code.cloudfoundry.org/credhub-cli/credhub"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

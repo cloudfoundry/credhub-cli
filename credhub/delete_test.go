@@ -1,7 +1,7 @@
 package credhub_test
 
 import (
-	. "github.com/cloudfoundry-incubator/credhub-cli/credhub"
+	. "code.cloudfoundry.org/credhub-cli/credhub"
 
 	"bytes"
 	"io/ioutil"

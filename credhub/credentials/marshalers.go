@@ -3,7 +3,7 @@ package credentials
 import (
 	"encoding/json"
 
-	"github.com/cloudfoundry-incubator/credhub-cli/errors"
+	"code.cloudfoundry.org/credhub-cli/errors"
 )
 
 func (c Credential) MarshalYAML() (interface{}, error) {

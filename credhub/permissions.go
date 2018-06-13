@@ -7,7 +7,7 @@ import (
 
 	"encoding/json"
 
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub/permissions"
+	"code.cloudfoundry.org/credhub-cli/credhub/permissions"
 )
 
 type permissionsResponse struct {

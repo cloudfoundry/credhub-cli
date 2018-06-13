@@ -2,7 +2,7 @@
 package credentials
 
 import (
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials/values"
+	"code.cloudfoundry.org/credhub-cli/credhub/credentials/values"
 )
 
 // Base fields of a credential

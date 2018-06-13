@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials"
+	"code.cloudfoundry.org/credhub-cli/credhub/credentials"
 )
 
 // Regenerate generates and returns a new credential version using the same parameters existing credential. The returned credential may be of any type.

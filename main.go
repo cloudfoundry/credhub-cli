@@ -5,10 +5,10 @@ import (
 	"os"
 	"runtime/debug"
 
-	"github.com/cloudfoundry-incubator/credhub-cli/commands"
-	"github.com/cloudfoundry-incubator/credhub-cli/config"
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub"
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub/auth"
+	"code.cloudfoundry.org/credhub-cli/commands"
+	"code.cloudfoundry.org/credhub-cli/config"
+	"code.cloudfoundry.org/credhub-cli/credhub"
+	"code.cloudfoundry.org/credhub-cli/credhub/auth"
 	"github.com/jessevdk/go-flags"
 )
 

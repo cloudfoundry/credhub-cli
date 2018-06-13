@@ -10,7 +10,7 @@ ifndef VERSION
 VERSION = dev
 endif
 
-GOFLAGS := -o $(DEST) -ldflags "-X github.com/cloudfoundry-incubator/credhub-cli/version.Version=${VERSION}"
+GOFLAGS := -o $(DEST) -ldflags "-X code.cloudfoundry.org/credhub-cli/version.Version=${VERSION}"
 
 all: test clean build
 

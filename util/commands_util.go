@@ -7,7 +7,7 @@ import (
 
 	"os"
 
-	credhub_errors "github.com/cloudfoundry-incubator/credhub-cli/errors"
+	credhub_errors "code.cloudfoundry.org/credhub-cli/errors"
 )
 
 func ReadFileOrStringFromField(field string) (string, error) {

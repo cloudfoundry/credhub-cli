@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	. "github.com/cloudfoundry-incubator/credhub-cli/credhub/auth/uaa"
+	. "code.cloudfoundry.org/credhub-cli/credhub/auth/uaa"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"

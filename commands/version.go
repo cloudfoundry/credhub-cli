@@ -5,9 +5,9 @@ import (
 
 	"os"
 
-	"github.com/cloudfoundry-incubator/credhub-cli/config"
-	"github.com/cloudfoundry-incubator/credhub-cli/errors"
-	"github.com/cloudfoundry-incubator/credhub-cli/version"
+	"code.cloudfoundry.org/credhub-cli/config"
+	"code.cloudfoundry.org/credhub-cli/errors"
+	"code.cloudfoundry.org/credhub-cli/version"
 )
 
 func PrintVersion() error {

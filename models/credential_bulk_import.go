@@ -7,7 +7,7 @@ import (
 
 	"regexp"
 
-	"github.com/cloudfoundry-incubator/credhub-cli/errors"
+	"code.cloudfoundry.org/credhub-cli/errors"
 	"gopkg.in/yaml.v2"
 )
 

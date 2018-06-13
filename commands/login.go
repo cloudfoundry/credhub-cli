@@ -5,11 +5,11 @@ import (
 
 	"os"
 
-	"github.com/cloudfoundry-incubator/credhub-cli/config"
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub"
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub/auth/uaa"
-	"github.com/cloudfoundry-incubator/credhub-cli/errors"
-	"github.com/cloudfoundry-incubator/credhub-cli/util"
+	"code.cloudfoundry.org/credhub-cli/config"
+	"code.cloudfoundry.org/credhub-cli/credhub"
+	"code.cloudfoundry.org/credhub-cli/credhub/auth/uaa"
+	"code.cloudfoundry.org/credhub-cli/errors"
+	"code.cloudfoundry.org/credhub-cli/util"
 	"github.com/howeyc/gopass"
 )
 

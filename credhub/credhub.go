@@ -1,7 +1,7 @@
 /*
 Package credhub is a client library for interacting with a CredHub server.
 
-More information on CredHub can be found at https://github.com/cloudfoundry-incubator/credhub
+More information on CredHub can be found at https://code.cloudfoundry.org/credhub
 
 Server HTTP API specification can be found at http://credhub-api.cfapps.io
 */
@@ -14,7 +14,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub/auth"
+	"code.cloudfoundry.org/credhub-cli/credhub/auth"
 )
 
 // CredHub client to access CredHub APIs.

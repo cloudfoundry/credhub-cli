@@ -5,7 +5,7 @@ package config_test
 import (
 	"io/ioutil"
 
-	"github.com/cloudfoundry-incubator/credhub-cli/config"
+	"code.cloudfoundry.org/credhub-cli/config"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

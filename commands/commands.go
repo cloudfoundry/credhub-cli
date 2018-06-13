@@ -1,8 +1,8 @@
 package commands
 
 import (
-	"github.com/cloudfoundry-incubator/credhub-cli/config"
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub"
+	"code.cloudfoundry.org/credhub-cli/config"
+	"code.cloudfoundry.org/credhub-cli/credhub"
 )
 
 type CredhubCommand struct {

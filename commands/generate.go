@@ -3,10 +3,10 @@ package commands
 import (
 	"strings"
 
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub"
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials/generate"
-	"github.com/cloudfoundry-incubator/credhub-cli/errors"
-	"github.com/cloudfoundry-incubator/credhub-cli/models"
+	"code.cloudfoundry.org/credhub-cli/credhub"
+	"code.cloudfoundry.org/credhub-cli/credhub/credentials/generate"
+	"code.cloudfoundry.org/credhub-cli/errors"
+	"code.cloudfoundry.org/credhub-cli/models"
 )
 
 type GenerateCommand struct {

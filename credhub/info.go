@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub/server"
+	"code.cloudfoundry.org/credhub-cli/credhub/server"
 )
 
 // Info returns the targeted CredHub server information.

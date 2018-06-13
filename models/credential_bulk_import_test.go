@@ -1,8 +1,8 @@
 package models_test
 
 import (
-	"github.com/cloudfoundry-incubator/credhub-cli/errors"
-	"github.com/cloudfoundry-incubator/credhub-cli/models"
+	"code.cloudfoundry.org/credhub-cli/errors"
+	"code.cloudfoundry.org/credhub-cli/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

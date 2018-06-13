@@ -3,7 +3,7 @@ package credhub
 import (
 	"net/url"
 
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub/auth"
+	"code.cloudfoundry.org/credhub-cli/credhub/auth"
 )
 
 // New provides a CredHub API client for the target server. Options can be

@@ -4,7 +4,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub/auth/uaa"
+	"code.cloudfoundry.org/credhub-cli/credhub/auth/uaa"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

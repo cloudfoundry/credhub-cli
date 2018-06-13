@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"github.com/cloudfoundry-incubator/credhub-cli/errors"
+	"code.cloudfoundry.org/credhub-cli/errors"
 )
 
 type FindCommand struct {

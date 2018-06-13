@@ -1,6 +1,6 @@
 package config
 
-import "github.com/cloudfoundry-incubator/credhub-cli/errors"
+import "code.cloudfoundry.org/credhub-cli/errors"
 
 func ValidateConfig(c Config) error {
 	err := ValidateConfigApi(c)

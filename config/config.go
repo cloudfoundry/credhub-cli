@@ -7,7 +7,7 @@ import (
 	"os"
 	"path"
 
-	"github.com/cloudfoundry-incubator/credhub-cli/util"
+	"code.cloudfoundry.org/credhub-cli/util"
 )
 
 const AuthClient = "credhub_cli"

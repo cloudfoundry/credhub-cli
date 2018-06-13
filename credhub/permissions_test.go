@@ -1,13 +1,13 @@
 package credhub_test
 
 import (
-	. "github.com/cloudfoundry-incubator/credhub-cli/credhub"
+	. "code.cloudfoundry.org/credhub-cli/credhub"
 
 	"bytes"
 	"io/ioutil"
 	"net/http"
 
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub/permissions"
+	"code.cloudfoundry.org/credhub-cli/credhub/permissions"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

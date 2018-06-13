@@ -3,7 +3,7 @@ package credhub_test
 import (
 	"net/http"
 
-	. "github.com/cloudfoundry-incubator/credhub-cli/credhub"
+	. "code.cloudfoundry.org/credhub-cli/credhub"
 	version "github.com/hashicorp/go-version"
 
 	. "github.com/onsi/ginkgo"

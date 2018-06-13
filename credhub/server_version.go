@@ -3,7 +3,7 @@ package credhub
 import (
 	"encoding/json"
 
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub/server"
+	"code.cloudfoundry.org/credhub-cli/credhub/server"
 	"github.com/hashicorp/go-version"
 )
 

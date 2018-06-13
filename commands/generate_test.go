@@ -7,8 +7,8 @@ import (
 
 	"fmt"
 
-	"github.com/cloudfoundry-incubator/credhub-cli/commands"
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub"
+	"code.cloudfoundry.org/credhub-cli/commands"
+	"code.cloudfoundry.org/credhub-cli/credhub"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"

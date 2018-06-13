@@ -1,7 +1,7 @@
 package models
 
 import (
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials"
+	"code.cloudfoundry.org/credhub-cli/credhub/credentials"
 	"gopkg.in/yaml.v2"
 )
 

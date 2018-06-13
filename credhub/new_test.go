@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	. "github.com/cloudfoundry-incubator/credhub-cli/credhub"
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub/auth"
+	. "code.cloudfoundry.org/credhub-cli/credhub"
+	"code.cloudfoundry.org/credhub-cli/credhub/auth"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

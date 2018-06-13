@@ -3,15 +3,15 @@ package util_test
 import (
 	"os"
 
-	"github.com/cloudfoundry-incubator/credhub-cli/util"
+	"code.cloudfoundry.org/credhub-cli/util"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
 	"runtime"
 
-	credhub_errors "github.com/cloudfoundry-incubator/credhub-cli/errors"
-	"github.com/cloudfoundry-incubator/credhub-cli/test"
+	credhub_errors "code.cloudfoundry.org/credhub-cli/errors"
+	"code.cloudfoundry.org/credhub-cli/test"
 )
 
 var _ = Describe("Util", func() {

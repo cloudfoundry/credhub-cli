@@ -10,7 +10,7 @@ import (
 
 	"encoding/json"
 
-	. "github.com/cloudfoundry-incubator/credhub-cli/credhub"
+	. "code.cloudfoundry.org/credhub-cli/credhub"
 )
 
 var _ = Describe("Regenerate", func() {

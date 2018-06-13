@@ -8,7 +8,7 @@ import (
 
 	"strconv"
 
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials"
+	"code.cloudfoundry.org/credhub-cli/credhub/credentials"
 )
 
 // GetById returns a credential version by ID. The returned credential will be encoded as a map and may be of any type.

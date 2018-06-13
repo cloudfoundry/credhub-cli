@@ -7,7 +7,7 @@ import (
 	"net/url"
 	"runtime"
 
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub/auth"
+	"code.cloudfoundry.org/credhub-cli/credhub/auth"
 )
 
 // Option can be provided to New() to specify additional parameters for

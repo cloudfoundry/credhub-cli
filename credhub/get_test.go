@@ -11,8 +11,8 @@ import (
 
 	"encoding/json"
 
-	. "github.com/cloudfoundry-incubator/credhub-cli/credhub"
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials/values"
+	. "code.cloudfoundry.org/credhub-cli/credhub"
+	"code.cloudfoundry.org/credhub-cli/credhub/credentials/values"
 	. "github.com/onsi/ginkgo/extensions/table"
 )
 

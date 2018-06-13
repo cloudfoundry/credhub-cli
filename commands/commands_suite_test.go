@@ -20,8 +20,8 @@ import (
 
 	"path/filepath"
 
-	"github.com/cloudfoundry-incubator/credhub-cli/config"
-	test_util "github.com/cloudfoundry-incubator/credhub-cli/test"
+	"code.cloudfoundry.org/credhub-cli/config"
+	test_util "code.cloudfoundry.org/credhub-cli/test"
 )
 
 const TIMESTAMP = `2016-01-01T12:00:00Z`
@@ -112,7 +112,7 @@ var _ = AfterEach(func() {
 })
 
 var _ = SynchronizedBeforeSuite(func() []byte {
-	executable_path, err := Build("github.com/cloudfoundry-incubator/credhub-cli", "-ldflags", "-X github.com/cloudfoundry-incubator/credhub-cli/version.Version=test-version")
+	executable_path, err := Build("code.cloudfoundry.org/credhub-cli", "-ldflags", "-X code.cloudfoundry.org/credhub-cli/version.Version=test-version")
 	Expect(err).NotTo(HaveOccurred())
 	return []byte(executable_path)
 }, func(data []byte) {

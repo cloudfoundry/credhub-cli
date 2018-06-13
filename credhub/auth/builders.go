@@ -3,7 +3,7 @@ package auth
 import (
 	"net/http"
 
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub/auth/uaa"
+	"code.cloudfoundry.org/credhub-cli/credhub/auth/uaa"
 )
 
 // Config provides the CredHub configuration necessary to build an auth Strategy

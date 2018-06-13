@@ -3,8 +3,8 @@ package commands
 import (
 	"fmt"
 
-	"github.com/cloudfoundry-incubator/credhub-cli/credhub/credentials"
-	"github.com/cloudfoundry-incubator/credhub-cli/errors"
+	"code.cloudfoundry.org/credhub-cli/credhub/credentials"
+	"code.cloudfoundry.org/credhub-cli/errors"
 )
 
 type GetCommand struct {
