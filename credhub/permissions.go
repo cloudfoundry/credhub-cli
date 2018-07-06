@@ -1,6 +1,8 @@
 package credhub
 
 import (
+	"io"
+	"io/ioutil"
 	"net/http"
 
 	"net/url"
@@ -26,6 +28,7 @@ func (ch *CredHub) GetPermissions(credName string) ([]permissions.Permission, er
 	}
 
 	defer resp.Body.Close()
+	defer io.Copy(ioutil.Discard, resp.Body)
 	var response permissionsResponse
 
 	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {

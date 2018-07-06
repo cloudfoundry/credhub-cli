@@ -3,6 +3,8 @@ package credhub
 import (
 	"bytes"
 	"encoding/json"
+	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 )
@@ -65,6 +67,7 @@ func (ch *CredHub) request(client requester, method string, pathStr string, quer
 func (ch *CredHub) checkForServerError(resp *http.Response) error {
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		defer resp.Body.Close()
+		defer io.Copy(ioutil.Discard, resp.Body)
 		dec := json.NewDecoder(resp.Body)
 
 		respErr := &Error{}
