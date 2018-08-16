@@ -5,8 +5,6 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"net/url"
-
 	"encoding/json"
 
 	"code.cloudfoundry.org/credhub-cli/credhub/permissions"
@@ -17,42 +15,44 @@ type permissionsResponse struct {
 	Permissions    []permissions.Permission `json:"permissions"`
 }
 
-// GetPermissions returns the permissions of a credential.
-func (ch *CredHub) GetPermissions(credName string) ([]permissions.Permission, error) {
-	query := url.Values{}
-	query.Set("credential_name", credName)
+func (ch *CredHub) GetPermission(uuid string) (*permissions.Permission, error) {
+	path:= "/api/v2/permissions/" + uuid
 
-	resp, err := ch.Request(http.MethodGet, "/api/v1/permissions", query, nil, true)
+	resp, err := ch.Request(http.MethodGet, path, nil, nil, true)
+
 	if err != nil {
 		return nil, err
 	}
 
 	defer resp.Body.Close()
 	defer io.Copy(ioutil.Discard, resp.Body)
-	var response permissionsResponse
+	var response permissions.Permission
 
 	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
 		return nil, err
 	}
 
-	return response.Permissions, nil
+	return &response, nil
 }
 
-// AddPermissions adds permissions to a credential.
-func (ch *CredHub) AddPermissions(credName string, perms []permissions.Permission) ([]permissions.Permission, error) {
+func (ch *CredHub) AddPermission(path string, actor string, ops []string) (*permissions.Permission, error) {
 	requestBody := map[string]interface{}{}
-	requestBody["credential_name"] = credName
-	requestBody["permissions"] = perms
+	requestBody["path"] = path
+	requestBody["actor"] = actor
+	requestBody["operations"] = ops
 
-	_, err := ch.Request(http.MethodPost, "/api/v1/permissions", nil, requestBody, true)
+	resp, err := ch.Request(http.MethodPost, "/api/v2/permissions", nil, requestBody, true)
 	if err != nil {
 		return nil, err
 	}
 
-	return nil, nil
-}
+	defer resp.Body.Close()
+	defer io.Copy(ioutil.Discard, resp.Body)
+	var response permissions.Permission
 
-// DeletePermissions deletes permissions on a credential by actor.
-func (ch *CredHub) DeletePermissions(credName string, actor string) error {
-	panic("Not implemented")
+	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
+		return nil, err
+	}
+
+	return &response, nil
 }

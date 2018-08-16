@@ -15,13 +15,13 @@ import (
 var _ = Describe("Permissions", func() {
 	Context("GetPermissions", func() {
 		It("returns the permissions", func() {
-			responseString := `{
-	"credential_name":"/test-password",
-	"permissions":[{
-			"actor":"uaa-user:e3366b5c-1c5a-4df8-8b0f-9001ee5a0cf0",
-			"operations":["read"]
-			}]
-	}`
+			responseString :=
+				`{
+	"actor":"user:A",
+	"operations":["read"],
+	"path":"/example-password",
+	"uuid":"1234"
+}`
 
 			dummyAuth := &DummyAuth{Response: &http.Response{
 				StatusCode: http.StatusOK,
@@ -29,93 +29,55 @@ var _ = Describe("Permissions", func() {
 			}}
 
 			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
-			actualPermissions, err := ch.GetPermissions("/example-password")
+			actualPermissions, err := ch.GetPermission("1234")
 			Expect(err).NotTo(HaveOccurred())
 
-			expectedPermissions := []permissions.Permission{
-				{
-					Actor:      "uaa-user:e3366b5c-1c5a-4df8-8b0f-9001ee5a0cf0",
-					Operations: []string{"read"},
-				},
+			expectedPermission := permissions.Permission{
+				Actor:      "user:A",
+				Operations: []string{"read"},
+				Path:		"/example-password",
+				UUID:		"1234",
 			}
-			Expect(actualPermissions).To(Equal(expectedPermissions))
-		})
+			Expect(actualPermissions).To(Equal(&expectedPermission))
 
-		It("returns an empty set of permissions", func() {
-			responseString := `{
-	"credential_name":"/test-password",
-	"permissions":[]
-	}`
-
-			dummyAuth := &DummyAuth{Response: &http.Response{
-				StatusCode: http.StatusOK,
-				Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
-			}}
-
-			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
-			actualPermissions, err := ch.GetPermissions("/example-password")
-			Expect(err).NotTo(HaveOccurred())
-
-			Expect(actualPermissions).To(Equal([]permissions.Permission{}))
+			By("calling the right endpoints")
+			url := dummyAuth.Request.URL.String()
+			Expect(url).To(Equal("https://example.com/api/v2/permissions/1234"))
+			Expect(dummyAuth.Request.Method).To(Equal(http.MethodGet))
 		})
 	})
 
 	Context("AddPermissions", func() {
 		Context("when a credential exists", func() {
 			It("can add permissions to it", func() {
+				responseString :=
+					`{
+	"actor":"user:B",
+	"operations":["read"],
+	"path":"/example-password"
+}`
 				dummy := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusCreated,
-					Body:       ioutil.NopCloser(bytes.NewBufferString("")),
+					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
 				}}
 				ch, _ := New("https://example.com", Auth(dummy.Builder()))
 
-				_, err := ch.AddPermissions("/example-password", []permissions.Permission{
-					{
-						Actor:      "some-actor",
-						Operations: []string{"operation-1", "operation-2"},
-						Path: "/example-password",
-					},
-				})
-
+				_, err := ch.AddPermission("/example-password", "user:A", []string{"read_acl", "write_acl"})
 				Expect(err).NotTo(HaveOccurred())
 
 				By("calling the right endpoints")
 				url := dummy.Request.URL.String()
-				Expect(url).To(Equal("https://example.com/api/v1/permissions"))
+				Expect(url).To(Equal("https://example.com/api/v2/permissions"))
 				Expect(dummy.Request.Method).To(Equal(http.MethodPost))
 				params, err := ioutil.ReadAll(dummy.Request.Body)
 				Expect(err).NotTo(HaveOccurred())
 
 				expectedParams := `{
-			  "credential_name": "/example-password",
-			  "permissions": [
-			  {
-				"actor": "some-actor",
-				"operations": ["operation-1", "operation-2"],
+				"actor": "user:A",
+				"operations": ["read_acl", "write_acl"],
 				"path": "/example-password"
-			  }]
 			}`
 				Expect(params).To(MatchJSON(expectedParams))
-			})
-		})
-
-		Context("when a credential doesn't exist", func() {
-			It("cannot add permissions to it", func() {
-				dummy := &DummyAuth{Response: &http.Response{
-					StatusCode: http.StatusNotFound,
-					Body:       ioutil.NopCloser(bytes.NewBufferString(`{"error":"The request could not be completed because the credential does not exist or you do not have sufficient authorization."}`)),
-				}}
-				ch, _ := New("https://example.com", Auth(dummy.Builder()))
-
-				_, err := ch.AddPermissions("/example-password", []permissions.Permission{
-					{
-						Actor:      "some-actor",
-						Operations: []string{"operation-1", "operation-2"},
-						Path: "/example-password",
-					},
-				})
-
-				Expect(err).To(MatchError(ContainSubstring("The request could not be completed because the credential does not exist or you do not have sufficient authorization.")))
 			})
 		})
 	})
