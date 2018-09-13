@@ -112,7 +112,7 @@ func (ch *CredHub) makeCredentialGetRequest(query url.Values, cred interface{}) 
 	resp, err := ch.Request(http.MethodGet, "/api/v1/data", query, nil, true)
 
 	if err != nil {
-		return err
+		return errors.New(err.Error() + "Error making http request")
 	}
 
 	defer resp.Body.Close()
@@ -122,7 +122,7 @@ func (ch *CredHub) makeCredentialGetRequest(query url.Values, cred interface{}) 
 	response := make(map[string][]json.RawMessage)
 
 	if err := dec.Decode(&response); err != nil {
-		return err
+		return errors.New(err.Error() + "Error decoding response")
 	}
 
 	var ok bool
