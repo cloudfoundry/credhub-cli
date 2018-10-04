@@ -50,7 +50,16 @@ type variableGetter struct {
 
 func (v variableGetter) Get(varDef template.VariableDefinition) (interface{}, bool, error) {
 	variable, err := v.clientCommand.client.GetLatestVersion(varDef.Name)
-	return variable.Value, true, err
+	var result = variable.Value
+	if mapString, ok := variable.Value.(map[string]interface{}); ok {
+		mapInterface := map[interface{}]interface{}{}
+		for k, v := range mapString {
+			mapInterface[k] = v
+		}
+		result = mapInterface
+	}
+
+	return result, true, err
 }
 
 func (v variableGetter) List() ([]template.VariableDefinition, error) {
