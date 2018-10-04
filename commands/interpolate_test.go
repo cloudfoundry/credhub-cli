@@ -118,26 +118,40 @@ static-value: a normal string
 		Expect(string(session.Out.Contents())).To(MatchYAML(`json-cred: {"whatthing":"something"}`))
 	})
 
-	PDescribe("the optional --prefix flag", func() {
+	Describe("the optional --prefix flag", func() {
 		BeforeEach(func() {
 			templateText = `---
-yaml-key-with-template-value: ((relative/cred/path.value))
-yaml-key-with-static-value: a normal string`
+full-certificate-cred: ((certificate/cred/path))
+cert-only-certificate-cred: ((/relative/certificate/cred/path.certificate))
+static-value: a normal string`
 			templateFile.WriteString(templateText)
 
-			responseJson := fmt.Sprintf(STRING_CREDENTIAL_ARRAY_RESPONSE_JSON, "value", "test/prefix/relative/cred/path", "prefixed-path-retrieved-value")
+			responseCertJson := fmt.Sprintf(CERTIFICATE_CREDENTIAL_ARRAY_RESPONSE_JSON, "test-cert", "", "-----BEGIN FAKE CERTIFICATE-----\\n-----END FAKE CERTIFICATE-----", "-----BEGIN FAKE RSA PRIVATE KEY-----\\n-----END FAKE RSA PRIVATE KEY-----")
 
 			server.RouteToHandler("GET", "/api/v1/data",
 				CombineHandlers(
-					VerifyRequest("GET", "/api/v1/data", "current=true&name=test/prefix/relative/cred/path"),
-					RespondWith(http.StatusOK, responseJson),
+					VerifyRequest("GET", "/api/v1/data", "current=true&name=/relative/certificate/cred/path"),
+					RespondWith(http.StatusOK, responseCertJson),
 				),
 			)
 		})
-		It("fetches/prints the values of credential names derived from the prefix", func() {
-			session = runCommand("interpolate", "-f", templateFile.Name(), "-p", "test/prefix")
-			Expect(string(session.Out.Contents())).To(ContainSubstring(`yaml-key-with-template-value: prefixed-path-retrieved-value`))
-			Expect(string(session.Out.Contents())).To(ContainSubstring(`yaml-key-with-static-value: a normal string`))
+		It("prints the values of credential names derived from the prefix, unless the cred paths start with /", func() {
+			session = runCommand("interpolate", "-f", templateFile.Name(), "-p", "/relative")
+			Eventually(session).Should(gexec.Exit(0))
+			Expect(string(session.Out.Contents())).To(MatchYAML(`
+full-certificate-cred:
+  ca: ""
+  certificate: |-
+    -----BEGIN FAKE CERTIFICATE-----
+    -----END FAKE CERTIFICATE-----
+  private_key: |-
+    -----BEGIN FAKE RSA PRIVATE KEY-----
+    -----END FAKE RSA PRIVATE KEY-----
+cert-only-certificate-cred: |-
+  -----BEGIN FAKE CERTIFICATE-----
+  -----END FAKE CERTIFICATE-----
+static-value: a normal string
+`))
 		})
 	})
 

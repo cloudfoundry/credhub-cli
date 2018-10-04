@@ -3,19 +3,19 @@ package commands
 import (
 	"fmt"
 	"io/ioutil"
+	"path"
 
 	"code.cloudfoundry.org/credhub-cli/errors"
 	"github.com/cloudfoundry/bosh-cli/director/template"
 )
 
 type InterpolateCommand struct {
-	File string `short:"f" long:"file" description:"Path to the file to interpolate"`
+	File   string `short:"f" long:"file"   description:"Path to the file to interpolate"`
+	Prefix string `short:"p" long:"prefix" description:"Prefix to be applied to credential paths. Will not be applied to paths that start with '/'"`
 	ClientCommand
 }
 
 func (c *InterpolateCommand) Execute([]string) error {
-	var ()
-
 	if c.File == "" {
 		return errors.NewMissingInterpolateParametersError()
 	}
@@ -33,6 +33,7 @@ func (c *InterpolateCommand) Execute([]string) error {
 
 	varGetter := variableGetter{
 		clientCommand: c.ClientCommand,
+		prefix:        c.Prefix,
 	}
 
 	renderedTemplate, err := initialTemplate.Evaluate(varGetter, nil, template.EvaluateOpts{ExpectAllKeys: true})
@@ -46,10 +47,16 @@ func (c *InterpolateCommand) Execute([]string) error {
 
 type variableGetter struct {
 	clientCommand ClientCommand
+	prefix        string
 }
 
 func (v variableGetter) Get(varDef template.VariableDefinition) (interface{}, bool, error) {
-	variable, err := v.clientCommand.client.GetLatestVersion(varDef.Name)
+	varName := varDef.Name
+	if !path.IsAbs(varDef.Name) {
+		varName = path.Join(v.prefix, varName)
+	}
+
+	variable, err := v.clientCommand.client.GetLatestVersion(varName)
 	var result = variable.Value
 	if mapString, ok := variable.Value.(map[string]interface{}); ok {
 		mapInterface := map[interface{}]interface{}{}
