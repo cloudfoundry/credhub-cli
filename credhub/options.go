@@ -94,4 +94,3 @@ func ServerVersion(version string) Option {
 		return nil
 	}
 }
-

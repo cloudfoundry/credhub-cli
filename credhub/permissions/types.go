@@ -7,3 +7,8 @@ type Permission struct {
 	Path       string   `json:"path"`
 	UUID       string   `json:"uuid"`
 }
+
+type V1_Permission struct {
+	Actor      string   `json:"actor"`
+	Operations []string `json:"operations"`
+}

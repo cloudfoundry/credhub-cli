@@ -110,6 +110,7 @@ func (c *LoginCommand) Execute([]string) error {
 		credhub.AuthURL(c.config.AuthURL),
 		credhub.Auth(auth.Uaa(c.ClientName, c.ClientSecret, "", "", c.config.AccessToken, "", true)),
 	)
+
 	if err != nil {
 		return err
 	}

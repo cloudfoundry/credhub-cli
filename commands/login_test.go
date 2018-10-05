@@ -615,7 +615,6 @@ var _ = Describe("Login", func() {
 			})
 		})
 
-
 		Context("when UAA client returns an error", func() {
 			Context("when client credentials are invalid", func() {
 				var (
@@ -793,7 +792,7 @@ var _ = Describe("Login", func() {
 						"refresh_token":"erousflkajqwer",
 						"token_type":"bearer",
 						"expires_in":3600}`),
-							))
+						))
 					badUaaServer.RouteToHandler("DELETE", "/oauth/token/revoke/"+VALID_ACCESS_TOKEN_JTI,
 						RespondWith(http.StatusOK, ""),
 					)
@@ -808,7 +807,7 @@ var _ = Describe("Login", func() {
 				})
 
 				It("fails to login", func() {
-					session = runCommand("login",  "--sso")
+					session = runCommand("login", "--sso")
 					Eventually(session).Should(Exit(1))
 					Eventually(session.Err).Should(Say("UAA error: unable to fetch metadata successfully"))
 					Expect(badUaaServer.ReceivedRequests()).Should(HaveLen(2))

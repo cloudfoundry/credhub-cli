@@ -189,7 +189,7 @@ func (ch *CredHub) makeMultiCredentialGetRequest(query url.Values) ([]credential
 	return data, nil
 }
 
-func addErrorDescription(err error, message string) error{
+func addErrorDescription(err error, message string) error {
 	if strings.HasSuffix(err.Error(), message) {
 		return err
 	}
