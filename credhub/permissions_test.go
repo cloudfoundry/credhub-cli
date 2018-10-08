@@ -16,7 +16,7 @@ import (
 var _ = Describe("Permissions", func() {
 	Context("GetPermission", func() {
 		Context("when server version is less than 2.0.0", func() {
-			FIt("returns permission using V1 endpoint", func() {
+			It("returns permission using V1 endpoint", func() {
 				responseString :=
 					`{
 	"credential_name":"/test-password",
@@ -81,40 +81,6 @@ var _ = Describe("Permissions", func() {
 				url := dummyAuth.Request.URL.String()
 				Expect(url).To(Equal("https://example.com/api/v2/permissions/1234"))
 				Expect(dummyAuth.Request.Method).To(Equal(http.MethodGet))
-			})
-		})
-
-		Context("when server version is not specified", func() {
-			var server *ghttp.Server
-
-			BeforeEach(func() {
-				server = ghttp.NewServer()
-				server.AppendHandlers(
-					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("GET", "/info"),
-						ghttp.RespondWith(http.StatusOK, `{}`),
-					),
-					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("GET", "/version"),
-						ghttp.RespondWith(http.StatusOK, `{"version": "1.9.0"}`),
-					),
-					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("GET", "/api/v1/permissions"),
-						ghttp.RespondWith(http.StatusOK, `{}`),
-					),
-				)
-			})
-
-			AfterEach(func() {
-				//shut down the server between tests
-				server.Close()
-			})
-
-			It("returns permission", func() {
-				ch, _ := New(server.URL())
-				_, err := ch.GetPermission("name")
-				Expect(err).NotTo(HaveOccurred())
-				Expect(server.ReceivedRequests()).To(HaveLen(3))
 			})
 		})
 	})
@@ -224,4 +190,3 @@ var _ = Describe("Permissions", func() {
 		})
 	})
 })
-
