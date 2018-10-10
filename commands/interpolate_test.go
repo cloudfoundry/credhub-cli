@@ -27,7 +27,7 @@ var _ = Describe("interpolate", func() {
 		templateFile, err = ioutil.TempFile("", "credhub_test_interpolate_template_")
 	})
 
-	Context("shared command examples", func() {
+	Describe("behavior shared with other commands", func() {
 		templateFile, err = ioutil.TempFile("", "credhub_test_interpolate_template_")
 		templateFile.WriteString("---")
 		ItAutomaticallyLogsIn("GET", "get_response.json", "/api/v1/data", "interpolate", "-f", templateFile.Name())
@@ -44,47 +44,48 @@ var _ = Describe("interpolate", func() {
 		ItRequiresAnAPIToBeSet("interpolate", "-f", "testinterpolationtemplate.yml")
 	})
 
-	It("queries for string creds and prints them in the template as strings", func() {
-		templateText = `---
+	Describe("interpolating various types of credentials", func() {
+		It("queries for string creds and prints them in the template as strings", func() {
+			templateText = `---
 value-cred: ((relative/value/cred/path))
 static-value: a normal string`
-		templateFile.WriteString(templateText)
-		responseValueJson := fmt.Sprintf(STRING_CREDENTIAL_ARRAY_RESPONSE_JSON, "value", "relative/value/cred/path", `{\"value\": \"should not be interpolated\"}`)
+			templateFile.WriteString(templateText)
+			responseValueJson := fmt.Sprintf(STRING_CREDENTIAL_ARRAY_RESPONSE_JSON, "value", "relative/value/cred/path", `{\"value\": \"should not be interpolated\"}`)
 
-		server.RouteToHandler("GET", "/api/v1/data",
-			CombineHandlers(
-				VerifyRequest("GET", "/api/v1/data", "current=true&name=relative/value/cred/path"),
-				RespondWith(http.StatusOK, responseValueJson),
-			),
-		)
+			server.RouteToHandler("GET", "/api/v1/data",
+				CombineHandlers(
+					VerifyRequest("GET", "/api/v1/data", "current=true&name=relative/value/cred/path"),
+					RespondWith(http.StatusOK, responseValueJson),
+				),
+			)
 
-		session = runCommand("interpolate", "-f", templateFile.Name())
-		Eventually(session).Should(gexec.Exit(0))
-		Expect(string(session.Out.Contents())).To(MatchYAML(`
+			session = runCommand("interpolate", "-f", templateFile.Name())
+			Eventually(session).Should(gexec.Exit(0))
+			Expect(string(session.Out.Contents())).To(MatchYAML(`
 value-cred: "{\"value\": \"should not be interpolated\"}"
 static-value: a normal string
 `))
-	})
+		})
 
-	It("queries for multi-line, multi-part credential types and prints them in the template", func() {
-		templateText = `---
+		It("queries for multi-line, multi-part credential types and prints them in the template", func() {
+			templateText = `---
 full-certificate-cred: ((relative/certificate/cred/path))
 cert-only-certificate-cred: ((relative/certificate/cred/path.certificate))
 static-value: a normal string`
-		templateFile.WriteString(templateText)
+			templateFile.WriteString(templateText)
 
-		responseCertJson := fmt.Sprintf(CERTIFICATE_CREDENTIAL_ARRAY_RESPONSE_JSON, "test-cert", "", "-----BEGIN FAKE CERTIFICATE-----\\n-----END FAKE CERTIFICATE-----", "-----BEGIN FAKE RSA PRIVATE KEY-----\\n-----END FAKE RSA PRIVATE KEY-----")
+			responseCertJson := fmt.Sprintf(CERTIFICATE_CREDENTIAL_ARRAY_RESPONSE_JSON, "test-cert", "", "-----BEGIN FAKE CERTIFICATE-----\\n-----END FAKE CERTIFICATE-----", "-----BEGIN FAKE RSA PRIVATE KEY-----\\n-----END FAKE RSA PRIVATE KEY-----")
 
-		server.RouteToHandler("GET", "/api/v1/data",
-			CombineHandlers(
-				VerifyRequest("GET", "/api/v1/data", "current=true&name=relative/certificate/cred/path"),
-				RespondWith(http.StatusOK, responseCertJson),
-			),
-		)
+			server.RouteToHandler("GET", "/api/v1/data",
+				CombineHandlers(
+					VerifyRequest("GET", "/api/v1/data", "current=true&name=relative/certificate/cred/path"),
+					RespondWith(http.StatusOK, responseCertJson),
+				),
+			)
 
-		session = runCommand("interpolate", "-f", templateFile.Name())
-		Eventually(session).Should(gexec.Exit(0))
-		Expect(string(session.Out.Contents())).To(MatchYAML(`
+			session = runCommand("interpolate", "-f", templateFile.Name())
+			Eventually(session).Should(gexec.Exit(0))
+			Expect(string(session.Out.Contents())).To(MatchYAML(`
 full-certificate-cred:
   ca: ""
   certificate: |-
@@ -98,24 +99,25 @@ cert-only-certificate-cred: |-
   -----END FAKE CERTIFICATE-----
 static-value: a normal string
 `))
-	})
+		})
 
-	It("queries for json creds and prints them in the template rendered as yaml", func() {
-		templateText = `json-cred: ((relative/json/cred/path))`
-		templateFile.WriteString(templateText)
+		It("queries for json creds and prints them in the template rendered as yaml", func() {
+			templateText = `json-cred: ((relative/json/cred/path))`
+			templateFile.WriteString(templateText)
 
-		responseJson := fmt.Sprintf(JSON_CREDENTIAL_ARRAY_RESPONSE_JSON, "test-json", `{"whatthing":"something"}`)
+			responseJson := fmt.Sprintf(JSON_CREDENTIAL_ARRAY_RESPONSE_JSON, "test-json", `{"whatthing":"something"}`)
 
-		server.RouteToHandler("GET", "/api/v1/data",
-			CombineHandlers(
-				VerifyRequest("GET", "/api/v1/data", "current=true&name=relative/json/cred/path"),
-				RespondWith(http.StatusOK, responseJson),
-			),
-		)
+			server.RouteToHandler("GET", "/api/v1/data",
+				CombineHandlers(
+					VerifyRequest("GET", "/api/v1/data", "current=true&name=relative/json/cred/path"),
+					RespondWith(http.StatusOK, responseJson),
+				),
+			)
 
-		session = runCommand("interpolate", "-f", templateFile.Name())
-		Eventually(session).Should(gexec.Exit(0))
-		Expect(string(session.Out.Contents())).To(MatchYAML(`json-cred: {"whatthing":"something"}`))
+			session = runCommand("interpolate", "-f", templateFile.Name())
+			Eventually(session).Should(gexec.Exit(0))
+			Expect(string(session.Out.Contents())).To(MatchYAML(`json-cred: {"whatthing":"something"}`))
+		})
 	})
 
 	Describe("the optional --prefix flag", func() {

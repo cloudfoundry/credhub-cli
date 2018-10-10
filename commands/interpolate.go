@@ -31,12 +31,12 @@ func (c *InterpolateCommand) Execute([]string) error {
 
 	initialTemplate := template.NewTemplate(fileContents)
 
-	varGetter := variableGetter{
+	credGetter := credentialGetter{
 		clientCommand: c.ClientCommand,
 		prefix:        c.Prefix,
 	}
 
-	renderedTemplate, err := initialTemplate.Evaluate(varGetter, nil, template.EvaluateOpts{ExpectAllKeys: true})
+	renderedTemplate, err := initialTemplate.Evaluate(credGetter, nil, template.EvaluateOpts{ExpectAllKeys: true})
 	if err != nil {
 		return err
 	}
@@ -45,31 +45,30 @@ func (c *InterpolateCommand) Execute([]string) error {
 	return nil
 }
 
-type variableGetter struct {
+type credentialGetter struct {
 	clientCommand ClientCommand
 	prefix        string
 }
 
-func (v variableGetter) Get(varDef template.VariableDefinition) (interface{}, bool, error) {
-	varName := varDef.Name
+func (v credentialGetter) Get(varDef template.VariableDefinition) (interface{}, bool, error) {
+	credName := varDef.Name
 	if !path.IsAbs(varDef.Name) {
-		varName = path.Join(v.prefix, varName)
+		credName = path.Join(v.prefix, credName)
 	}
 
-	variable, err := v.clientCommand.client.GetLatestVersion(varName)
-	var result = variable.Value
-	if mapString, ok := variable.Value.(map[string]interface{}); ok {
+	credential, err := v.clientCommand.client.GetLatestVersion(credName)
+	var result = credential.Value
+	if mapString, ok := credential.Value.(map[string]interface{}); ok {
 		mapInterface := map[interface{}]interface{}{}
 		for k, v := range mapString {
 			mapInterface[k] = v
 		}
 		result = mapInterface
 	}
-
 	return result, true, err
 }
 
-func (v variableGetter) List() ([]template.VariableDefinition, error) {
+func (v credentialGetter) List() ([]template.VariableDefinition, error) {
 	// not implemented
 	return []template.VariableDefinition{}, nil
 }
