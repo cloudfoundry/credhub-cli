@@ -138,7 +138,7 @@ static-value: a normal string`
 			)
 		})
 		It("prints the values of credential names derived from the prefix, unless the cred paths start with /", func() {
-			session = runCommand("interpolate", "-f", templateFile.Name(), "-p", "/relative")
+			session = runCommand("interpolate", "-f", templateFile.Name(), "-p=/relative")
 			Eventually(session).Should(gexec.Exit(0))
 			Expect(string(session.Out.Contents())).To(MatchYAML(`
 full-certificate-cred:
@@ -182,7 +182,7 @@ static-value: a normal string
 			It("prints and errors to require data in the template", func() {
 				session := runCommand("interpolate", "-f", templateFile.Name())
 				Eventually(session).Should(gexec.Exit(1), "interpolate should have failed")
-				Expect(session.Err).To(Say(fmt.Sprintf("Error: %s was an empty file", templateFile.Name())))
+				Expect(session.Err.Contents()).To(ContainSubstring(fmt.Sprintf("Error: %s was an empty file", templateFile.Name())))
 			})
 		})
 
