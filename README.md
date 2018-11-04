@@ -2,6 +2,7 @@
 
 [![slack.cloudfoundry.org](https://slack.cloudfoundry.org/badge.svg)](https://slack.cloudfoundry.org)
 [![GoDoc](https://godoc.org/github.com/golang/gddo?status.svg)](http://godoc.org/code.cloudfoundry.org/credhub-cli/credhub)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fcloudfoundry-incubator%2Fcredhub-cli.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fcloudfoundry-incubator%2Fcredhub-cli?ref=badge_shield)
 
 CredHub manages credentials like passwords, certificates, certificate authorities, ssh keys, rsa keys and arbitrary values (strings and JSON blobs). CredHub provides a CLI and API to get, set, generate and securely store such credentials.
 
@@ -39,3 +40,7 @@ This repository contains a Go client library that can be used independently of t
 CredHub CLI can be used to manage credentials stored in a CredHub server. You must first target the CredHub server using the `api` command. Once targeted, you must login with either user or client credentials. Future commands will be sent to the targeted server. For additional information on how to perform CLI operations, you may review the examples shown [here][1] or review the help menus with the commands `credhub --help` and `credhub <command> --help`.
 
 [1]:https://credhub-api.cfapps.io
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fcloudfoundry-incubator%2Fcredhub-cli.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fcloudfoundry-incubator%2Fcredhub-cli?ref=badge_large)
