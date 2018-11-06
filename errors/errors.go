@@ -81,6 +81,10 @@ func NewGetVersionAndKeyError() error {
 	return errors.New("The --version flag and --key flag are incompatible")
 }
 
+func NewOutputJsonAndQuietError() error {
+	return errors.New("The --output-json flag and --quiet flag are incompatible")
+}
+
 func NewUserNameOnlyValidForUserType() error {
 	return errors.New("Username parameter is not valid for this credential type.")
 }
