@@ -199,10 +199,12 @@ func runCommandWithStdin(stdin io.Reader, args ...string) *Session {
 
 func setupUAAConfig(uaaResponseStatus int) {
 	cfg := config.Config{
-		RefreshToken: "5b9c9fd51ba14838ac2e6b222d487106-r",
-		AccessToken:  "e30K.eyJqdGkiOiIxIn0K.e30K",
-		AuthURL:      authServer.URL(),
-		ApiURL:       server.URL(),
+		ConfigWithoutSecrets: config.ConfigWithoutSecrets{
+			RefreshToken: "5b9c9fd51ba14838ac2e6b222d487106-r",
+			AccessToken:  "e30K.eyJqdGkiOiIxIn0K.e30K",
+			AuthURL:      authServer.URL(),
+			ApiURL:       server.URL(),
+		},
 	}
 
 	Expect(cfg.UpdateTrustedCAs([]string{"../test/auth-tls-ca.pem", "../test/server-tls-ca.pem"})).To(Succeed())
