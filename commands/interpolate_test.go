@@ -1,6 +1,7 @@
 package commands_test
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -52,9 +53,15 @@ static-value: a normal string`
 			templateFile.WriteString(templateText)
 			responseValueJson := fmt.Sprintf(STRING_CREDENTIAL_ARRAY_RESPONSE_JSON, "value", "relative/value/cred/path", `{\"value\": \"should not be interpolated\"}`)
 
-			server.RouteToHandler("GET", "/api/v1/data",
+			credentialListJson, err := credentialsListJSON([]string{"/relative/value/cred/path"})
+			Expect(err).Should(BeNil())
+			server.AppendHandlers(
 				CombineHandlers(
-					VerifyRequest("GET", "/api/v1/data", "current=true&name=relative/value/cred/path"),
+					VerifyRequest("GET", "/api/v1/data", "path="),
+					RespondWith(http.StatusOK, credentialListJson),
+				),
+				CombineHandlers(
+					VerifyRequest("GET", "/api/v1/data", "current=true&name=/relative/value/cred/path"),
 					RespondWith(http.StatusOK, responseValueJson),
 				),
 			)
@@ -76,9 +83,15 @@ static-value: a normal string`
 
 			responseCertJson := fmt.Sprintf(CERTIFICATE_CREDENTIAL_ARRAY_RESPONSE_JSON, "test-cert", "", "-----BEGIN FAKE CERTIFICATE-----\\n-----END FAKE CERTIFICATE-----", "-----BEGIN FAKE RSA PRIVATE KEY-----\\n-----END FAKE RSA PRIVATE KEY-----")
 
-			server.RouteToHandler("GET", "/api/v1/data",
+			credentialListJson, err := credentialsListJSON([]string{"/relative/certificate/cred/path"})
+			Expect(err).Should(BeNil())
+			server.AppendHandlers(
 				CombineHandlers(
-					VerifyRequest("GET", "/api/v1/data", "current=true&name=relative/certificate/cred/path"),
+					VerifyRequest("GET", "/api/v1/data", "path="),
+					RespondWith(http.StatusOK, credentialListJson),
+				),
+				CombineHandlers(
+					VerifyRequest("GET", "/api/v1/data", "current=true&name=/relative/certificate/cred/path"),
 					RespondWith(http.StatusOK, responseCertJson),
 				),
 			)
@@ -106,10 +119,15 @@ static-value: a normal string
 			templateFile.WriteString(templateText)
 
 			responseJson := fmt.Sprintf(JSON_CREDENTIAL_ARRAY_RESPONSE_JSON, "test-json", `{"whatthing":"something"}`)
-
-			server.RouteToHandler("GET", "/api/v1/data",
+			credentialListJson, err := credentialsListJSON([]string{"/relative/json/cred/path"})
+			Expect(err).Should(BeNil())
+			server.AppendHandlers(
 				CombineHandlers(
-					VerifyRequest("GET", "/api/v1/data", "current=true&name=relative/json/cred/path"),
+					VerifyRequest("GET", "/api/v1/data", "path="),
+					RespondWith(http.StatusOK, credentialListJson),
+				),
+				CombineHandlers(
+					VerifyRequest("GET", "/api/v1/data", "current=true&name=/relative/json/cred/path"),
 					RespondWith(http.StatusOK, responseJson),
 				),
 			)
@@ -129,8 +147,13 @@ static-value: a normal string`
 			templateFile.WriteString(templateText)
 
 			responseCertJson := fmt.Sprintf(CERTIFICATE_CREDENTIAL_ARRAY_RESPONSE_JSON, "test-cert", "", "-----BEGIN FAKE CERTIFICATE-----\\n-----END FAKE CERTIFICATE-----", "-----BEGIN FAKE RSA PRIVATE KEY-----\\n-----END FAKE RSA PRIVATE KEY-----")
-
-			server.RouteToHandler("GET", "/api/v1/data",
+			credentialListJson, err := credentialsListJSON([]string{"/relative/certificate/cred/path"})
+			Expect(err).Should(BeNil())
+			server.AppendHandlers(
+				CombineHandlers(
+					VerifyRequest("GET", "/api/v1/data", "path=/relative"),
+					RespondWith(http.StatusOK, credentialListJson),
+				),
 				CombineHandlers(
 					VerifyRequest("GET", "/api/v1/data", "current=true&name=/relative/certificate/cred/path"),
 					RespondWith(http.StatusOK, responseCertJson),
@@ -191,6 +214,14 @@ static-value: a normal string
 				templateText = `---
 yaml-key-with-static-value: a normal string`
 				templateFile.WriteString(templateText)
+				credentialListJson, err := credentialsListJSON([]string{""})
+				Expect(err).Should(BeNil())
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest("GET", "/api/v1/data", "path="),
+						RespondWith(http.StatusOK, credentialListJson),
+					),
+				)
 			})
 			It("succeeds and prints the template to stdout", func() {
 				session := runCommand("interpolate", "-f", templateFile.Name())
@@ -206,9 +237,15 @@ yaml-key-with-template-value: ((relative/cred/path))
 yaml-key-with-static-value: a normal string`
 				templateFile.WriteString(templateText)
 
-				server.RouteToHandler("GET", "/api/v1/data",
+				credentialListJson, err := credentialsListJSON([]string{"/relative/cred/path"})
+				Expect(err).Should(BeNil())
+				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest("GET", "/api/v1/data", "current=true&name=relative/cred/path"),
+						VerifyRequest("GET", "/api/v1/data", "path="),
+						RespondWith(http.StatusOK, credentialListJson),
+					),
+					CombineHandlers(
+						VerifyRequest("GET", "/api/v1/data", "current=true&name=/relative/cred/path"),
 						RespondWith(http.StatusOK, `{"data":[]}`),
 					),
 				)
@@ -220,5 +257,46 @@ yaml-key-with-static-value: a normal string`
 				Expect(session.Err).To(Say("Finding variable 'relative/cred/path': response did not contain any credentials"))
 			})
 		})
+
+		Context("when skip is specified", func() {
+			BeforeEach(func() {
+				templateText = `---
+yaml-key-with-template-value: ((not_a_cred))
+yaml-key-with-static-value: a normal string`
+				templateFile.WriteString(templateText)
+
+				credentialListJson, err := credentialsListJSON([]string{""})
+				Expect(err).Should(BeNil())
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest("GET", "/api/v1/data", "path="),
+						RespondWith(http.StatusOK, credentialListJson),
+					),
+				)
+			})
+
+			It("succeeds and prints out same yaml", func() {
+				session = runCommand("interpolate", "-f", templateFile.Name(), "-s")
+				Eventually(session).Should(gexec.Exit(0))
+				Expect(string(session.Out.Contents())).To(MatchYAML(`
+yaml-key-with-template-value: ((not_a_cred))
+yaml-key-with-static-value: a normal string`))
+			})
+		})
 	})
 })
+
+func credentialsListJSON(names []string) (string, error) {
+	type creds struct {
+		Name string `json:"name"`
+	}
+	type credholder struct {
+		Credentials []creds `json:"credentials"`
+	}
+	holder := &credholder{}
+	for _, name := range names {
+		holder.Credentials = append(holder.Credentials, creds{Name: name})
+	}
+	bytes, err := json.Marshal(holder)
+	return string(bytes), err
+}
