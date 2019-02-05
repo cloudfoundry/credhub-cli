@@ -1,73 +1,73 @@
 package commands_test
 
 import (
-  "net/http"
-  "net/url"
-  "runtime"
+	"net/http"
+	"net/url"
+	"runtime"
 
-  . "github.com/onsi/ginkgo"
-  . "github.com/onsi/gomega"
-  . "github.com/onsi/gomega/gbytes"
-  . "github.com/onsi/gomega/gexec"
-  . "github.com/onsi/gomega/ghttp"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	. "github.com/onsi/gomega/gbytes"
+	. "github.com/onsi/gomega/gexec"
+	. "github.com/onsi/gomega/ghttp"
 )
 
 var _ = Describe("Curl", func() {
-  BeforeEach(func() {
-    login()
-  })
+	BeforeEach(func() {
+		login()
+	})
 
-  ItRequiresAuthentication("curl", "-p", "api/v1/data")
-  ItRequiresAnAPIToBeSet("curl", "-p", "api/v1/data")
-  ItAutomaticallyLogsIn("GET", "find_response.json", "/api/v1/data", "curl", "-p", "api/v1/data")
+	ItRequiresAuthentication("curl", "-p", "api/v1/data")
+	ItRequiresAnAPIToBeSet("curl", "-p", "api/v1/data")
+	ItAutomaticallyLogsIn("GET", "find_response.json", "/api/v1/data", "curl", "-p", "api/v1/data")
 
-  ItBehavesLikeHelp("curl", "curl", func(session *Session) {
-    Expect(session.Err).To(Say("Usage"))
-    if runtime.GOOS == "windows" {
-      Expect(session.Err).To(Say("credhub-cli.exe \\[OPTIONS\\] curl \\[curl-OPTIONS\\]"))
-    } else {
-      Expect(session.Err).To(Say("credhub-cli \\[OPTIONS\\] curl \\[curl-OPTIONS\\]"))
-    }
-  })
+	ItBehavesLikeHelp("curl", "curl", func(session *Session) {
+		Expect(session.Err).To(Say("Usage"))
+		if runtime.GOOS == "windows" {
+			Expect(session.Err).To(Say("credhub-cli.exe \\[OPTIONS\\] curl \\[curl-OPTIONS\\]"))
+		} else {
+			Expect(session.Err).To(Say("credhub-cli \\[OPTIONS\\] curl \\[curl-OPTIONS\\]"))
+		}
+	})
 
-  It("displays missing required parameter", func() {
-    session := runCommand("curl")
+	It("displays missing required parameter", func() {
+		session := runCommand("curl")
 
-    Eventually(session).Should(Exit(1))
+		Eventually(session).Should(Exit(1))
 
-    Expect(session.Err).To(Say("A path must be provided. Please update and retry your request."))
-  })
+		Expect(session.Err).To(Say("A path must be provided. Please update and retry your request."))
+	})
 
-  Context("the user provides an invalid path", func() {
-    It("receives what the server returns", func() {
-      //language=json
-      responseJson := `
+	Context("the user provides an invalid path", func() {
+		It("receives what the server returns", func() {
+			//language=json
+			responseJson := `
         {
           "error": "An application error occurred. Please contact your CredHub administrator."
         }
       `
-      server.RouteToHandler("GET", "/api/v1/data/bogus",
-        CombineHandlers(
-          VerifyRequest("GET", "/api/v1/data/bogus"),
-          RespondWith(http.StatusOK, responseJson),
-        ),
-      )
+			server.RouteToHandler("GET", "/api/v1/data/bogus",
+				CombineHandlers(
+					VerifyRequest("GET", "/api/v1/data/bogus"),
+					RespondWith(http.StatusOK, responseJson),
+				),
+			)
 
-      session := runCommand("curl", "-p", "api/v1/data/bogus")
+			session := runCommand("curl", "-p", "api/v1/data/bogus")
 
-      Eventually(session).Should(Exit(0))
-      Eventually(session.Out.Contents()).Should(MatchJSON(`
+			Eventually(session).Should(Exit(0))
+			Eventually(session.Out.Contents()).Should(MatchJSON(`
 				{
   				"error": "An application error occurred. Please contact your CredHub administrator."
 				}
 			`))
-    })
-  })
+		})
+	})
 
-  Context("When the api returns an array", func() {
-    It("can be parsed successfully", func() {
-      //language=json
-      responseJson := `
+	Context("When the api returns an array", func() {
+		It("can be parsed successfully", func() {
+			//language=json
+			responseJson := `
         [
           {
             "id": "2993f622-cb1e-4e00-a267-4b23c273bf3d",
@@ -78,18 +78,18 @@ var _ = Describe("Curl", func() {
           }
         ]
       `
-      server.RouteToHandler("GET", "/api/v1/data/valid-credential-id",
-        CombineHandlers(
-          VerifyRequest("GET", "/api/v1/data/valid-credential-id"),
-          RespondWith(http.StatusOK, responseJson),
-        ),
-      )
+			server.RouteToHandler("GET", "/api/v1/data/valid-credential-id",
+				CombineHandlers(
+					VerifyRequest("GET", "/api/v1/data/valid-credential-id"),
+					RespondWith(http.StatusOK, responseJson),
+				),
+			)
 
-      session := runCommand("curl", "-p", "api/v1/data/valid-credential-id")
+			session := runCommand("curl", "-p", "api/v1/data/valid-credential-id")
 
-      Eventually(session).Should(Exit(0))
+			Eventually(session).Should(Exit(0))
 
-      Eventually(session.Out.Contents()).Should(MatchJSON(`
+			Eventually(session.Out.Contents()).Should(MatchJSON(`
 				[
 					{
 						"id": "2993f622-cb1e-4e00-a267-4b23c273bf3d",
@@ -100,13 +100,13 @@ var _ = Describe("Curl", func() {
 					}
 				]
 			`))
-    })
-  })
+		})
+	})
 
-  Context("the user provides a valid path", func() {
-    It("receives what the server returns", func() {
-      //language=json
-      responseJson := `
+	Context("the user provides a valid path", func() {
+		It("receives what the server returns", func() {
+			//language=json
+			responseJson := `
         {
           "id": "2993f622-cb1e-4e00-a267-4b23c273bf3d",
           "name": "/example-password",
@@ -115,17 +115,17 @@ var _ = Describe("Curl", func() {
           "version_created_at": "2017-01-05T01:01:01Z"
         }
       `
-      server.RouteToHandler("GET", "/api/v1/data/valid-credential-id",
-        CombineHandlers(
-          VerifyRequest("GET", "/api/v1/data/valid-credential-id"),
-          RespondWith(http.StatusOK, responseJson),
-        ),
-      )
+			server.RouteToHandler("GET", "/api/v1/data/valid-credential-id",
+				CombineHandlers(
+					VerifyRequest("GET", "/api/v1/data/valid-credential-id"),
+					RespondWith(http.StatusOK, responseJson),
+				),
+			)
 
-      session := runCommand("curl", "-p", "api/v1/data/valid-credential-id")
+			session := runCommand("curl", "-p", "api/v1/data/valid-credential-id")
 
-      Eventually(session).Should(Exit(0))
-      Eventually(session.Out.Contents()).Should(MatchJSON(`
+			Eventually(session).Should(Exit(0))
+			Eventually(session.Out.Contents()).Should(MatchJSON(`
 				{
 					"id": "2993f622-cb1e-4e00-a267-4b23c273bf3d",
 					"name": "/example-password",
@@ -134,38 +134,38 @@ var _ = Describe("Curl", func() {
 					"version_created_at": "2017-01-05T01:01:01Z"
 				}
 			`))
-    })
+		})
 
-    Context("the user does not specify required parameters", func() {
-      It("returns a wrapped error", func() {
-        //language=json
-        responseJson := `
+		Context("the user does not specify required parameters", func() {
+			It("returns a wrapped error", func() {
+				//language=json
+				responseJson := `
           {
             "error": "The query parameter name is required for this request."
           }
         `
-        server.RouteToHandler("GET", "/api/v1/data",
-          CombineHandlers(
-            VerifyRequest("GET", "/api/v1/data"),
-            RespondWith(http.StatusBadRequest, responseJson),
-          ),
-        )
+				server.RouteToHandler("GET", "/api/v1/data",
+					CombineHandlers(
+						VerifyRequest("GET", "/api/v1/data"),
+						RespondWith(http.StatusBadRequest, responseJson),
+					),
+				)
 
-        session := runCommand("curl", "-p", "api/v1/data")
+				session := runCommand("curl", "-p", "api/v1/data")
 
-        Eventually(session).Should(Exit(0))
-        Eventually(session.Out.Contents()).Should(MatchJSON(`
+				Eventually(session).Should(Exit(0))
+				Eventually(session.Out.Contents()).Should(MatchJSON(`
 					{
 						"error": "The query parameter name is required for this request."
 					}
 				`))
-      })
-    })
+			})
+		})
 
-    Context("when parameters are provided by the user", func() {
-      It("returns what the server returns", func() {
-        //language=json
-        responseJson := `
+		Context("when parameters are provided by the user", func() {
+			It("returns what the server returns", func() {
+				//language=json
+				responseJson := `
           {
             "data": [
               {
@@ -178,19 +178,19 @@ var _ = Describe("Curl", func() {
             ]
           }
         `
-        server.RouteToHandler("GET", "/api/v1/data",
-          CombineHandlers(
-            VerifyRequest("GET", "/api/v1/data"),
-            VerifyForm(url.Values{"name": []string{"/example-password"},
-              "current": []string{"true"}}),
-            RespondWith(http.StatusOK, responseJson),
-          ),
-        )
+				server.RouteToHandler("GET", "/api/v1/data",
+					CombineHandlers(
+						VerifyRequest("GET", "/api/v1/data"),
+						VerifyForm(url.Values{"name": []string{"/example-password"},
+							"current": []string{"true"}}),
+						RespondWith(http.StatusOK, responseJson),
+					),
+				)
 
-        session := runCommand("curl", "-p", "api/v1/data?name=/example-password&current=true")
+				session := runCommand("curl", "-p", "api/v1/data?name=/example-password&current=true")
 
-        Eventually(session).Should(Exit(0))
-        Eventually(string(session.Out.Contents())).Should(MatchJSON(`
+				Eventually(session).Should(Exit(0))
+				Eventually(string(session.Out.Contents())).Should(MatchJSON(`
 					{
 						"data": [
 							{
@@ -203,39 +203,39 @@ var _ = Describe("Curl", func() {
 						]
 					}
 				`))
-      })
-    })
+			})
+		})
 
-    Context("the user specifies a method with -X", func() {
-      It("returns what the server returns", func() {
-        //language=json
-        responseJson := `
+		Context("the user specifies a method with -X", func() {
+			It("returns what the server returns", func() {
+				//language=json
+				responseJson := `
           {
             "error": "The request could not be fulfilled because the request path or body did not meet expectation. Please check the documentation for required formatting and retry your request."
           }
         `
-        server.RouteToHandler("PUT", "/api/v1/data",
-          CombineHandlers(
-            VerifyRequest("PUT", "/api/v1/data"),
-            RespondWith(http.StatusOK, responseJson),
-          ),
-        )
+				server.RouteToHandler("PUT", "/api/v1/data",
+					CombineHandlers(
+						VerifyRequest("PUT", "/api/v1/data"),
+						RespondWith(http.StatusOK, responseJson),
+					),
+				)
 
-        session := runCommand("curl", "-X", "PUT", "-p", "api/v1/data")
+				session := runCommand("curl", "-X", "PUT", "-p", "api/v1/data")
 
-        Eventually(session).Should(Exit(0))
-        Eventually(session.Out.Contents()).Should(MatchJSON(`
+				Eventually(session).Should(Exit(0))
+				Eventually(session.Out.Contents()).Should(MatchJSON(`
 					{
 						"error": "The request could not be fulfilled because the request path or body did not meet expectation. Please check the documentation for required formatting and retry your request."
 					}
 				`))
-      })
-    })
+			})
+		})
 
-    Context("the user provides a request body", func() {
-      It("receives what the server returns", func() {
-        //language=json
-        responseJson := `
+		Context("the user provides a request body", func() {
+			It("receives what the server returns", func() {
+				//language=json
+				responseJson := `
           {
             "type": "password",
             "version_created_at": "2018-03-06T09:10:18Z",
@@ -244,20 +244,20 @@ var _ = Describe("Curl", func() {
             "value": "XbD5KGiLB4pBi24WEYq857psfvMMww"
           }
         `
-        body := `{"name":"/some/cred","type":"password"}`
+				body := `{"name":"/some/cred","type":"password"}`
 
-        server.RouteToHandler("PUT", "/api/v1/data",
-          CombineHandlers(
-            VerifyRequest("PUT", "/api/v1/data"),
-            VerifyBody([]byte(body)),
-            RespondWith(http.StatusOK, responseJson),
-          ),
-        )
+				server.RouteToHandler("PUT", "/api/v1/data",
+					CombineHandlers(
+						VerifyRequest("PUT", "/api/v1/data"),
+						VerifyBody([]byte(body)),
+						RespondWith(http.StatusOK, responseJson),
+					),
+				)
 
-        session := runCommand("curl", "-p", "api/v1/data", "-X", "PUT", "-d", body)
+				session := runCommand("curl", "-p", "api/v1/data", "-X", "PUT", "-d", body)
 
-        Eventually(session).Should(Exit(0))
-        Eventually(session.Out.Contents()).Should(MatchJSON(`
+				Eventually(session).Should(Exit(0))
+				Eventually(session.Out.Contents()).Should(MatchJSON(`
 					{
 						"id": "93959091-0fcd-4a2a-bedb-97d3ee0d0e87",
 						"name": "/some/cred",
@@ -266,33 +266,33 @@ var _ = Describe("Curl", func() {
 						"version_created_at": "2018-03-06T09:10:18Z"
 					}
 				`))
-      })
-    })
+			})
+		})
 
-    Context("the user provides a -i flag", func() {
-      It("displays the response headers to the user", func() {
-        responseJson := `{"id":"2993f622-cb1e-4e00-a267-4b23c273bf3d","name":"/example-password","type":"password","value":"6mRPZB3bAfb8lRpacnXsHfDhlPqFcjH2h9YDvLpL","version_created_at":"2017-01-05T01:01:01Z"}`
-        server.RouteToHandler("GET", "/api/v1/data/valid-credential-id",
-          CombineHandlers(
-            VerifyRequest("GET", "/api/v1/data/valid-credential-id"),
-            RespondWith(http.StatusOK, responseJson, http.Header{"Test1": []string{"test1"}, "Test2": []string{"test2"}}),
-          ),
-        )
+		Context("the user provides a -i flag", func() {
+			It("displays the response headers to the user", func() {
+				responseJson := `{"id":"2993f622-cb1e-4e00-a267-4b23c273bf3d","name":"/example-password","type":"password","value":"6mRPZB3bAfb8lRpacnXsHfDhlPqFcjH2h9YDvLpL","version_created_at":"2017-01-05T01:01:01Z"}`
+				server.RouteToHandler("GET", "/api/v1/data/valid-credential-id",
+					CombineHandlers(
+						VerifyRequest("GET", "/api/v1/data/valid-credential-id"),
+						RespondWith(http.StatusOK, responseJson, http.Header{"Test1": []string{"test1"}, "Test2": []string{"test2"}}),
+					),
+				)
 
-        session := runCommand("curl", "-p", "api/v1/data/valid-credential-id", "-i")
+				session := runCommand("curl", "-p", "api/v1/data/valid-credential-id", "-i")
 
-        Eventually(session).Should(Exit(0))
-        Eventually(session.Out).Should(Say("HTTP/1.1 200"))
-        Eventually(session.Out).Should(Say("Test1: test1"))
-        Eventually(session.Out).Should(Say("Test2: test2"))
-        Eventually(session.Out).Should(Say(`{
+				Eventually(session).Should(Exit(0))
+				Eventually(session.Out).Should(Say("HTTP/1.1 200"))
+				Eventually(session.Out).Should(Say("Test1: test1"))
+				Eventually(session.Out).Should(Say("Test2: test2"))
+				Eventually(session.Out).Should(Say(`{
   "id": "2993f622-cb1e-4e00-a267-4b23c273bf3d",
   "name": "/example-password",
   "type": "password",
   "value": "6mRPZB3bAfb8lRpacnXsHfDhlPqFcjH2h9YDvLpL",
   "version_created_at": "2017-01-05T01:01:01Z"
 }`))
-      })
-    })
-  })
+			})
+		})
+	})
 })

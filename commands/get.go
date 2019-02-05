@@ -42,7 +42,7 @@ func (c *GetCommand) printArrayOfCredentials() error {
 
 	if c.Quiet {
 		values := c.convertToValues(arrayOfCredentials)
-		output := map[string][]interface{} {
+		output := map[string][]interface{}{
 			"versions": values,
 		}
 		printCredential(c.OutputJSON, output)
