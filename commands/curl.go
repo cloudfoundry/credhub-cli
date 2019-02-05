@@ -65,7 +65,7 @@ func (c *CurlCommand) Execute([]string) error {
 		return err
 	}
 
-	var bod map[string]interface{}
+	var bod interface{}
 	err = json.Unmarshal(body, &bod)
 	if err != nil {
 		return err
