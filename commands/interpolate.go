@@ -40,7 +40,7 @@ func (c *InterpolateCommand) Execute([]string) error {
 		creds:         make(map[string]credentials.Credential),
 	}
 
-	results, err := c.ClientCommand.client.FindByPath(c.Prefix)
+	results, err := c.ClientCommand.client.FindByPath("")
 	if err != nil {
 		return err
 	}
@@ -70,7 +70,6 @@ func (v credentialGetter) Get(varDef template.VariableDefinition) (interface{}, 
 	if !path.IsAbs(varDef.Name) {
 		credName = path.Join("/", v.prefix, credName)
 	}
-
 	if v.HasCredential(credName) {
 		var credential credentials.Credential
 		if val, ok := v.creds[credName]; ok {
