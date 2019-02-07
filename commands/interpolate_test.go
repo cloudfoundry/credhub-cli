@@ -151,7 +151,7 @@ static-value: a normal string`
 			Expect(err).Should(BeNil())
 			server.AppendHandlers(
 				CombineHandlers(
-					VerifyRequest("GET", "/api/v1/data", "path=/relative"),
+					VerifyRequest("GET", "/api/v1/data", "path="),
 					RespondWith(http.StatusOK, credentialListJson),
 				),
 				CombineHandlers(
@@ -180,6 +180,51 @@ static-value: a normal string
 		})
 	})
 
+	Describe("when template has different paths than prefix", func() {
+		var credentialListJson string
+		var err error
+		BeforeEach(func() {
+			credentialListJson, err = credentialsListJSON([]string{"/a/pass1", "/a/myval", "/b/pass2", "/b/pass"})
+			Expect(err).Should(BeNil())
+			server.AppendHandlers(
+				CombineHandlers(
+					VerifyRequest("GET", "/api/v1/data", "path="),
+					RespondWith(http.StatusOK, credentialListJson),
+				),
+			)
+		})
+		It("finds credential without path", func() {
+			templateFile.WriteString(`---
+/a/pass1: ((pass1))`)
+			server.AppendHandlers(
+				CombineHandlers(
+					VerifyRequest("GET", "/api/v1/data", "current=true&name=/a/pass1"),
+					RespondWith(http.StatusOK, fmt.Sprintf(STRING_CREDENTIAL_ARRAY_RESPONSE_JSON, "value", "a/pass1", "pass1")),
+				),
+			)
+			session = runCommand("interpolate", "-f", templateFile.Name(), "-p=/a")
+			Eventually(session).Should(gexec.Exit(0))
+			Expect(string(session.Out.Contents())).To(MatchYAML(`
+/a/pass1: pass1
+`))
+		})
+
+		It("finds credential in different path", func() {
+			templateFile.WriteString(`---
+/b/pass: ((/b/pass))`)
+			server.AppendHandlers(
+				CombineHandlers(
+					VerifyRequest("GET", "/api/v1/data", "current=true&name=/b/pass"),
+					RespondWith(http.StatusOK, fmt.Sprintf(STRING_CREDENTIAL_ARRAY_RESPONSE_JSON, "value", "b/pass", "pass")),
+				),
+			)
+			session = runCommand("interpolate", "-f", templateFile.Name(), "-p=/a")
+			Eventually(session).Should(gexec.Exit(0))
+			Expect(string(session.Out.Contents())).To(MatchYAML(`
+/b/pass: pass
+`))
+		})
+	})
 	Describe("Errors", func() {
 		Context("when no template file is provided", func() {
 			BeforeEach(func() {
