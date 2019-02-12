@@ -12,9 +12,9 @@ import (
 )
 
 type InterpolateCommand struct {
-	File              string `short:"f" long:"file"   description:"Path to the file to interpolate"`
-	Prefix            string `short:"p" long:"prefix" description:"Prefix to be applied to credential paths. Will not be applied to paths that start with '/'"`
-	SkipMissingParams bool   `short:"s" long:"skip-missing" description:"allow skipping missing params"`
+	File      string `short:"f" long:"file"   description:"Path to the file to interpolate"`
+	Prefix    string `short:"p" long:"prefix" description:"Prefix to be applied to credential paths. Will not be applied to paths that start with '/'"`
+	VarErrors bool   `long:"var-errs" description:"Expect all variables to be found, otherwise error"`
 	ClientCommand
 }
 
@@ -49,7 +49,7 @@ func (c *InterpolateCommand) Execute([]string) error {
 		paths = append(paths, result.Name)
 	}
 	credGetter.paths = paths
-	renderedTemplate, err := initialTemplate.Evaluate(credGetter, nil, template.EvaluateOpts{ExpectAllKeys: !c.SkipMissingParams})
+	renderedTemplate, err := initialTemplate.Evaluate(credGetter, nil, template.EvaluateOpts{ExpectAllKeys: !c.VarErrors})
 	if err != nil {
 		return err
 	}
