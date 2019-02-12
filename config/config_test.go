@@ -63,8 +63,8 @@ var _ = Describe("Config", func() {
 					CaCerts:            []string{"cert1", "cert2"},
 					ServerVersion:      "version",
 				},
-				ClientID:           someClientID,
-				ClientSecret:       someClientSecret,
+				ClientID:     someClientID,
+				ClientSecret: someClientSecret,
 			}
 
 			err := config.WriteConfig(cliConfig)

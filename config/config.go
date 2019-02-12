@@ -15,8 +15,8 @@ const AuthPassword = ""
 
 type Config struct {
 	ConfigWithoutSecrets
-	ClientID           string
-	ClientSecret       string
+	ClientID     string
+	ClientSecret string
 }
 
 func ConfigDir() string {

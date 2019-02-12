@@ -12,7 +12,7 @@ import (
 )
 
 type permissionsResponse struct {
-	CredentialName string                   `json:"credential_name"`
+	CredentialName string                      `json:"credential_name"`
 	Permissions    []permissions.V1_Permission `json:"permissions"`
 }
 

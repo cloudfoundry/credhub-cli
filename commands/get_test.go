@@ -64,7 +64,6 @@ var _ = Describe("Get", func() {
 			Eventually(session.Out).Should(Say("value: potatoes"))
 		})
 
-
 		Context("with --quiet flag", func() {
 			It("returns only the value", func() {
 				responseJson := fmt.Sprintf(STRING_CREDENTIAL_ARRAY_RESPONSE_JSON, "value", "my-value", "potatoes")
@@ -83,7 +82,6 @@ var _ = Describe("Get", func() {
 				Eventually(contents).Should(Equal("potatoes"))
 			})
 		})
-
 
 		Context("multiple versions with --quiet flag", func() {
 			It("returns array of values", func() {
