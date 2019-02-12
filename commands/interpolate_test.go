@@ -321,7 +321,7 @@ yaml-key-with-static-value: a normal string`
 			})
 
 			It("succeeds and prints out same yaml", func() {
-				session = runCommand("interpolate", "-f", templateFile.Name(), "-s")
+				session = runCommand("interpolate", "-f", templateFile.Name(), "--var-errs")
 				Eventually(session).Should(gexec.Exit(0))
 				Expect(string(session.Out.Contents())).To(MatchYAML(`
 yaml-key-with-template-value: ((not_a_cred))
