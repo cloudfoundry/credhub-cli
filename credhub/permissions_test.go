@@ -118,19 +118,27 @@ var _ = Describe("Permissions", func() {
 		})
 
 		Context("when server version is greater than or equal to 2.0.0", func() {
-			It("can add with V2 endpoint", func() {
-				responseString :=
+			var(
+				responseString string
+				ch *CredHub
+				dummy *DummyAuth
+			)
+			BeforeEach(func() {
+				responseString =
 					`{
-	"actor":"user:B",
-	"operations":["read"],
-	"path":"/example-password"
-}`
-				dummy := &DummyAuth{Response: &http.Response{
+						"actor":"user:B",
+						"operations":["read"],
+						"path":"/example-password"
+					}`
+				dummy = &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusCreated,
 					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
 				}}
-				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
+				ch, _ = New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
 
+			})
+
+			FIt("can add with V2 endpoint", func() {
 				_, err := ch.AddPermission("/example-password", "user:A", []string{"read", "read"})
 				Expect(err).NotTo(HaveOccurred())
 
@@ -147,6 +155,20 @@ var _ = Describe("Permissions", func() {
 				"path": "/example-password"
 			}`
 				Expect(params).To(MatchJSON(expectedParams))
+
+			})
+
+			It("properly returns permissions", func() {
+				permission, err := ch.AddPermission("/example-password", "user:B", []string{"read"})
+				Expect(err).NotTo(HaveOccurred())
+				expectedPermission := permissions.Permission{
+					Actor:      "user:A",
+					Path:       "/example-password",
+					Operations: []string{"read", "read"},
+				}
+
+				Expect(*permission).To(Equal(expectedPermission))
+
 			})
 		})
 
@@ -190,3 +212,4 @@ var _ = Describe("Permissions", func() {
 		})
 	})
 })
+
