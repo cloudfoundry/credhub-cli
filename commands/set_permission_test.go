@@ -18,9 +18,9 @@ var _ = Describe("Set Permission", func() {
 		login()
 	})
 
-	ItRequiresAuthentication("set-permission", "-a", "test-actor", "-p", "/some-path", "-o", "read, write, delete")
-	ItRequiresAnAPIToBeSet("set-permission", "-a", "test-actor", "-p", "/some-path", "-o", "read, write, delete")
-	ItAutomaticallyLogsIn("POST", "set_response.json", "/api/v2/permissions", "set-permission", "-a", "test-actor", "-p", "/some-path", "-o", "read, write, delete")
+	ItRequiresAuthentication("set-permission", "-a", "test-actor", "-p", "'/path'", "-o", "read, write, delete")
+	ItRequiresAnAPIToBeSet("set-permission", "-a", "test-actor", "-p", "'/path'", "-o", "read, write, delete")
+	ItAutomaticallyLogsIn("POST", "set_response.json", "/api/v2/permissions", "set-permission", "-a", "test-actor", "-p", "'/path'", "-o", "read, write, delete")
 
 	Describe("Help", func() {
 		ItBehavesLikeHelp("set-permission", "", func(session *Session) {
@@ -39,8 +39,8 @@ var _ = Describe("Set Permission", func() {
 
 		})
 		It("creates a new permission", func() {
-			responseJson := fmt.Sprintf(ADD_PERMISSIONS_RESPONSE_JSON, "/some-path", "test-actor", "[\"read\", \"write\", \"delete\"]")
-			body := `{"actor": "test-actor", "path": "/some-path", "operations": ["read", "write", "delete"]}`
+			responseJson := fmt.Sprintf(ADD_PERMISSIONS_RESPONSE_JSON, "'/path'", "test-actor", "[\"read\", \"write\", \"delete\"]")
+			body := `{"actor": "test-actor", "path": "'/path'", "operations": ["read", "write", "delete"]}`
 
 			server.RouteToHandler("POST", "/api/v2/permissions",
 				CombineHandlers(
@@ -50,14 +50,14 @@ var _ = Describe("Set Permission", func() {
 				),
 			)
 
-			session := runCommand("set-permission", "-a", "test-actor", "-p", "/some-path", "-o", "read, write, delete")
+			session := runCommand("set-permission", "-a", "test-actor", "-p", "'/path'", "-o", "read, write, delete")
 
 			Eventually(session).Should(Exit(0))
 			Eventually(session.Out.Contents()).Should(MatchJSON(`
 				{
 					"uuid": "5a2edd4f-1686-4c8d-80eb-5daa866f9f86",
 					"actor": "test-actor",
-					"path": "/some-path",
+					"path": "'/path'",
 					"operations": ["read", "write", "delete"]
 				}
 				`))
@@ -68,8 +68,8 @@ var _ = Describe("Set Permission", func() {
 			clientCommand := commands.ClientCommand{}
 			clientCommand.SetClient(ch)
 			setCommand := commands.SetPermissionCommand{
-				Actor:         "test-actor",
-				Path:          "/some-path",
+				Actor:         "testactor",
+				Path:          "'/path'",
 				Operations:    "read",
 				ClientCommand: clientCommand,
 			}
