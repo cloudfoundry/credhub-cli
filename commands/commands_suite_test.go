@@ -63,7 +63,7 @@ const MULTIPLE_STRING_CREDENTIAL_ARRAY_RESPONSE_JSON = `{"data":[` + STRING_CRED
 const MULTIPLE_RSA_SSH_CREDENTIAL_ARRAY_RESPONSE_JSON = `{"data":[` + RSA_CREDENTIAL_RESPONSE_JSON + `,` + RSA_CREDENTIAL_RESPONSE_JSON + `]}`
 const MULTIPLE_USER_CREDENTIAL_ARRAY_RESPONSE_JSON = `{"data":[` + USER_CREDENTIAL_RESPONSE_JSON + `,` + USER_CREDENTIAL_RESPONSE_JSON + `]}`
 
-const ADD_PERMISSIONS_RESPONSE_JSON = `{"uuid":"` + UUID + `","path":"%s","actor":"%s","operations": "%s"}`
+const ADD_PERMISSIONS_RESPONSE_JSON = `{"uuid":"` + UUID + `","path":"%s","actor":"%s","operations":%s}`
 
 var responseMyValuePotatoesJson = fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_JSON, "value", "my-value", "potatoes")
 var responseMyPasswordPotatoesJson = fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_JSON, "password", "my-password", "potatoes")

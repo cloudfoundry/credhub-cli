@@ -138,7 +138,7 @@ var _ = Describe("Permissions", func() {
 
 			})
 
-			FIt("can add with V2 endpoint", func() {
+			It("can add with V2 endpoint", func() {
 				_, err := ch.AddPermission("/example-password", "user:A", []string{"read", "read"})
 				Expect(err).NotTo(HaveOccurred())
 
@@ -162,9 +162,9 @@ var _ = Describe("Permissions", func() {
 				permission, err := ch.AddPermission("/example-password", "user:B", []string{"read"})
 				Expect(err).NotTo(HaveOccurred())
 				expectedPermission := permissions.Permission{
-					Actor:      "user:A",
+					Actor:      "user:B",
 					Path:       "/example-password",
-					Operations: []string{"read", "read"},
+					Operations: []string{"read"},
 				}
 
 				Expect(*permission).To(Equal(expectedPermission))
