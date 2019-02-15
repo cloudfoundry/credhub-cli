@@ -22,7 +22,7 @@ func ParseOperations(operations string) []string {
 	return trimmedOps
 }
 
-func(c *SetPermissionCommand) addPermission() error {
+func (c *SetPermissionCommand) addPermission() error {
 	serverVersion, _ := c.client.ServerVersion()
 	isOlderVersion := serverVersion.Segments()[0] < 2
 	if isOlderVersion {
@@ -35,7 +35,7 @@ func(c *SetPermissionCommand) addPermission() error {
 	if err != nil {
 		return err
 	}
-	permissionJson , _ := json.Marshal(permission)
+	permissionJson, _ := json.Marshal(permission)
 	fmt.Println(string(permissionJson))
 	return nil
 }

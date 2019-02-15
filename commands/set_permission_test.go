@@ -64,13 +64,13 @@ var _ = Describe("Set Permission", func() {
 		})
 
 		It("fails when server version is <2.0", func() {
-			ch , _ := credhub.New("https://example.com", credhub.ServerVersion("1.0.0"))
+			ch, _ := credhub.New("https://example.com", credhub.ServerVersion("1.0.0"))
 			clientCommand := commands.ClientCommand{}
 			clientCommand.SetClient(ch)
 			setCommand := commands.SetPermissionCommand{
-				Actor:"test-actor",
-				Path:"/some-path",
-				Operations:"read",
+				Actor:         "test-actor",
+				Path:          "/some-path",
+				Operations:    "read",
 				ClientCommand: clientCommand,
 			}
 			err := setCommand.Execute([]string{})

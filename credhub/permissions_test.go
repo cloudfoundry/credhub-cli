@@ -118,10 +118,10 @@ var _ = Describe("Permissions", func() {
 		})
 
 		Context("when server version is greater than or equal to 2.0.0", func() {
-			var(
+			var (
 				responseString string
-				ch *CredHub
-				dummy *DummyAuth
+				ch             *CredHub
+				dummy          *DummyAuth
 			)
 			BeforeEach(func() {
 				responseString =
@@ -212,4 +212,3 @@ var _ = Describe("Permissions", func() {
 		})
 	})
 })
-
