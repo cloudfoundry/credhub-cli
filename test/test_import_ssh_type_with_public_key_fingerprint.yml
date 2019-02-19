@@ -1,0 +1,7 @@
+credentials:
+  - name: /test/sshCred
+    type: ssh
+    value:
+      private_key: some-private-key
+      public_key: some-key
+      public_key_fingerprint: some-key-fingerprint
