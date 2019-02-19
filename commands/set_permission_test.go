@@ -38,30 +38,6 @@ var _ = Describe("Set Permission", func() {
 			Expect(parsedInput).To(Equal(expectedOutput))
 
 		})
-		It("creates a new permission", func() {
-			responseJson := fmt.Sprintf(ADD_PERMISSIONS_RESPONSE_JSON, "'/path'", "test-actor", "[\"read\", \"write\", \"delete\"]")
-			body := `{"actor": "test-actor", "path": "'/path'", "operations": ["read", "write", "delete"]}`
-
-			server.RouteToHandler("POST", "/api/v2/permissions",
-				CombineHandlers(
-					VerifyRequest("POST", "/api/v2/permissions"),
-					VerifyJSON(body),
-					RespondWith(http.StatusOK, responseJson),
-				),
-			)
-
-			session := runCommand("set-permission", "-a", "test-actor", "-p", "'/path'", "-o", "read, write, delete")
-
-			Eventually(session).Should(Exit(0))
-			Eventually(session.Out.Contents()).Should(MatchJSON(`
-				{
-					"uuid": "5a2edd4f-1686-4c8d-80eb-5daa866f9f86",
-					"actor": "test-actor",
-					"path": "'/path'",
-					"operations": ["read", "write", "delete"]
-				}
-				`))
-		})
 
 		It("fails when server version is <2.0", func() {
 			ch, _ := credhub.New("https://example.com", credhub.ServerVersion("1.0.0"))
@@ -76,6 +52,87 @@ var _ = Describe("Set Permission", func() {
 			err := setCommand.Execute([]string{})
 			Expect(err).To(HaveOccurred())
 			Eventually(err).Should(Equal(fmt.Errorf("credhub server version <2.0 not supported")))
+		})
+
+		Context("when permission exists", func() {
+			It("updates existing permission", func() {
+				server.RouteToHandler("GET", "/api/v2/permissions",
+					CombineHandlers(
+						VerifyRequest("GET", "/api/v2/permissions"),
+						RespondWith(http.StatusOK, `{"actor": "some-actor",
+	"operations": [
+    "read",
+    "write"
+  ],
+  "path": "'/some-path'",
+  "uuid": "1234"}`),
+					),
+				)
+				server.RouteToHandler("PUT", "/api/v2/permissions/1234",
+					CombineHandlers(
+						VerifyRequest("PUT", "/api/v2/permissions/1234"),
+						VerifyJSON(`{"actor": "some-actor",
+					"path": "'/some-path'",
+					"operations": ["read", "write", "delete"]}`),
+						RespondWith(http.StatusOK, `{"actor": "some-actor",
+	"operations": [
+    "read",
+    "write",
+		"delete"
+  ],
+  "path": "'/some-path'",
+  "uuid": "1234"}`),
+					),
+				)
+				session := runCommand("set-permission", "-a", "some-actor", "-p", "'/some-path'", "-o", "read, write, delete")
+				Eventually(session).Should(Exit(0))
+				Eventually(session.Out.Contents()).Should(MatchJSON(`
+				{
+					"uuid": "1234",
+					"actor": "some-actor",
+					"path": "'/some-path'",
+					"operations": ["read", "write", "delete"]
+				}
+				`))
+			})
+		})
+
+		Context("when permission does not exist", func() {
+			It("creates a new permission", func() {
+				server.RouteToHandler("GET", "/api/v2/permissions",
+					CombineHandlers(
+						VerifyRequest("GET", "/api/v2/permissions"),
+						RespondWith(http.StatusOK, `{"error": "The request could not be completed because the permission does not exist or you do not have sufficient authorization."}`),
+					))
+
+				responseJson := `{"actor": "some-actor",
+	"operations": [
+    "read",
+    "write",
+		"delete"
+  ],
+  "path": "'/some-path'",
+  "uuid": "1234"}`
+				body := `{"actor": "some-actor", "path": "'/some-path'", "operations": ["read", "write", "delete"]}`
+
+				server.RouteToHandler("POST", "/api/v2/permissions",
+					CombineHandlers(
+						VerifyRequest("POST", "/api/v2/permissions"),
+						VerifyJSON(body),
+						RespondWith(http.StatusOK, responseJson),
+					))
+
+				session := runCommand("set-permission", "-a", "some-actor", "-p", "'/some-path'", "-o", "read, write, delete")
+				Eventually(session).Should(Exit(0))
+				Eventually(session.Out.Contents()).Should(MatchJSON(`
+				{
+					"uuid": "1234",
+					"actor": "some-actor",
+					"path": "'/some-path'",
+					"operations": ["read", "write", "delete"]
+				}
+				`))
+			})
 		})
 
 	})

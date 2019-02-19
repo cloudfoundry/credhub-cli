@@ -151,6 +151,12 @@ func login() {
 				}`),
 	)
 
+	server.RouteToHandler("GET", "/api/v2/permissions",
+		CombineHandlers(
+			VerifyRequest("GET", "/api/v2/permissions"),
+			RespondWith(http.StatusOK, `{"error": "The request could not be completed because the permission does not exist or you do not have sufficient authorization."}`),
+		))
+
 	server.RouteToHandler("GET", "/version",
 		RespondWith(http.StatusOK, `{"version":"9.9.9"}`),
 	)
