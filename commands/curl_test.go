@@ -19,7 +19,16 @@ var _ = Describe("Curl", func() {
 
 	ItRequiresAuthentication("curl", "-p", "api/v1/data")
 	ItRequiresAnAPIToBeSet("curl", "-p", "api/v1/data")
-	ItAutomaticallyLogsIn("GET", "find_response.json", "/api/v1/data", "curl", "-p", "api/v1/data")
+
+	testAutoLogIns := []TestAutoLogin{
+		{
+			method:              "GET",
+			responseFixtureFile: "find_response.json",
+			responseStatus: http.StatusOK,
+			endpoint:            "/api/v1/data",
+		},
+	}
+	ItAutomaticallyLogsIn(testAutoLogIns, "curl", "-p", "api/v1/data")
 
 	ItBehavesLikeHelp("curl", "curl", func(session *Session) {
 		Expect(session.Err).To(Say("Usage"))

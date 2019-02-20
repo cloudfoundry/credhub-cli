@@ -20,7 +20,23 @@ var _ = Describe("Set Permission", func() {
 
 	ItRequiresAuthentication("set-permission", "-a", "test-actor", "-p", "'/path'", "-o", "read, write, delete")
 	ItRequiresAnAPIToBeSet("set-permission", "-a", "test-actor", "-p", "'/path'", "-o", "read, write, delete")
-	ItAutomaticallyLogsIn("POST", "set_response.json", "/api/v2/permissions", "set-permission", "-a", "test-actor", "-p", "'/path'", "-o", "read, write, delete")
+
+	testAutoLogIns := []TestAutoLogin {
+		{
+			method: "GET",
+			responseFixtureFile: "get_permission_response.json",
+			responseStatus: http.StatusNotFound,
+			endpoint: "/api/v2/permissions",
+		},
+		{
+			method: "POST",
+			responseFixtureFile: "set_permission_response.json",
+			responseStatus: http.StatusOK,
+			endpoint: "/api/v2/permissions",
+		},
+	}
+	ItAutomaticallyLogsIn(testAutoLogIns, "set-permission", "-a", "test-actor", "-p", "'/path'", "-o", "read, write, delete")
+
 
 	Describe("Help", func() {
 		ItBehavesLikeHelp("set-permission", "", func(session *Session) {
@@ -61,8 +77,8 @@ var _ = Describe("Set Permission", func() {
 						VerifyRequest("GET", "/api/v2/permissions"),
 						RespondWith(http.StatusOK, `{"actor": "some-actor",
 	"operations": [
-    "read",
-    "write"
+   "read",
+   "write"
   ],
   "path": "'/some-path'",
   "uuid": "1234"}`),
@@ -76,8 +92,8 @@ var _ = Describe("Set Permission", func() {
 					"operations": ["read", "write", "delete"]}`),
 						RespondWith(http.StatusOK, `{"actor": "some-actor",
 	"operations": [
-    "read",
-    "write",
+   "read",
+   "write",
 		"delete"
   ],
   "path": "'/some-path'",
@@ -102,13 +118,13 @@ var _ = Describe("Set Permission", func() {
 				server.RouteToHandler("GET", "/api/v2/permissions",
 					CombineHandlers(
 						VerifyRequest("GET", "/api/v2/permissions"),
-						RespondWith(http.StatusOK, `{"error": "The request could not be completed because the permission does not exist or you do not have sufficient authorization."}`),
+						RespondWith(http.StatusNotFound, `{"error": "The request could not be completed because the permission does not exist or you do not have sufficient authorization."}`),
 					))
 
 				responseJson := `{"actor": "some-actor",
 	"operations": [
-    "read",
-    "write",
+   "read",
+   "write",
 		"delete"
   ],
   "path": "'/some-path'",

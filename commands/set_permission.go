@@ -53,12 +53,14 @@ func (c *SetPermissionCommand) Execute([]string) error {
 	}
 
 	permission, err := c.client.GetPermissionByPathActor(c.Path, c.Actor)
-	if err != nil {
-		return err
-	}
+	notFoundError := "The request could not be completed because the permission does not exist or you do not have sufficient authorization."
 
-	if permission.UUID == "" {
-		return c.addPermission()
+	if err != nil {
+		if err.Error() == notFoundError {
+			return c.addPermission()
+		} else {
+			return err
+		}
 	} else {
 		return c.updatePermission(permission.UUID)
 	}

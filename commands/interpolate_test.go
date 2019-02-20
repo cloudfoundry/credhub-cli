@@ -31,7 +31,15 @@ var _ = Describe("interpolate", func() {
 	Describe("behavior shared with other commands", func() {
 		templateFile, err = ioutil.TempFile("", "credhub_test_interpolate_template_")
 		templateFile.WriteString("---")
-		ItAutomaticallyLogsIn("GET", "get_response.json", "/api/v1/data", "interpolate", "-f", templateFile.Name())
+		testAutoLogin := []TestAutoLogin{
+			{
+				method: "GET",
+				responseFixtureFile: "get_response.json",
+				responseStatus: http.StatusOK,
+				endpoint: "/api/v1/data",
+			},
+		}
+		ItAutomaticallyLogsIn(testAutoLogin, "interpolate", "-f", templateFile.Name())
 
 		ItBehavesLikeHelp("interpolate", "interpolate", func(session *gexec.Session) {
 			Expect(session.Err).To(Say("Usage"))
