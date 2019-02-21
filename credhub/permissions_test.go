@@ -319,4 +319,52 @@ var _ = Describe("Permissions", func() {
 			})
 		})
 	})
+	Context("Delete Permission", func() {
+		It("correctly formats request", func() {
+			dummy := &DummyAuth{Response: &http.Response{
+				StatusCode: http.StatusOK,
+				Body:       ioutil.NopCloser(bytes.NewBufferString("")),
+			}}
+			ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.1.2"))
+			_, _ = ch.DeletePermission("1234")
+			request := dummy.Request.URL
+			expectedRequest, _ := url.Parse("https://example.com/api/v2/permissions/1234")
+			Expect(request.String()).To(Equal(expectedRequest.String()))
+			Expect(dummy.Request.Method).To(Equal(http.MethodDelete))
+		})
+		Context("when server version less than 2.0", func() {
+			It("throws error", func() {
+				ch, _ := New("https://example.com", ServerVersion("1.0.0"))
+				_, err := ch.DeletePermission("123")
+				Expect(err).To(HaveOccurred())
+				Eventually(err).Should(Equal(fmt.Errorf("credhub server version <2.0 not supported")))
+			})
+		})
+		Context("when server version is greater than or equal 2.0", func() {
+			responseString :=
+				`{
+						"actor":"user:B",
+						"operations":["read"],
+						"path":"/example-password",
+				    "uuid":"1234"
+					}`
+			dummy := &DummyAuth{Response: &http.Response{
+				StatusCode: http.StatusOK,
+				Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
+			}}
+			ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
+			It("properly returns deleted permission", func() {
+				permission, err := ch.DeletePermission("1234")
+				Expect(err).NotTo(HaveOccurred())
+				expectedPermission := permissions.Permission{
+					Actor:      "user:B",
+					Path:       "/example-password",
+					Operations: []string{"read"},
+					UUID:       "1234",
+				}
+
+				Expect(*permission).To(Equal(expectedPermission))
+			})
+		})
+	})
 })

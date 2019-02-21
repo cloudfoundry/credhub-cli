@@ -172,3 +172,31 @@ func (ch *CredHub) UpdatePermission(uuid string, path string, actor string, ops 
 	return &response, nil
 
 }
+
+func (ch *CredHub) DeletePermission(uuid string) (*permissions.Permission, error) {
+	serverVersion, err := ch.ServerVersion()
+	if err != nil {
+		return nil, err
+	}
+
+	isOlderVersion := serverVersion.Segments()[0] < 2
+	if isOlderVersion {
+		return nil, errors.New("credhub server version <2.0 not supported")
+	}
+
+	resp, err := ch.Request(http.MethodDelete, "/api/v2/permissions/"+uuid, nil, nil, true)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+	defer io.Copy(ioutil.Discard, resp.Body)
+
+	var response permissions.Permission
+
+	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
