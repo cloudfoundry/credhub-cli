@@ -26,7 +26,7 @@ var _ = Describe("Bulk-regenerate", func() {
 		{
 			method:              "POST",
 			responseFixtureFile: "bulk_regenerate_response.json",
-			responseStatus: http.StatusOK,
+			responseStatus:      http.StatusOK,
 			endpoint:            "/api/v1/bulk-regenerate",
 		},
 	}

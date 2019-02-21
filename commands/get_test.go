@@ -24,10 +24,10 @@ var _ = Describe("Get", func() {
 	ItRequiresAnAPIToBeSet("get", "-n", "test-credential")
 	testAutoLogin := []TestAutoLogin{
 		{
-			method: "GET",
+			method:              "GET",
 			responseFixtureFile: "get_response.json",
-			responseStatus: http.StatusOK,
-			endpoint: "/api/v1/data",
+			responseStatus:      http.StatusOK,
+			endpoint:            "/api/v1/data",
 		},
 	}
 	ItAutomaticallyLogsIn(testAutoLogin, "get", "-n", "test-credential")

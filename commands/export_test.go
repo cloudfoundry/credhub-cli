@@ -43,7 +43,7 @@ var _ = Describe("Export", func() {
 		{
 			method:              "GET",
 			responseFixtureFile: "get_response.json",
-			responseStatus: http.StatusOK,
+			responseStatus:      http.StatusOK,
 			endpoint:            "/api/v1/data",
 		},
 	}

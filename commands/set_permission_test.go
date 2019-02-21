@@ -21,22 +21,21 @@ var _ = Describe("Set Permission", func() {
 	ItRequiresAuthentication("set-permission", "-a", "test-actor", "-p", "'/path'", "-o", "read, write, delete")
 	ItRequiresAnAPIToBeSet("set-permission", "-a", "test-actor", "-p", "'/path'", "-o", "read, write, delete")
 
-	testAutoLogIns := []TestAutoLogin {
+	testAutoLogIns := []TestAutoLogin{
 		{
-			method: "GET",
+			method:              "GET",
 			responseFixtureFile: "get_permission_response.json",
-			responseStatus: http.StatusNotFound,
-			endpoint: "/api/v2/permissions",
+			responseStatus:      http.StatusNotFound,
+			endpoint:            "/api/v2/permissions",
 		},
 		{
-			method: "POST",
+			method:              "POST",
 			responseFixtureFile: "set_permission_response.json",
-			responseStatus: http.StatusOK,
-			endpoint: "/api/v2/permissions",
+			responseStatus:      http.StatusOK,
+			endpoint:            "/api/v2/permissions",
 		},
 	}
 	ItAutomaticallyLogsIn(testAutoLogIns, "set-permission", "-a", "test-actor", "-p", "'/path'", "-o", "read, write, delete")
-
 
 	Describe("Help", func() {
 		ItBehavesLikeHelp("set-permission", "", func(session *Session) {

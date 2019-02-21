@@ -25,7 +25,7 @@ var _ = Describe("Delete", func() {
 		{
 			method:              "DELETE",
 			responseFixtureFile: "delete_test.json",
-			responseStatus: http.StatusOK,
+			responseStatus:      http.StatusOK,
 			endpoint:            "/api/v1/data",
 		},
 	}

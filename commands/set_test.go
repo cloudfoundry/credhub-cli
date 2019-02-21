@@ -25,10 +25,10 @@ var _ = Describe("Set", func() {
 	ItRequiresAnAPIToBeSet("set", "-n", "test-credential", "-t", "password", "-w", "value")
 	testAutoLogin := []TestAutoLogin{
 		{
-			method: "PUT",
+			method:              "PUT",
 			responseFixtureFile: "set_response.json",
-			responseStatus: http.StatusOK,
-			endpoint: "/api/v1/data",
+			responseStatus:      http.StatusOK,
+			endpoint:            "/api/v1/data",
 		},
 	}
 	ItAutomaticallyLogsIn(testAutoLogin, "set", "-n", "test-credential", "-t", "password", "-w", "test-value")

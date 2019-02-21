@@ -21,6 +21,7 @@ type CredhubCommand struct {
 	Set            SetCommand            `command:"set"        alias:"s" description:"Set a credential with a provided value" long-description:"Set a credential with provided value(s). A type must be specified when setting a credential. The provided flags are used to set specific values of a credential, e.g. a certificate credential may use --root, --certificate and --private to set each value. Supported credential types are prefixed in the flag description.\n\n More information: https://credhub-api.cfapps.io/#set-credentials"`
 	Curl           CurlCommand           `command:"curl"       description:"Make an arbitrary request to the targeted CredHub server." long-description:"Make an arbitrary request to the targeted CredHub server"`
 	SetPermission  SetPermissionCommand  `command:"set-permission" description:"Set permissions for an actor on a given path." long-description:"Set permissions for an actor on a given path."`
+	GetPermission  GetPermissionCommand  `command:"get-permission" description:"Get permissions for an actor on a given path." long-description:"Get permissions for an actor on a given path."`
 
 	Version func() `long:"version" description:"Version of CLI and targeted CredHub API"`
 	Token   func() `long:"token" description:"Return your current CredHub authentication token"`

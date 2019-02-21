@@ -25,7 +25,7 @@ var _ = Describe("Find", func() {
 		{
 			method:              "GET",
 			responseFixtureFile: "find_response.json",
-			responseStatus: http.StatusOK,
+			responseStatus:      http.StatusOK,
 			endpoint:            "/api/v1/data",
 		},
 	}

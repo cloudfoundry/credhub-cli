@@ -25,10 +25,10 @@ var _ = Describe("Generate", func() {
 	ItRequiresAnAPIToBeSet("generate", "-n", "test-credential", "-t", "password")
 	testAutoLogin := []TestAutoLogin{
 		{
-			method: "POST",
+			method:              "POST",
 			responseFixtureFile: "generate_response.json",
-			responseStatus: http.StatusOK,
-			endpoint: "/api/v1/data",
+			responseStatus:      http.StatusOK,
+			endpoint:            "/api/v1/data",
 		},
 	}
 	ItAutomaticallyLogsIn(testAutoLogin, "generate", "-n", "test-credential", "-t", "password")

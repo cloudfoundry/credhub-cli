@@ -24,10 +24,10 @@ var _ = Describe("Regenerate", func() {
 	ItRequiresAnAPIToBeSet("regenerate", "-n", "test-credential")
 	testAutoLogin := []TestAutoLogin{
 		{
-			method: "POST",
+			method:              "POST",
 			responseFixtureFile: "regenerate_response.json",
-			responseStatus: http.StatusOK,
-			endpoint: "/api/v1/data",
+			responseStatus:      http.StatusOK,
+			endpoint:            "/api/v1/data",
 		},
 	}
 	ItAutomaticallyLogsIn(testAutoLogin, "regenerate", "-n", "test-credential")

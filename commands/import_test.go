@@ -252,7 +252,6 @@ Failed to set: 2
 		It("ignore public_key_fingerprint", func() {
 			SetupPutSshServer("/test/sshCred", "ssh", "some-key", "some-private-key")
 
-
 			session := runCommand("import", "-f", "../test/test_import_ssh_type_with_public_key_fingerprint.yml")
 			Eventually(session).Should(Exit(0))
 			Eventually(session.Out).Should(Say(`type: ssh
