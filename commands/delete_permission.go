@@ -1,7 +1,6 @@
 package commands
 
 import (
-	"encoding/json"
 	"fmt"
 )
 
@@ -17,8 +16,8 @@ func (c *DeletePermissionCommand) DeletePermission(uuid string) error {
 	if err != nil {
 		return err
 	}
-	permissionJson, _ := json.Marshal(permission)
-	fmt.Println(string(permissionJson))
+
+	formatOutput(false, permission)
 	return nil
 }
 

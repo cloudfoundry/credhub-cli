@@ -18,8 +18,8 @@ var _ = Describe("Get Permission", func() {
 		login()
 	})
 
-	ItRequiresAuthentication("get-permission", "-a", "test-actor", "-p", "'/some-path'")
-	ItRequiresAnAPIToBeSet("get-permission", "-a", "test-actor", "-p", "'/some-path'")
+	ItRequiresAuthentication("get-permission", "-a", "some-actor", "-p", "/some-path")
+	ItRequiresAnAPIToBeSet("get-permission", "-a", "some-actor", "-p", "/some-path")
 
 	testAutoLogIns := []TestAutoLogin{
 		{
@@ -29,9 +29,9 @@ var _ = Describe("Get Permission", func() {
 			endpoint:            "/api/v2/permissions",
 		},
 	}
-	ItAutomaticallyLogsIn(testAutoLogIns, "get-permission", "-a", "test-actor", "-p", "'/some-path'")
+	ItAutomaticallyLogsIn(testAutoLogIns, "get-permission", "-a", "some-actor", "-p", "/some-path")
 
-	Describe("Help", func() {
+	Context("when help flag is used", func() {
 		ItBehavesLikeHelp("get-permission", "", func(session *Session) {
 			Expect(session.Err).To(Say("get-permission"))
 			Expect(session.Err).To(Say("actor"))
@@ -39,47 +39,65 @@ var _ = Describe("Get Permission", func() {
 		})
 	})
 
-	Describe("Get Permission", func() {
-		It("fails when server version is <2.0", func() {
+	Context("when server version is < 2.)", func() {
+		It("fails", func() {
 			ch, _ := credhub.New("https://example.com", credhub.ServerVersion("1.0.0"))
 			clientCommand := commands.ClientCommand{}
 			clientCommand.SetClient(ch)
 			getCommand := commands.GetPermissionCommand{
-				Actor:         "testactor",
-				Path:          "'/path'",
+				Actor:         "some-actor",
+				Path:          "/some-path",
 				ClientCommand: clientCommand,
 			}
 			err := getCommand.Execute([]string{})
 			Expect(err).To(HaveOccurred())
 			Eventually(err).Should(Equal(fmt.Errorf("credhub server version <2.0 not supported")))
 		})
+	})
 
+	Context("when server version is >= 2.0", func() {
 		Context("when permission exists", func() {
-			It("returns permission", func() {
-				server.RouteToHandler("GET", "/api/v2/permissions",
-					CombineHandlers(
-						VerifyRequest("GET", "/api/v2/permissions"),
-						RespondWith(http.StatusOK, `{"actor": "test-actor",
-	"operations": [
-   "read",
-   "write"
-  ],
-  "path": "'/some-path'",
-  "uuid": "1234"}`),
-					))
+			Context("when output-json flag is used", func() {
+				It("returns permission", func() {
+					responseJson := fmt.Sprintf(PERMISSIONS_RESPONSE_JSON, "/some-path", "some-actor", `["read", "write"]`)
+					server.RouteToHandler("GET", "/api/v2/permissions",
+						CombineHandlers(
+							VerifyRequest("GET", "/api/v2/permissions"),
+							RespondWith(http.StatusOK, responseJson),
+						))
 
-				session := runCommand("get-permission", "-a", "test-actor", "-p", "'/some-path'")
-				Eventually(session).Should(Exit(0))
-				Eventually(session.Out.Contents()).Should(MatchJSON(`
+					session := runCommand("get-permission", "-a", "some-actor", "-p", "/some-path", "-j")
+					Eventually(session).Should(Exit(0))
+					Eventually(session.Out.Contents()).Should(MatchJSON(`
 				{
-					"uuid": "1234",
-					"actor": "test-actor",
-					"path": "'/some-path'",
+					"uuid": "` + UUID + `",
+					"actor": "some-actor",
+					"path": "/some-path",
 					"operations": ["read", "write"]
 				}
 				`))
+				})
+			})
+
+			It("returns permission", func() {
+				responseJson := fmt.Sprintf(PERMISSIONS_RESPONSE_JSON, "/some-path", "some-actor", `["read", "write"]`)
+				server.RouteToHandler("GET", "/api/v2/permissions",
+					CombineHandlers(
+						VerifyRequest("GET", "/api/v2/permissions"),
+						RespondWith(http.StatusOK, responseJson),
+					))
+
+				session := runCommand("get-permission", "-a", "some-actor", "-p", "/some-path")
+				Eventually(session).Should(Exit(0))
+				Eventually(string(session.Out.Contents())).Should(ContainSubstring("uuid: " + UUID))
+				Eventually(string(session.Out.Contents())).Should(ContainSubstring("actor: some-actor"))
+				Eventually(string(session.Out.Contents())).Should(ContainSubstring("path: /some-path"))
+				Eventually(string(session.Out.Contents())).Should(ContainSubstring(`operations:
+- read
+- write`))
 			})
 		})
+
 		Context("when permission does not exist", func() {
 			It("returns error", func() {
 				server.RouteToHandler("GET", "/api/v2/permissions",

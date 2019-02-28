@@ -18,8 +18,8 @@ var _ = Describe("Delete Permission", func() {
 		login()
 	})
 
-	ItRequiresAuthentication("delete-permission", "-a", "test-actor", "-p", "'/path'")
-	ItRequiresAnAPIToBeSet("delete-permission", "-a", "test-actor", "-p", "'/path'")
+	ItRequiresAuthentication("delete-permission", "-a", "some-actor", "-p", "/some-path")
+	ItRequiresAnAPIToBeSet("delete-permission", "-a", "some-actor", "-p", "/some-path")
 
 	testAutoLogIns := []TestAutoLogin{
 		{
@@ -32,10 +32,10 @@ var _ = Describe("Delete Permission", func() {
 			method:              "DELETE",
 			responseFixtureFile: "set_permission_response.json",
 			responseStatus:      http.StatusOK,
-			endpoint:            "/api/v2/permissions/1234",
+			endpoint:            "/api/v2/permissions/" + UUID,
 		},
 	}
-	ItAutomaticallyLogsIn(testAutoLogIns, "delete-permission", "-a", "test-actor", "-p", "'/path'")
+	ItAutomaticallyLogsIn(testAutoLogIns, "delete-permission", "-a", "some-actor", "-p", "/some-path")
 
 	Describe("Help", func() {
 		ItBehavesLikeHelp("delete-permission", "", func(session *Session) {
@@ -52,8 +52,8 @@ var _ = Describe("Delete Permission", func() {
 			clientCommand := commands.ClientCommand{}
 			clientCommand.SetClient(ch)
 			setCommand := commands.SetPermissionCommand{
-				Actor:         "testactor",
-				Path:          "'/path'",
+				Actor:         "some-actor",
+				Path:          "/some-path",
 				Operations:    "read",
 				ClientCommand: clientCommand,
 			}
@@ -64,64 +64,50 @@ var _ = Describe("Delete Permission", func() {
 
 		Context("when permission exists", func() {
 			It("deletes existing permission", func() {
+				responseJson := fmt.Sprintf(PERMISSIONS_RESPONSE_JSON, "/some-path", "some-actor", `["read", "write"]`)
 				server.RouteToHandler("GET", "/api/v2/permissions",
 					CombineHandlers(
 						VerifyRequest("GET", "/api/v2/permissions"),
-						RespondWith(http.StatusOK, `{"actor": "some-actor",
-	"operations": [
-   "read",
-   "write"
-  ],
-  "path": "'/some-path'",
-  "uuid": "1234"}`),
+						RespondWith(http.StatusOK, responseJson),
 					),
 				)
-				server.RouteToHandler("DELETE", "/api/v2/permissions/1234",
+				server.RouteToHandler("DELETE", "/api/v2/permissions/"+UUID,
 					CombineHandlers(
-						VerifyRequest("DELETE", "/api/v2/permissions/1234"),
-						RespondWith(http.StatusOK, `{"actor": "some-actor",
-	"operations": [
-   "read",
-   "write"
-  ],
-  "path": "'/some-path'",
-  "uuid": "1234"}`),
+						VerifyRequest("DELETE", "/api/v2/permissions/"+UUID),
+						RespondWith(http.StatusOK, responseJson),
 					),
 				)
-				session := runCommand("delete-permission", "-a", "some-actor", "-p", "'/some-path'")
+				session := runCommand("delete-permission", "-a", "some-actor", "-p", "/some-path")
 				Eventually(session).Should(Exit(0))
-				Eventually(session.Out.Contents()).Should(MatchJSON(`
-				{
-					"uuid": "1234",
-					"actor": "some-actor",
-					"path": "'/some-path'",
-					"operations": ["read", "write"]
-				}
-				`))
+				Eventually(string(session.Out.Contents())).Should(ContainSubstring("uuid: " + UUID))
+				Eventually(string(session.Out.Contents())).Should(ContainSubstring("actor: some-actor"))
+				Eventually(string(session.Out.Contents())).Should(ContainSubstring("path: /some-path"))
+				Eventually(string(session.Out.Contents())).Should(ContainSubstring(`operations:
+- read
+- write`))
 			})
 		})
+	})
 
-		Context("when permission does not exist", func() {
-			It("throws an error", func() {
-				server.RouteToHandler("GET", "/api/v2/permissions",
-					CombineHandlers(
-						VerifyRequest("GET", "/api/v2/permissions"),
-						RespondWith(http.StatusNotFound, `{"error": "The request could not be completed because the permission does not exist or you do not have sufficient authorization."}`),
-					))
+	Context("when permission does not exist", func() {
+		It("throws an error", func() {
+			server.RouteToHandler("GET", "/api/v2/permissions",
+				CombineHandlers(
+					VerifyRequest("GET", "/api/v2/permissions"),
+					RespondWith(http.StatusNotFound, `{"error": "The request could not be completed because the permission does not exist or you do not have sufficient authorization."}`),
+				))
 
-				errorJson := `{"error": "The request includes a permission that does not exist."}`
-				server.RouteToHandler("DELETE", "/api/v2/permissions",
-					CombineHandlers(
-						VerifyRequest("DELETE", "/api/v2/permissions"),
-						RespondWith(http.StatusOK, errorJson),
-					))
+			errorJson := `{"error": "The request includes a permission that does not exist."}`
+			server.RouteToHandler("DELETE", "/api/v2/permissions",
+				CombineHandlers(
+					VerifyRequest("DELETE", "/api/v2/permissions"),
+					RespondWith(http.StatusOK, errorJson),
+				))
 
-				session := runCommand("delete-permission", "-a", "some-actor", "-p", "'/some-path'")
-				Eventually(session).Should(Exit(1))
+			session := runCommand("delete-permission", "-a", "some-actor", "-p", "'/some-path'")
+			Eventually(session).Should(Exit(1))
 
-			})
 		})
-
 	})
 
 })

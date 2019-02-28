@@ -70,7 +70,7 @@ func (c *ImportCommand) setCredentials(bulkImport models.CredentialBulkImport) e
 		} else {
 			successful++
 		}
-		printCredential(false, result)
+		formatOutput(false, result)
 	}
 
 	fmt.Println("Import complete.")
