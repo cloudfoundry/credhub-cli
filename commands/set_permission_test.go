@@ -1,16 +1,15 @@
 package commands_test
 
 import (
-	"fmt"
-	"net/http"
-
 	"code.cloudfoundry.org/credhub-cli/commands"
 	"code.cloudfoundry.org/credhub-cli/credhub"
+	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
 	. "github.com/onsi/gomega/ghttp"
+	"net/http"
 )
 
 var _ = Describe("Set Permission", func() {
@@ -18,8 +17,8 @@ var _ = Describe("Set Permission", func() {
 		login()
 	})
 
-	ItRequiresAuthentication("set-permission", "-a", "some-actor", "-p", "/some-path", "-o", "read, write, delete")
-	ItRequiresAnAPIToBeSet("set-permission", "-a", "some-actor", "-p", "/some-path", "-o", "read, write, delete")
+	ItRequiresAuthentication("set-permission", "-a", "some-actor", "-p", "'/some-path'", "-o", "read, write, delete")
+	ItRequiresAnAPIToBeSet("set-permission", "-a", "some-actor", "-p", "'/some-path'", "-o", "read, write, delete")
 
 	testAutoLogIns := []TestAutoLogin{
 		{
@@ -35,7 +34,7 @@ var _ = Describe("Set Permission", func() {
 			endpoint:            "/api/v2/permissions",
 		},
 	}
-	ItAutomaticallyLogsIn(testAutoLogIns, "set-permission", "-a", "some-actor", "-p", "/some-path", "-o", "read, write, delete")
+	ItAutomaticallyLogsIn(testAutoLogIns, "set-permission", "-a", "some-actor", "-p", "'/some-path'", "-o", "read, write, delete")
 
 	Describe("Help", func() {
 		ItBehavesLikeHelp("set-permission", "", func(session *Session) {
@@ -60,7 +59,7 @@ var _ = Describe("Set Permission", func() {
 			clientCommand.SetClient(ch)
 			setCommand := commands.SetPermissionCommand{
 				Actor:         "some-actor",
-				Path:          "/some-path",
+				Path:          "'/some-path'",
 				Operations:    "read",
 				ClientCommand: clientCommand,
 			}
@@ -72,8 +71,8 @@ var _ = Describe("Set Permission", func() {
 		Context("when permission exists", func() {
 			Context("when output json flag is used", func() {
 				It("updates existing permission", func() {
-					responseJsonWithoutDelete := fmt.Sprintf(PERMISSIONS_RESPONSE_JSON, "/some-path", "some-actor", `["read", "write"]`)
-					responseJsonWithDelete := fmt.Sprintf(PERMISSIONS_RESPONSE_JSON, "/some-path", "some-actor", `["read", "write", "delete"]`)
+					responseJsonWithoutDelete := fmt.Sprintf(PERMISSIONS_RESPONSE_JSON, "'/some-path'", "some-actor", `["read", "write"]`)
+					responseJsonWithDelete := fmt.Sprintf(PERMISSIONS_RESPONSE_JSON, "'/some-path'", "some-actor", `["read", "write", "delete"]`)
 					server.RouteToHandler("GET", "/api/v2/permissions",
 						CombineHandlers(
 							VerifyRequest("GET", "/api/v2/permissions"),
@@ -81,7 +80,7 @@ var _ = Describe("Set Permission", func() {
 						),
 					)
 
-					body := fmt.Sprintf(ADD_PERMISSIONS_REQUEST_JSON, "/some-path", "some-actor", `["read", "write", "delete"]`)
+					body := fmt.Sprintf(ADD_PERMISSIONS_REQUEST_JSON, "'/some-path'", "some-actor", `["read", "write", "delete"]`)
 					server.RouteToHandler("PUT", "/api/v2/permissions/" + UUID,
 						CombineHandlers(
 							VerifyRequest("PUT", "/api/v2/permissions/" + UUID),
@@ -89,21 +88,21 @@ var _ = Describe("Set Permission", func() {
 							RespondWith(http.StatusOK, responseJsonWithDelete),
 						),
 					)
-					session := runCommand("set-permission", "-a", "some-actor", "-p", "/some-path", "-o", "read, write, delete", "-j")
+					session := runCommand("set-permission", "-a", "some-actor", "-p", "'/some-path'", "-o", "read, write, delete", "-j")
 					Eventually(session).Should(Exit(0))
 					Eventually(session.Out.Contents()).Should(MatchJSON(`
 				{
 					"uuid": "` + UUID + `",
 					"actor": "some-actor",
-					"path": "/some-path",
+					"path": "'/some-path'",
 					"operations": ["read", "write", "delete"]
 				}
 				`))
 				})
 			})
 			It("updates existing permission", func() {
-				responseJsonWithoutDelete := fmt.Sprintf(PERMISSIONS_RESPONSE_JSON, "/some-path", "some-actor", `["read", "write"]`)
-				responseJsonWithDelete := fmt.Sprintf(PERMISSIONS_RESPONSE_JSON, "/some-path", "some-actor", `["read", "write", "delete"]`)
+				responseJsonWithoutDelete := fmt.Sprintf(PERMISSIONS_RESPONSE_JSON, "'/some-path'", "some-actor", `["read", "write"]`)
+				responseJsonWithDelete := fmt.Sprintf(PERMISSIONS_RESPONSE_JSON, "'/some-path'", "some-actor", `["read", "write", "delete"]`)
 				server.RouteToHandler("GET", "/api/v2/permissions",
 					CombineHandlers(
 						VerifyRequest("GET", "/api/v2/permissions"),
@@ -111,7 +110,7 @@ var _ = Describe("Set Permission", func() {
 					),
 				)
 
-				body := fmt.Sprintf(ADD_PERMISSIONS_REQUEST_JSON, "/some-path", "some-actor", `["read", "write", "delete"]`)
+				body := fmt.Sprintf(ADD_PERMISSIONS_REQUEST_JSON, "'/some-path'", "some-actor", `["read", "write", "delete"]`)
 				server.RouteToHandler("PUT", "/api/v2/permissions/" + UUID,
 					CombineHandlers(
 						VerifyRequest("PUT", "/api/v2/permissions/" + UUID),
@@ -119,15 +118,15 @@ var _ = Describe("Set Permission", func() {
 						RespondWith(http.StatusOK, responseJsonWithDelete),
 					),
 				)
-				session := runCommand("set-permission", "-a", "some-actor", "-p", "/some-path", "-o", "read, write, delete")
+				session := runCommand("set-permission", "-a", "some-actor", "-p", "'/some-path'", "-o", "read, write, delete")
 				Eventually(session).Should(Exit(0))
-				Eventually(string(session.Out.Contents())).Should(ContainSubstring("uuid: " + UUID))
-				Eventually(string(session.Out.Contents())).Should(ContainSubstring("actor: some-actor"))
-				Eventually(string(session.Out.Contents())).Should(ContainSubstring("path: /some-path"))
-				Eventually(string(session.Out.Contents())).Should(ContainSubstring(`operations:
+				Eventually(session.Out).Should(Say("actor: some-actor"))
+				Eventually(session.Out).Should(Say(`operations:
 - read
 - write
 - delete`))
+				Eventually(session.Out).Should(Say("path: .*'/some-path'.*"))
+				Eventually(session.Out).Should(Say("uuid: " + UUID))
 			})
 		})
 
@@ -139,8 +138,8 @@ var _ = Describe("Set Permission", func() {
 						RespondWith(http.StatusNotFound, `{"error": "The request could not be completed because the permission does not exist or you do not have sufficient authorization."}`),
 					))
 
-				responseJson := fmt.Sprintf(PERMISSIONS_RESPONSE_JSON, "/some-path", "some-actor", `["read", "write", "delete"]`)
-				body := fmt.Sprintf(ADD_PERMISSIONS_REQUEST_JSON, "/some-path", "some-actor", `["read", "write", "delete"]`)
+				responseJson := fmt.Sprintf(PERMISSIONS_RESPONSE_JSON, "'/some-path'", "some-actor", `["read", "write", "delete"]`)
+				body := fmt.Sprintf(ADD_PERMISSIONS_REQUEST_JSON, "'/some-path'", "some-actor", `["read", "write", "delete"]`)
 
 				server.RouteToHandler("POST", "/api/v2/permissions",
 					CombineHandlers(
@@ -149,15 +148,15 @@ var _ = Describe("Set Permission", func() {
 						RespondWith(http.StatusOK, responseJson),
 					))
 
-				session := runCommand("set-permission", "-a", "some-actor", "-p", "/some-path", "-o", "read, write, delete")
+				session := runCommand("set-permission", "-a", "some-actor", "-p", "'/some-path'", "-o", "read, write, delete")
 				Eventually(session).Should(Exit(0))
-				Eventually(string(session.Out.Contents())).Should(ContainSubstring("uuid: " + UUID))
-				Eventually(string(session.Out.Contents())).Should(ContainSubstring("actor: some-actor"))
-				Eventually(string(session.Out.Contents())).Should(ContainSubstring("path: /some-path"))
-				Eventually(string(session.Out.Contents())).Should(ContainSubstring(`operations:
+				Eventually(session.Out).Should(Say("actor: some-actor"))
+				Eventually(session.Out).Should(Say(`operations:
 - read
 - write
 - delete`))
+				Eventually(session.Out).Should(Say("path: .*'/some-path'.*"))
+				Eventually(session.Out).Should(Say("uuid: " + UUID))
 			})
 
 			Context("when output json flag is used", func() {
@@ -168,8 +167,8 @@ var _ = Describe("Set Permission", func() {
 							RespondWith(http.StatusNotFound, `{"error": "The request could not be completed because the permission does not exist or you do not have sufficient authorization."}`),
 						))
 
-					responseJson := fmt.Sprintf(PERMISSIONS_RESPONSE_JSON, "/some-path", "some-actor", `["read", "write", "delete"]`)
-					body := fmt.Sprintf(ADD_PERMISSIONS_REQUEST_JSON, "/some-path", "some-actor", `["read", "write", "delete"]`)
+					responseJson := fmt.Sprintf(PERMISSIONS_RESPONSE_JSON, "'/some-path'", "some-actor", `["read", "write", "delete"]`)
+					body := fmt.Sprintf(ADD_PERMISSIONS_REQUEST_JSON, "'/some-path'", "some-actor", `["read", "write", "delete"]`)
 
 					server.RouteToHandler("POST", "/api/v2/permissions",
 						CombineHandlers(
@@ -178,13 +177,13 @@ var _ = Describe("Set Permission", func() {
 							RespondWith(http.StatusOK, responseJson),
 						))
 
-					session := runCommand("set-permission", "-a", "some-actor", "-p", "/some-path", "-o", "read, write, delete", "-j")
+					session := runCommand("set-permission", "-a", "some-actor", "-p", "'/some-path'", "-o", "read, write, delete", "-j")
 					Eventually(session).Should(Exit(0))
 					Eventually(session.Out.Contents()).Should(MatchJSON(`
 				{
 					"uuid": "` + UUID + `",
 					"actor": "some-actor",
-					"path": "/some-path",
+					"path": "'/some-path'",
 					"operations": ["read", "write", "delete"]
 				}
 				`))

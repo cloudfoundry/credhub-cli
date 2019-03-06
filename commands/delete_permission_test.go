@@ -18,8 +18,8 @@ var _ = Describe("Delete Permission", func() {
 		login()
 	})
 
-	ItRequiresAuthentication("delete-permission", "-a", "some-actor", "-p", "/some-path")
-	ItRequiresAnAPIToBeSet("delete-permission", "-a", "some-actor", "-p", "/some-path")
+	ItRequiresAuthentication("delete-permission", "-a", "some-actor", "-p", "'/some-path'")
+	ItRequiresAnAPIToBeSet("delete-permission", "-a", "some-actor", "-p", "'/some-path'")
 
 	testAutoLogIns := []TestAutoLogin{
 		{
@@ -35,7 +35,7 @@ var _ = Describe("Delete Permission", func() {
 			endpoint:            "/api/v2/permissions/" + UUID,
 		},
 	}
-	ItAutomaticallyLogsIn(testAutoLogIns, "delete-permission", "-a", "some-actor", "-p", "/some-path")
+	ItAutomaticallyLogsIn(testAutoLogIns, "delete-permission", "-a", "some-actor", "-p", "'/some-path'")
 
 	Describe("Help", func() {
 		ItBehavesLikeHelp("delete-permission", "", func(session *Session) {
@@ -53,7 +53,7 @@ var _ = Describe("Delete Permission", func() {
 			clientCommand.SetClient(ch)
 			setCommand := commands.SetPermissionCommand{
 				Actor:         "some-actor",
-				Path:          "/some-path",
+				Path:          "'/some-path'",
 				Operations:    "read",
 				ClientCommand: clientCommand,
 			}
@@ -64,7 +64,7 @@ var _ = Describe("Delete Permission", func() {
 
 		Context("when permission exists", func() {
 			It("deletes existing permission", func() {
-				responseJson := fmt.Sprintf(PERMISSIONS_RESPONSE_JSON, "/some-path", "some-actor", `["read", "write"]`)
+				responseJson := fmt.Sprintf(PERMISSIONS_RESPONSE_JSON, "'/some-path'", "some-actor", `["read", "write"]`)
 				server.RouteToHandler("GET", "/api/v2/permissions",
 					CombineHandlers(
 						VerifyRequest("GET", "/api/v2/permissions"),
@@ -77,14 +77,14 @@ var _ = Describe("Delete Permission", func() {
 						RespondWith(http.StatusOK, responseJson),
 					),
 				)
-				session := runCommand("delete-permission", "-a", "some-actor", "-p", "/some-path")
+				session := runCommand("delete-permission", "-a", "some-actor", "-p", "'/some-path'")
 				Eventually(session).Should(Exit(0))
-				Eventually(string(session.Out.Contents())).Should(ContainSubstring("uuid: " + UUID))
-				Eventually(string(session.Out.Contents())).Should(ContainSubstring("actor: some-actor"))
-				Eventually(string(session.Out.Contents())).Should(ContainSubstring("path: /some-path"))
-				Eventually(string(session.Out.Contents())).Should(ContainSubstring(`operations:
+				Eventually(session.Out).Should(Say("actor: some-actor"))
+				Eventually(session.Out).Should(Say(`operations:
 - read
 - write`))
+				Eventually(session.Out).Should(Say("path: .*'/some-path'.*"))
+				Eventually(session.Out).Should(Say("uuid: " + UUID))
 			})
 		})
 	})

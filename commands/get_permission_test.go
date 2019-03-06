@@ -18,8 +18,8 @@ var _ = Describe("Get Permission", func() {
 		login()
 	})
 
-	ItRequiresAuthentication("get-permission", "-a", "some-actor", "-p", "/some-path")
-	ItRequiresAnAPIToBeSet("get-permission", "-a", "some-actor", "-p", "/some-path")
+	ItRequiresAuthentication("get-permission", "-a", "some-actor", "-p", "'/some-path'")
+	ItRequiresAnAPIToBeSet("get-permission", "-a", "some-actor", "-p", "'/some-path'")
 
 	testAutoLogIns := []TestAutoLogin{
 		{
@@ -29,7 +29,7 @@ var _ = Describe("Get Permission", func() {
 			endpoint:            "/api/v2/permissions",
 		},
 	}
-	ItAutomaticallyLogsIn(testAutoLogIns, "get-permission", "-a", "some-actor", "-p", "/some-path")
+	ItAutomaticallyLogsIn(testAutoLogIns, "get-permission", "-a", "some-actor", "-p", "'/some-path'")
 
 	Context("when help flag is used", func() {
 		ItBehavesLikeHelp("get-permission", "", func(session *Session) {
@@ -46,7 +46,7 @@ var _ = Describe("Get Permission", func() {
 			clientCommand.SetClient(ch)
 			getCommand := commands.GetPermissionCommand{
 				Actor:         "some-actor",
-				Path:          "/some-path",
+				Path:          "'/some-path'",
 				ClientCommand: clientCommand,
 			}
 			err := getCommand.Execute([]string{})
@@ -59,20 +59,20 @@ var _ = Describe("Get Permission", func() {
 		Context("when permission exists", func() {
 			Context("when output-json flag is used", func() {
 				It("returns permission", func() {
-					responseJson := fmt.Sprintf(PERMISSIONS_RESPONSE_JSON, "/some-path", "some-actor", `["read", "write"]`)
+					responseJson := fmt.Sprintf(PERMISSIONS_RESPONSE_JSON, "'/some-path'", "some-actor", `["read", "write"]`)
 					server.RouteToHandler("GET", "/api/v2/permissions",
 						CombineHandlers(
 							VerifyRequest("GET", "/api/v2/permissions"),
 							RespondWith(http.StatusOK, responseJson),
 						))
 
-					session := runCommand("get-permission", "-a", "some-actor", "-p", "/some-path", "-j")
+					session := runCommand("get-permission", "-a", "some-actor", "-p", "'/some-path'", "-j")
 					Eventually(session).Should(Exit(0))
 					Eventually(session.Out.Contents()).Should(MatchJSON(`
 				{
 					"uuid": "` + UUID + `",
 					"actor": "some-actor",
-					"path": "/some-path",
+					"path": "'/some-path'",
 					"operations": ["read", "write"]
 				}
 				`))
@@ -80,21 +80,21 @@ var _ = Describe("Get Permission", func() {
 			})
 
 			It("returns permission", func() {
-				responseJson := fmt.Sprintf(PERMISSIONS_RESPONSE_JSON, "/some-path", "some-actor", `["read", "write"]`)
+				responseJson := fmt.Sprintf(PERMISSIONS_RESPONSE_JSON, "'/some-path'", "some-actor", `["read", "write"]`)
 				server.RouteToHandler("GET", "/api/v2/permissions",
 					CombineHandlers(
 						VerifyRequest("GET", "/api/v2/permissions"),
 						RespondWith(http.StatusOK, responseJson),
 					))
 
-				session := runCommand("get-permission", "-a", "some-actor", "-p", "/some-path")
+				session := runCommand("get-permission", "-a", "some-actor", "-p", "'/some-path'")
 				Eventually(session).Should(Exit(0))
-				Eventually(string(session.Out.Contents())).Should(ContainSubstring("uuid: " + UUID))
-				Eventually(string(session.Out.Contents())).Should(ContainSubstring("actor: some-actor"))
-				Eventually(string(session.Out.Contents())).Should(ContainSubstring("path: /some-path"))
-				Eventually(string(session.Out.Contents())).Should(ContainSubstring(`operations:
+				Eventually(session.Out).Should(Say("actor: some-actor"))
+				Eventually(session.Out).Should(Say(`operations:
 - read
 - write`))
+				Eventually(session.Out).Should(Say("path: .*'/some-path'.*"))
+				Eventually(session.Out).Should(Say("uuid: " + UUID))
 			})
 		})
 
