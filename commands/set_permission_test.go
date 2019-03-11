@@ -81,9 +81,9 @@ var _ = Describe("Set Permission", func() {
 					)
 
 					body := fmt.Sprintf(ADD_PERMISSIONS_REQUEST_JSON, "'/some-path'", "some-actor", `["read", "write", "delete"]`)
-					server.RouteToHandler("PUT", "/api/v2/permissions/" + UUID,
+					server.RouteToHandler("PUT", "/api/v2/permissions/"+UUID,
 						CombineHandlers(
-							VerifyRequest("PUT", "/api/v2/permissions/" + UUID),
+							VerifyRequest("PUT", "/api/v2/permissions/"+UUID),
 							VerifyJSON(body),
 							RespondWith(http.StatusOK, responseJsonWithDelete),
 						),
@@ -111,9 +111,9 @@ var _ = Describe("Set Permission", func() {
 				)
 
 				body := fmt.Sprintf(ADD_PERMISSIONS_REQUEST_JSON, "'/some-path'", "some-actor", `["read", "write", "delete"]`)
-				server.RouteToHandler("PUT", "/api/v2/permissions/" + UUID,
+				server.RouteToHandler("PUT", "/api/v2/permissions/"+UUID,
 					CombineHandlers(
-						VerifyRequest("PUT", "/api/v2/permissions/" + UUID),
+						VerifyRequest("PUT", "/api/v2/permissions/"+UUID),
 						VerifyJSON(body),
 						RespondWith(http.StatusOK, responseJsonWithDelete),
 					),
