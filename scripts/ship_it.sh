@@ -21,8 +21,41 @@ function run_linters() {
     go fmt $(go list ./... | grep -v /vendor/)
 }
 
+
+function login_to_local_credhub(){
+   echo "Logging in to CredHub"
+   credhub a https://localhost:9000 --skip-tls-validation
+   credhub l -u credhub -p password
+}
+
+function check_for_local_server(){
+   echo "Checking for locally running server"
+   if curl -s https://localhost:9000/health --insecure > /dev/null; then
+      echo "Found locally running CredHub"
+   else
+      echo "CredHub is not running, attempting to start"
+      pushd /Users/pivotal/workspace/credhub-release/src/credhub
+        xterm -e ./scripts/start_server.sh &
+        COUNTER=1
+        while ! curl -s https://localhost:9000/health --insecure > /dev/null; do
+          sleep 10
+          echo "Connection attempt #" ${COUNTER}
+          COUNTER=$((COUNTER + 1))
+        done;
+      popd
+   fi
+   login_to_local_credhub
+}
+
 function run_tests() {
-    make test
+  export GOPATH=~/go
+  pushd ${GOPATH}/src/github.com/cloudfoundry-incubator/credhub-acceptance-tests
+      ./scripts/run_tests.sh
+  popd
+}
+
+function kill_xterm(){
+  pkill xterm
 }
 
 function fail_for_uncommitted_changes() {
@@ -47,6 +80,7 @@ function main() {
     set_bash_error_handling
     go_to_project_root_directory
     check_ssh_key
+    check_for_local_server
 
     run_linters
     fail_for_uncommitted_changes
@@ -55,6 +89,7 @@ function main() {
 
     push_code
     display_ascii_success_message
+    kill_xterm
 }
 
 main
