@@ -33,16 +33,8 @@ function check_for_local_server(){
    if curl -s https://localhost:9000/health --insecure > /dev/null; then
       echo "Found locally running CredHub"
    else
-      echo "CredHub is not running, attempting to start"
-      pushd /Users/pivotal/workspace/credhub-release/src/credhub
-        xterm -e ./scripts/start_server.sh &
-        COUNTER=1
-        while ! curl -s https://localhost:9000/health --insecure > /dev/null; do
-          sleep 10
-          echo "Connection attempt #" ${COUNTER}
-          COUNTER=$((COUNTER + 1))
-        done;
-      popd
+      echo "CredHub is not running, please run the server and try again"
+      exit
    fi
    login_to_local_credhub
 }
