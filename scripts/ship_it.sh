@@ -46,10 +46,6 @@ function run_tests() {
   popd
 }
 
-function kill_xterm(){
-  pkill xterm
-}
-
 function fail_for_uncommitted_changes() {
     local -r number_of_uncommitted_changes=$(git status -s | wc -l | tr -d '[:space:]')
 
@@ -81,7 +77,6 @@ function main() {
 
     push_code
     display_ascii_success_message
-    kill_xterm
 }
 
 main
