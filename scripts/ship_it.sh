@@ -28,16 +28,33 @@ function login_to_local_credhub(){
    credhub l -u credhub -p password
 }
 
+function start_background_server(){
+    pushd ~/workspace/credhub-release/src/credhub
+    ./scripts/start_server.sh &> /dev/null &
+    export PID=$!
+    echo "Waiting for server to start up"
+    sleep 30
+
+    COUNTER=1
+    while ! curl -s https://localhost:9000/health --insecure > /dev/null; do
+        echo "Connection attempt #" ${COUNTER}
+        COUNTER=$((COUNTER + 1))
+        sleep 10
+      done;
+    popd
+}
+
 function check_for_local_server(){
    echo "Checking for locally running server"
    if curl -s https://localhost:9000/health --insecure > /dev/null; then
       echo "Found locally running CredHub"
    else
-      echo "CredHub is not running, please run the server and try again"
-      exit
+      echo "CredHub is not running, attempting to start"
+      start_background_server
    fi
    login_to_local_credhub
 }
+
 
 function run_tests() {
   export GOPATH=~/go
@@ -77,6 +94,7 @@ function main() {
 
     push_code
     display_ascii_success_message
+    kill ${PID}
 }
 
 main
