@@ -140,19 +140,6 @@ var _ = Describe("Get", func() {
 				Expect(err).To(HaveOccurred())
 			})
 		})
-
-		Context("when the credential does not exist", func() {
-			It("returns the error from the server", func() {
-				dummyAuth := &DummyAuth{Response: &http.Response{
-					StatusCode: http.StatusNotFound,
-					Body:       ioutil.NopCloser(bytes.NewBufferString(`{"error":"The request could not be completed because the credential does not exist or you do not have sufficient authorization."}`)),
-				}}
-				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
-				_, err := ch.GetById("0239482304958")
-
-				Expect(err).To(MatchError("The request could not be completed because the credential does not exist or you do not have sufficient authorization."))
-			})
-		})
 	})
 
 	Describe("GetAllVersions()", func() {
@@ -831,6 +818,67 @@ var _ = Describe("Get", func() {
 			})
 		})
 	})
+
+	DescribeTable("returns credhub error when the cred does not exist",
+		func(performAction func(*CredHub) error) {
+			dummyAuth := &DummyAuth{Response: &http.Response{
+				StatusCode: http.StatusNotFound,
+				Body:       ioutil.NopCloser(bytes.NewBufferString(`{"error":"The request could not be completed because the credential does not exist or you do not have sufficient authorization."}`)),
+			}}
+			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
+			err := performAction(ch)
+
+			Expect(err).To(MatchError(&Error{
+				Name:        "The request could not be completed because the credential does not exist or you do not have sufficient authorization.",
+				Description: " making an http request",
+			}))
+		},
+
+		Entry("GetAllVersions", func(ch *CredHub) error {
+			_, err := ch.GetAllVersions("/example-password")
+			return err
+		}),
+		Entry("GetNVersions", func(ch *CredHub) error {
+			_, err := ch.GetNVersions("/example-password", 47)
+			return err
+		}),
+		Entry("GetLatestVersion", func(ch *CredHub) error {
+			_, err := ch.GetLatestVersion("/example-password")
+			return err
+		}),
+		Entry("GetLatestPassword", func(ch *CredHub) error {
+			_, err := ch.GetLatestPassword("/example-password")
+			return err
+		}),
+		Entry("GetLatestCertificate", func(ch *CredHub) error {
+			_, err := ch.GetLatestCertificate("/example-certificate")
+			return err
+		}),
+		Entry("GetLatestUser", func(ch *CredHub) error {
+			_, err := ch.GetLatestUser("/example-password")
+			return err
+		}),
+		Entry("GetLatestRSA", func(ch *CredHub) error {
+			_, err := ch.GetLatestRSA("/example-password")
+			return err
+		}),
+		Entry("GetById", func(ch *CredHub) error {
+			_, err := ch.GetById("0239482304958")
+			return err
+		}),
+		Entry("GetLatestSSH", func(ch *CredHub) error {
+			_, err := ch.GetLatestSSH("/example-password")
+			return err
+		}),
+		Entry("GetLatestJSON", func(ch *CredHub) error {
+			_, err := ch.GetLatestJSON("/example-password")
+			return err
+		}),
+		Entry("GetLatestValue", func(ch *CredHub) error {
+			_, err := ch.GetLatestValue("/example-password")
+			return err
+		}),
+	)
 
 	DescribeTable("request fails due to network error",
 		func(performAction func(*CredHub) error) {
