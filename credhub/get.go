@@ -130,7 +130,7 @@ func (ch *CredHub) makeCredentialGetRequest(query url.Values, cred interface{}) 
 	var data []json.RawMessage
 
 	if data, ok = response["data"]; !ok || len(data) == 0 {
-		return errors.New("response did not contain any credentials")
+		return newCredhubError("response did not contain any credentials", "")
 	}
 
 	rawMessage := data[0]
@@ -142,7 +142,7 @@ func (ch *CredHub) makeCredentialGetByIdRequest(id string, cred *credentials.Cre
 	resp, err := ch.Request(http.MethodGet, "/api/v1/data/"+id, nil, nil, true)
 
 	if err != nil {
-		return err
+		return addErrorDescription(err, " making an http request")
 	}
 
 	defer resp.Body.Close()
@@ -150,7 +150,7 @@ func (ch *CredHub) makeCredentialGetByIdRequest(id string, cred *credentials.Cre
 	dec := json.NewDecoder(resp.Body)
 
 	if err := dec.Decode(cred); err != nil {
-		return err
+		return addErrorDescription(err, " while decoding http response")
 	}
 
 	return nil
@@ -168,7 +168,7 @@ func (ch *CredHub) makeMultiCredentialGetRequest(query url.Values) ([]credential
 	resp, err := ch.Request(http.MethodGet, "/api/v1/data", query, nil, true)
 
 	if err != nil {
-		return nil, err
+		return nil, addErrorDescription(err, " making an http request")
 	}
 
 	defer resp.Body.Close()
@@ -177,13 +177,15 @@ func (ch *CredHub) makeMultiCredentialGetRequest(query url.Values) ([]credential
 
 	response := make(map[string][]credentials.Credential)
 
-	dec.Decode(&response)
+	if err := dec.Decode(&response); err != nil {
+		return nil, addErrorDescription(err, " while decoding http response")
+	}
 
 	var ok bool
 	var data []credentials.Credential
 
 	if data, ok = response["data"]; !ok || len(data) == 0 {
-		return nil, errors.New("response did not contain any credentials")
+		return nil, newCredhubError("response did not contain any credentials", "")
 	}
 
 	return data, nil
@@ -193,5 +195,11 @@ func addErrorDescription(err error, message string) error {
 	if strings.HasSuffix(err.Error(), message) {
 		return err
 	}
+
+	if credhubErr, isCredhubErr := err.(*Error); isCredhubErr {
+		credhubErr.Description += message
+		return credhubErr
+	}
+
 	return errors.New(err.Error() + message)
 }

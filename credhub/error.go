@@ -14,3 +14,10 @@ func (e *Error) Error() string {
 	}
 	return fmt.Sprintf("%s: %s", e.Name, e.Description)
 }
+
+func newCredhubError(name, description string) error {
+	return &Error{
+		Name:        name,
+		Description: description,
+	}
+}
