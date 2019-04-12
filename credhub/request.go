@@ -83,8 +83,8 @@ func (ch *CredHub) checkForServerError(resp *http.Response) error {
 
 		respErr := &Error{}
 
-		if err := dec.Decode(respErr); err != nil {
-			return err
+		if err := dec.Decode(&respErr); err != nil {
+			return addErrorDescription(err, "the response body could not be decoded.")
 		}
 
 		return respErr

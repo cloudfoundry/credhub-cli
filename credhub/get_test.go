@@ -340,6 +340,23 @@ var _ = Describe("Get", func() {
 				Expect(err).To(MatchError("response did not contain any credentials"))
 			})
 		})
+
+		Context("when the server returns a 200 but the cli can not parse the response", func() {
+			It("returns an appropriate error", func() {
+				responseString := `some-invalid-json`
+
+				dummyAuth := &DummyAuth{Response: &http.Response{
+					StatusCode: http.StatusOK,
+					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
+				}}
+				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
+				_, err := ch.GetNVersions("/example-password", 2)
+
+				Expect(err.Error()).To(ContainSubstring("the response body could not be decoded"))
+
+			})
+
+		})
 	})
 
 	Describe("GetLatestPassword()", func() {
@@ -731,15 +748,16 @@ var _ = Describe("Get", func() {
 		}),
 	}
 
-	DescribeTable("errors when response body cannot be unmarshalled",
+	DescribeTable("errors when response body is not json and/or cannot be decoded",
 		func(performAction func(*CredHub) error) {
 			dummyAuth := &DummyAuth{Response: &http.Response{
-				Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
+				Body: ioutil.NopCloser(bytes.NewBufferString("<html>")),
 			}}
 			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
 			err := performAction(ch)
 
 			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("the response body could not be decoded."))
 		},
 
 		listOfActions...,
@@ -754,10 +772,7 @@ var _ = Describe("Get", func() {
 			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
 			err := performAction(ch)
 
-			Expect(err).To(MatchError(&Error{
-				Name:        "The request could not be completed because the credential does not exist or you do not have sufficient authorization.",
-				Description: " making an http request",
-			}))
+			Expect(err).To(MatchError("The request could not be completed because the credential does not exist or you do not have sufficient authorization."))
 		},
 
 		listOfActions...,

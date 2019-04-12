@@ -113,7 +113,7 @@ func (ch *CredHub) makeCredentialGetRequest(query url.Values, cred interface{}) 
 	resp, err := ch.Request(http.MethodGet, "/api/v1/data", query, nil, true)
 
 	if err != nil {
-		return addErrorDescription(err, " making an http request")
+		return err
 	}
 
 	defer resp.Body.Close()
@@ -123,7 +123,7 @@ func (ch *CredHub) makeCredentialGetRequest(query url.Values, cred interface{}) 
 	response := make(map[string][]json.RawMessage)
 
 	if err := dec.Decode(&response); err != nil {
-		return addErrorDescription(err, " while decoding http response")
+		return addErrorDescription(err, "the response body could not be decoded.")
 	}
 
 	var ok bool
@@ -142,7 +142,7 @@ func (ch *CredHub) makeCredentialGetByIdRequest(id string, cred *credentials.Cre
 	resp, err := ch.Request(http.MethodGet, "/api/v1/data/"+id, nil, nil, true)
 
 	if err != nil {
-		return addErrorDescription(err, " making an http request")
+		return err
 	}
 
 	defer resp.Body.Close()
@@ -150,7 +150,7 @@ func (ch *CredHub) makeCredentialGetByIdRequest(id string, cred *credentials.Cre
 	dec := json.NewDecoder(resp.Body)
 
 	if err := dec.Decode(cred); err != nil {
-		return addErrorDescription(err, " while decoding http response")
+		return addErrorDescription(err, "the response body could not be decoded.")
 	}
 
 	return nil
@@ -168,7 +168,7 @@ func (ch *CredHub) makeMultiCredentialGetRequest(query url.Values) ([]credential
 	resp, err := ch.Request(http.MethodGet, "/api/v1/data", query, nil, true)
 
 	if err != nil {
-		return nil, addErrorDescription(err, " making an http request")
+		return nil, err
 	}
 
 	defer resp.Body.Close()
@@ -178,7 +178,7 @@ func (ch *CredHub) makeMultiCredentialGetRequest(query url.Values) ([]credential
 	response := make(map[string][]credentials.Credential)
 
 	if err := dec.Decode(&response); err != nil {
-		return nil, addErrorDescription(err, " while decoding http response")
+		return nil, addErrorDescription(err, "the response body could not be decoded.")
 	}
 
 	var ok bool
