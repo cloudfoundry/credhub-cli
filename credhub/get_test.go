@@ -352,7 +352,7 @@ var _ = Describe("Get", func() {
 				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
 				_, err := ch.GetNVersions("/example-password", 2)
 
-				Expect(err.Error()).To(ContainSubstring("the response body could not be decoded"))
+				Expect(err.Error()).To(ContainSubstring("The response body could not be decoded:"))
 
 			})
 
@@ -757,7 +757,7 @@ var _ = Describe("Get", func() {
 			err := performAction(ch)
 
 			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring("the response body could not be decoded."))
+			Expect(err.Error()).To(ContainSubstring("The response body could not be decoded:"))
 		},
 
 		listOfActions...,

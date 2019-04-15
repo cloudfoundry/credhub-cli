@@ -3,6 +3,7 @@ package credhub
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -84,7 +85,7 @@ func (ch *CredHub) checkForServerError(resp *http.Response) error {
 		respErr := &Error{}
 
 		if err := dec.Decode(&respErr); err != nil {
-			return addErrorDescription(err, "the response body could not be decoded.")
+			return errors.New("The response body could not be decoded: " + err.Error())
 		}
 
 		return respErr

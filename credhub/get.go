@@ -11,7 +11,6 @@ import (
 	"strconv"
 
 	"code.cloudfoundry.org/credhub-cli/credhub/credentials"
-	"strings"
 )
 
 // GetById returns a credential version by ID. The returned credential will be encoded as a map and may be of any type.
@@ -123,7 +122,7 @@ func (ch *CredHub) makeCredentialGetRequest(query url.Values, cred interface{}) 
 	response := make(map[string][]json.RawMessage)
 
 	if err := dec.Decode(&response); err != nil {
-		return addErrorDescription(err, "the response body could not be decoded.")
+		return errors.New("The response body could not be decoded: " + err.Error())
 	}
 
 	var ok bool
@@ -150,7 +149,7 @@ func (ch *CredHub) makeCredentialGetByIdRequest(id string, cred *credentials.Cre
 	dec := json.NewDecoder(resp.Body)
 
 	if err := dec.Decode(cred); err != nil {
-		return addErrorDescription(err, "the response body could not be decoded.")
+		return errors.New("The response body could not be decoded: " + err.Error())
 	}
 
 	return nil
@@ -178,7 +177,7 @@ func (ch *CredHub) makeMultiCredentialGetRequest(query url.Values) ([]credential
 	response := make(map[string][]credentials.Credential)
 
 	if err := dec.Decode(&response); err != nil {
-		return nil, addErrorDescription(err, "the response body could not be decoded.")
+		return nil, errors.New("The response body could not be decoded: " + err.Error())
 	}
 
 	var ok bool
@@ -189,17 +188,4 @@ func (ch *CredHub) makeMultiCredentialGetRequest(query url.Values) ([]credential
 	}
 
 	return data, nil
-}
-
-func addErrorDescription(err error, message string) error {
-	if strings.HasSuffix(err.Error(), message) {
-		return err
-	}
-
-	if credhubErr, isCredhubErr := err.(*Error); isCredhubErr {
-		credhubErr.Description += message
-		return credhubErr
-	}
-
-	return errors.New(err.Error() + message)
 }
