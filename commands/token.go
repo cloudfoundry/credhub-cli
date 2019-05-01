@@ -33,7 +33,7 @@ func refreshConfiguration(cfg config.Config) config.Config {
 	err := oauth.Refresh()
 
 	if err != nil {
-		fmt.Println("Bearer " + cfg.AccessToken)
+		return cfg
 	}
 
 	cfg.AccessToken = oauth.AccessToken()

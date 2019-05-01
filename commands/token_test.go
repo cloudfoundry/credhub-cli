@@ -2,6 +2,7 @@ package commands_test
 
 import (
 	"net/http"
+	"strings"
 
 	"code.cloudfoundry.org/credhub-cli/config"
 	. "github.com/onsi/ginkgo"
@@ -54,6 +55,29 @@ var _ = Describe("Token", func() {
 			Expect(sout).To(ContainSubstring("Bearer 2YotnFZFEjr1zCsicMWpAA"))
 			cfg := config.ReadConfig()
 			Expect(cfg.AccessToken).To(ContainSubstring("2YotnFZFEjr1zCsicMWpAA"))
+		})
+
+		Context("when we fail to refresh the token", func() {
+			BeforeEach(func() {
+				uaaServer.RouteToHandler("POST", "/oauth/token",
+					CombineHandlers(
+						VerifyBody([]byte(`client_id=credhub_cli&client_secret=&grant_type=refresh_token&refresh_token=revoked&response_type=token`)),
+						RespondWith(http.StatusBadRequest, "{}"),
+					),
+				)
+			})
+
+			It("still only prints out one bearer token", func() {
+				session := runCommand("--token")
+				Eventually(session).Should(Exit(0))
+
+				Expect(uaaServer.ReceivedRequests()).Should(HaveLen(1))
+
+				sout := strings.TrimSpace(string(session.Out.Contents()))
+				Expect(sout).To(Equal("Bearer 2YotnFZFEjr1zCsicMWpAA"))
+				cfg := config.ReadConfig()
+				Expect(cfg.AccessToken).To(Equal("2YotnFZFEjr1zCsicMWpAA"))
+			})
 		})
 	})
 
