@@ -307,6 +307,34 @@ var _ = Describe("Client", func() {
 		)
 	})
 
+	DescribeTable("unable to create the token request",
+		func(performAction func(*Client) error) {
+			client := &Client{
+				AuthURL: "127.0.0.1:urlFailingRequestCreation",
+				Client:  http.DefaultClient,
+			}
+
+			err := performAction(client)
+
+			Expect(err).To(HaveOccurred())
+		},
+		Entry("client credentials", func(c *Client) error {
+			_, err := c.ClientCredentialGrant("client-id", "client-secret")
+			return err
+		}),
+		Entry("password grant", func(c *Client) error {
+			_, _, err := c.PasswordGrant("some-client-id", "some-client-secret", "username", "password")
+			return err
+		}),
+		Entry("refresh token grant", func(c *Client) error {
+			_, _, err := c.RefreshTokenGrant("client-id", "client-secret", "some-refresh-token")
+			return err
+		}),
+		Entry("revoke token", func(c *Client) error {
+			return c.RevokeToken("e30K.eyJqdGkiOiIxIn0K.e30K") // {}.{"jti":"1"}.{}
+		}),
+	)
+
 	DescribeTable("unable to complete the request",
 		func(performAction func(*Client) error) {
 			uaaServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
