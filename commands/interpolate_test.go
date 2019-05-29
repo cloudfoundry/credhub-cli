@@ -179,10 +179,9 @@ static-value: a normal string
 		})
 
 		Context("when the template file is empty", func() {
-			It("prints and errors to require data in the template", func() {
+			It("ignores it and returns 0", func() {
 				session := runCommand("interpolate", "-f", templateFile.Name())
-				Eventually(session).Should(gexec.Exit(1), "interpolate should have failed")
-				Expect(session.Err.Contents()).To(ContainSubstring(fmt.Sprintf("Error: %s was an empty file", templateFile.Name())))
+				Eventually(session).Should(gexec.Exit(0), "interpolate should returned 0")
 			})
 		})
 
@@ -196,6 +195,19 @@ yaml-key-with-static-value: a normal string`
 				session := runCommand("interpolate", "-f", templateFile.Name())
 				Eventually(session).Should(gexec.Exit(0), "command should succeed")
 				Expect(session.Out).To(Say("yaml-key-with-static-value: a normal string"))
+			})
+		})
+
+		Context("when the template file contains invalid yaml", func() {
+			BeforeEach(func() {
+				templateText = `---
+invalid-key: {{invalid}}
+`
+				templateFile.WriteString(templateText)
+			})
+			It("errors and returns 1", func() {
+				session := runCommand("interpolate", "-f", templateFile.Name())
+				Eventually(session).Should(gexec.Exit(1), "yaml is invalid")
 			})
 		})
 
