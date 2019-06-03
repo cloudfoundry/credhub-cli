@@ -151,7 +151,7 @@ var _ = Describe("OAuthStrategy", func() {
 					request, _ := http.NewRequest("GET", "https://some-endpoint.com/path/", nil)
 
 					_, err := oauth.Do(request)
-					Expect(err).To(MatchError("failed to login"))
+					Expect(err).To(MatchError("Your token has expired and could not be refreshed. Please log in again to continue."))
 				})
 			})
 
@@ -363,7 +363,7 @@ var _ = Describe("OAuthStrategy", func() {
 					}
 
 					err := uaa.Refresh()
-					Expect(err).To(MatchError("password grant error"))
+					Expect(err).To(MatchError("Your token has expired and could not be refreshed. Please log in again to continue."))
 				})
 			})
 
@@ -398,7 +398,7 @@ var _ = Describe("OAuthStrategy", func() {
 
 						err := uaa.Refresh()
 
-						Expect(err).To(MatchError("client credentials grant failed"))
+						Expect(err).To(MatchError("Your token has expired and could not be refreshed. Please log in again to continue."))
 
 					})
 				})
@@ -495,7 +495,7 @@ var _ = Describe("OAuthStrategy", func() {
 
 					err := uaa.Refresh()
 
-					Expect(err).To(MatchError("client credentials grant failed"))
+					Expect(err).To(MatchError("Your token has expired and could not be refreshed. Please log in again to continue."))
 
 				})
 			})
