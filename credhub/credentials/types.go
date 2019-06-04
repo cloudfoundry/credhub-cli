@@ -92,3 +92,17 @@ type Paths struct {
 type Path struct {
 	Path string `json:"path" yaml:"path"`
 }
+
+type CertificateMetadata struct {
+	Id string `json:"id" yaml:"id"`
+	Name string `json:"name" yaml:"name"`
+	SignedBy string `json:"signed_by" yaml:"signed_by"`
+	Signs []string `json:"signs" yaml:"signs"`
+	Versions []CertificateMetadataVersion `json:"versions" yaml:"versions"`
+}
+
+type CertificateMetadataVersion struct {
+	Id string `json:"id" yaml:"id"`
+	ExpiryDate string `json:"expiry_date" yaml:"expiry_date"`
+	Transitional bool `json:"transitional" yaml:"transitional"`
+}
