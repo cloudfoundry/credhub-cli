@@ -56,7 +56,7 @@ func (c *ImportCommand) setCredentials(bulkImport models.CredentialBulkImport) e
 			}
 		}
 
-		result, err := c.client.SetCredential(name, credential["type"].(string), credential["value"])
+		_, err := c.client.SetCredential(name, credential["type"].(string), credential["value"])
 
 		if err != nil {
 			if isAuthenticationError(err) {
@@ -70,7 +70,6 @@ func (c *ImportCommand) setCredentials(bulkImport models.CredentialBulkImport) e
 		} else {
 			successful++
 		}
-		formatOutput(false, result)
 	}
 
 	fmt.Println("Import complete.")
