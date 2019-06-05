@@ -2,16 +2,17 @@ package credhub_test
 
 import (
 	"bytes"
-	. "github.com/onsi/ginkgo"
 	"io/ioutil"
 	"net/http"
+
+	. "github.com/onsi/ginkgo"
 
 	. "github.com/onsi/gomega"
 
 	. "code.cloudfoundry.org/credhub-cli/credhub"
 )
 
-var _ = FDescribe("Certificates", func() {
+var _ = Describe("Certificates", func() {
 	It("requests to get all certificates", func() {
 		dummy := &DummyAuth{Response: &http.Response{
 			StatusCode: http.StatusOK,
