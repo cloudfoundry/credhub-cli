@@ -254,14 +254,6 @@ static-value: a normal string
 			})
 		})
 
-		Context("when the template file is empty", func() {
-			It("prints and errors to require data in the template", func() {
-				session := runCommand("interpolate", "-f", templateFile.Name())
-				Eventually(session).Should(gexec.Exit(1), "interpolate should have failed")
-				Expect(session.Err.Contents()).To(ContainSubstring(fmt.Sprintf("Error: %s was an empty file", templateFile.Name())))
-			})
-		})
-
 		Context("when the template file contains no credentials to resolve", func() {
 			BeforeEach(func() {
 				templateText = `---
@@ -334,6 +326,34 @@ yaml-key-with-static-value: a normal string`
 				Expect(string(session.Out.Contents())).To(MatchYAML(`
 yaml-key-with-template-value: ((not_a_cred))
 yaml-key-with-static-value: a normal string`))
+			})
+		})
+
+		Context("when the file has invalid yaml", func() {
+			It("prints an error that says there is invalid yaml", func() {
+				templateText = `key: - value`
+				templateFile.WriteString(templateText)
+
+				credentialListJson, err := credentialsListJSON([]string{""})
+				Expect(err).Should(BeNil())
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest("GET", "/api/v1/data", "path="),
+						RespondWith(http.StatusOK, credentialListJson),
+					),
+				)
+
+				session = runCommand("interpolate", "-f", templateFile.Name())
+				Eventually(session).Should(gexec.Exit(1))
+			})
+		})
+	})
+
+	Describe("Empty file", func() {
+		Context("when the template file is empty", func() {
+			It("does not throw an error", func() {
+				session := runCommand("interpolate", "-f", templateFile.Name())
+				Eventually(session).Should(gexec.Exit(0))
 			})
 		})
 	})

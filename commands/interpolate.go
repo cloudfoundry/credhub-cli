@@ -29,7 +29,7 @@ func (c *InterpolateCommand) Execute([]string) error {
 	}
 
 	if len(fileContents) == 0 {
-		return errors.NewEmptyTemplateError(c.File)
+		return nil
 	}
 
 	initialTemplate := template.NewTemplate(fileContents)
