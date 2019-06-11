@@ -403,4 +403,61 @@ version_created_at: '2017-01-01T04:07:18Z'`
 			Expect(yamlOutput).To(MatchYAML(credYaml))
 		})
 	})
+	Describe("Certificate Metadata", func() {
+		Specify("when decoding and encoding", func() {
+			var certMetadata CertificateMetadata
+			metadataJson := `{
+      "id": "some-id",
+      "name": "/some-cert",
+      "signed_by": "/some-cert",
+      "signs": ["/another-cert"],
+      "versions": [
+        {
+          "expiry_date": "2020-05-29T12:33:50Z",
+          "id": "some-other-id",
+          "transitional": false
+        }
+      ]
+    }`
+
+			metadataYaml := `
+id: some-id
+name: "/some-cert"
+signed_by: "/some-cert"
+signs:
+- "/another-cert"
+versions:
+- expiry_date: '2020-05-29T12:33:50Z'
+  id: some-other-id
+  transitional: false
+`
+
+			err := json.Unmarshal([]byte(metadataJson), &certMetadata)
+
+			Expect(err).To(BeNil())
+
+			jsonVersionString := `{
+          "expiry_date": "2020-05-29T12:33:50Z",
+          "id": "some-other-id",
+          "transitional": false
+        }`
+			var jsonVersion CertificateMetadataVersion
+			err = json.Unmarshal([]byte(jsonVersionString), &jsonVersion)
+			Expect(err).To(BeNil())
+
+			Expect(certMetadata.Id).To(Equal("some-id"))
+			Expect(certMetadata.Name).To(Equal("/some-cert"))
+			Expect(certMetadata.Signs[0]).To(Equal("/another-cert"))
+			Expect(certMetadata.SignedBy).To(Equal("/some-cert"))
+			Expect(certMetadata.Versions[0]).To(Equal(jsonVersion))
+
+			jsonOutput, err := json.Marshal(certMetadata)
+
+			Expect(jsonOutput).To(MatchJSON(metadataJson))
+
+			yamlOutput, err := yaml.Marshal(certMetadata)
+
+			Expect(yamlOutput).To(MatchYAML(metadataYaml))
+		})
+	})
 })

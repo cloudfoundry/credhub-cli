@@ -1,6 +1,7 @@
 package credhub
 
 import (
+	"errors"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -12,7 +13,7 @@ import (
 )
 
 type permissionsResponse struct {
-	CredentialName string                   `json:"credential_name"`
+	CredentialName string                      `json:"credential_name"`
 	Permissions    []permissions.V1_Permission `json:"permissions"`
 }
 
@@ -36,7 +37,7 @@ func (ch *CredHub) GetPermissions(name string) ([]permissions.V1_Permission, err
 	return response.Permissions, err
 }
 
-func (ch *CredHub) GetPermission(uuid string) (*permissions.Permission, error) {
+func (ch *CredHub) GetPermissionByUUID(uuid string) (*permissions.Permission, error) {
 	path := "/api/v2/permissions/" + uuid
 
 	resp, err := ch.Request(http.MethodGet, path, nil, nil, true)
@@ -53,6 +54,26 @@ func (ch *CredHub) GetPermission(uuid string) (*permissions.Permission, error) {
 		return nil, err
 	}
 
+	return &response, nil
+}
+
+func (ch *CredHub) GetPermissionByPathActor(path string, actor string) (*permissions.Permission, error) {
+	apiPath := "/api/v2/permissions"
+	query := url.Values{}
+	query.Set("actor", actor)
+	query.Set("path", path)
+	resp, err := ch.Request(http.MethodGet, apiPath, query, nil, true)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+	defer io.Copy(ioutil.Discard, resp.Body)
+	var response permissions.Permission
+
+	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
+		return nil, err
+	}
 	return &response, nil
 }
 
@@ -108,6 +129,69 @@ func (ch *CredHub) AddPermission(path string, actor string, ops []string) (*perm
 
 	defer resp.Body.Close()
 	defer io.Copy(ioutil.Discard, resp.Body)
+	var response permissions.Permission
+
+	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
+func (ch *CredHub) UpdatePermission(uuid string, path string, actor string, ops []string) (*permissions.Permission, error) {
+	serverVersion, err := ch.ServerVersion()
+	if err != nil {
+		return nil, err
+	}
+
+	isOlderVersion := serverVersion.Segments()[0] < 2
+	if isOlderVersion {
+		return nil, errors.New("credhub server version <2.0 not supported")
+	}
+
+	requestBody := map[string]interface{}{}
+
+	requestBody["path"] = path
+	requestBody["actor"] = actor
+	requestBody["operations"] = ops
+
+	resp, err := ch.Request(http.MethodPut, "/api/v2/permissions/"+uuid, nil, requestBody, true)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+	defer io.Copy(ioutil.Discard, resp.Body)
+
+	var response permissions.Permission
+
+	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+
+}
+
+func (ch *CredHub) DeletePermission(uuid string) (*permissions.Permission, error) {
+	serverVersion, err := ch.ServerVersion()
+	if err != nil {
+		return nil, err
+	}
+
+	isOlderVersion := serverVersion.Segments()[0] < 2
+	if isOlderVersion {
+		return nil, errors.New("credhub server version <2.0 not supported")
+	}
+
+	resp, err := ch.Request(http.MethodDelete, "/api/v2/permissions/"+uuid, nil, nil, true)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+	defer io.Copy(ioutil.Discard, resp.Body)
+
 	var response permissions.Permission
 
 	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {

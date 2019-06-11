@@ -14,15 +14,9 @@ const AuthClient = "credhub_cli"
 const AuthPassword = ""
 
 type Config struct {
-	ApiURL             string
-	AuthURL            string
-	AccessToken        string
-	RefreshToken       string
-	InsecureSkipVerify bool
-	CaCerts            []string
-	ServerVersion      string
-	ClientID           string
-	ClientSecret       string
+	ConfigWithoutSecrets
+	ClientID     string
+	ClientSecret string
 }
 
 func ConfigDir() string {
@@ -75,7 +69,9 @@ func WriteConfig(c Config) error {
 		return err
 	}
 
-	data, err := json.Marshal(c)
+	configWithoutSecrets := ConvertConfigToConfigWithoutSecrets(c)
+
+	data, err := json.Marshal(configWithoutSecrets)
 	if err != nil {
 		return err
 	}

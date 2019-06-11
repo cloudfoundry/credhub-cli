@@ -22,7 +22,15 @@ var _ = Describe("Get", func() {
 
 	ItRequiresAuthentication("get", "-n", "test-credential")
 	ItRequiresAnAPIToBeSet("get", "-n", "test-credential")
-	ItAutomaticallyLogsIn("GET", "get_response.json", "/api/v1/data", "get", "-n", "test-credential")
+	testAutoLogin := []TestAutoLogin{
+		{
+			method:              "GET",
+			responseFixtureFile: "get_response.json",
+			responseStatus:      http.StatusOK,
+			endpoint:            "/api/v1/data",
+		},
+	}
+	ItAutomaticallyLogsIn(testAutoLogin, "get", "-n", "test-credential")
 
 	ItBehavesLikeHelp("get", "g", func(session *Session) {
 		Expect(session.Err).To(Say("Usage"))
@@ -64,7 +72,6 @@ var _ = Describe("Get", func() {
 			Eventually(session.Out).Should(Say("value: potatoes"))
 		})
 
-
 		Context("with --quiet flag", func() {
 			It("returns only the value", func() {
 				responseJson := fmt.Sprintf(STRING_CREDENTIAL_ARRAY_RESPONSE_JSON, "value", "my-value", "potatoes")
@@ -83,7 +90,6 @@ var _ = Describe("Get", func() {
 				Eventually(contents).Should(Equal("potatoes"))
 			})
 		})
-
 
 		Context("multiple versions with --quiet flag", func() {
 			It("returns array of values", func() {

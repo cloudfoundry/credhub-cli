@@ -26,46 +26,7 @@ var _ = Describe("Import", func() {
 
 			Eventually(session).Should(Exit(0))
 
-			Eventually(session.Out).Should(Say(`name: /test/password`))
-			Eventually(session.Out).Should(Say(`type: password`))
-			Eventually(session.Out).Should(Say(`value: test-password-value`))
-			Eventually(session.Out).Should(Say(`name: /test/value`))
-			Eventually(session.Out).Should(Say(`type: value`))
-			Eventually(session.Out).Should(Say(`value: test-value`))
-			Eventually(session.Out).Should(Say(`name: /test/certificate`))
-			Eventually(session.Out).Should(Say(`type: certificate
-value:
-  ca: ca-certificate
-  certificate: certificate
-  private_key: private-key`))
-			Eventually(session.Out).Should(Say(`name: /test/rsa`))
-			Eventually(session.Out).Should(Say(`type: rsa
-value:
-  private_key: private-key
-  public_key: public-key`))
-			Eventually(session.Out).Should(Say(`name: /test/ssh`))
-			Eventually(session.Out).Should(Say(`type: ssh
-value:
-  private_key: private-key
-  public_key: ssh-public-key`))
-			Eventually(session.Out).Should(Say(`name: /test/user`))
-			Eventually(session.Out).Should(Say(`type: user
-value:
-  password: test-user-password
-  password_hash: P455W0rd-H45H
-  username: covfefe`))
-			Eventually(session.Out).Should(Say(`name: /test/json`))
-			Eventually(session.Out).Should(Say(`type: json
-value:
-  "1": key is not a string
-  "3.14": pi
-  arbitrary_object:
-    nested_array:
-    - array_val1
-    - array_object_subvalue: covfefe
-  "true": key is a bool
-`))
-			Eventually(session.Out).Should(Say(`Import complete.
+			Expect(string(session.Out.Contents())).To(Equal(`Import complete.
 Successfully set: 7
 Failed to set: 0
 `))
@@ -80,46 +41,7 @@ Failed to set: 0
 
 			Eventually(session).Should(Exit(0))
 
-			Eventually(session.Out).Should(Say(`name: /test/password`))
-			Eventually(session.Out).Should(Say(`type: password`))
-			Eventually(session.Out).Should(Say(`value: test-password-value`))
-			Eventually(session.Out).Should(Say(`name: /test/value`))
-			Eventually(session.Out).Should(Say(`type: value`))
-			Eventually(session.Out).Should(Say(`value: test-value`))
-			Eventually(session.Out).Should(Say(`name: /test/certificate`))
-			Eventually(session.Out).Should(Say(`type: certificate
-value:
-  ca: ca-certificate
-  certificate: certificate
-  private_key: private-key`))
-			Eventually(session.Out).Should(Say(`name: /test/rsa`))
-			Eventually(session.Out).Should(Say(`type: rsa
-value:
-  private_key: private-key
-  public_key: public-key`))
-			Eventually(session.Out).Should(Say(`name: /test/ssh`))
-			Eventually(session.Out).Should(Say(`type: ssh
-value:
-  private_key: private-key
-  public_key: ssh-public-key`))
-			Eventually(session.Out).Should(Say(`name: /test/user`))
-			Eventually(session.Out).Should(Say(`type: user
-value:
-  password: test-user-password
-  password_hash: P455W0rd-H45H
-  username: covfefe`))
-			Eventually(session.Out).Should(Say(`name: /test/json`))
-			Eventually(session.Out).Should(Say(`type: json
-value:
-  "1": key is not a string
-  "3.14": pi
-  arbitrary_object:
-    nested_array:
-    - array_val1
-    - array_object_subvalue: covfefe
-  "true": key is a bool
-`))
-			Eventually(session.Out).Should(Say(`Import complete.
+			Expect(string(session.Out.Contents())).To(Equal(`Import complete.
 Successfully set: 7
 Failed to set: 0
 `))
@@ -134,46 +56,7 @@ Failed to set: 0
 
 			Eventually(session).Should(Exit(0))
 
-			Eventually(session.Out).Should(Say(`name: /test/password`))
-			Eventually(session.Out).Should(Say(`type: password`))
-			Eventually(session.Out).Should(Say(`value: test-password-value`))
-			Eventually(session.Out).Should(Say(`name: /test/value`))
-			Eventually(session.Out).Should(Say(`type: value`))
-			Eventually(session.Out).Should(Say(`value: test-value`))
-			Eventually(session.Out).Should(Say(`name: /test/certificate`))
-			Eventually(session.Out).Should(Say(`type: certificate
-value:
-  ca: ca-certificate
-  certificate: certificate
-  private_key: private-key`))
-			Eventually(session.Out).Should(Say(`name: /test/rsa`))
-			Eventually(session.Out).Should(Say(`type: rsa
-value:
-  private_key: private-key
-  public_key: public-key`))
-			Eventually(session.Out).Should(Say(`name: /test/ssh`))
-			Eventually(session.Out).Should(Say(`type: ssh
-value:
-  private_key: private-key
-  public_key: ssh-public-key`))
-			Eventually(session.Out).Should(Say(`name: /test/user`))
-			Eventually(session.Out).Should(Say(`type: user
-value:
-  password: test-user-password
-  password_hash: P455W0rd-H45H
-  username: covfefe`))
-			Eventually(session.Out).Should(Say(`name: /test/json`))
-			Eventually(session.Out).Should(Say(`type: json
-value:
-  "1": key is not a string
-  "3.14": pi
-  arbitrary_object:
-    nested_array:
-    - array_val1
-    - array_object_subvalue: covfefe
-  "true": key is a bool
-`))
-			Eventually(session.Out).Should(Say(`Import complete.
+			Expect(string(session.Out.Contents())).To(Equal(`Import complete.
 Successfully set: 7
 Failed to set: 0
 `))
@@ -226,13 +109,9 @@ Failed to set: 2
 `
 			Eventually(session.Out).Should(Say(`Credential '/test/invalid_type' at index 0 could not be set: The request does not include a valid type. Valid values include 'value', 'json', 'password', 'user', 'certificate', 'ssh' and 'rsa'.`))
 			Eventually(session.Out).Should(Say(`Credential '/test/invalid_type1' at index 1 could not be set: The request does not include a valid type. Valid values include 'value', 'json', 'password', 'user', 'certificate', 'ssh' and 'rsa'.`))
-			Expect(session.Out.Contents()).To(ContainSubstring(`id: 5a2edd4f-1686-4c8d-80eb-5daa866f9f86`))
-			Expect(session.Out.Contents()).To(ContainSubstring(`name: /test/user`))
-			Expect(session.Out.Contents()).To(ContainSubstring(`version_created_at: "2016-01-01T12:00:00Z"`))
-			Expect(session.Out.Contents()).To(ContainSubstring(`type: user`))
-			Expect(session.Out.Contents()).To(ContainSubstring(`password: test-user-password`))
-			Expect(session.Out.Contents()).To(ContainSubstring(`password_hash: P455W0rd-H45H`))
-			Expect(session.Out.Contents()).To(ContainSubstring(`username: covfefe`))
+			Expect(session.ExitCode()).ToNot(Equal(0))
+			Expect(session.Out.Contents()).NotTo(ContainSubstring(`id: 5a2edd4f-1686-4c8d-80eb-5daa866f9f86`))
+			Expect(session.Err.Contents()).To(ContainSubstring(`One or more credentials failed to import`))
 			Eventually(session.Out).Should(Say(summaryMessage))
 		})
 	})
@@ -243,6 +122,32 @@ Failed to set: 2
 
 			noCredentialTagError := "The referenced import file does not begin with the key 'credentials'. The import file must contain a list of credentials under the key 'credentials'. Please update and retry your request."
 			Eventually(session.Err).Should(Say(noCredentialTagError))
+		})
+	})
+
+	Describe("when importing an ssh type with key public_key_fingerprint", func() {
+		It("ignore public_key_fingerprint", func() {
+			SetupPutSshServer("/test/sshCred", "ssh", "some-key", "some-private-key")
+
+			session := runCommand("import", "-f", "../test/test_import_ssh_type_with_public_key_fingerprint.yml")
+			Eventually(session).Should(Exit(0))
+			Expect(string(session.Out.Contents())).To(Equal(`Import complete.
+Successfully set: 1
+Failed to set: 0
+`))
+		})
+	})
+
+	Describe("when importing a user type with password_hash", func() {
+		It("ignore password_hash", func() {
+			SetupPutUserServer("/test/userCred", `{"username": "sample-username", "password": "test-user-password"}`, "sample-username", "test-user-password", "P455W0rd-H45H")
+
+			session := runCommand("import", "-f", "../test/test_import_user_type_with_password_hash.yml")
+			Eventually(session).Should(Exit(0))
+			Expect(string(session.Out.Contents())).To(Equal(`Import complete.
+Successfully set: 1
+Failed to set: 0
+`))
 		})
 	})
 })

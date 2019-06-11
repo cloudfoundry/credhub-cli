@@ -22,7 +22,15 @@ var _ = Describe("Regenerate", func() {
 
 	ItRequiresAuthentication("regenerate", "-n", "test-credential")
 	ItRequiresAnAPIToBeSet("regenerate", "-n", "test-credential")
-	ItAutomaticallyLogsIn("POST", "regenerate_response.json", "/api/v1/data", "regenerate", "-n", "test-credential")
+	testAutoLogin := []TestAutoLogin{
+		{
+			method:              "POST",
+			responseFixtureFile: "regenerate_response.json",
+			responseStatus:      http.StatusOK,
+			endpoint:            "/api/v1/data",
+		},
+	}
+	ItAutomaticallyLogsIn(testAutoLogin, "regenerate", "-n", "test-credential")
 
 	Describe("Regenerating password", func() {
 		It("prints the regenerated password secret in yaml format", func() {

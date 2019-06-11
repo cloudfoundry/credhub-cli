@@ -14,7 +14,7 @@ func (c *RegenerateCommand) Execute([]string) error {
 	}
 
 	credential.Value = "<redacted>"
-	printCredential(c.OutputJSON, credential)
+	formatOutput(c.OutputJSON, credential)
 
 	return nil
 }

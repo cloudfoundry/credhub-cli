@@ -21,7 +21,16 @@ var _ = Describe("Bulk-regenerate", func() {
 
 	ItRequiresAuthentication("bulk-regenerate", "--signed-by", "example-ca")
 	ItRequiresAnAPIToBeSet("bulk-regenerate", "--signed-by", "example-ca")
-	ItAutomaticallyLogsIn("POST", "bulk_regenerate_response.json", "/api/v1/bulk-regenerate", "bulk-regenerate", "--signed-by", "example-ca")
+
+	testAutoLogIns := []TestAutoLogin{
+		{
+			method:              "POST",
+			responseFixtureFile: "bulk_regenerate_response.json",
+			responseStatus:      http.StatusOK,
+			endpoint:            "/api/v1/bulk-regenerate",
+		},
+	}
+	ItAutomaticallyLogsIn(testAutoLogIns, "bulk-regenerate", "--signed-by", "example-ca")
 
 	Describe("Regenerating all certificates signed by the given CA", func() {
 		It("prints the regenerated certificates in yaml format", func() {

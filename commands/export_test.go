@@ -38,7 +38,16 @@ var _ = Describe("Export", func() {
 
 	ItRequiresAuthentication("export")
 	ItRequiresAnAPIToBeSet("export")
-	ItAutomaticallyLogsIn("GET", "get_response.json", "/api/v1/data", "export")
+
+	testAutoLogIns := []TestAutoLogin{
+		{
+			method:              "GET",
+			responseFixtureFile: "get_response.json",
+			responseStatus:      http.StatusOK,
+			endpoint:            "/api/v1/data",
+		},
+	}
+	ItAutomaticallyLogsIn(testAutoLogIns, "export")
 
 	ItBehavesLikeHelp("export", "e", func(session *Session) {
 		Expect(session.Err).To(Say("Usage"))

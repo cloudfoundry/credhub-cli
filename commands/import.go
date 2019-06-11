@@ -35,7 +35,7 @@ func (c *ImportCommand) setCredentials(bulkImport models.CredentialBulkImport) e
 		successful int
 		failed     int
 	)
-	errors := make([]string, 0)
+	importErrors := make([]string, 0)
 
 	for i, credential := range bulkImport.Credentials {
 		switch credentialName := credential["name"].(type) {
@@ -45,7 +45,18 @@ func (c *ImportCommand) setCredentials(bulkImport models.CredentialBulkImport) e
 			name = ""
 		}
 
-		result, err := c.client.SetCredential(name, credential["type"].(string), credential["value"])
+		switch credential["type"].(string) {
+		case "ssh":
+			if _, ok := credential["value"].(map[string]interface{})["public_key_fingerprint"]; ok {
+				delete(credential["value"].(map[string]interface{}), "public_key_fingerprint")
+			}
+		case "user":
+			if _, ok := credential["value"].(map[string]interface{})["password_hash"]; ok {
+				delete(credential["value"].(map[string]interface{}), "password_hash")
+			}
+		}
+
+		_, err := c.client.SetCredential(name, credential["type"].(string), credential["value"])
 
 		if err != nil {
 			if isAuthenticationError(err) {
@@ -53,20 +64,23 @@ func (c *ImportCommand) setCredentials(bulkImport models.CredentialBulkImport) e
 			}
 			failure := fmt.Sprintf("Credential '%s' at index %d could not be set: %v", name, i, err)
 			fmt.Println(failure + "\n")
-			errors = append(errors, " - "+failure)
+			importErrors = append(importErrors, " - "+failure)
 			failed++
 			continue
 		} else {
 			successful++
 		}
-		printCredential(false, result)
 	}
 
 	fmt.Println("Import complete.")
 	fmt.Fprintf(os.Stdout, "Successfully set: %d\n", successful)
 	fmt.Fprintf(os.Stdout, "Failed to set: %d\n", failed)
-	for _, v := range errors {
+	for _, v := range importErrors {
 		fmt.Println(v)
+	}
+
+	if failed > 0 {
+		return errors.NewFailedToImportError()
 	}
 
 	return nil

@@ -1,0 +1,8 @@
+{"actor": "some-actor",
+"operations": [
+  "read",
+  "write",
+	"delete"
+],
+"path": "'/some-path'",
+"uuid": "5a2edd4f-1686-4c8d-80eb-5daa866f9f86"}

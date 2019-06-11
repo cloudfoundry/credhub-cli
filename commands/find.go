@@ -23,14 +23,14 @@ func (c *FindCommand) Execute([]string) error {
 			return errors.NewNoMatchingCredentialsFoundError()
 		}
 
-		printCredential(c.OutputJSON, results)
+		formatOutput(c.OutputJSON, results)
 	} else {
 		output, err := c.client.FindByPath(c.PathIdentifier)
 		if err != nil {
 			return err
 		}
 
-		printCredential(c.OutputJSON, output)
+		formatOutput(c.OutputJSON, output)
 	}
 
 	return nil

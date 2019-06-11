@@ -20,7 +20,16 @@ var _ = Describe("Delete", func() {
 
 	ItRequiresAuthentication("delete", "-n", "test-credential")
 	ItRequiresAnAPIToBeSet("delete", "-n", "test-credential")
-	ItAutomaticallyLogsIn("DELETE", "delete_test.json", "/api/v1/data", "delete", "-n", "test-credential")
+
+	testAutoLogIns := []TestAutoLogin{
+		{
+			method:              "DELETE",
+			responseFixtureFile: "delete_test.json",
+			responseStatus:      http.StatusOK,
+			endpoint:            "/api/v1/data",
+		},
+	}
+	ItAutomaticallyLogsIn(testAutoLogIns, "delete", "-n", "test-credential")
 
 	Describe("Help", func() {
 		ItBehavesLikeHelp("delete", "d", func(session *Session) {

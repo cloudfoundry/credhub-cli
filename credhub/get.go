@@ -11,7 +11,6 @@ import (
 	"strconv"
 
 	"code.cloudfoundry.org/credhub-cli/credhub/credentials"
-	"strings"
 )
 
 // GetById returns a credential version by ID. The returned credential will be encoded as a map and may be of any type.
@@ -113,7 +112,7 @@ func (ch *CredHub) makeCredentialGetRequest(query url.Values, cred interface{}) 
 	resp, err := ch.Request(http.MethodGet, "/api/v1/data", query, nil, true)
 
 	if err != nil {
-		return addErrorDescription(err, " making an http request")
+		return err
 	}
 
 	defer resp.Body.Close()
@@ -123,14 +122,14 @@ func (ch *CredHub) makeCredentialGetRequest(query url.Values, cred interface{}) 
 	response := make(map[string][]json.RawMessage)
 
 	if err := dec.Decode(&response); err != nil {
-		return addErrorDescription(err, " while decoding http response")
+		return errors.New("The response body could not be decoded: " + err.Error())
 	}
 
 	var ok bool
 	var data []json.RawMessage
 
 	if data, ok = response["data"]; !ok || len(data) == 0 {
-		return errors.New("response did not contain any credentials")
+		return newCredhubError("response did not contain any credentials", "")
 	}
 
 	rawMessage := data[0]
@@ -150,7 +149,7 @@ func (ch *CredHub) makeCredentialGetByIdRequest(id string, cred *credentials.Cre
 	dec := json.NewDecoder(resp.Body)
 
 	if err := dec.Decode(cred); err != nil {
-		return err
+		return errors.New("The response body could not be decoded: " + err.Error())
 	}
 
 	return nil
@@ -177,21 +176,16 @@ func (ch *CredHub) makeMultiCredentialGetRequest(query url.Values) ([]credential
 
 	response := make(map[string][]credentials.Credential)
 
-	dec.Decode(&response)
+	if err := dec.Decode(&response); err != nil {
+		return nil, errors.New("The response body could not be decoded: " + err.Error())
+	}
 
 	var ok bool
 	var data []credentials.Credential
 
 	if data, ok = response["data"]; !ok || len(data) == 0 {
-		return nil, errors.New("response did not contain any credentials")
+		return nil, newCredhubError("response did not contain any credentials", "")
 	}
 
 	return data, nil
-}
-
-func addErrorDescription(err error, message string) error {
-	if strings.HasSuffix(err.Error(), message) {
-		return err
-	}
-	return errors.New(err.Error() + message)
 }

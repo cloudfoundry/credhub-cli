@@ -61,19 +61,6 @@ var _ = Describe("Get", func() {
 			})
 		})
 
-		Context("when response body cannot be unmarshalled", func() {
-			It("returns an error", func() {
-				dummyAuth := &DummyAuth{Response: &http.Response{
-					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
-				}}
-
-				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
-				_, err := ch.GetLatestVersion("/example-password")
-
-				Expect(err).To(HaveOccurred())
-			})
-		})
-
 		Context("when the response body contains an empty list", func() {
 			It("returns an error", func() {
 				dummyAuth := &DummyAuth{Response: &http.Response{
@@ -125,32 +112,6 @@ var _ = Describe("Get", func() {
 				Expect(cred.Type).To(Equal("password"))
 				Expect(cred.Value.(string)).To(Equal("some-password"))
 				Expect(cred.VersionCreatedAt).To(Equal("2017-01-05T01:01:01Z"))
-			})
-		})
-
-		Context("when response body cannot be unmarshalled", func() {
-			It("returns an error", func() {
-				dummyAuth := &DummyAuth{Response: &http.Response{
-					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
-				}}
-
-				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
-				_, err := ch.GetById("0239482304958")
-
-				Expect(err).To(HaveOccurred())
-			})
-		})
-
-		Context("when the credential does not exist", func() {
-			It("returns the error from the server", func() {
-				dummyAuth := &DummyAuth{Response: &http.Response{
-					StatusCode: http.StatusNotFound,
-					Body:       ioutil.NopCloser(bytes.NewBufferString(`{"error":"The request could not be completed because the credential does not exist or you do not have sufficient authorization."}`)),
-				}}
-				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
-				_, err := ch.GetById("0239482304958")
-
-				Expect(err).To(MatchError("The request could not be completed because the credential does not exist or you do not have sufficient authorization."))
 			})
 		})
 	})
@@ -251,19 +212,6 @@ var _ = Describe("Get", func() {
 				Expect(creds[0].VersionCreatedAt).To(Equal("2017-01-05T01:01:01Z"))
 
 				Expect(creds[1].Value.(map[string]interface{})["username"]).To(Equal("second-username"))
-			})
-		})
-
-		Context("when response body cannot be unmarshalled", func() {
-			It("returns an error", func() {
-				dummyAuth := &DummyAuth{Response: &http.Response{
-					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
-				}}
-
-				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
-				_, err := ch.GetAllVersions("/example-password")
-
-				Expect(err).To(HaveOccurred())
 			})
 		})
 
@@ -380,19 +328,6 @@ var _ = Describe("Get", func() {
 			})
 		})
 
-		Context("when response body cannot be unmarshalled", func() {
-			It("returns an error", func() {
-				dummyAuth := &DummyAuth{Response: &http.Response{
-					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
-				}}
-
-				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
-				_, err := ch.GetNVersions("/example-password", 2)
-
-				Expect(err).To(HaveOccurred())
-			})
-		})
-
 		Context("when the response body contains an empty list", func() {
 			It("returns an error", func() {
 				dummyAuth := &DummyAuth{Response: &http.Response{
@@ -404,6 +339,23 @@ var _ = Describe("Get", func() {
 
 				Expect(err).To(MatchError("response did not contain any credentials"))
 			})
+		})
+
+		Context("when the server returns a 200 but the cli can not parse the response", func() {
+			It("returns an appropriate error", func() {
+				responseString := `some-invalid-json`
+
+				dummyAuth := &DummyAuth{Response: &http.Response{
+					StatusCode: http.StatusOK,
+					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
+				}}
+				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
+				_, err := ch.GetNVersions("/example-password", 2)
+
+				Expect(err.Error()).To(ContainSubstring("The response body could not be decoded:"))
+
+			})
+
 		})
 	})
 
@@ -442,18 +394,6 @@ var _ = Describe("Get", func() {
 				cred, err := ch.GetLatestPassword("/example-password")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(cred.Value).To(BeEquivalentTo("some-password"))
-			})
-		})
-
-		Context("when response body cannot be unmarshalled", func() {
-			It("returns an error", func() {
-				dummyAuth := &DummyAuth{Response: &http.Response{
-					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
-				}}
-				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
-				_, err := ch.GetLatestPassword("/example-cred")
-
-				Expect(err).To(HaveOccurred())
 			})
 		})
 	})
@@ -501,18 +441,6 @@ var _ = Describe("Get", func() {
 				Expect(cred.Value.Certificate).To(Equal("-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----"))
 				Expect(cred.Value.PrivateKey).To(Equal("-----BEGIN RSA PRIVATE KEY-----\n...\n-----END RSA PRIVATE KEY-----"))
 				Expect(cred.VersionCreatedAt).To(Equal("2017-01-01T04:07:18Z"))
-			})
-		})
-
-		Context("when response body cannot be unmarshalled", func() {
-			It("returns an error", func() {
-				dummyAuth := &DummyAuth{Response: &http.Response{
-					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
-				}}
-				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
-				_, err := ch.GetLatestCertificate("/example-cred")
-
-				Expect(err).To(HaveOccurred())
 			})
 		})
 	})
@@ -566,18 +494,6 @@ var _ = Describe("Get", func() {
 				}))
 			})
 		})
-
-		Context("when response body cannot be unmarshalled", func() {
-			It("returns an error", func() {
-				dummyAuth := &DummyAuth{Response: &http.Response{
-					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
-				}}
-				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
-				_, err := ch.GetLatestUser("/example-cred")
-
-				Expect(err).To(HaveOccurred())
-			})
-		})
 	})
 
 	Describe("GetLatestRSA()", func() {
@@ -625,18 +541,6 @@ var _ = Describe("Get", func() {
 					PublicKey:  "public-key",
 					PrivateKey: "private-key",
 				}))
-			})
-		})
-
-		Context("when response body cannot be unmarshalled", func() {
-			It("returns an error", func() {
-				dummyAuth := &DummyAuth{Response: &http.Response{
-					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
-				}}
-				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
-				_, err := ch.GetLatestRSA("/example-cred")
-
-				Expect(err).To(HaveOccurred())
 			})
 		})
 	})
@@ -688,18 +592,6 @@ var _ = Describe("Get", func() {
 					PublicKey:  "public-key",
 					PrivateKey: "private-key",
 				}))
-			})
-		})
-
-		Context("when response body cannot be unmarshalled", func() {
-			It("returns an error", func() {
-				dummyAuth := &DummyAuth{Response: &http.Response{
-					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
-				}}
-				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
-				_, err := ch.GetLatestSSH("/example-cred")
-
-				Expect(err).To(HaveOccurred())
 			})
 		})
 	})
@@ -766,17 +658,6 @@ var _ = Describe("Get", func() {
 			})
 		})
 
-		Context("when response body cannot be unmarshalled", func() {
-			It("returns an error", func() {
-				dummyAuth := &DummyAuth{Response: &http.Response{
-					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
-				}}
-				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
-				_, err := ch.GetLatestJSON("/example-cred")
-
-				Expect(err).To(HaveOccurred())
-			})
-		})
 	})
 
 	Describe("GetLatestValue()", func() {
@@ -818,19 +699,84 @@ var _ = Describe("Get", func() {
 				Expect(cred.Value).To(Equal(values.Value("some-value")))
 			})
 		})
-
-		Context("when response body cannot be unmarshalled", func() {
-			It("returns an error", func() {
-				dummyAuth := &DummyAuth{Response: &http.Response{
-					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
-				}}
-				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
-				_, err := ch.GetLatestValue("/example-cred")
-
-				Expect(err).To(HaveOccurred())
-			})
-		})
 	})
+
+	var listOfActions = []TableEntry{
+		Entry("GetAllVersions", func(ch *CredHub) error {
+			_, err := ch.GetAllVersions("/example-password")
+			return err
+		}),
+		Entry("GetNVersions", func(ch *CredHub) error {
+			_, err := ch.GetNVersions("/example-password", 47)
+			return err
+		}),
+		Entry("GetLatestVersion", func(ch *CredHub) error {
+			_, err := ch.GetLatestVersion("/example-password")
+			return err
+		}),
+		Entry("GetLatestPassword", func(ch *CredHub) error {
+			_, err := ch.GetLatestPassword("/example-password")
+			return err
+		}),
+		Entry("GetLatestCertificate", func(ch *CredHub) error {
+			_, err := ch.GetLatestCertificate("/example-certificate")
+			return err
+		}),
+		Entry("GetLatestUser", func(ch *CredHub) error {
+			_, err := ch.GetLatestUser("/example-password")
+			return err
+		}),
+		Entry("GetLatestRSA", func(ch *CredHub) error {
+			_, err := ch.GetLatestRSA("/example-password")
+			return err
+		}),
+		Entry("GetById", func(ch *CredHub) error {
+			_, err := ch.GetById("0239482304958")
+			return err
+		}),
+		Entry("GetLatestSSH", func(ch *CredHub) error {
+			_, err := ch.GetLatestSSH("/example-password")
+			return err
+		}),
+		Entry("GetLatestJSON", func(ch *CredHub) error {
+			_, err := ch.GetLatestJSON("/example-password")
+			return err
+		}),
+		Entry("GetLatestValue", func(ch *CredHub) error {
+			_, err := ch.GetLatestValue("/example-password")
+			return err
+		}),
+	}
+
+	DescribeTable("errors when response body is not json and/or cannot be decoded",
+		func(performAction func(*CredHub) error) {
+			dummyAuth := &DummyAuth{Response: &http.Response{
+				Body: ioutil.NopCloser(bytes.NewBufferString("<html>")),
+			}}
+			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
+			err := performAction(ch)
+
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("The response body could not be decoded:"))
+		},
+
+		listOfActions...,
+	)
+
+	DescribeTable("returns credhub error when the cred does not exist",
+		func(performAction func(*CredHub) error) {
+			dummyAuth := &DummyAuth{Response: &http.Response{
+				StatusCode: http.StatusNotFound,
+				Body:       ioutil.NopCloser(bytes.NewBufferString(`{"error":"The request could not be completed because the credential does not exist or you do not have sufficient authorization."}`)),
+			}}
+			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
+			err := performAction(ch)
+
+			Expect(err).To(MatchError("The request could not be completed because the credential does not exist or you do not have sufficient authorization."))
+		},
+
+		listOfActions...,
+	)
 
 	DescribeTable("request fails due to network error",
 		func(performAction func(*CredHub) error) {
@@ -844,41 +790,6 @@ var _ = Describe("Get", func() {
 			Expect(err).To(Equal(networkError))
 		},
 
-		Entry("GetNVersions", func(ch *CredHub) error {
-			_, err := ch.GetNVersions("/example-password", 47)
-			return err
-		}),
-		Entry("GetLatestVersion", func(ch *CredHub) error {
-			_, err := ch.GetLatestVersion("/example-password")
-			return err
-		}),
-		Entry("GetPassword", func(ch *CredHub) error {
-			_, err := ch.GetLatestPassword("/example-password")
-			return err
-		}),
-		Entry("GetCertificate", func(ch *CredHub) error {
-			_, err := ch.GetLatestCertificate("/example-certificate")
-			return err
-		}),
-		Entry("GetUser", func(ch *CredHub) error {
-			_, err := ch.GetLatestUser("/example-password")
-			return err
-		}),
-		Entry("GetRSA", func(ch *CredHub) error {
-			_, err := ch.GetLatestRSA("/example-password")
-			return err
-		}),
-		Entry("GetSSH", func(ch *CredHub) error {
-			_, err := ch.GetLatestSSH("/example-password")
-			return err
-		}),
-		Entry("GetJSON", func(ch *CredHub) error {
-			_, err := ch.GetLatestJSON("/example-password")
-			return err
-		}),
-		Entry("GetValue", func(ch *CredHub) error {
-			_, err := ch.GetLatestValue("/example-password")
-			return err
-		}),
+		listOfActions...,
 	)
 })

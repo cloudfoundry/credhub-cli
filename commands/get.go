@@ -42,15 +42,15 @@ func (c *GetCommand) printArrayOfCredentials() error {
 
 	if c.Quiet {
 		values := c.convertToValues(arrayOfCredentials)
-		output := map[string][]interface{} {
+		output := map[string][]interface{}{
 			"versions": values,
 		}
-		printCredential(c.OutputJSON, output)
+		formatOutput(c.OutputJSON, output)
 	} else {
 		output := map[string][]credentials.Credential{
 			"versions": arrayOfCredentials,
 		}
-		printCredential(c.OutputJSON, output)
+		formatOutput(c.OutputJSON, output)
 	}
 
 	return nil
@@ -88,15 +88,15 @@ func (c *GetCommand) printCredential() error {
 			fmt.Println(cred[c.Key])
 
 		default:
-			printCredential(c.OutputJSON, cred[c.Key])
+			formatOutput(c.OutputJSON, cred[c.Key])
 		}
 	} else if c.Quiet {
 		if c.OutputJSON {
 			return errors.NewOutputJsonAndQuietError()
 		}
-		printCredential(c.OutputJSON, credential.Value)
+		formatOutput(c.OutputJSON, credential.Value)
 	} else {
-		printCredential(c.OutputJSON, credential)
+		formatOutput(c.OutputJSON, credential)
 	}
 
 	return nil

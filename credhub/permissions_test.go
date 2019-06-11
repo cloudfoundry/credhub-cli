@@ -2,8 +2,10 @@ package credhub_test
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 
 	. "code.cloudfoundry.org/credhub-cli/credhub"
 	"code.cloudfoundry.org/credhub-cli/credhub/permissions"
@@ -14,7 +16,7 @@ import (
 )
 
 var _ = Describe("Permissions", func() {
-	Context("GetPermission", func() {
+	Context("GetPermissionByUUID", func() {
 		Context("when server version is less than 2.0.0", func() {
 			It("returns permission using V1 endpoint", func() {
 				responseString :=
@@ -66,7 +68,7 @@ var _ = Describe("Permissions", func() {
 				}}
 
 				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()), ServerVersion("2.0.0"))
-				actualPermissions, err := ch.GetPermission("1234")
+				actualPermissions, err := ch.GetPermissionByUUID("1234")
 				Expect(err).NotTo(HaveOccurred())
 
 				expectedPermission := permissions.Permission{
@@ -81,6 +83,73 @@ var _ = Describe("Permissions", func() {
 				url := dummyAuth.Request.URL.String()
 				Expect(url).To(Equal("https://example.com/api/v2/permissions/1234"))
 				Expect(dummyAuth.Request.Method).To(Equal(http.MethodGet))
+			})
+		})
+	})
+
+	Context("GetPermissionByPathActor", func() {
+		It("correctly formats request", func() {
+			dummy := &DummyAuth{Response: &http.Response{
+				StatusCode: http.StatusCreated,
+				Body:       ioutil.NopCloser(bytes.NewBufferString("")),
+			}}
+			ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.1.2"))
+			_, _ = ch.GetPermissionByPathActor("/path", "some-actor")
+			request := dummy.Request.URL
+			expectedRequest, _ := url.Parse("https://example.com/api/v2/permissions?actor=some-actor&path=/path")
+			Expect(request.Query()).To(Equal(expectedRequest.Query()))
+			Expect(dummy.Request.Method).To(Equal(http.MethodGet))
+		})
+
+		Context("if permissions exists", func() {
+			It("return permission using V2 endpoint", func() {
+				responseString :=
+					`{
+		"actor":"user:A",
+		"operations":["read"],
+		"path":"/example-password",
+		"uuid":"1234"
+	}`
+
+				dummy := &DummyAuth{Response: &http.Response{
+					StatusCode: http.StatusCreated,
+					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
+				}}
+				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.1.2"))
+
+				actualPermissions, err := ch.GetPermissionByPathActor("/path", "some-actor")
+				Expect(err).NotTo(HaveOccurred())
+
+				expectedPermission := permissions.Permission{
+					Actor:      "user:A",
+					Operations: []string{"read"},
+					Path:       "/example-password",
+					UUID:       "1234",
+				}
+
+				Expect(actualPermissions).To(Equal(&expectedPermission))
+			})
+
+		})
+
+		Context("if permissions does not exists", func() {
+			It("returns empty permission", func() {
+				responseString := `{
+  "error": "The request could not be completed because the permission does not exist or you do not have sufficient authorization."
+}`
+
+				dummy := &DummyAuth{Response: &http.Response{
+					StatusCode: http.StatusCreated,
+					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
+				}}
+				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.1.2"))
+
+				actualPermissions, err := ch.GetPermissionByPathActor("/path", "some-actor")
+				Expect(err).NotTo(HaveOccurred())
+
+				expectedPermission := permissions.Permission{}
+
+				Expect(actualPermissions).To(Equal(&expectedPermission))
 			})
 		})
 	})
@@ -118,19 +187,27 @@ var _ = Describe("Permissions", func() {
 		})
 
 		Context("when server version is greater than or equal to 2.0.0", func() {
-			It("can add with V2 endpoint", func() {
-				responseString :=
+			var (
+				responseString string
+				ch             *CredHub
+				dummy          *DummyAuth
+			)
+			BeforeEach(func() {
+				responseString =
 					`{
-	"actor":"user:B",
-	"operations":["read"],
-	"path":"/example-password"
-}`
-				dummy := &DummyAuth{Response: &http.Response{
+						"actor":"user:B",
+						"operations":["read"],
+						"path":"/example-password"
+					}`
+				dummy = &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusCreated,
 					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
 				}}
-				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
+				ch, _ = New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
 
+			})
+
+			It("can add with V2 endpoint", func() {
 				_, err := ch.AddPermission("/example-password", "user:A", []string{"read", "read"})
 				Expect(err).NotTo(HaveOccurred())
 
@@ -147,6 +224,20 @@ var _ = Describe("Permissions", func() {
 				"path": "/example-password"
 			}`
 				Expect(params).To(MatchJSON(expectedParams))
+
+			})
+
+			It("properly returns permissions", func() {
+				permission, err := ch.AddPermission("/example-password", "user:B", []string{"read"})
+				Expect(err).NotTo(HaveOccurred())
+				expectedPermission := permissions.Permission{
+					Actor:      "user:B",
+					Path:       "/example-password",
+					Operations: []string{"read"},
+				}
+
+				Expect(*permission).To(Equal(expectedPermission))
+
 			})
 		})
 
@@ -186,6 +277,93 @@ var _ = Describe("Permissions", func() {
 				_, err := ch.AddPermission("/example-password", "some-actor", []string{"read", "write"})
 				Expect(err).NotTo(HaveOccurred())
 				Expect(server.ReceivedRequests()).To(HaveLen(3))
+			})
+		})
+	})
+
+	Context("UpdatePermission", func() {
+		Context("when server version is less than 2.0", func() {
+			It("throws error", func() {
+				ch, _ := New("https://example.com", ServerVersion("1.0.0"))
+				_, err := ch.UpdatePermission("123", "path", "testactor", []string{"read"})
+				Expect(err).To(HaveOccurred())
+				Eventually(err).Should(Equal(fmt.Errorf("credhub server version <2.0 not supported")))
+			})
+		})
+		Context("when server version is greater than or equal to 2.0", func() {
+			responseString :=
+				`{
+						"actor":"user:B",
+						"operations":["read"],
+						"path":"/example-password",
+				    "uuid":"1234"
+					}`
+			dummy := &DummyAuth{Response: &http.Response{
+				StatusCode: http.StatusCreated,
+				Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
+			}}
+			ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
+
+			It("properly returns permissions", func() {
+				permission, err := ch.UpdatePermission("1234", "/example-password", "user:B", []string{"read"})
+				Expect(err).NotTo(HaveOccurred())
+				expectedPermission := permissions.Permission{
+					Actor:      "user:B",
+					Path:       "/example-password",
+					Operations: []string{"read"},
+					UUID:       "1234",
+				}
+
+				Expect(*permission).To(Equal(expectedPermission))
+
+			})
+		})
+	})
+	Context("Delete Permission", func() {
+		It("correctly formats request", func() {
+			dummy := &DummyAuth{Response: &http.Response{
+				StatusCode: http.StatusOK,
+				Body:       ioutil.NopCloser(bytes.NewBufferString("")),
+			}}
+			ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.1.2"))
+			_, _ = ch.DeletePermission("1234")
+			request := dummy.Request.URL
+			expectedRequest, _ := url.Parse("https://example.com/api/v2/permissions/1234")
+			Expect(request.String()).To(Equal(expectedRequest.String()))
+			Expect(dummy.Request.Method).To(Equal(http.MethodDelete))
+		})
+		Context("when server version less than 2.0", func() {
+			It("throws error", func() {
+				ch, _ := New("https://example.com", ServerVersion("1.0.0"))
+				_, err := ch.DeletePermission("123")
+				Expect(err).To(HaveOccurred())
+				Eventually(err).Should(Equal(fmt.Errorf("credhub server version <2.0 not supported")))
+			})
+		})
+		Context("when server version is greater than or equal 2.0", func() {
+			responseString :=
+				`{
+						"actor":"user:B",
+						"operations":["read"],
+						"path":"/example-password",
+				    "uuid":"1234"
+					}`
+			dummy := &DummyAuth{Response: &http.Response{
+				StatusCode: http.StatusOK,
+				Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
+			}}
+			ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
+			It("properly returns deleted permission", func() {
+				permission, err := ch.DeletePermission("1234")
+				Expect(err).NotTo(HaveOccurred())
+				expectedPermission := permissions.Permission{
+					Actor:      "user:B",
+					Path:       "/example-password",
+					Operations: []string{"read"},
+					UUID:       "1234",
+				}
+
+				Expect(*permission).To(Equal(expectedPermission))
 			})
 		})
 	})

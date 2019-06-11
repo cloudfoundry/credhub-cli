@@ -12,7 +12,7 @@ func (c *BulkRegenerateCommand) Execute([]string) error {
 		return err
 	}
 
-	printCredential(c.OutputJSON, credentials)
+	formatOutput(c.OutputJSON, credentials)
 
 	return nil
 }

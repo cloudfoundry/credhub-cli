@@ -1,6 +1,7 @@
 package commands_test
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -30,7 +31,15 @@ var _ = Describe("interpolate", func() {
 	Describe("behavior shared with other commands", func() {
 		templateFile, err = ioutil.TempFile("", "credhub_test_interpolate_template_")
 		templateFile.WriteString("---")
-		ItAutomaticallyLogsIn("GET", "get_response.json", "/api/v1/data", "interpolate", "-f", templateFile.Name())
+		testAutoLogin := []TestAutoLogin{
+			{
+				method:              "GET",
+				responseFixtureFile: "get_response.json",
+				responseStatus:      http.StatusOK,
+				endpoint:            "/api/v1/data",
+			},
+		}
+		ItAutomaticallyLogsIn(testAutoLogin, "interpolate", "-f", templateFile.Name())
 
 		ItBehavesLikeHelp("interpolate", "interpolate", func(session *gexec.Session) {
 			Expect(session.Err).To(Say("Usage"))
@@ -52,9 +61,15 @@ static-value: a normal string`
 			templateFile.WriteString(templateText)
 			responseValueJson := fmt.Sprintf(STRING_CREDENTIAL_ARRAY_RESPONSE_JSON, "value", "relative/value/cred/path", `{\"value\": \"should not be interpolated\"}`)
 
-			server.RouteToHandler("GET", "/api/v1/data",
+			credentialListJson, err := credentialsListJSON([]string{"/relative/value/cred/path"})
+			Expect(err).Should(BeNil())
+			server.AppendHandlers(
 				CombineHandlers(
-					VerifyRequest("GET", "/api/v1/data", "current=true&name=relative/value/cred/path"),
+					VerifyRequest("GET", "/api/v1/data", "path="),
+					RespondWith(http.StatusOK, credentialListJson),
+				),
+				CombineHandlers(
+					VerifyRequest("GET", "/api/v1/data", "current=true&name=/relative/value/cred/path"),
 					RespondWith(http.StatusOK, responseValueJson),
 				),
 			)
@@ -76,9 +91,15 @@ static-value: a normal string`
 
 			responseCertJson := fmt.Sprintf(CERTIFICATE_CREDENTIAL_ARRAY_RESPONSE_JSON, "test-cert", "", "-----BEGIN FAKE CERTIFICATE-----\\n-----END FAKE CERTIFICATE-----", "-----BEGIN FAKE RSA PRIVATE KEY-----\\n-----END FAKE RSA PRIVATE KEY-----")
 
-			server.RouteToHandler("GET", "/api/v1/data",
+			credentialListJson, err := credentialsListJSON([]string{"/relative/certificate/cred/path"})
+			Expect(err).Should(BeNil())
+			server.AppendHandlers(
 				CombineHandlers(
-					VerifyRequest("GET", "/api/v1/data", "current=true&name=relative/certificate/cred/path"),
+					VerifyRequest("GET", "/api/v1/data", "path="),
+					RespondWith(http.StatusOK, credentialListJson),
+				),
+				CombineHandlers(
+					VerifyRequest("GET", "/api/v1/data", "current=true&name=/relative/certificate/cred/path"),
 					RespondWith(http.StatusOK, responseCertJson),
 				),
 			)
@@ -106,10 +127,15 @@ static-value: a normal string
 			templateFile.WriteString(templateText)
 
 			responseJson := fmt.Sprintf(JSON_CREDENTIAL_ARRAY_RESPONSE_JSON, "test-json", `{"whatthing":"something"}`)
-
-			server.RouteToHandler("GET", "/api/v1/data",
+			credentialListJson, err := credentialsListJSON([]string{"/relative/json/cred/path"})
+			Expect(err).Should(BeNil())
+			server.AppendHandlers(
 				CombineHandlers(
-					VerifyRequest("GET", "/api/v1/data", "current=true&name=relative/json/cred/path"),
+					VerifyRequest("GET", "/api/v1/data", "path="),
+					RespondWith(http.StatusOK, credentialListJson),
+				),
+				CombineHandlers(
+					VerifyRequest("GET", "/api/v1/data", "current=true&name=/relative/json/cred/path"),
 					RespondWith(http.StatusOK, responseJson),
 				),
 			)
@@ -129,8 +155,13 @@ static-value: a normal string`
 			templateFile.WriteString(templateText)
 
 			responseCertJson := fmt.Sprintf(CERTIFICATE_CREDENTIAL_ARRAY_RESPONSE_JSON, "test-cert", "", "-----BEGIN FAKE CERTIFICATE-----\\n-----END FAKE CERTIFICATE-----", "-----BEGIN FAKE RSA PRIVATE KEY-----\\n-----END FAKE RSA PRIVATE KEY-----")
-
-			server.RouteToHandler("GET", "/api/v1/data",
+			credentialListJson, err := credentialsListJSON([]string{"/relative/certificate/cred/path"})
+			Expect(err).Should(BeNil())
+			server.AppendHandlers(
+				CombineHandlers(
+					VerifyRequest("GET", "/api/v1/data", "path="),
+					RespondWith(http.StatusOK, credentialListJson),
+				),
 				CombineHandlers(
 					VerifyRequest("GET", "/api/v1/data", "current=true&name=/relative/certificate/cred/path"),
 					RespondWith(http.StatusOK, responseCertJson),
@@ -157,6 +188,51 @@ static-value: a normal string
 		})
 	})
 
+	Describe("when template has different paths than prefix", func() {
+		var credentialListJson string
+		var err error
+		BeforeEach(func() {
+			credentialListJson, err = credentialsListJSON([]string{"/a/pass1", "/a/myval", "/b/pass2", "/b/pass"})
+			Expect(err).Should(BeNil())
+			server.AppendHandlers(
+				CombineHandlers(
+					VerifyRequest("GET", "/api/v1/data", "path="),
+					RespondWith(http.StatusOK, credentialListJson),
+				),
+			)
+		})
+		It("finds credential without path", func() {
+			templateFile.WriteString(`---
+/a/pass1: ((pass1))`)
+			server.AppendHandlers(
+				CombineHandlers(
+					VerifyRequest("GET", "/api/v1/data", "current=true&name=/a/pass1"),
+					RespondWith(http.StatusOK, fmt.Sprintf(STRING_CREDENTIAL_ARRAY_RESPONSE_JSON, "value", "a/pass1", "pass1")),
+				),
+			)
+			session = runCommand("interpolate", "-f", templateFile.Name(), "-p=/a")
+			Eventually(session).Should(gexec.Exit(0))
+			Expect(string(session.Out.Contents())).To(MatchYAML(`
+/a/pass1: pass1
+`))
+		})
+
+		It("finds credential in different path", func() {
+			templateFile.WriteString(`---
+/b/pass: ((/b/pass))`)
+			server.AppendHandlers(
+				CombineHandlers(
+					VerifyRequest("GET", "/api/v1/data", "current=true&name=/b/pass"),
+					RespondWith(http.StatusOK, fmt.Sprintf(STRING_CREDENTIAL_ARRAY_RESPONSE_JSON, "value", "b/pass", "pass")),
+				),
+			)
+			session = runCommand("interpolate", "-f", templateFile.Name(), "-p=/a")
+			Eventually(session).Should(gexec.Exit(0))
+			Expect(string(session.Out.Contents())).To(MatchYAML(`
+/b/pass: pass
+`))
+		})
+	})
 	Describe("Errors", func() {
 		Context("when no template file is provided", func() {
 			BeforeEach(func() {
@@ -179,6 +255,16 @@ static-value: a normal string
 		})
 
 		Context("when the template file is empty", func() {
+			BeforeEach(func() {
+				credentialListJson, err := credentialsListJSON([]string{""})
+				Expect(err).Should(BeNil())
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest("GET", "/api/v1/data", "path="),
+						RespondWith(http.StatusOK, credentialListJson),
+					),
+				)
+			})
 			It("ignores it and returns 0", func() {
 				session := runCommand("interpolate", "-f", templateFile.Name())
 				Eventually(session).Should(gexec.Exit(0), "interpolate should returned 0")
@@ -190,6 +276,14 @@ static-value: a normal string
 				templateText = `---
 yaml-key-with-static-value: a normal string`
 				templateFile.WriteString(templateText)
+				credentialListJson, err := credentialsListJSON([]string{""})
+				Expect(err).Should(BeNil())
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest("GET", "/api/v1/data", "path="),
+						RespondWith(http.StatusOK, credentialListJson),
+					),
+				)
 			})
 			It("succeeds and prints the template to stdout", func() {
 				session := runCommand("interpolate", "-f", templateFile.Name())
@@ -204,6 +298,14 @@ yaml-key-with-static-value: a normal string`
 invalid-key: {{invalid}}
 `
 				templateFile.WriteString(templateText)
+				credentialListJson, err := credentialsListJSON([]string{""})
+				Expect(err).Should(BeNil())
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest("GET", "/api/v1/data", "path="),
+						RespondWith(http.StatusOK, credentialListJson),
+					),
+				)
 			})
 			It("errors and returns 1", func() {
 				session := runCommand("interpolate", "-f", templateFile.Name())
@@ -218,9 +320,15 @@ yaml-key-with-template-value: ((relative/cred/path))
 yaml-key-with-static-value: a normal string`
 				templateFile.WriteString(templateText)
 
-				server.RouteToHandler("GET", "/api/v1/data",
+				credentialListJson, err := credentialsListJSON([]string{"/relative/cred/path"})
+				Expect(err).Should(BeNil())
+				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest("GET", "/api/v1/data", "current=true&name=relative/cred/path"),
+						VerifyRequest("GET", "/api/v1/data", "path="),
+						RespondWith(http.StatusOK, credentialListJson),
+					),
+					CombineHandlers(
+						VerifyRequest("GET", "/api/v1/data", "current=true&name=/relative/cred/path"),
 						RespondWith(http.StatusOK, `{"data":[]}`),
 					),
 				)
@@ -232,5 +340,74 @@ yaml-key-with-static-value: a normal string`
 				Expect(session.Err).To(Say("Finding variable 'relative/cred/path': response did not contain any credentials"))
 			})
 		})
+
+		Context("when skip is specified", func() {
+			BeforeEach(func() {
+				templateText = `---
+yaml-key-with-template-value: ((not_a_cred))
+yaml-key-with-static-value: a normal string`
+				templateFile.WriteString(templateText)
+
+				credentialListJson, err := credentialsListJSON([]string{""})
+				Expect(err).Should(BeNil())
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest("GET", "/api/v1/data", "path="),
+						RespondWith(http.StatusOK, credentialListJson),
+					),
+				)
+			})
+
+			It("succeeds and prints out same yaml", func() {
+				session = runCommand("interpolate", "-f", templateFile.Name(), "-s")
+				Eventually(session).Should(gexec.Exit(0))
+				Expect(string(session.Out.Contents())).To(MatchYAML(`
+yaml-key-with-template-value: ((not_a_cred))
+yaml-key-with-static-value: a normal string`))
+			})
+		})
+
+		Context("when the file has invalid yaml", func() {
+			It("prints an error that says there is invalid yaml", func() {
+				templateText = `key: - value`
+				templateFile.WriteString(templateText)
+
+				credentialListJson, err := credentialsListJSON([]string{""})
+				Expect(err).Should(BeNil())
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest("GET", "/api/v1/data", "path="),
+						RespondWith(http.StatusOK, credentialListJson),
+					),
+				)
+
+				session = runCommand("interpolate", "-f", templateFile.Name())
+				Eventually(session).Should(gexec.Exit(1))
+			})
+		})
+	})
+
+	Describe("Empty file", func() {
+		Context("when the template file is empty", func() {
+			It("does not throw an error", func() {
+				session := runCommand("interpolate", "-f", templateFile.Name())
+				Eventually(session).Should(gexec.Exit(0))
+			})
+		})
 	})
 })
+
+func credentialsListJSON(names []string) (string, error) {
+	type creds struct {
+		Name string `json:"name"`
+	}
+	type credholder struct {
+		Credentials []creds `json:"credentials"`
+	}
+	holder := &credholder{}
+	for _, name := range names {
+		holder.Credentials = append(holder.Credentials, creds{Name: name})
+	}
+	bytes, err := json.Marshal(holder)
+	return string(bytes), err
+}

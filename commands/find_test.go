@@ -20,7 +20,16 @@ var _ = Describe("Find", func() {
 
 	ItRequiresAuthentication("find", "-n", "test-credential")
 	ItRequiresAnAPIToBeSet("find", "-n", "test-credential")
-	ItAutomaticallyLogsIn("GET", "find_response.json", "/api/v1/data", "find")
+
+	testAutoLogIns := []TestAutoLogin{
+		{
+			method:              "GET",
+			responseFixtureFile: "find_response.json",
+			responseStatus:      http.StatusOK,
+			endpoint:            "/api/v1/data",
+		},
+	}
+	ItAutomaticallyLogsIn(testAutoLogIns, "find")
 
 	Describe("Help", func() {
 		ItBehavesLikeHelp("find", "f", func(session *Session) {

@@ -60,8 +60,11 @@ const USER_CREDENTIAL_ARRAY_RESPONSE_JSON = `{"data":[` + USER_CREDENTIAL_RESPON
 
 const MULTIPLE_CERTIFICATE_CREDENTIAL_ARRAY_RESPONSE_JSON = `{"data":[` + CERTIFICATE_CREDENTIAL_RESPONSE_JSON + `,` + CERTIFICATE_CREDENTIAL_RESPONSE_JSON + `]}`
 const MULTIPLE_STRING_CREDENTIAL_ARRAY_RESPONSE_JSON = `{"data":[` + STRING_CREDENTIAL_RESPONSE_JSON + `,` + STRING_CREDENTIAL_RESPONSE_JSON + `]}`
-const MULTIPLE_RSA_SSH_CREDENTIAL_ARRAY_RESPONSE_JSON = `{"data":[` + RSA_CREDENTIAL_RESPONSE_JSON + `,` + RSA_CREDENTIAL_RESPONSE_JSON+ `]}`
+const MULTIPLE_RSA_SSH_CREDENTIAL_ARRAY_RESPONSE_JSON = `{"data":[` + RSA_CREDENTIAL_RESPONSE_JSON + `,` + RSA_CREDENTIAL_RESPONSE_JSON + `]}`
 const MULTIPLE_USER_CREDENTIAL_ARRAY_RESPONSE_JSON = `{"data":[` + USER_CREDENTIAL_RESPONSE_JSON + `,` + USER_CREDENTIAL_RESPONSE_JSON + `]}`
+
+const ADD_PERMISSIONS_REQUEST_JSON = `{"path":"%s","actor":"%s","operations":%s}`
+const PERMISSIONS_RESPONSE_JSON = `{"uuid":"` + UUID + `","path":"%s","actor":"%s","operations":%s}`
 
 var responseMyValuePotatoesJson = fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_JSON, "value", "my-value", "potatoes")
 var responseMyPasswordPotatoesJson = fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_JSON, "password", "my-password", "potatoes")
@@ -199,10 +202,12 @@ func runCommandWithStdin(stdin io.Reader, args ...string) *Session {
 
 func setupUAAConfig(uaaResponseStatus int) {
 	cfg := config.Config{
-		RefreshToken: "5b9c9fd51ba14838ac2e6b222d487106-r",
-		AccessToken:  "e30K.eyJqdGkiOiIxIn0K.e30K",
-		AuthURL:      authServer.URL(),
-		ApiURL:       server.URL(),
+		ConfigWithoutSecrets: config.ConfigWithoutSecrets{
+			RefreshToken: "5b9c9fd51ba14838ac2e6b222d487106-r",
+			AccessToken:  "e30K.eyJqdGkiOiIxIn0K.e30K",
+			AuthURL:      authServer.URL(),
+			ApiURL:       server.URL(),
+		},
 	}
 
 	Expect(cfg.UpdateTrustedCAs([]string{"../test/auth-tls-ca.pem", "../test/server-tls-ca.pem"})).To(Succeed())
@@ -304,12 +309,21 @@ func ItRequiresAnAPIToBeSet(args ...string) {
 	})
 }
 
-func ItAutomaticallyLogsIn(method string, responseFixtureFile string, endpoint string, args ...string) {
-	var serverResponse string
+type TestAutoLogin struct {
+	method              string
+	responseFixtureFile string
+	responseStatus      int
+	endpoint            string
+}
+
+func ItAutomaticallyLogsIn(autoLogins []TestAutoLogin, args ...string) {
+	var serverResponse = make([]string, len(autoLogins))
 	Describe("automatic authentication", func() {
 		BeforeEach(func() {
-			buf, _ := ioutil.ReadFile(filepath.Join("testdata", responseFixtureFile))
-			serverResponse = string(buf)
+			for i, autoLogin := range autoLogins {
+				buf, _ := ioutil.ReadFile(filepath.Join("testdata", autoLogin.responseFixtureFile))
+				serverResponse[i] = string(buf)
+			}
 		})
 		AfterEach(func() {
 			server.Reset()
@@ -317,15 +331,17 @@ func ItAutomaticallyLogsIn(method string, responseFixtureFile string, endpoint s
 
 		Context("with correct environment and unauthenticated", func() {
 			BeforeEach(func() {
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(method, endpoint),
-						VerifyHeader(http.Header{
-							"Authorization": []string{"Bearer 2YotnFZFEjr1zCsicMWpAA"},
-						}),
-						RespondWith(http.StatusOK, serverResponse),
-					),
-				)
+				for i, autoLogin := range autoLogins {
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(autoLogin.method, autoLogin.endpoint),
+							VerifyHeader(http.Header{
+								"Authorization": []string{"Bearer 2YotnFZFEjr1zCsicMWpAA"},
+							}),
+							RespondWith(autoLogin.responseStatus, serverResponse[i]),
+						),
+					)
+				}
 			})
 
 			It("automatically authenticates", func() {
@@ -352,9 +368,10 @@ func ItAutomaticallyLogsIn(method string, responseFixtureFile string, endpoint s
 
 		Context("with correct environment and expired token", func() {
 			BeforeEach(func() {
+
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(method, endpoint),
+						VerifyRequest(autoLogins[0].method, autoLogins[0].endpoint),
 						VerifyHeader(http.Header{
 							"Authorization": []string{"Bearer test-access-token"},
 						}),
@@ -375,15 +392,18 @@ func ItAutomaticallyLogsIn(method string, responseFixtureFile string, endpoint s
 					),
 				)
 
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(method, endpoint),
-						VerifyHeader(http.Header{
-							"Authorization": []string{"Bearer new-token"},
-						}),
-						RespondWith(http.StatusOK, serverResponse),
-					),
-				)
+				for i, autoLogin := range autoLogins {
+
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(autoLogin.method, autoLogin.endpoint),
+							VerifyHeader(http.Header{
+								"Authorization": []string{"Bearer new-token"},
+							}),
+							RespondWith(autoLogin.responseStatus, serverResponse[i]),
+						),
+					)
+				}
 			})
 
 			It("automatically authenticates", func() {

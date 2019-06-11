@@ -35,7 +35,7 @@ func initializeCredhubClient(cfg config.Config) (*credhub.CredHub, error) {
 	return credhubClient, err
 }
 
-func printCredential(outputJson bool, v interface{}) {
+func formatOutput(outputJson bool, v interface{}) {
 	if outputJson {
 
 		s, _ := json.MarshalIndent(v, "", "\t")
