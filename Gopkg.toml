@@ -48,7 +48,7 @@ required = ["github.com/onsi/ginkgo/ginkgo"]
 
 [[constraint]]
   name = "github.com/cloudfoundry/socks5-proxy"
-  revision = "3c6b4eec9c2d16c1dac4c42bdb5f755ba09daff8"
+  version = "0.2.0"
 
 [prune]
   go-tests = true

@@ -46,7 +46,7 @@ func httpsClient(insecureSkipVerify bool, rootCAs *x509.CertPool, cert *tls.Cert
 	var dialer = SOCKS5DialFuncFromEnvironment((&net.Dialer{
 		Timeout:   30 * time.Second,
 		KeepAlive: 30 * time.Second,
-	}).Dial, proxy.NewSocks5Proxy(proxy.NewHostKey(), nil))
+	}).Dial, proxy.NewSocks5Proxy(proxy.NewHostKey(), nil, 30 * time.Second))
 
 	client.Transport = &http.Transport{
 		TLSClientConfig: &tls.Config{
