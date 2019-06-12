@@ -27,9 +27,11 @@ var _ = Describe("Certificates", func() {
 
 	})
 
-	It("gets all certificate metadata", func() {
-		responseString :=
-			`{"certificates": [
+	Context("getting certificate metadata", func() {
+		Describe("when there is data returned", func() {
+			It("marshals it properly", func() {
+				responseString :=
+					`{"certificates": [
 				{
 				  "id": "some-id",
 				  "name": "/some-cert",
@@ -62,33 +64,88 @@ var _ = Describe("Certificates", func() {
 				  ]
 				}
 			]}`
-		dummyAuth := &DummyAuth{Response: &http.Response{
-			StatusCode: http.StatusOK,
-			Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
-		}}
+				dummyAuth := &DummyAuth{Response: &http.Response{
+					StatusCode: http.StatusOK,
+					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
+				}}
 
-		ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
+				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
 
-		metadata, err := ch.GetAllCertificatesMetadata()
+				metadata, err := ch.GetAllCertificatesMetadata()
 
-		Expect(err).To(BeNil())
-		Expect(metadata[0].Id).To(Equal("some-id"))
-		Expect(metadata[0].Name).To(Equal("/some-cert"))
-		Expect(metadata[0].SignedBy).To(Equal("/some-cert"))
-		Expect(metadata[0].Signs[0]).To(Equal("/another-cert"))
-		Expect(metadata[0].Versions[0].Id).To(Equal("some-version-id"))
-		Expect(metadata[0].Versions[0].ExpiryDate).To(Equal("2020-05-29T12:33:50Z"))
-		Expect(metadata[0].Versions[0].Transitional).To(BeFalse())
-		Expect(metadata[0].Versions[1].Id).To(Equal("some-other-version-id"))
-		Expect(metadata[0].Versions[1].ExpiryDate).To(Equal("2020-05-29T12:33:50Z"))
-		Expect(metadata[0].Versions[1].Transitional).To(BeTrue())
-		Expect(metadata[1].Id).To(Equal("some-other-id"))
-		Expect(metadata[1].Name).To(Equal("/some-other-cert"))
-		Expect(metadata[1].SignedBy).To(Equal("/some-cert"))
-		Expect(metadata[1].Signs).To(Equal([]string{}))
-		Expect(metadata[1].Versions[0].Id).To(Equal("some-other-other-version-id"))
-		Expect(metadata[1].Versions[0].ExpiryDate).To(Equal("2020-05-29T12:33:50Z"))
-		Expect(metadata[1].Versions[0].Transitional).To(BeFalse())
+				Expect(err).To(BeNil())
+				Expect(metadata[0].Id).To(Equal("some-id"))
+				Expect(metadata[0].Name).To(Equal("/some-cert"))
+				Expect(metadata[0].SignedBy).To(Equal("/some-cert"))
+				Expect(metadata[0].Signs[0]).To(Equal("/another-cert"))
+				Expect(metadata[0].Versions[0].Id).To(Equal("some-version-id"))
+				Expect(metadata[0].Versions[0].ExpiryDate).To(Equal("2020-05-29T12:33:50Z"))
+				Expect(metadata[0].Versions[0].Transitional).To(BeFalse())
+				Expect(metadata[0].Versions[1].Id).To(Equal("some-other-version-id"))
+				Expect(metadata[0].Versions[1].ExpiryDate).To(Equal("2020-05-29T12:33:50Z"))
+				Expect(metadata[0].Versions[1].Transitional).To(BeTrue())
+				Expect(metadata[1].Id).To(Equal("some-other-id"))
+				Expect(metadata[1].Name).To(Equal("/some-other-cert"))
+				Expect(metadata[1].SignedBy).To(Equal("/some-cert"))
+				Expect(metadata[1].Signs).To(Equal([]string{}))
+				Expect(metadata[1].Versions[0].Id).To(Equal("some-other-other-version-id"))
+				Expect(metadata[1].Versions[0].ExpiryDate).To(Equal("2020-05-29T12:33:50Z"))
+				Expect(metadata[1].Versions[0].Transitional).To(BeFalse())
+			})
+		})
+
+		Describe("when no certificates are returned", func() {
+			It("returns empty array", func() {
+				responseString :=
+					`{"certificates": []}`
+
+				dummyAuth := &DummyAuth{Response: &http.Response{
+					StatusCode: http.StatusOK,
+					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
+				}}
+
+				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
+				metadata, err := ch.GetAllCertificatesMetadata()
+
+				Expect(err).To(BeNil())
+				Expect(len(metadata)).To(Equal(0))
+			})
+		})
+
+		Describe("when certificates key is missing", func() {
+			It("returns empty array", func() {
+				responseString :=
+					`{}`
+
+				dummyAuth := &DummyAuth{Response: &http.Response{
+					StatusCode: http.StatusOK,
+					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
+				}}
+
+				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
+				metadata, err := ch.GetAllCertificatesMetadata()
+
+				Expect(err).To(BeNil())
+				Expect(len(metadata)).To(Equal(0))
+			})
+		})
+
+		Describe("when response is empty", func() {
+			It("returns error", func() {
+				responseString := ``
+
+				dummyAuth := &DummyAuth{Response: &http.Response{
+					StatusCode: http.StatusOK,
+					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
+				}}
+
+				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
+				metadata, err := ch.GetAllCertificatesMetadata()
+
+				Expect(err).ToNot(BeNil())
+				Expect(err.Error()).To(ContainSubstring("The response body could not be decoded"))
+				Expect(metadata).To(BeNil())
+			})
+		})
 	})
-
 })

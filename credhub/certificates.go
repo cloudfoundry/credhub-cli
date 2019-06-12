@@ -35,7 +35,7 @@ func (ch *CredHub) makeGetAllCertificatesRequest() ([]credentials.CertificateMet
 	var data []credentials.CertificateMetadata
 
 	if data, ok = response["certificates"]; !ok || len(data) == 0 {
-		return nil, newCredhubError("response did not contain any credentials", "")
+		return []credentials.CertificateMetadata{}, nil
 	}
 
 	return data, nil
