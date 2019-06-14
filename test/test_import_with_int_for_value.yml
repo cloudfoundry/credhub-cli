@@ -1,0 +1,4 @@
+credentials:
+  - name: /test/intStringValue
+    type: value
+    value: 123

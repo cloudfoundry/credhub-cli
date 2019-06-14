@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"strconv"
 
 	"os"
 
@@ -53,6 +54,10 @@ func (c *ImportCommand) setCredentials(bulkImport models.CredentialBulkImport) e
 		case "user":
 			if _, ok := credential["value"].(map[string]interface{})["password_hash"]; ok {
 				delete(credential["value"].(map[string]interface{}), "password_hash")
+			}
+		case "value":
+			if reflect.TypeOf(credential["value"]).Kind() == reflect.Int {
+				credential["value"] = strconv.Itoa(credential["value"].(int))
 			}
 		}
 

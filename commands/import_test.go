@@ -150,6 +150,21 @@ Failed to set: 0
 `))
 		})
 	})
+
+	Describe("when importing a value as a YAML integer", func() {
+		It("casts int to string and successfully imports", func() {
+			SetupPutValueServer("/test/intStringValue", "value", "123")
+
+			session := runCommand("import", "-f", "../test/test_import_with_int_for_value.yml")
+
+			Eventually(session).Should(Exit(0))
+
+			Expect(string(session.Out.Contents())).To(Equal(`Import complete.
+Successfully set: 1
+Failed to set: 0
+`))
+		})
+	})
 })
 
 func setUpImportRequests() {
