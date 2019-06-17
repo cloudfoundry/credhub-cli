@@ -112,7 +112,7 @@ var _ = Describe("Permissions", func() {
 	}`
 
 				dummy := &DummyAuth{Response: &http.Response{
-					StatusCode: http.StatusCreated,
+					StatusCode: http.StatusOK,
 					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
 				}}
 				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.1.2"))
@@ -129,27 +129,31 @@ var _ = Describe("Permissions", func() {
 
 				Expect(actualPermissions).To(Equal(&expectedPermission))
 			})
-
 		})
 
-		Context("if permissions does not exists", func() {
-			It("returns empty permission", func() {
-				responseString := `{
-  "error": "The request could not be completed because the permission does not exist or you do not have sufficient authorization."
-}`
+		Context("if permissions does not exist", func() {
+			It("returns a not found error", func() {
 
 				dummy := &DummyAuth{Response: &http.Response{
-					StatusCode: http.StatusCreated,
-					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
+					StatusCode: http.StatusNotFound,
+					Body:       ioutil.NopCloser(bytes.NewBufferString(`{"error": "The request could not be completed because the permission does not exist or you do not have sufficient authorization."}`)),
 				}}
 				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.1.2"))
 
-				actualPermissions, err := ch.GetPermissionByPathActor("/path", "some-actor")
-				Expect(err).NotTo(HaveOccurred())
+				_, err := ch.GetPermissionByPathActor("/path", "some-actor")
+				Expect(err).To(BeAssignableToTypeOf(&NotFoundError{}))
+			})
+		})
+		Context("if CredHub returns a 500 error", func() {
+			It("returns a CredHub error", func() {
+				dummy := &DummyAuth{Response: &http.Response{
+					StatusCode: http.StatusInternalServerError,
+					Body:       ioutil.NopCloser(bytes.NewBufferString(`{"error": "some-error"}`)),
+				}}
+				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.1.2"))
 
-				expectedPermission := permissions.Permission{}
-
-				Expect(actualPermissions).To(Equal(&expectedPermission))
+				_, err := ch.GetPermissionByPathActor("/path", "some-actor")
+				Expect(err).To(BeAssignableToTypeOf(&Error{}))
 			})
 		})
 	})

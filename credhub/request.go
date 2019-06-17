@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"net/http"
 	"net/http/httputil"
@@ -79,15 +78,23 @@ func (ch *CredHub) request(client requester, method string, pathStr string, quer
 func (ch *CredHub) checkForServerError(resp *http.Response) error {
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		defer resp.Body.Close()
-		defer io.Copy(ioutil.Discard, resp.Body)
-		dec := json.NewDecoder(resp.Body)
-
-		respErr := &Error{}
-
-		if err := dec.Decode(&respErr); err != nil {
-			return errors.New("The response body could not be decoded: " + err.Error())
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return errors.New("The response body could not be read: " + err.Error())
 		}
 
+		var respErr error
+
+		switch resp.StatusCode {
+		case http.StatusNotFound:
+			respErr = &NotFoundError{}
+		default:
+			respErr = &Error{}
+		}
+
+		if err := json.Unmarshal(body, &respErr); err != nil {
+			return errors.New("The response body could not be decoded: " + err.Error())
+		}
 		return respErr
 	}
 

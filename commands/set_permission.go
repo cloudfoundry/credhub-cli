@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"code.cloudfoundry.org/credhub-cli/credhub"
 	"fmt"
 	"strings"
 )
@@ -51,10 +52,10 @@ func (c *SetPermissionCommand) Execute([]string) error {
 	}
 
 	permission, err := c.client.GetPermissionByPathActor(c.Path, c.Actor)
-	notFoundError := "The request could not be completed because the permission does not exist or you do not have sufficient authorization."
 
 	if err != nil {
-		if err.Error() == notFoundError {
+		_, isNotFoundError := err.(*credhub.NotFoundError)
+		if isNotFoundError {
 			return c.addPermission()
 		} else {
 			return err
