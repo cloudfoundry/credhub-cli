@@ -415,7 +415,9 @@ version_created_at: '2017-01-01T04:07:18Z'`
         {
           "expiry_date": "2020-05-29T12:33:50Z",
           "id": "some-other-id",
-          "transitional": false
+          "transitional": false,
+		  "certificate_authority": true,
+		  "self_signed": true
         }
       ]
     }`
@@ -430,6 +432,8 @@ versions:
 - expiry_date: '2020-05-29T12:33:50Z'
   id: some-other-id
   transitional: false
+  certificate_authority: true
+  self_signed: true
 `
 
 			err := json.Unmarshal([]byte(metadataJson), &certMetadata)
@@ -439,7 +443,9 @@ versions:
 			jsonVersionString := `{
           "expiry_date": "2020-05-29T12:33:50Z",
           "id": "some-other-id",
-          "transitional": false
+          "transitional": false,
+          "certificate_authority": true,
+		  "self_signed": true
         }`
 			var jsonVersion CertificateMetadataVersion
 			err = json.Unmarshal([]byte(jsonVersionString), &jsonVersion)

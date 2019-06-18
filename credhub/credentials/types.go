@@ -102,7 +102,9 @@ type CertificateMetadata struct {
 }
 
 type CertificateMetadataVersion struct {
-	Id           string `json:"id" yaml:"id"`
-	ExpiryDate   string `json:"expiry_date" yaml:"expiry_date"`
-	Transitional bool   `json:"transitional" yaml:"transitional"`
+	Id                   string `json:"id" yaml:"id"`
+	ExpiryDate           string `json:"expiry_date" yaml:"expiry_date"`
+	Transitional         bool   `json:"transitional" yaml:"transitional"`
+	CertificateAuthority bool   `json:"certificate_authority" yaml:"certificate_authority"`
+	SelfSigned           bool   `json:"self_signed" yaml:"self_signed"`
 }
