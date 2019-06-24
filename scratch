@@ -1,0 +1,29 @@
+root
+int1
+int2
+int3
+leaf
+
+___________________
+
+int2 -> int1 -> int3 ->root -> leaf
+
+map<cert:ca> certsMap{
+  int2:int1
+  int1:root
+  int3:int2
+  leaf:int3
+}
+
+for cert in keyset(certsMap) {
+  import(cert)
+}
+
+private import(cert) {
+  ca = certmap(cert)
+  if (certmap.contains(ca) {
+    import(ca)
+  }
+  setInCredhub(cert)
+  certmap.delete(cert)
+}

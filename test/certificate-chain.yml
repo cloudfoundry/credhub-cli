@@ -1,0 +1,19 @@
+credentials:
+  - name: /leaf_cert
+    type: certificate
+    value:
+      ca_name: /intermediate_ca
+      certificate: leaf certificate
+      private_key: leaf private key
+  - name: /intermediate_ca
+    type: certificate
+    value:
+      ca_name: /root_ca
+      certificate: intermediate certificate
+      private_key: intermediate private key
+  - name: /root_ca
+    type: certificate
+    value:
+      ca: root ca
+      certificate: root certificate
+      private_key: root private key

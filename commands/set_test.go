@@ -610,6 +610,18 @@ func SetupPutCertificateWithCaNameServer(name, caName, cert, priv string) {
 	)
 }
 
+func SetupPutCertificateWithCaNameForImportServer(name, caName, cert, priv string) {
+	var jsonRequest string
+	jsonRequest = fmt.Sprintf(CERTIFICATE_CREDENTIAL_WITH_NAMED_CA_REQUEST_JSON_FOR_IMPORT, name, caName, cert, priv)
+	server.AppendHandlers(
+		CombineHandlers(
+			VerifyRequest("PUT", "/api/v1/data"),
+			VerifyJSON(jsonRequest),
+			RespondWith(http.StatusOK, fmt.Sprintf(CERTIFICATE_CREDENTIAL_RESPONSE_JSON, name, "known-ca-value", cert, priv)),
+		),
+	)
+}
+
 func SetupPutUserServer(name, value, username, password, passwordHash string) {
 	var jsonRequest string
 	jsonRequest = fmt.Sprintf(USER_SET_CREDENTIAL_REQUEST_JSON, name, value)

@@ -17,6 +17,17 @@ type ImportCommand struct {
 	ClientCommand
 }
 
+type CaAndIndex struct {
+	Ca    string
+	Index int
+}
+
+type ErrorInfo struct {
+	Successful   int
+	Failed       int
+	ImportErrors []string
+}
+
 func (c *ImportCommand) Execute([]string) error {
 	var bulkImport models.CredentialBulkImport
 	err := bulkImport.ReadFile(c.File)
@@ -32,11 +43,10 @@ func (c *ImportCommand) Execute([]string) error {
 
 func (c *ImportCommand) setCredentials(bulkImport models.CredentialBulkImport) error {
 	var (
-		name       string
-		successful int
-		failed     int
+		name      string
+		errorInfo = ErrorInfo{}
 	)
-	importErrors := make([]string, 0)
+	certsWithCaName := make(map[string]CaAndIndex)
 
 	for i, credential := range bulkImport.Credentials {
 		switch credentialName := credential["name"].(type) {
@@ -46,6 +56,8 @@ func (c *ImportCommand) setCredentials(bulkImport models.CredentialBulkImport) e
 			name = ""
 		}
 
+		var certWithCaName bool
+		var caName string
 		switch credential["type"].(string) {
 		case "ssh":
 			if _, ok := credential["value"].(map[string]interface{})["public_key_fingerprint"]; ok {
@@ -59,32 +71,35 @@ func (c *ImportCommand) setCredentials(bulkImport models.CredentialBulkImport) e
 			if reflect.TypeOf(credential["value"]).Kind() == reflect.Int {
 				credential["value"] = strconv.Itoa(credential["value"].(int))
 			}
+		case "certificate":
+			caName, certWithCaName = credential["value"].(map[string]interface{})["ca_name"].(string)
 		}
 
-		_, err := c.client.SetCredential(name, credential["type"].(string), credential["value"])
-
-		if err != nil {
-			if isAuthenticationError(err) {
+		if certWithCaName {
+			certsWithCaName[name] = CaAndIndex{caName, i}
+		} else {
+			err := c.setCredentialInCredHub(name, credential["type"].(string), credential["value"], &errorInfo, i)
+			if err != nil {
 				return err
 			}
-			failure := fmt.Sprintf("Credential '%s' at index %d could not be set: %v", name, i, err)
-			fmt.Println(failure + "\n")
-			importErrors = append(importErrors, " - "+failure)
-			failed++
-			continue
-		} else {
-			successful++
+		}
+	}
+
+	for signedCert := range certsWithCaName {
+		err := c.importCert(signedCert, certsWithCaName, bulkImport.Credentials, &errorInfo)
+		if err != nil {
+			return err
 		}
 	}
 
 	fmt.Println("Import complete.")
-	fmt.Fprintf(os.Stdout, "Successfully set: %d\n", successful)
-	fmt.Fprintf(os.Stdout, "Failed to set: %d\n", failed)
-	for _, v := range importErrors {
+	_, _ = fmt.Fprintf(os.Stdout, "Successfully set: %d\n", errorInfo.Successful)
+	_, _ = fmt.Fprintf(os.Stdout, "Failed to set: %d\n", errorInfo.Failed)
+	for _, v := range errorInfo.ImportErrors {
 		fmt.Println(v)
 	}
 
-	if failed > 0 {
+	if errorInfo.Failed > 0 {
 		return errors.NewFailedToImportError()
 	}
 
@@ -95,4 +110,38 @@ func isAuthenticationError(err error) bool {
 	return reflect.DeepEqual(err, errors.NewNoApiUrlSetError()) ||
 		reflect.DeepEqual(err, errors.NewRevokedTokenError()) ||
 		reflect.DeepEqual(err, errors.NewRefreshError())
+}
+
+func (c *ImportCommand) setCredentialInCredHub(name, credType string, value interface{}, errorInfo *ErrorInfo, index int) error {
+	_, err := c.client.SetCredential(name, credType, value)
+
+	if err != nil {
+		if isAuthenticationError(err) {
+			return err
+		}
+		failure := fmt.Sprintf("Credential '%s' at index %d could not be set: %v", name, index, err)
+		fmt.Println(failure + "\n")
+		errorInfo.ImportErrors = append(errorInfo.ImportErrors, " - "+failure)
+		errorInfo.Failed++
+	} else {
+		errorInfo.Successful++
+	}
+	return nil
+}
+
+func (c *ImportCommand) importCert(cert string, certs map[string]CaAndIndex, credentials []map[string]interface{}, errorInfo *ErrorInfo) error {
+	caAndIndex, certNotImported := certs[cert]
+	if !certNotImported {
+		return nil
+	}
+	_, caNotImported := certs[caAndIndex.Ca]
+	if caNotImported {
+		err := c.importCert(caAndIndex.Ca, certs, credentials, errorInfo)
+		if err != nil {
+			return err
+		}
+	}
+	delete(certs, cert)
+	credential := credentials[caAndIndex.Index]
+	return c.setCredentialInCredHub(cert, credential["type"].(string), credential["value"], errorInfo, caAndIndex.Index)
 }

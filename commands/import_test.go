@@ -165,6 +165,33 @@ Failed to set: 0
 `))
 		})
 	})
+
+	Describe("when importing certificate chain", func() {
+		Context("and leaf comes after signing CA", func() {
+			It("imports the signing CA first", func() {
+				SetupPutCertificateServer("/root_ca",
+					"root ca",
+					"root certificate",
+					"root private key")
+				SetupPutCertificateWithCaNameForImportServer("/intermediate_ca",
+					"/root_ca",
+					"intermediate certificate",
+					"intermediate private key")
+				SetupPutCertificateWithCaNameForImportServer("/leaf_cert",
+					"/intermediate_ca",
+					"leaf certificate",
+					"leaf private key")
+
+				session := runCommand("import", "-f", "../test/certificate-chain.yml")
+				Eventually(session).Should(Exit(0))
+				Expect(string(session.Out.Contents())).To(Equal(`Import complete.
+Successfully set: 3
+Failed to set: 0
+`))
+
+			})
+		})
+	})
 })
 
 func setUpImportRequests() {
