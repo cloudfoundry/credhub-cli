@@ -1,6 +1,7 @@
 package credhub_test
 
 import (
+	"crypto/tls"
 	"crypto/x509"
 	"io/ioutil"
 	"net/http"
@@ -30,6 +31,18 @@ var _ = Describe("Client()", func() {
 			dialer := transport.Dial
 
 			Expect(dialer).NotTo(BeNil())
+		})
+	})
+
+	Context("TLS configuration", func() {
+		It("should require a minimum TLS version of 1.2", func() {
+			ch, err := New("https://example.com")
+			Expect(err).NotTo(HaveOccurred())
+			client := ch.Client()
+			transport := client.Transport.(*http.Transport)
+
+			tlsConfig := transport.TLSClientConfig
+			Expect(tlsConfig.MinVersion).To(Equal(uint16(tls.VersionTLS12)))
 		})
 	})
 

@@ -54,6 +54,7 @@ func httpsClient(insecureSkipVerify bool, rootCAs *x509.CertPool, cert *tls.Cert
 			PreferServerCipherSuites: true,
 			Certificates:             certs,
 			RootCAs:                  rootCAs,
+			MinVersion:               tls.VersionTLS12,
 		},
 		Proxy:               http.ProxyFromEnvironment,
 		Dial:                dialer,
