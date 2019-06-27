@@ -127,7 +127,7 @@ func (c *LoginCommand) Execute([]string) error {
 	}
 
 	if c.ServerUrl != "" {
-		PrintWarnings(c.ServerUrl, c.SkipTlsValidation)
+		PrintWarnings(c.config.ApiURL, c.SkipTlsValidation)
 		fmt.Println("Setting the target url:", c.config.ApiURL)
 	}
 
