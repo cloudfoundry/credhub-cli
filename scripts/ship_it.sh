@@ -43,6 +43,10 @@ function start_background_server(){
     popd
 }
 
+function unset_env() {
+    eval "$(env | grep "\(BOSH\|CREDHUB\)" | cut -f1 -d= | xargs -n1 echo unset)"
+}
+
 function check_for_local_server(){
     echo "Checking for locally running server"
     if curl -s https://localhost:9000/health --insecure > /dev/null; then
@@ -81,9 +85,11 @@ function display_ascii_success_message() {
 }
 
 function main() {
+    PID=
     set_bash_error_handling
     go_to_project_root_directory
     check_ssh_key
+    unset_env
     check_for_local_server
 
     run_linters
