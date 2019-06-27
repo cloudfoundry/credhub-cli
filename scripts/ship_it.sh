@@ -18,14 +18,13 @@ function check_ssh_key() {
 }
 
 function run_linters() {
-    go fmt $(go list ./... | grep -v /vendor/)
+    ./scripts/lint.sh
 }
 
-
 function login_to_local_credhub(){
-   echo "Logging in to CredHub"
-   credhub a https://localhost:9000 --skip-tls-validation
-   credhub l -u credhub -p password
+    echo "Logging in to CredHub"
+    credhub a https://localhost:9000 --skip-tls-validation
+    credhub l -u credhub -p password
 }
 
 function start_background_server(){
@@ -45,22 +44,22 @@ function start_background_server(){
 }
 
 function check_for_local_server(){
-   echo "Checking for locally running server"
-   if curl -s https://localhost:9000/health --insecure > /dev/null; then
+    echo "Checking for locally running server"
+    if curl -s https://localhost:9000/health --insecure > /dev/null; then
       echo "Found locally running CredHub"
-   else
+    else
       echo "CredHub is not running, attempting to start"
       start_background_server
-   fi
-   login_to_local_credhub
+    fi
+    login_to_local_credhub
 }
 
 
 function run_tests() {
-  export GOPATH=~/go
-  pushd ${GOPATH}/src/github.com/cloudfoundry-incubator/credhub-acceptance-tests
-      ./scripts/run_tests.sh
-  popd
+    export GOPATH=~/go
+    pushd ${GOPATH}/src/github.com/cloudfoundry-incubator/credhub-acceptance-tests
+        ./scripts/run_tests.sh
+    popd
 }
 
 function fail_for_uncommitted_changes() {
