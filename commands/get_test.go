@@ -112,6 +112,26 @@ var _ = Describe("Get", func() {
 			})
 		})
 
+		Context("--quiet flag with multi-line value", func() {
+			It("should not return the value with yaml formatting", func() {
+				responseJson := `{"data":[{"type":"value","id":"` + UUID + `","name":"my-value","version_created_at":"` + TIMESTAMP + `","value":"potatoes\nand\ntomatoes"}]}`
+
+				server.RouteToHandler("GET", "/api/v1/data",
+					CombineHandlers(
+						VerifyRequest("GET", "/api/v1/data", "current=true&name=my-value"),
+						RespondWith(http.StatusOK, responseJson),
+					),
+				)
+
+				session := runCommand("get", "-n", "my-value", "-q")
+
+				Eventually(session).Should(Exit(0))
+				Eventually(session.Out).Should(Say(`potatoes
+and
+tomatoes`))
+			})
+		})
+
 	})
 
 	Describe("password type", func() {

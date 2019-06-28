@@ -94,7 +94,17 @@ func (c *GetCommand) printCredential() error {
 		if c.OutputJSON {
 			return errors.NewOutputJsonAndQuietError()
 		}
-		formatOutput(c.OutputJSON, credential.Value)
+		value, ok := credential.Value.(interface{})
+		if !ok {
+			return nil
+		}
+		switch value.(type) {
+		case string:
+			fmt.Println(value)
+
+		default:
+			formatOutput(c.OutputJSON, value)
+		}
 	} else {
 		formatOutput(c.OutputJSON, credential)
 	}
