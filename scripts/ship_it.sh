@@ -84,6 +84,12 @@ function display_ascii_success_message() {
     echo -e "${green_color_code}\\n$(cat scripts/success_ascii_art.txt)"
 }
 
+function kill_server_if_started() {
+    if [[ ${PID} != "" ]]; then
+        kill ${PID}
+    fi
+}
+
 function main() {
     PID=
     set_bash_error_handling
@@ -99,7 +105,7 @@ function main() {
 
     push_code
     display_ascii_success_message
-    kill ${PID}
+    kill_server_if_started
 }
 
 main
