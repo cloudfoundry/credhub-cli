@@ -145,20 +145,6 @@ var _ = Describe("API", func() {
 
 				Eventually(session).Should(Exit(0))
 			})
-
-			It("http error is not printed when scheme is defaulted to https", func() {
-				apiServer := NewTLSServer()
-
-				apiServer.RouteToHandler("GET", "/info", RespondWith(http.StatusOK, `{
-						"app":{"name":"CredHub"},
-						"auth-server":{"url":"`+authServer.URL()+`"}
-						}`),
-				)
-
-				session := runCommand("api", apiServer.Addr())
-
-				Eventually(session).Should(Exit(0))
-			})
 		})
 
 		Context("when the provided server url's scheme is https", func() {

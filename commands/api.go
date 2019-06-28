@@ -41,7 +41,6 @@ func (c *ApiCommand) Execute([]string) error {
 		return errors.NewNoApiUrlSetError()
 	}
 	newConfig.ApiURL = util.AddDefaultSchemeIfNecessary(newConfig.ApiURL)
-	fmt.Println("Setting the target url:", newConfig.ApiURL)
 
 	caCerts, err := ReadOrGetCaCerts(c.CaCerts)
 	if err != nil {
@@ -69,6 +68,8 @@ func (c *ApiCommand) Execute([]string) error {
 	}
 
 	err = PrintWarnings(newConfig.ApiURL, newConfig.InsecureSkipVerify)
+	fmt.Println("Setting the target url:", newConfig.ApiURL)
+
 	if err != nil {
 		return err
 	}
