@@ -20,31 +20,47 @@ import (
 var _ = Describe("Set", func() {
 	Describe("SetCertificate()", func() {
 		It("requests to set the certificate", func() {
-			dummy := &DummyAuth{Response: &http.Response{
-				Body: ioutil.NopCloser(bytes.NewBufferString("")),
-			}}
+			requestBody := `
+{
+	"name":"/example-certificate",
+    "type":"certificate",
+	"value":{
+		"ca":"some-ca",
+		"ca_name":"/some-ca-name",
+		"certificate":"some-certificate",
+		"private_key":"some-private-key"
+	}
+}
+`
+			server := ghttp.NewServer()
+			server.AppendHandlers(
+				ghttp.CombineHandlers(
+					ghttp.VerifyRequest("GET", "/info"),
+					ghttp.RespondWith(http.StatusOK, `{}`),
+				),
+				ghttp.CombineHandlers(
+					ghttp.VerifyRequest("GET", "/version"),
+					ghttp.RespondWith(http.StatusOK, `{"version": "2.0.0"}`),
+				),
+				ghttp.CombineHandlers(
+					ghttp.VerifyRequest("PUT", "/api/v1/data"),
+					ghttp.VerifyJSON(requestBody),
+					ghttp.RespondWith(http.StatusOK, `{}`),
+				),
+			)
 
-			ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
+			ch, err := New(server.URL())
+
+			Expect(err).ToNot(HaveOccurred())
 
 			certificate := values.Certificate{
-				Ca:     "some-ca",
-				CaName: "/some-ca-name",
+				Ca:          "some-ca",
+				CaName:      "/some-ca-name",
+				Certificate: "some-certificate",
+				PrivateKey:  "some-private-key",
 			}
-			ch.SetCertificate("/example-certificate", certificate)
-
-			urlPath := dummy.Request.URL.Path
-			Expect(urlPath).To(Equal("/api/v1/data"))
-			Expect(dummy.Request.Method).To(Equal(http.MethodPut))
-
-			var requestBody map[string]interface{}
-			body, _ := ioutil.ReadAll(dummy.Request.Body)
-			json.Unmarshal(body, &requestBody)
-
-			Expect(requestBody["name"]).To(Equal("/example-certificate"))
-			Expect(requestBody["type"]).To(Equal("certificate"))
-
-			Expect(requestBody["value"].(map[string]interface{})["ca"]).To(Equal("some-ca"))
-			Expect(requestBody["value"].(map[string]interface{})["ca_name"]).To(Equal("/some-ca-name"))
+			_, err = ch.SetCertificate("/example-certificate", certificate)
+			Expect(err).ToNot(HaveOccurred())
 		})
 
 		Context("when server version is not provided", func() {
