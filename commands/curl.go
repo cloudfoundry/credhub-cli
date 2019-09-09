@@ -7,10 +7,12 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/url"
+	"os"
 )
 
 type CurlCommand struct {
 	Path          string `short:"p" long:"path" description:"The server endpoint to make the request against"`
+	Fail          bool 	 `short:"f" long:"fail" description:"Fail silently (no output at all) on HTTP errors"`
 	Method        string `short:"X" description:"HTTP method (default: GET)"`
 	Data          string `short:"d" description:"HTTP data to include in the request body"`
 	IncludeHeader bool   `short:"i" description:"Include the response headers in the output"`
@@ -46,6 +48,11 @@ func (c *CurlCommand) Execute([]string) error {
 	if err != nil {
 		return err
 	}
+
+	if c.Fail && response.StatusCode >= 400 && response.StatusCode < 600 {
+		os.Exit(22)
+	}
+
 	if c.IncludeHeader {
 		headers := new(bytes.Buffer)
 		err = response.Header.Write(headers)

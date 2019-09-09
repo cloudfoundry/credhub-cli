@@ -303,5 +303,53 @@ var _ = Describe("Curl", func() {
 }`))
 			})
 		})
+
+		Context("and the user provides a -f flag", func() {
+			Context("when the request fails", func() {
+				It("the request fails silently", func() {
+					//language=json
+					responseJson := `
+       				{
+					"error": "The request could not be completed because the credential does not exist or you do not have sufficient authorization."
+        			}
+      				`
+					server.RouteToHandler("GET", "/api/v1/data",
+						CombineHandlers(
+							VerifyRequest("GET", "/api/v1/data", "name=doesNotExist"),
+							RespondWith(http.StatusBadRequest, responseJson),
+						),
+					)
+
+					session := runCommand("curl", "-f", "-p", "/api/v1/data?name=doesNotExist")
+
+					Eventually(session).Should(Exit(22))
+					Eventually(session.Out.Contents()).Should(BeEmpty())
+				})
+			})
+
+			It("the request continues to succeed", func() {
+				responseJson := `
+				  {
+					"type": "password",
+					"version_created_at": "2018-03-06T09:10:18Z",
+					"id": "93959091-0fcd-4a2a-bedb-97d3ee0d0e87",
+					"name": "/some/cred",
+					"value": "XbD5KGiLB4pBi24WEYq857psfvMMww"
+				  }
+				`
+				body := `{"name":"/some/cred","type":"password"}`
+				server.RouteToHandler("PUT", "/api/v1/data",
+					CombineHandlers(
+						VerifyRequest("PUT", "/api/v1/data"),
+						VerifyBody([]byte(body)),
+						RespondWith(http.StatusOK, responseJson),
+					),
+				)
+
+				session := runCommand("curl", "-f", "-p", "api/v1/data", "-X", "PUT", "-d", body)
+
+				Eventually(session).Should(Exit(0))
+			})
+		})
 	})
 })
