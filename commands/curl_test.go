@@ -315,12 +315,13 @@ var _ = Describe("Curl", func() {
       				`
 					server.RouteToHandler("GET", "/api/v1/data",
 						CombineHandlers(
-							VerifyRequest("GET", "/api/v1/data", "name=doesNotExist"),
-							RespondWith(http.StatusBadRequest, responseJson),
+							VerifyRequest("GET", "/api/v1/data"),
+							VerifyForm(url.Values{"name": []string{"/doesNotExist"}}),
+							RespondWith(http.StatusNotFound, responseJson),
 						),
 					)
 
-					session := runCommand("curl", "-f", "-p", "/api/v1/data?name=doesNotExist")
+					session := runCommand("curl", "-f", "-p", "api/v1/data?name=/doesNotExist")
 
 					Eventually(session).Should(Exit(22))
 					Eventually(session.Out.Contents()).Should(BeEmpty())
