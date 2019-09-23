@@ -326,6 +326,28 @@ var _ = Describe("Curl", func() {
 					Eventually(session).Should(Exit(22))
 					Eventually(session.Out.Contents()).Should(BeEmpty())
 				})
+				Context("when request includes -i flag", func() {
+					It("displays response headers to the user and exits with proper code", func() {
+						//language=json
+						responseJson := `
+						{
+						"error": "The request could not be completed because the credential does not exist or you do not have sufficient authorization."
+						}
+						`
+						server.RouteToHandler("GET", "/api/v1/data",
+							CombineHandlers(
+								VerifyRequest("GET", "/api/v1/data"),
+								VerifyForm(url.Values{"name": []string{"/doesNotExist"}}),
+								RespondWith(http.StatusNotFound, responseJson),
+							),
+						)
+
+						session := runCommand("curl", "-f", "-p", "api/v1/data?name=/doesNotExist", "-i")
+
+						Eventually(session).Should(Exit(22))
+						Eventually(session.Out).Should(Say("HTTP/1.1 404"))
+					})
+				})
 			})
 
 			It("the request continues to succeed", func() {

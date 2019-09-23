@@ -49,10 +49,6 @@ func (c *CurlCommand) Execute([]string) error {
 		return err
 	}
 
-	if c.Fail && response.StatusCode >= 400 && response.StatusCode < 600 {
-		os.Exit(22)
-	}
-
 	if c.IncludeHeader {
 		headers := new(bytes.Buffer)
 		err = response.Header.Write(headers)
@@ -65,6 +61,10 @@ func (c *CurlCommand) Execute([]string) error {
 		fmt.Print(" ")
 		fmt.Println(response.StatusCode)
 		fmt.Println(headers.String())
+	}
+
+	if c.Fail && response.StatusCode >= 400 && response.StatusCode < 600 {
+		os.Exit(22)
 	}
 
 	body, err := ioutil.ReadAll(response.Body)
