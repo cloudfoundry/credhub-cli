@@ -3,7 +3,9 @@ package commands
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
 	"path"
+	"regexp"
 	"strings"
 
 	"code.cloudfoundry.org/credhub-cli/credhub/credentials"
@@ -53,6 +55,22 @@ func (c *InterpolateCommand) Execute([]string) error {
 	if err != nil {
 		return err
 	}
+
+	re := regexp.MustCompile(`\(\((.*)\)\)`)
+	matches := re.FindAllString(string(renderedTemplate), -1)
+
+	if len(matches) > 0 {
+		fmt.Fprint(os.Stderr, "Could not find values for:\n")
+	}
+
+	for i, line := range strings.Split(string(fileContents), "\n") {
+		for _, fullParam := range matches {
+			if strings.Contains(line, fullParam) {
+				fmt.Fprintf(os.Stderr, "%s:%d %s\n", c.File, i+1, fullParam)
+			}
+		}
+	}
+	fmt.Fprint(os.Stderr, "\n")
 
 	fmt.Println(string(renderedTemplate))
 	return nil
