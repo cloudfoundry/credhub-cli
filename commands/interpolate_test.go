@@ -233,6 +233,7 @@ static-value: a normal string
 `))
 		})
 	})
+
 	Describe("Errors", func() {
 		Context("when no template file is provided", func() {
 			BeforeEach(func() {
@@ -355,6 +356,37 @@ yaml-key-with-static-value: a normal string`))
 				session := runCommand("interpolate", "-f", templateFile.Name())
 				Eventually(session).Should(gexec.Exit(0))
 			})
+		})
+	})
+
+	Describe("when parameters could not be interpolated", func() {
+		It("prints a warning with the filename and line number of the uninterpolated parameters", func() {
+			templateText = `---
+static-value: a normal string
+value-cred: ((relative/value/cred/path))
+`
+			templateFile.WriteString(templateText)
+
+			server.AppendHandlers(
+				CombineHandlers(
+					VerifyRequest("GET", "/api/v1/data", "path="),
+					RespondWith(http.StatusOK, `{"credentials":[]}`),
+				),
+				CombineHandlers(
+					VerifyRequest("GET", "/api/v1/data", "current=true&name=/relative/value/cred/path"),
+					RespondWith(http.StatusNotFound, ``),
+				),
+			)
+
+			session = runCommand("interpolate", "-f", templateFile.Name(), "--skip-missing")
+			Eventually(session).Should(gexec.Exit(0))
+			Expect(string(session.Err.Contents())).To(ContainSubstring(fmt.Sprintf(`Could not find values for:
+
+%s:3 ((relative/value/cred/path))`, templateFile.Name())))
+			Expect(string(session.Out.Contents())).To(MatchYAML(`
+value-cred: ((relative/value/cred/path))
+static-value: a normal string
+`))
 		})
 	})
 })
