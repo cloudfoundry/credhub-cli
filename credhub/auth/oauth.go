@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -149,7 +150,7 @@ func (a *OAuthStrategy) requestToken() error {
 	}
 
 	if err != nil {
-		return errors.New("Your token has expired and could not be refreshed. Please log in again to continue.")
+		return fmt.Errorf(fmt.Sprintf("Error getting token. Your token may have expired and could not be refreshed. Please try logging in again. [%s]", err.Error()))
 	}
 
 	a.SetTokens(accessToken, refreshToken)
