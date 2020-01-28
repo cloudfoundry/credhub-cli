@@ -6,16 +6,31 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 
 	"code.cloudfoundry.org/credhub-cli/credhub/credentials"
 )
 
 func (ch *CredHub) GetAllCertificatesMetadata() ([]credentials.CertificateMetadata, error) {
-	return ch.makeGetAllCertificatesRequest()
+	query := url.Values{}
+	
+	return ch.makeGetCertificatesRequest(query)
 }
 
-func (ch *CredHub) makeGetAllCertificatesRequest() ([]credentials.CertificateMetadata, error) {
-	resp, err := ch.Request(http.MethodGet, "/api/v1/certificates/", nil, nil, true)
+func (ch *CredHub) GetCertificateMetadataByName(name string) (credentials.CertificateMetadata, error) {
+	query := url.Values{}
+	query.Set("name", name)
+
+	certs, err := ch.makeGetCertificatesRequest(query)
+	if err != nil {
+		return credentials.CertificateMetadata{}, err
+	}
+
+	return certs[0], nil
+}
+
+func (ch *CredHub) makeGetCertificatesRequest(query url.Values) ([]credentials.CertificateMetadata, error) {
+	resp, err := ch.Request(http.MethodGet, "/api/v1/certificates/", query, nil, true)
 
 	if err != nil {
 		return nil, err

@@ -27,6 +27,19 @@ var _ = Describe("Certificates", func() {
 
 	})
 
+	It("requests the certificates by name", func() {
+		dummy := &DummyAuth{Response: &http.Response{
+			StatusCode: http.StatusOK,
+			Body:       ioutil.NopCloser(bytes.NewBufferString("")),
+		}}
+
+		ch, _ := New("https://example.com", Auth(dummy.Builder()))
+		_, _ = ch.GetCertificateMetadataByName("/example-certificate")
+		url := dummy.Request.URL.String()
+		Expect(url).To(Equal("https://example.com/api/v1/certificates/?name=%2Fexample-certificate"))
+		Expect(dummy.Request.Method).To(Equal(http.MethodGet))
+	})
+
 	Context("getting certificate metadata", func() {
 		Describe("when there is data returned", func() {
 			It("marshals it properly", func() {

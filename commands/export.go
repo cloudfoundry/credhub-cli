@@ -59,6 +59,21 @@ func getAllCredentialsForPath(path string) ([]credentials.Credential, error) {
 			return nil, err
 		}
 
+		if credential.Type == "certificate" {
+			certMetadata, err := credhubClient.GetCertificateMetadataByName(credential.Name)
+
+			if err != nil {
+				return nil, err
+			}
+			signedBy := certMetadata.SignedBy
+
+			if signedBy != "" && signedBy != credential.Name {
+				if cert, ok := credential.Value.(map[string]interface{}); ok {
+					cert["ca"] = signedBy
+					credential.Value = cert
+				}
+			}
+		}
 		credentials[i] = credential
 	}
 

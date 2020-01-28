@@ -112,6 +112,134 @@ var _ = Describe("Export", func() {
 			Eventually(session.Out).Should(Say(responseTable))
 		})
 
+		It("resolves ca names for certificats", func() {
+			findJson := `{
+				"credentials": [
+					{
+						"version_created_at": "idc",
+						"name": "/path/to/cert"
+					},
+					{
+						"version_created_at": "idc",
+						"name": "/path/to/cert_ca"
+					}
+				]
+			}`
+
+			getCertJson := `{
+				"data": [{
+					"type": "certificate",
+					"certificate_authority": false,
+					"expiry_date": "some_expiry_date",
+					"generated": true,
+					"id": "some_uuid",
+					"name": "/path/to/cert",
+					"self_signed": false,
+					"transitional": false,
+					"version_created_at": "idc",
+					"value": {
+						"ca": "some_ca",
+						"certificate": "some_cert",
+						"private_key": "private_key"
+					}
+				}]}`
+
+			getCertCaJson := `{
+				"data": [{
+					"type": "certificate",
+					"certificate_authority": true,
+					"expiry_date": "some_expiry_date",
+					"generated": true,
+					"id": "some_uuid",
+					"name": "/path/to/cert_ca",
+					"self_signed": true,
+					"transitional": false,
+					"version_created_at": "idc",
+					"value": {
+						"ca": "some_ca",
+						"certificate": "some_cert",
+						"private_key": "private_key"
+					}
+				}]}`
+
+			getCertMetaJson := `{
+				"certificates": [{
+					"id": "cert-id",
+					"name": "/path/to/cert",
+					"signed_by": "/path/to/cert_ca",
+					"signs": [],
+					"versions": [{
+							"certificate_authority": false,
+							"expiry_date": "2020-11-28T14:04:40Z",
+							"generated": true,
+							"id": "cert-version-id",
+							"self_signed": false,
+							"transitional": false
+					}]
+				}]}`
+
+			getCertCaMetaJson := `{
+				"certificates":[{
+					"id": "cert-ca-id",
+					"name": "/path/to/cert_ca",
+					"signed_by": "/path/to/cert_ca",
+					"signs": [
+						"/path/to/cert"
+					],
+					"versions": [{
+							"certificate_authority": true,
+							"expiry_date": "2020-11-28T14:04:38Z",
+							"generated": true,
+							"id": "cert-ca-version-id",
+							"self_signed": true,
+							"transitional": false
+						}
+					]
+				}]}`
+
+			responseTable := `credentials:
+- name: /path/to/cert
+  type: certificate
+  value:
+    ca: /path/to/cert_ca
+    certificate: some_cert
+    private_key: private_key
+- name: /path/to/cert_ca
+  type: certificate
+  value:
+    ca: some_ca
+    certificate: some_cert
+    private_key: private_key`
+
+			server.AppendHandlers(
+				CombineHandlers(
+					VerifyRequest("GET", "/api/v1/data", "path="),
+					RespondWith(http.StatusOK, findJson),
+				),
+				CombineHandlers(
+					VerifyRequest("GET", "/api/v1/data", "name=/path/to/cert&current=true"),
+					RespondWith(http.StatusOK, getCertJson),
+				),
+				CombineHandlers(
+					VerifyRequest("GET", "/api/v1/certificates/", "name=/path/to/cert"),
+					RespondWith(http.StatusOK, getCertMetaJson),
+				),
+				CombineHandlers(
+					VerifyRequest("GET", "/api/v1/data", "name=/path/to/cert_ca&current=true"),
+					RespondWith(http.StatusOK, getCertCaJson),
+				),
+				CombineHandlers(
+					VerifyRequest("GET", "/api/v1/certificates/", "name=/path/to/cert_ca"),
+					RespondWith(http.StatusOK, getCertCaMetaJson),
+				),
+			)
+
+			session := runCommand("export")
+
+			Eventually(session).Should(Exit(0))
+			Eventually(session.Out).Should(Say(responseTable))
+		})
+
 		Context("when given a path", func() {
 			It("queries for credentials matching that path", func() {
 				noCredsJson := `{ "credentials" : [] }`
