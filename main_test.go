@@ -47,11 +47,12 @@ var _ = Describe("main", func() {
 			Expect(err).NotTo(HaveOccurred())
 			<-session.Exited
 
+			Eventually(session).Should(Exit(1))
+
 			if runtime.GOOS == "windows" {
-				Eventually(session).Should(Exit(1))
 				Expect(session.Err).To(Say("Flag parsing in windows will interpret any argument with a '/' prefix as an option. Please remove any prepended '/' from flag arguments as it may be causing the following error: expected argument for flag `/n, /name', but got option `/foo/bar'"))
 			} else {
-				Eventually(session).Should(Exit(0))
+				Expect(session.Err).NotTo(Say("expected argument for flag"))
 			}
 		})
 	})
