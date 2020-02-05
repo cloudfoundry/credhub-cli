@@ -40,4 +40,19 @@ var _ = Describe("main", func() {
 			Expect(session.Err).To(Say("Usage:"))
 		})
 	})
+	Context("when a prepended / is used in the argument", func() {
+		It("raises expected error for windows, otherwise does not raise an error", func() {
+			cmd := exec.Command(commandPath,"get", "--name", "/foo/bar")
+			session, err := Start(cmd, GinkgoWriter, GinkgoWriter)
+			Expect(err).NotTo(HaveOccurred())
+			<-session.Exited
+
+			if runtime.GOOS == "windows" {
+				Eventually(session).Should(Exit(1))
+				Expect(session.Err).To(Say("Flag parsing in windows will interpret any argument with a '/' prefix as an option. Please remove any prepended '/' from flag arguments as it may be causing the following error: expected argument for flag `/n, /name', but got option `/foo/bar'"))
+			} else {
+				Eventually(session).Should(Exit(0))
+			}
+		})
+	})
 })
