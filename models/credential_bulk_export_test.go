@@ -1,6 +1,8 @@
 package models_test
 
 import (
+	"encoding/json"
+
 	"code.cloudfoundry.org/credhub-cli/credhub/credentials"
 	"code.cloudfoundry.org/credhub-cli/models"
 
@@ -11,7 +13,7 @@ import (
 
 var _ = Describe("ExportCredentials", func() {
 	credentials := []credentials.Credential{
-		credentials.Credential{
+		{
 			Metadata: credentials.Metadata{
 				Id: "valueID",
 				Base: credentials.Base{
@@ -22,7 +24,7 @@ var _ = Describe("ExportCredentials", func() {
 			},
 			Value: "test",
 		},
-		credentials.Credential{
+		{
 			Metadata: credentials.Metadata{
 				Id: "passwordID",
 				Base: credentials.Base{
@@ -35,55 +37,110 @@ var _ = Describe("ExportCredentials", func() {
 		},
 	}
 
-	It("returns a YAML map with a root credential object", func() {
-		exportCreds, err := models.ExportCredentials(credentials)
+	Describe("outputJSON is set to true", func() {
+		It("returns a JSON map with a root credential object", func() {
+			exportCreds, err := models.ExportCredentials(credentials, true)
 
-		var v map[string]interface{}
-		var mapOfInterfaces []interface{}
+			var v map[string]interface{}
+			var mapOfInterfaces []interface{}
 
-		err = yaml.Unmarshal(exportCreds.Bytes, &v)
+			err = json.Unmarshal(exportCreds.Bytes, &v)
 
-		Expect(err).To(BeNil())
-		Expect(v["credentials"]).NotTo(BeNil())
-		Expect(v["credentials"]).To(BeAssignableToTypeOf(mapOfInterfaces))
-	})
+			Expect(err).To(BeNil())
+			Expect(v["Credentials"]).NotTo(BeNil())
+			Expect(v["Credentials"]).To(BeAssignableToTypeOf(mapOfInterfaces))
+		})
 
-	It("lists each credential", func() {
-		exportCreds, _ := models.ExportCredentials(credentials)
+		It("lists each credential", func() {
+			exportCreds, _ := models.ExportCredentials(credentials, true)
 
-		var v map[string]interface{}
-		_ = yaml.Unmarshal(exportCreds.Bytes, &v)
+			var v map[string]interface{}
+			_ = json.Unmarshal(exportCreds.Bytes, &v)
 
-		exportedCredentials := v["credentials"].([]interface{})
+			exportedCredentials := v["Credentials"].([]interface{})
 
-		Expect(exportedCredentials).To(HaveLen(len(credentials)))
-	})
+			Expect(exportedCredentials).To(HaveLen(len(credentials)))
+		})
 
-	It("includes only a name, type and value in each credential", func() {
-		expectedKeys := []string{"name", "type", "value"}
-		exportCreds, _ := models.ExportCredentials(credentials)
+		It("includes only a name, type and value in each credential", func() {
+			expectedKeys := []string{"Name", "Type", "Value"}
+			exportCreds, _ := models.ExportCredentials(credentials, true)
 
-		var v map[string]interface{}
-		_ = yaml.Unmarshal(exportCreds.Bytes, &v)
+			var v map[string]interface{}
+			_ = json.Unmarshal(exportCreds.Bytes, &v)
 
-		exportedCredentials := v["credentials"].([]interface{})
+			exportedCredentials := v["Credentials"].([]interface{})
 
-		for _, credential := range exportedCredentials {
-			c := credential.(map[interface{}]interface{})
+			for _, credential := range exportedCredentials {
+				c := credential.(map[string]interface{})
 
-			for k := range c {
-				Expect(expectedKeys).To(ContainElement(k))
+				for k := range c {
+					Expect(expectedKeys).To(ContainElement(k))
+				}
 			}
-		}
+		})
+
+		It("produces JSON that can be reimported", func() {
+			exportCreds, _ := models.ExportCredentials(credentials, true)
+			credImporter := &models.CredentialBulkImport{}
+
+			err := credImporter.ReadBytes(exportCreds.Bytes, true)
+
+			Expect(err).To(BeNil())
+		})
 	})
 
-	It("produces YAML that can be reimported", func() {
-		exportCreds, _ := models.ExportCredentials(credentials)
-		credImporter := &models.CredentialBulkImport{}
+	Describe("outputJSON is set to false", func() {
+		It("returns a YAML map with a root credential object", func() {
+			exportCreds, err := models.ExportCredentials(credentials, false)
 
-		err := credImporter.ReadBytes(exportCreds.Bytes)
+			var v map[string]interface{}
+			var mapOfInterfaces []interface{}
 
-		Expect(err).To(BeNil())
+			err = yaml.Unmarshal(exportCreds.Bytes, &v)
+
+			Expect(err).To(BeNil())
+			Expect(v["credentials"]).NotTo(BeNil())
+			Expect(v["credentials"]).To(BeAssignableToTypeOf(mapOfInterfaces))
+		})
+
+		It("lists each credential", func() {
+			exportCreds, _ := models.ExportCredentials(credentials, false)
+
+			var v map[string]interface{}
+			_ = yaml.Unmarshal(exportCreds.Bytes, &v)
+
+			exportedCredentials := v["credentials"].([]interface{})
+
+			Expect(exportedCredentials).To(HaveLen(len(credentials)))
+		})
+
+		It("includes only a name, type and value in each credential", func() {
+			expectedKeys := []string{"name", "type", "value"}
+			exportCreds, _ := models.ExportCredentials(credentials, false)
+
+			var v map[string]interface{}
+			_ = yaml.Unmarshal(exportCreds.Bytes, &v)
+
+			exportedCredentials := v["credentials"].([]interface{})
+
+			for _, credential := range exportedCredentials {
+				c := credential.(map[interface{}]interface{})
+
+				for k := range c {
+					Expect(expectedKeys).To(ContainElement(k))
+				}
+			}
+		})
+
+		It("produces YAML that can be reimported", func() {
+			exportCreds, _ := models.ExportCredentials(credentials, false)
+			credImporter := &models.CredentialBulkImport{}
+
+			err := credImporter.ReadBytes(exportCreds.Bytes, false)
+
+			Expect(err).To(BeNil())
+		})
 	})
 })
 

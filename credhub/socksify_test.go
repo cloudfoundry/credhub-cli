@@ -11,7 +11,7 @@ import (
 	"errors"
 
 	"code.cloudfoundry.org/credhub-cli/credhub"
-	"github.com/cloudfoundry/socks5-proxy"
+	proxy "github.com/cloudfoundry/socks5-proxy"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

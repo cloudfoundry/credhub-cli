@@ -1,0 +1,9 @@
+{
+  "credentials": [
+    {
+      "type": "value",
+      "name": "/test/intStringValue",
+      "value": 123
+    }
+  ]
+}

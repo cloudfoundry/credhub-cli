@@ -10,8 +10,9 @@ import (
 )
 
 type ExportCommand struct {
-	Path string `short:"p" long:"path" description:"Path of credentials to export" required:"false"`
-	File string `short:"f" long:"file" description:"File in which to write credentials" required:"false"`
+	Path       string `short:"p" long:"path" description:"Path of credentials to export" required:"false"`
+	File       string `short:"f" long:"file" description:"File in which to write credentials" required:"false"`
+	OutputJSON bool   `short:"j" long:"output-json" description:"Return response in JSON format"`
 }
 
 func (cmd ExportCommand) Execute([]string) error {
@@ -21,7 +22,7 @@ func (cmd ExportCommand) Execute([]string) error {
 		return err
 	}
 
-	exportCreds, err := models.ExportCredentials(allCredentials)
+	exportCreds, err := models.ExportCredentials(allCredentials, cmd.OutputJSON)
 
 	if err != nil {
 		return err

@@ -2,12 +2,13 @@ package credhub_test
 
 import (
 	"bytes"
-	. "code.cloudfoundry.org/credhub-cli/credhub"
 	"encoding/json"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"io/ioutil"
 	"net/http"
+
+	. "code.cloudfoundry.org/credhub-cli/credhub"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Bulk Regenerate", func() {

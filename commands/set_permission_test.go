@@ -1,15 +1,16 @@
 package commands_test
 
 import (
+	"fmt"
+	"net/http"
+
 	"code.cloudfoundry.org/credhub-cli/commands"
 	"code.cloudfoundry.org/credhub-cli/credhub"
-	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
 	. "github.com/onsi/gomega/ghttp"
-	"net/http"
 )
 
 var _ = Describe("Set Permission", func() {

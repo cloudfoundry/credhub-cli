@@ -77,7 +77,11 @@ func NewInvalidImportYamlError() error {
 	return errors.New("The referenced file does not contain valid yaml structure. Please update and retry your request.")
 }
 
-func NewNoCredentialsTag() error {
+func NewInvalidImportJsonError() error {
+	return errors.New("The referenced file does not contain valid json structure. Please update and retry your request.")
+}
+
+func NewNoCredentialsTagError() error {
 	return errors.New("The referenced import file does not begin with the key 'credentials'. The import file must contain a list of credentials under the key 'credentials'. Please update and retry your request.")
 }
 

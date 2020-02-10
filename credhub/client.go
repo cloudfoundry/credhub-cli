@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/cloudfoundry/socks5-proxy"
+	proxy "github.com/cloudfoundry/socks5-proxy"
 )
 
 // Client provides an unauthenticated http.Client to the CredHub server

@@ -1,6 +1,8 @@
 package models
 
 import (
+	"encoding/json"
+
 	"code.cloudfoundry.org/credhub-cli/credhub/credentials"
 	"gopkg.in/yaml.v2"
 )
@@ -19,7 +21,7 @@ type CredentialBulkExport struct {
 	Bytes []byte
 }
 
-func ExportCredentials(credentials []credentials.Credential) (*CredentialBulkExport, error) {
+func ExportCredentials(credentials []credentials.Credential, outputJSON bool) (*CredentialBulkExport, error) {
 	exportCreds := exportCredentials{make([]exportCredential, len(credentials))}
 
 	for i, credential := range credentials {
@@ -27,6 +29,9 @@ func ExportCredentials(credentials []credentials.Credential) (*CredentialBulkExp
 	}
 
 	result, err := yaml.Marshal(exportCreds)
+	if outputJSON {
+		result, err = json.Marshal(exportCreds)
+	}
 
 	if err != nil {
 		return nil, err

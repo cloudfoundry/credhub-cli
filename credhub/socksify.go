@@ -8,7 +8,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/cloudfoundry/socks5-proxy"
+	proxy "github.com/cloudfoundry/socks5-proxy"
 	goproxy "golang.org/x/net/proxy"
 )
 

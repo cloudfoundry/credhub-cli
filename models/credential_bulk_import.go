@@ -1,52 +1,57 @@
 package models
 
 import (
+	"encoding/json"
 	"io/ioutil"
+	"strings"
+
+	"gopkg.in/yaml.v2"
 
 	"strconv"
 
-	"regexp"
-
 	"code.cloudfoundry.org/credhub-cli/errors"
-	"gopkg.in/yaml.v2"
 )
 
 type CredentialBulkImport struct {
-	Credentials []map[string]interface{} `yaml:"credentials"`
+	Credentials []map[string]interface{} `json:"credentials" yaml:"credentials"`
 }
 
-func (credentialBulkImport *CredentialBulkImport) ReadFile(filepath string) error {
+func (credentialBulkImport *CredentialBulkImport) ReadFile(filepath string, importJSON bool) error {
 	data, err := ioutil.ReadFile(filepath)
 	if err != nil {
 		return err
 	}
 
-	return credentialBulkImport.ReadBytes(data)
+	return credentialBulkImport.ReadBytes(data, importJSON)
 }
 
-func (credentialBulkImport *CredentialBulkImport) ReadBytes(data []byte) error {
-	if !hasCredentialTag(data) {
-		return errors.NewNoCredentialsTag()
+func (credentialBulkImport *CredentialBulkImport) ReadBytes(data []byte, importJSON bool) error {
+	if importJSON {
+		if err := json.Unmarshal(data, credentialBulkImport); err != nil {
+			return errors.NewInvalidImportJsonError()
+		}
+	} else {
+		if err := yaml.Unmarshal(data, credentialBulkImport); err != nil {
+			return errors.NewInvalidImportYamlError()
+		}
 	}
 
-	err := yaml.Unmarshal(data, credentialBulkImport)
+	if credentialBulkImport.Credentials == nil {
+			return errors.NewNoCredentialsTagError()
+	}
 
 	for i, credential := range credentialBulkImport.Credentials {
 		credentialBulkImport.Credentials[i] = unpackCredential(credential)
 	}
 
-	if err != nil {
-		return errors.NewInvalidImportYamlError()
-	} else {
-		return nil
-	}
+	return nil
 }
 
 func unpackCredential(interfaceToInterfaceMap map[string]interface{}) map[string]interface{} {
 	stringToInterfaceMap := make(map[string]interface{})
 	stringToInterfaceMap["overwrite"] = true
 	for key, value := range interfaceToInterfaceMap {
-		stringToInterfaceMap[key] = unpackAnyType(value)
+		stringToInterfaceMap[strings.ToLower(key)] = unpackAnyType(value)
 	}
 	return stringToInterfaceMap
 }
@@ -95,10 +100,4 @@ func unpackArray(array []interface{}) []interface{} {
 		array[i] = unpackAnyType(value)
 	}
 	return array
-}
-
-func hasCredentialTag(data []byte) bool {
-	hasCredentialTag, _ := regexp.Match("^(?:---[ \\n]+)?credentials:[^\\w]*", data)
-
-	return hasCredentialTag
 }

@@ -13,7 +13,8 @@ import (
 )
 
 type ImportCommand struct {
-	File string `short:"f" long:"file" description:"File containing credentials to import" required:"true"`
+	File       string `short:"f" long:"file" description:"File containing credentials to import" required:"true"`
+	ImportJSON bool   `short:"j" long:"import-json" description:"File to import is of type JSON"`
 	ClientCommand
 }
 
@@ -30,7 +31,7 @@ type ErrorInfo struct {
 
 func (c *ImportCommand) Execute([]string) error {
 	var bulkImport models.CredentialBulkImport
-	err := bulkImport.ReadFile(c.File)
+	err := bulkImport.ReadFile(c.File, c.ImportJSON)
 
 	if err != nil {
 		return err
@@ -68,8 +69,13 @@ func (c *ImportCommand) setCredentials(bulkImport models.CredentialBulkImport) e
 				delete(credential["value"].(map[string]interface{}), "password_hash")
 			}
 		case "value":
-			if reflect.TypeOf(credential["value"]).Kind() == reflect.Int {
-				credential["value"] = strconv.Itoa(credential["value"].(int))
+			switch value := credential["value"].(type) {
+			case int:
+				credential["value"] = strconv.Itoa(value)
+			case float32:
+				credential["value"] = strconv.FormatFloat(float64(value), 'f', -1, 32)
+			case float64:
+				credential["value"] = strconv.FormatFloat(value, 'f', -1, 64)
 			}
 		case "certificate":
 			caName, certWithCaName = credential["value"].(map[string]interface{})["ca_name"].(string)

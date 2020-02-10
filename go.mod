@@ -20,9 +20,7 @@ require (
 	github.com/mattn/go-isatty v0.0.3 // indirect
 	github.com/onsi/ginkgo v1.4.0
 	github.com/onsi/gomega v1.3.0
-	golang.org/x/crypto v0.0.0-20180319061731-c3a3ad6d03f7 // indirect
-	golang.org/x/net v0.0.0-20180319151425-92b859f39abd
-	golang.org/x/sys v0.0.0-20180319153314-d8e400bc7db4 // indirect
-	golang.org/x/text v0.3.0 // indirect
+	golang.org/x/net v0.0.0-20190620200207-3b0461eec859
+	golang.org/x/tools v0.0.0-20200207224406-61798d64f025 // indirect
 	gopkg.in/yaml.v2 v2.0.0-20190319135612-7b8349ac747c
 )

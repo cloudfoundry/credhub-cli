@@ -130,28 +130,56 @@ var _ = Describe("Export", func() {
 		})
 
 		Context("when given a file", func() {
-			It("writes the YAML to that file", func() {
-				withTemporaryFile(func(filename string) {
-					noCredsJson := `{ "credentials" : [] }`
-					noCredsYaml := `credentials: []
+			Context("when given output-json flag", func() {
+				It("writes the JSON to that file", func() {
+					withTemporaryFile(func(filename string) {
+						noCredsJson := `{ "credentials" : [] }`
+						jsonOutput := `{"Credentials":[]}`
+
+						server.AppendHandlers(
+							CombineHandlers(
+								VerifyRequest("GET", "/api/v1/data", "path="),
+								RespondWith(http.StatusOK, noCredsJson),
+							),
+						)
+
+						session := runCommand("export", "-f", filename, "--output-json")
+
+						Eventually(session).Should(Exit(0))
+
+						Expect(filename).To(BeAnExistingFile())
+
+						fileContents, _ := ioutil.ReadFile(filename)
+
+						Expect(string(fileContents)).To(Equal(jsonOutput))
+					})
+				})
+			})
+
+			Context("when not given output-json flag", func() {
+				It("writes the YAML to that file", func() {
+					withTemporaryFile(func(filename string) {
+						noCredsJson := `{ "credentials" : [] }`
+						noCredsYaml := `credentials: []
 `
 
-					server.AppendHandlers(
-						CombineHandlers(
-							VerifyRequest("GET", "/api/v1/data", "path="),
-							RespondWith(http.StatusOK, noCredsJson),
-						),
-					)
+						server.AppendHandlers(
+							CombineHandlers(
+								VerifyRequest("GET", "/api/v1/data", "path="),
+								RespondWith(http.StatusOK, noCredsJson),
+							),
+						)
 
-					session := runCommand("export", "-f", filename)
+						session := runCommand("export", "-f", filename)
 
-					Eventually(session).Should(Exit(0))
+						Eventually(session).Should(Exit(0))
 
-					Expect(filename).To(BeAnExistingFile())
+						Expect(filename).To(BeAnExistingFile())
 
-					fileContents, _ := ioutil.ReadFile(filename)
+						fileContents, _ := ioutil.ReadFile(filename)
 
-					Expect(string(fileContents)).To(Equal(noCredsYaml))
+						Expect(string(fileContents)).To(Equal(noCredsYaml))
+					})
 				})
 			})
 		})

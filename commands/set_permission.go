@@ -1,9 +1,10 @@
 package commands
 
 import (
-	"code.cloudfoundry.org/credhub-cli/credhub"
 	"fmt"
 	"strings"
+
+	"code.cloudfoundry.org/credhub-cli/credhub"
 )
 
 type SetPermissionCommand struct {
