@@ -3,8 +3,8 @@ package commands_test
 import (
 	"fmt"
 	"net/http"
-
 	"strings"
+	"time"
 
 	"io/ioutil"
 
@@ -818,6 +818,21 @@ var _ = Describe("Login", func() {
 					Eventually(session).Should(Exit(1))
 					Expect(session.Out).NotTo(Say("Setting the target url: " + apiServer.URL()))
 				})
+			})
+		})
+
+		Describe("when providing timeout", func() {
+			It("reads the timeout from the environment and writes it to disk", func() {
+				config.RemoveConfig()
+
+				session := runCommandWithEnv([]string{"CREDHUB_HTTP_TIMEOUT=60"},"login", "-s", apiServer.URL(), "-u", "user", "-p", "pass", "--skip-tls-validation")
+
+				Eventually(session).Should(Exit(0))
+
+				cfg := config.ReadConfig()
+
+				expected := 60 * time.Second
+				Expect(*cfg.HttpTimeout).To(Equal(expected))
 			})
 		})
 	})

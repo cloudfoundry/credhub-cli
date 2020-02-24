@@ -1,5 +1,7 @@
 package config
 
+import "time"
+
 type ConfigWithoutSecrets struct {
 	ApiURL             string
 	AuthURL            string
@@ -8,6 +10,7 @@ type ConfigWithoutSecrets struct {
 	InsecureSkipVerify bool
 	CaCerts            []string
 	ServerVersion      string
+	HttpTimeout        *time.Duration
 }
 
 func ConvertConfigToConfigWithoutSecrets(config Config) ConfigWithoutSecrets {
@@ -19,5 +22,6 @@ func ConvertConfigToConfigWithoutSecrets(config Config) ConfigWithoutSecrets {
 		InsecureSkipVerify: config.InsecureSkipVerify,
 		CaCerts:            config.CaCerts,
 		ServerVersion:      config.ServerVersion,
+		HttpTimeout:        config.HttpTimeout,
 	}
 }

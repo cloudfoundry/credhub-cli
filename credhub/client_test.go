@@ -147,4 +147,14 @@ var _ = Describe("Client()", func() {
 			Expect(dial).NotTo(BeNil())
 		})
 	})
+
+	Context("With SetHttpTimeout", func() {
+		It("should return a http.Client with the requested timeout", func() {
+			timeout := 60 * time.Second
+			ch, _ := New("https://example.com", SetHttpTimeout(&timeout))
+			client := ch.Client()
+
+			Expect(client.Timeout).To(Equal(60 * time.Second))
+		})
+	})
 })

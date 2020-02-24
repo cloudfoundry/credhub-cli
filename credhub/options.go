@@ -6,6 +6,7 @@ import (
 	"errors"
 	"net/url"
 	"runtime"
+	"time"
 
 	"code.cloudfoundry.org/credhub-cli/credhub/auth"
 )
@@ -84,6 +85,14 @@ func ClientCert(certificate, key string) Option {
 		}
 		c.clientCertificate = &cert
 
+		return nil
+	}
+}
+
+//SetHttpTimeout will set the timeout for the CredHub client
+func SetHttpTimeout(timeout *time.Duration) Option {
+	return func(c *CredHub) error {
+		c.httpTimeout = timeout
 		return nil
 	}
 }

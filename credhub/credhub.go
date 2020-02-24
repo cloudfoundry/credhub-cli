@@ -10,6 +10,7 @@ package credhub
 import (
 	"net/http"
 	"net/url"
+	"time"
 
 	"crypto/tls"
 	"crypto/x509"
@@ -47,4 +48,7 @@ type CredHub struct {
 
 	// Version of the server to make API requests against. Some methods will hit alternate endpoints based on this value
 	cachedServerVersion string
+
+	// Timeout for http client
+	httpTimeout *time.Duration
 }

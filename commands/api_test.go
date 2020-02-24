@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"time"
 
 	"code.cloudfoundry.org/credhub-cli/config"
 	. "github.com/onsi/ginkgo"
@@ -455,6 +456,21 @@ var _ = Describe("API", func() {
 				Eventually(session).Should(Say("Warning: Insecure HTTP API detected. Data sent to this API could be intercepted" +
 					" in transit by third parties. Secure HTTPS API endpoints are recommended."))
 			})
+		})
+	})
+
+	Describe("when providing timeout", func() {
+		It("reads the timeout from the environment and writes it to disk", func() {
+			config.RemoveConfig()
+
+			session := runCommandWithEnv([]string{"CREDHUB_HTTP_TIMEOUT=60"}, "api", "--server", server.URL(), "--ca-cert", "../test/server-tls-ca.pem", "--ca-cert", "../test/auth-tls-ca.pem")
+
+			Eventually(session).Should(Exit(0))
+
+			cfg := config.ReadConfig()
+
+			expected := 60 * time.Second
+			Expect(*cfg.HttpTimeout).To(Equal(expected))
 		})
 	})
 })

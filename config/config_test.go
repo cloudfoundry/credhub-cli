@@ -3,14 +3,14 @@
 package config_test
 
 import (
+	"code.cloudfoundry.org/credhub-cli/config"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"io/ioutil"
 	"os"
 	"path"
 	"runtime"
-
-	"code.cloudfoundry.org/credhub-cli/config"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
+	"time"
 )
 
 var _ = Describe("Config", func() {
@@ -74,6 +74,36 @@ var _ = Describe("Config", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(string(configFile)).NotTo(ContainSubstring(someClientID))
 			Expect(string(configFile)).NotTo(ContainSubstring(someClientSecret))
+		})
+	})
+
+	Describe("HttpTimeout", func() {
+		It("write the http timeout to disk", func() {
+			someClientID := "someClientID"
+			someClientSecret := "someClientSecret"
+			timeout := 60 * time.Second
+
+			cliConfig := config.Config{
+				ConfigWithoutSecrets: config.ConfigWithoutSecrets{
+					ApiURL:             "apiURL",
+					AuthURL:            "authURL",
+					AccessToken:        "accessToken",
+					RefreshToken:       "refreshToken",
+					InsecureSkipVerify: true,
+					CaCerts:            []string{"cert1", "cert2"},
+					ServerVersion:      "version",
+					HttpTimeout:        &timeout,
+				},
+				ClientID:     someClientID,
+				ClientSecret: someClientSecret,
+			}
+
+			err := config.WriteConfig(cliConfig)
+			Expect(err).NotTo(HaveOccurred())
+
+			configFile, err := ioutil.ReadFile(path.Join(os.Getenv("HOME"), ".credhub", "config.json"))
+			Expect(err).NotTo(HaveOccurred())
+			Expect(string(configFile)).NotTo(ContainSubstring(string(60*time.Second)))
 		})
 	})
 

@@ -49,7 +49,7 @@ func (c *LoginCommand) Execute([]string) error {
 			return err
 		}
 
-		credhubInfo, err := GetApiInfo(serverUrl, c.config.CaCerts, c.SkipTlsValidation)
+		credhubInfo, err := GetApiInfo(serverUrl, c.config.CaCerts, c.SkipTlsValidation, c.config.HttpTimeout)
 		if err != nil {
 			return errors.NewNetworkError(err)
 		}
@@ -66,7 +66,7 @@ func (c *LoginCommand) Execute([]string) error {
 	if err != nil {
 		return err
 	}
-	credhubClient, err := credhub.New(c.config.ApiURL, credhub.CaCerts(c.config.CaCerts...), credhub.SkipTLSValidation(c.config.InsecureSkipVerify))
+	credhubClient, err := credhub.New(c.config.ApiURL, credhub.CaCerts(c.config.CaCerts...), credhub.SkipTLSValidation(c.config.InsecureSkipVerify), credhub.SetHttpTimeout(c.config.HttpTimeout))
 	if err != nil {
 		return err
 	}
@@ -109,6 +109,7 @@ func (c *LoginCommand) Execute([]string) error {
 		credhub.SkipTLSValidation(c.config.InsecureSkipVerify),
 		credhub.AuthURL(c.config.AuthURL),
 		credhub.Auth(auth.Uaa(c.ClientName, c.ClientSecret, "", "", c.config.AccessToken, "", true)),
+		credhub.SetHttpTimeout(c.config.HttpTimeout),
 	)
 
 	if err != nil {

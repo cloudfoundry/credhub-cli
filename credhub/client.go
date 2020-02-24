@@ -21,23 +21,27 @@ func (ch *CredHub) Client() *http.Client {
 
 func (ch *CredHub) client() *http.Client {
 	if ch.baseURL.Scheme == "https" {
-		return httpsClient(ch.insecureSkipVerify, ch.caCerts, ch.clientCertificate)
+		return httpsClient(ch.insecureSkipVerify, ch.caCerts, ch.clientCertificate, ch.httpTimeout)
 	}
 
-	return httpClient()
+	return httpClient(ch.httpTimeout)
 }
 
-func httpClient() *http.Client {
+func httpClient(timeout *time.Duration) *http.Client {
+	if timeout == nil {
+		t := 45 * time.Second
+		timeout = &t
+	}
+
 	return &http.Client{
-		Timeout: time.Second * 45,
+		Timeout: *timeout,
 	}
 }
 
 var defaultDialer net.Dialer
 
-func httpsClient(insecureSkipVerify bool, rootCAs *x509.CertPool, cert *tls.Certificate) *http.Client {
-	client := httpClient()
-
+func httpsClient(insecureSkipVerify bool, rootCAs *x509.CertPool, cert *tls.Certificate, timeout *time.Duration) *http.Client {
+	client := httpClient(timeout)
 	var certs []tls.Certificate
 	if cert != nil {
 		certs = []tls.Certificate{*cert}

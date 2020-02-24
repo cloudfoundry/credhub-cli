@@ -1,13 +1,14 @@
 package config
 
 import (
+	"code.cloudfoundry.org/credhub-cli/util"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"path"
-
-	"code.cloudfoundry.org/credhub-cli/util"
+	"strconv"
+	"time"
 )
 
 const AuthClient = "credhub_cli"
@@ -58,6 +59,15 @@ func ReadConfig() Config {
 			return c
 		}
 		c.CaCerts = certs
+	}
+	if timeoutString, ok := os.LookupEnv("CREDHUB_HTTP_TIMEOUT"); ok {
+		timeoutInt, err := strconv.Atoi(timeoutString)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error parsing HttpTimeout: %+v", err)
+			return c
+		}
+		timeout := time.Duration(timeoutInt) * time.Second
+		c.HttpTimeout = &timeout
 	}
 
 	return c

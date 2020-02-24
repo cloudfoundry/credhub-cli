@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"time"
 
 	"net/url"
 
@@ -48,8 +49,9 @@ func (c *ApiCommand) Execute([]string) error {
 	}
 	newConfig.CaCerts = caCerts
 	newConfig.InsecureSkipVerify = c.SkipTlsValidation
+	newConfig.HttpTimeout = c.config.HttpTimeout
 
-	credhubInfo, err := GetApiInfo(newConfig.ApiURL, newConfig.CaCerts, newConfig.InsecureSkipVerify)
+	credhubInfo, err := GetApiInfo(newConfig.ApiURL, newConfig.CaCerts, newConfig.InsecureSkipVerify, newConfig.HttpTimeout)
 	if err != nil {
 		return errors.NewNetworkError(err)
 	}
@@ -77,8 +79,8 @@ func (c *ApiCommand) Execute([]string) error {
 	return config.WriteConfig(newConfig)
 }
 
-func GetApiInfo(serverUrl string, caCerts []string, skipTlsValidation bool) (*server.Info, error) {
-	credhubClient, err := credhub.New(serverUrl, credhub.CaCerts(caCerts...), credhub.SkipTLSValidation(skipTlsValidation))
+func GetApiInfo(serverUrl string, caCerts []string, skipTlsValidation bool, httpTimeout *time.Duration) (*server.Info, error) {
+	credhubClient, err := credhub.New(serverUrl, credhub.CaCerts(caCerts...), credhub.SkipTLSValidation(skipTlsValidation), credhub.SetHttpTimeout(httpTimeout))
 	if err != nil {
 		return nil, err
 	}

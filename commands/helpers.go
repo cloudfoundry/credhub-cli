@@ -65,7 +65,7 @@ func readConfigFromEnvironmentVariables(cfg *config.Config) error {
 	}
 
 	if cfg.AuthURL == "" && cfg.ApiURL != "" {
-		credhubInfo, err := GetApiInfo(cfg.ApiURL, cfg.CaCerts, cfg.InsecureSkipVerify)
+		credhubInfo, err := GetApiInfo(cfg.ApiURL, cfg.CaCerts, cfg.InsecureSkipVerify, cfg.HttpTimeout)
 		if err != nil {
 			return errors.NewNetworkError(err)
 		}
@@ -86,7 +86,8 @@ func newCredhubClient(cfg *config.Config, clientId string, clientSecret string, 
 		cfg.RefreshToken,
 		usingClientCredentials,
 	)),
-		credhub.AuthURL(cfg.AuthURL))
+		credhub.AuthURL(cfg.AuthURL),
+		credhub.SetHttpTimeout(cfg.HttpTimeout))
 	return credhubClient, err
 }
 
@@ -95,7 +96,7 @@ func clientCredentialsInEnvironment() bool {
 }
 
 func verifyAuthServerConnection(cfg config.Config, skipTlsValidation bool) error {
-	credhubClient, err := credhub.New(cfg.ApiURL, credhub.CaCerts(cfg.CaCerts...), credhub.SkipTLSValidation(skipTlsValidation))
+	credhubClient, err := credhub.New(cfg.ApiURL, credhub.CaCerts(cfg.CaCerts...), credhub.SkipTLSValidation(skipTlsValidation), credhub.SetHttpTimeout(cfg.HttpTimeout))
 	if err != nil {
 		return err
 	}

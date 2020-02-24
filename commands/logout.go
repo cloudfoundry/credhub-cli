@@ -25,7 +25,7 @@ func (c *LogoutCommand) Execute([]string) error {
 }
 
 func RevokeTokenIfNecessary(cfg config.Config) error {
-	credhubClient, err := credhub.New(cfg.ApiURL, credhub.CaCerts(cfg.CaCerts...), credhub.SkipTLSValidation(cfg.InsecureSkipVerify))
+	credhubClient, err := credhub.New(cfg.ApiURL, credhub.CaCerts(cfg.CaCerts...), credhub.SkipTLSValidation(cfg.InsecureSkipVerify), credhub.SetHttpTimeout(cfg.HttpTimeout))
 	if err != nil {
 		return err
 	}
