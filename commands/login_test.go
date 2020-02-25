@@ -825,7 +825,7 @@ var _ = Describe("Login", func() {
 			It("reads the timeout from the environment and writes it to disk", func() {
 				config.RemoveConfig()
 
-				session := runCommandWithEnv([]string{"CREDHUB_HTTP_TIMEOUT=60"},"login", "-s", apiServer.URL(), "-u", "user", "-p", "pass", "--skip-tls-validation")
+				session := runCommandWithEnv([]string{"CREDHUB_HTTP_TIMEOUT=60s"},"login", "-s", apiServer.URL(), "-u", "user", "-p", "pass", "--skip-tls-validation")
 
 				Eventually(session).Should(Exit(0))
 

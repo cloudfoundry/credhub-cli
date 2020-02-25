@@ -6,6 +6,7 @@ import (
 	"os"
 	"runtime"
 	"runtime/debug"
+	"time"
 
 	"code.cloudfoundry.org/credhub-cli/commands"
 	"code.cloudfoundry.org/credhub-cli/config"
@@ -29,6 +30,10 @@ func main() {
 		if command == nil {
 			parser.WriteHelp(os.Stderr)
 			os.Exit(1)
+		}
+
+		if timeout := parser.FindOptionByLongName("http-timeout").Value().(*time.Duration); timeout != nil {
+			_ = os.Setenv("CREDHUB_HTTP_TIMEOUT", timeout.String())
 		}
 
 		if cmd, ok := command.(NeedsConfig); ok {

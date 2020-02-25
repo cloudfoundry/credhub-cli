@@ -3,6 +3,7 @@ package commands
 import (
 	"code.cloudfoundry.org/credhub-cli/config"
 	"code.cloudfoundry.org/credhub-cli/credhub"
+	"time"
 )
 
 type CredhubCommand struct {
@@ -23,6 +24,8 @@ type CredhubCommand struct {
 	SetPermission    SetPermissionCommand    `command:"set-permission" description:"Set permissions for an actor on a given path." long-description:"Set permissions for an actor on a given path"`
 	GetPermission    GetPermissionCommand    `command:"get-permission" description:"Get permissions for an actor on a given path." long-description:"Get permissions for an actor on a given path"`
 	DeletePermission DeletePermissionCommand `command:"delete-permission" description:"Delete permissions for an actor on a given path." long-description:"Delete permissions for an actor on a given path"`
+
+	HttpTimeout *time.Duration `long:"http-timeout" env:"CREDHUB_HTTP_TIMEOUT" description:"Http timeout for http-client. Needs to have unit passed in (i.e. 30s, 1m)"`
 
 	Version func() `long:"version" description:"Version of CLI and targeted CredHub API"`
 	Token   func() `long:"token" description:"Return your current CredHub authentication token"`

@@ -463,7 +463,7 @@ var _ = Describe("API", func() {
 		It("reads the timeout from the environment and writes it to disk", func() {
 			config.RemoveConfig()
 
-			session := runCommandWithEnv([]string{"CREDHUB_HTTP_TIMEOUT=60"}, "api", "--server", server.URL(), "--ca-cert", "../test/server-tls-ca.pem", "--ca-cert", "../test/auth-tls-ca.pem")
+			session := runCommandWithEnv([]string{"CREDHUB_HTTP_TIMEOUT=60s"}, "api", "--server", server.URL(), "--ca-cert", "../test/server-tls-ca.pem", "--ca-cert", "../test/auth-tls-ca.pem")
 
 			Eventually(session).Should(Exit(0))
 

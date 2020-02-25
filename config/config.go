@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
-	"strconv"
 	"time"
 )
 
@@ -61,12 +60,11 @@ func ReadConfig() Config {
 		c.CaCerts = certs
 	}
 	if timeoutString, ok := os.LookupEnv("CREDHUB_HTTP_TIMEOUT"); ok {
-		timeoutInt, err := strconv.Atoi(timeoutString)
+		timeout, err := time.ParseDuration(timeoutString)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "error parsing HttpTimeout: %+v", err)
 			return c
 		}
-		timeout := time.Duration(timeoutInt) * time.Second
 		c.HttpTimeout = &timeout
 	}
 
