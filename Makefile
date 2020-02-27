@@ -29,4 +29,4 @@ ci: ginkgo
 
 build:
 	mkdir -p build
-	go build $(GOFLAGS)
+	CGO_ENABLED=0 go build $(GOFLAGS)
