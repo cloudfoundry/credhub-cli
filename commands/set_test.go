@@ -16,7 +16,7 @@ import (
 	. "github.com/onsi/gomega/ghttp"
 )
 
-var _ = Describe("Set", func() {
+var _ = FDescribe("Set", func() {
 	BeforeEach(func() {
 		login()
 	})
@@ -43,8 +43,8 @@ var _ = Describe("Set", func() {
 	})
 
 	Describe("setting value secrets", func() {
-		It("puts a secret using explicit value type", func() {
-			SetupPutValueServer("my-value", "value", "potatoes")
+		It("puts a secret", func() {
+			setupSetServer("my-value", "value", `"potatoes"`)
 
 			session := runCommand("set", "-n", "my-value", "-v", "potatoes", "-t", "value")
 
@@ -55,7 +55,7 @@ var _ = Describe("Set", func() {
 		})
 
 		It("escapes special characters in the value", func() {
-			SetupPutValueServer("my-character-test", "value", `{\"password\":\"some-still-bad-password\"}`)
+			setupSetServer("my-character-test", "value", `"{\"password\":\"some-still-bad-password\"}"`)
 
 			session := runCommand("set", "-t", "value", "-n", "my-character-test", "-v", `{"password":"some-still-bad-password"}`)
 
@@ -65,8 +65,8 @@ var _ = Describe("Set", func() {
 			Eventually(string(session.Out.Contents())).Should(ContainSubstring(`value: <redacted>`))
 		})
 
-		It("puts a secret using explicit value type and returns in json format", func() {
-			SetupPutValueServer("my-value", "value", "potatoes")
+		It("puts a secret and returns in json format", func() {
+			setupSetServer("my-value", "value", `"potatoes"`)
 
 			session := runCommand("set", "-n", "my-value", "-v", "potatoes", "-t", "value", "--output-json")
 
@@ -75,7 +75,7 @@ var _ = Describe("Set", func() {
 		})
 
 		It("accepts case-insensitive type", func() {
-			SetupPutValueServer("my-value", "value", "potatoes")
+			setupSetServer("my-value", "value", `"potatoes"`)
 
 			session := runCommand("set", "-n", "my-value", "-v", "potatoes", "-t", "VALUE", "--output-json")
 
@@ -85,9 +85,9 @@ var _ = Describe("Set", func() {
 	})
 
 	Describe("setting json secrets", func() {
-		It("puts a secret using explicit json type", func() {
+		It("puts a secret", func() {
 			jsonValue := `{"foo":"bar","nested":{"a":1},"an":["array"]}`
-			setupPutJsonServer("json-secret", jsonValue)
+			setupSetServer("json-secret", "json", jsonValue)
 
 			session := runCommand("set", "-n", "json-secret", "-v", jsonValue, "-t", "json")
 
@@ -98,7 +98,7 @@ var _ = Describe("Set", func() {
 		})
 
 		It("escapes special characters in the json", func() {
-			setupPutJsonServer("my-character-test", `{"foo":"b\"ar"}`)
+			setupSetServer("my-character-test", "json", `{"foo":"b\"ar"}`)
 
 			session := runCommand("set", "-t", "json", "-n", "my-character-test", "-v", `{"foo":"b\"ar"}`)
 
@@ -110,7 +110,7 @@ var _ = Describe("Set", func() {
 
 		It("puts a secret using explicit json type and returns in json format", func() {
 			jsonValue := `{"foo":"bar","nested":{"a":1},"an":["array"]}`
-			setupPutJsonServer("json-secret", jsonValue)
+			setupSetServer("json-secret", "json", jsonValue)
 
 			session := runCommand("set", "-n", "json-secret", "-v", jsonValue, "-t", "json", "--output-json")
 
@@ -127,7 +127,7 @@ var _ = Describe("Set", func() {
 
 		It("accepts case-insensitive type", func() {
 			jsonValue := `{"foo":"bar","nested":{"a":1},"an":["array"]}`
-			setupPutJsonServer("json-secret", jsonValue)
+			setupSetServer("json-secret", "json", jsonValue)
 
 			session := runCommand("set", "-n", "json-secret", "-v", jsonValue, "-t", "JSON")
 
@@ -140,7 +140,7 @@ var _ = Describe("Set", func() {
 
 	Describe("setting SSH secrets", func() {
 		It("puts a secret using explicit ssh type", func() {
-			SetupPutSshServer("foo-ssh-key", "ssh", "some-public-key", "some-private-key")
+			setupSetServer("foo-ssh-key", "ssh", `{"public_key":"some-public-key","private_key":"some-private-key"}`)
 
 			session := runCommand("set", "-n", "foo-ssh-key", "-u", "some-public-key", "-p", "some-private-key", "-t", "ssh")
 
@@ -151,7 +151,7 @@ var _ = Describe("Set", func() {
 		})
 
 		It("puts a secret using values read from files", func() {
-			SetupPutSshServer("foo-ssh-key", "ssh", "some-public-key", "some-private-key")
+			setupSetServer("foo-ssh-key", "ssh", `{"public_key":"some-public-key","private_key":"some-private-key"}`)
 
 			tempDir := test.CreateTempDir("sshFilesForTesting")
 			publicFileName := test.CreateCredentialFile(tempDir, "rsa.pub", "some-public-key")
@@ -170,7 +170,7 @@ var _ = Describe("Set", func() {
 		})
 
 		It("puts a secret using explicit ssh type and returns in json format", func() {
-			SetupPutSshServer("foo-ssh-key", "ssh", "some-public-key", "some-private-key")
+			setupSetServer("foo-ssh-key", "ssh", `{"public_key":"some-public-key","private_key":"some-private-key"}`)
 
 			session := runCommand("set", "-n", "foo-ssh-key", "-u", "some-public-key", "-p", "some-private-key", "-t", "ssh", "--output-json")
 
@@ -186,7 +186,7 @@ var _ = Describe("Set", func() {
 		})
 
 		It("accepts case-insensitive type", func() {
-			SetupPutSshServer("foo-ssh-key", "ssh", "some-public-key", "some-private-key")
+			setupSetServer("foo-ssh-key", "ssh", `{"public_key":"some-public-key","private_key":"some-private-key"}`)
 
 			session := runCommand("set", "-n", "foo-ssh-key", "-u", "some-public-key", "-p", "some-private-key", "-t", "SSH")
 
@@ -197,7 +197,7 @@ var _ = Describe("Set", func() {
 		})
 
 		It("handles newline characters", func() {
-			SetupPutSshServer("foo-ssh-key", "ssh", `some\npublic\nkey`, `some\nprivate\nkey`)
+			setupSetServer("foo-ssh-key", "ssh", `{"public_key":"some\npublic\nkey","private_key":"some\nprivate\nkey"}`)
 			session := runCommand("set", "-n", "foo-ssh-key", "-u", `some\npublic\nkey`, "-p", `some\nprivate\nkey`, "-t", "ssh", "--output-json")
 
 			responseJson := `{
@@ -215,8 +215,7 @@ var _ = Describe("Set", func() {
 
 	Describe("setting RSA secrets", func() {
 		It("puts a secret using explicit rsa type", func() {
-			SetupPutRsaServer("foo-rsa-key", "rsa", "some-public-key", "some-private-key")
-
+			setupSetServer("foo-rsa-key", "rsa", `{"public_key":"some-public-key","private_key":"some-private-key"}`)
 			session := runCommand("set", "-n", "foo-rsa-key", "-u", "some-public-key", "-p", "some-private-key", "-t", "rsa")
 
 			Eventually(session).Should(Exit(0))
@@ -226,7 +225,7 @@ var _ = Describe("Set", func() {
 		})
 
 		It("puts a secret using values read from files", func() {
-			SetupPutRsaServer("foo-rsa-key", "rsa", "some-public-key", "some-private-key")
+			setupSetServer("foo-rsa-key", "rsa", `{"public_key":"some-public-key","private_key":"some-private-key"}`)
 
 			tempDir := test.CreateTempDir("rsaFilesForTesting")
 			publicFileName := test.CreateCredentialFile(tempDir, "rsa.pub", "some-public-key")
@@ -245,7 +244,7 @@ var _ = Describe("Set", func() {
 		})
 
 		It("puts a secret using explicit rsa type and returns in json format", func() {
-			SetupPutRsaServer("foo-rsa-key", "rsa", "some-public-key", "some-private-key")
+			setupSetServer("foo-rsa-key", "rsa", `{"public_key":"some-public-key","private_key":"some-private-key"}`)
 
 			session := runCommand("set", "-n", "foo-rsa-key", "-u", "some-public-key", "-p", "some-private-key", "-t", "rsa", "--output-json")
 
@@ -257,7 +256,7 @@ var _ = Describe("Set", func() {
 		})
 
 		It("accepts case-insensitive type", func() {
-			SetupPutRsaServer("foo-rsa-key", "rsa", "some-public-key", "some-private-key")
+			setupSetServer("foo-rsa-key", "rsa", `{"public_key":"some-public-key","private_key":"some-private-key"}`)
 
 			session := runCommand("set", "-n", "foo-rsa-key", "-u", "some-public-key", "-p", "some-private-key", "-t", "RSA")
 
@@ -268,7 +267,8 @@ var _ = Describe("Set", func() {
 		})
 
 		It("handles newline characters", func() {
-			SetupPutRsaServer("foo-rsa-key", "rsa", `some\npublic\nkey`, `some\nprivate\nkey`)
+			setupSetServer("foo-rsa-key", "rsa", `{"public_key":"some\npublic\nkey","private_key":"some\nprivate\nkey"}`)
+
 			session := runCommand("set", "-n", "foo-rsa-key", "-u", `some\npublic\nkey`, "-p", `some\nprivate\nkey`, "-t", "rsa", "--output-json")
 
 			Eventually(session).Should(Exit(0))
@@ -279,7 +279,7 @@ var _ = Describe("Set", func() {
 	Describe("setting password secrets", func() {
 
 		It("puts a secret using explicit password type  and returns in yaml format", func() {
-			SetupPutValueServer("my-password", "password", "potatoes")
+			setupSetServer("my-password", "password", `"potatoes"`)
 
 			session := runCommand("set", "-n", "my-password", "-w", "potatoes", "-t", "password")
 
@@ -290,7 +290,7 @@ var _ = Describe("Set", func() {
 		})
 
 		It("prompts for value if value is not provided", func() {
-			SetupPutValueServer("my-password", "password", "potatoes")
+			setupSetServer("my-password", "password", `"potatoes"`)
 
 			session := runCommandWithStdin(strings.NewReader("potatoes\n"), "set", "-n", "my-password", "-t", "password")
 
@@ -302,7 +302,7 @@ var _ = Describe("Set", func() {
 		})
 
 		It("can set password that contains spaces interactively", func() {
-			SetupPutValueServer("my-password", "password", "potatoes potatoes")
+			setupSetServer("my-password", "password", `"potatoes potatoes"`)
 
 			session := runCommandWithStdin(strings.NewReader("potatoes potatoes\n"), "set", "-n", "my-password", "-t", "password")
 
@@ -314,16 +314,16 @@ var _ = Describe("Set", func() {
 		})
 
 		It("escapes special characters in the password", func() {
-			SetupPutValueServer("my-character-test", "password", `{\"password\":\"some-still-bad-password\"}`)
+			setupSetServer("my-password", "password", `"{\"password\":\"some-still-bad-password\"}"`)
 
-			session := runCommand("set", "-t", "password", "-n", "my-character-test", "-w", `{"password":"some-still-bad-password"}`)
+			session := runCommand("set", "-t", "password", "-n", "my-password", "-w", `{"password":"some-still-bad-password"}`)
 
 			Eventually(session).Should(Exit(0))
 			Eventually(string(session.Out.Contents())).Should(ContainSubstring(`value: <redacted>`))
 		})
 
 		It("puts a secret using explicit password type and returns in json format", func() {
-			SetupPutValueServer("my-password", "password", "potatoes")
+			setupSetServer("my-password", "password", `"potatoes"`)
 
 			session := runCommand("set", "-n", "my-password", "-w", "potatoes", "-t", "password", "--output-json")
 
@@ -332,7 +332,7 @@ var _ = Describe("Set", func() {
 		})
 
 		It("accepts case-insensitive type", func() {
-			SetupPutValueServer("my-password", "password", "potatoes")
+			setupSetServer("my-password", "password", `"potatoes"`)
 
 			session := runCommand("set", "-n", "my-password", "-w", "potatoes", "-t", "PASSWORD")
 
@@ -345,8 +345,7 @@ var _ = Describe("Set", func() {
 
 	Describe("setting certificate secrets", func() {
 		It("puts a secret using explicit certificate type and string values", func() {
-			SetupPutCertificateServer("my-secret", "my-ca", "my-cert", "my-priv")
-
+			setupSetServer("my-secret", "certificate", `{"ca":"my-ca","certificate":"my-cert","private_key":"my-priv"}`)
 			session := runCommand("set", "-n", "my-secret",
 				"-t", "certificate", "--root", "my-ca",
 				"--certificate", "my-cert", "--private", "my-priv")
@@ -358,7 +357,7 @@ var _ = Describe("Set", func() {
 		})
 
 		It("puts a secret using explicit certificate type, string values, and certificate authority name", func() {
-			SetupPutCertificateWithCaNameServer("my-secret", "my-ca", "my-cert", "my-priv")
+			setupSetServer("my-secret", "certificate", `{"ca": "", "ca_name":"my-ca","certificate":"my-cert","private_key":"my-priv"}`)
 
 			session := runCommand("set", "-n", "my-secret",
 				"-t", "certificate", "--ca-name", "my-ca",
@@ -371,7 +370,7 @@ var _ = Describe("Set", func() {
 		})
 
 		It("puts a secret using explicit certificate type and values read from files", func() {
-			SetupPutCertificateServer("my-secret", "my-ca", "my-cert", "my-priv")
+			setupSetServer("my-secret", "certificate", `{"ca":"my-ca","certificate":"my-cert","private_key":"my-priv"}`)
 			tempDir := test.CreateTempDir("certFilesForTesting")
 			caFilename := test.CreateCredentialFile(tempDir, "ca.txt", "my-ca")
 			certificateFilename := test.CreateCredentialFile(tempDir, "certificate.txt", "my-cert")
@@ -397,7 +396,7 @@ var _ = Describe("Set", func() {
 		}
 
 		It("puts a secret using explicit certificate type and string values in json format", func() {
-			SetupPutCertificateServer("my-secret", "my-ca", "my-cert", "my-priv")
+			setupSetServer("my-secret", "certificate", `{"ca":"my-ca","certificate":"my-cert","private_key":"my-priv"}`)
 
 			session := runCommand("set", "-n", "my-secret",
 				"-t", "certificate", "--root", "my-ca",
@@ -410,7 +409,7 @@ var _ = Describe("Set", func() {
 		})
 
 		It("accepts case insensitive type", func() {
-			SetupPutCertificateServer("my-secret", "my-ca", "my-cert", "my-priv")
+			setupSetServer("my-secret", "certificate", `{"ca":"my-ca","certificate":"my-cert","private_key":"my-priv"}`)
 
 			session := runCommand("set", "-n", "my-secret",
 				"-t", "CERTIFICATE", "--root", "my-ca",
@@ -423,7 +422,7 @@ var _ = Describe("Set", func() {
 		})
 
 		It("handles newline characters", func() {
-			SetupPutCertificateServer("my-secret", `my\nca`, `my\ncert`, `my\npriv`)
+			setupSetServer("my-secret", "certificate", `{"ca":"my\nca","certificate":"my\ncert","private_key":"my\npriv"}`)
 			session := runCommand("set", "-n", "my-secret",
 				"-t", "certificate", "--root", `my\nca`,
 				"--certificate", `my\ncert`, "--private", `my\npriv`, "--output-json")
@@ -434,8 +433,8 @@ var _ = Describe("Set", func() {
 
 	Describe("setting User secrets", func() {
 		It("puts a secret using explicit user type", func() {
-			SetupPutUserServer("my-username-credential", `{"username": "my-username", "password": "test-password"}`, "my-username", "test-password", "passw0rd-H4$h")
-
+			//SetupPutUserServer("my-username-credential", `{"username": "my-username", "password": "test-password"}`, "my-username", "test-password", "passw0rd-H4$h")
+			setupSetServer("my-username-credential", "user", `{"username": "my-username", "password": "test-password"}`)
 			session := runCommand("set", "-n", "my-username-credential", "-z", "my-username", "-w", "test-password", "-t", "user")
 
 			Eventually(session).Should(Exit(0))
@@ -446,8 +445,7 @@ var _ = Describe("Set", func() {
 		})
 
 		It("should set password interactively for user", func() {
-			SetupPutUserServer("my-username-credential", `{"username": "my-username", "password": "test-password"}`, "my-username", "test-password", "passw0rd-H4$h")
-
+			setupSetServer("my-username-credential", "user", `{"username": "my-username", "password": "test-password"}`)
 			session := runCommandWithStdin(strings.NewReader("test-password\n"), "set", "-n", "my-username-credential", "-t", "user", "--username", "my-username")
 
 			Eventually(string(session.Out.Contents())).Should(ContainSubstring("name: my-username-credential"))
@@ -457,11 +455,9 @@ var _ = Describe("Set", func() {
 		})
 
 		It("should set null username when it isn't provided", func() {
-			SetupPutUserWithoutUsernameServer("my-username-credential", `{"username":"","password": "test-password"}`, "test-password", "passw0rd-H4$h")
+			setupSetServer("my-username-credential", "user", `{"username": "", "password": "test-password"}`)
 
 			session := runCommandWithStdin(strings.NewReader("test-password\n"), "set", "-n", "my-username-credential", "-t", "user")
-
-			//response := fmt.Sprintf(USER_WITHOUT_USERNAME_CREDENTIAL_RESPONSE_YAML, "my-username-credential", "test-password", "passw0rd-H4$h")
 
 			Eventually(session).Should(Exit(0))
 			Eventually(string(session.Out.Contents())).Should(ContainSubstring("name: my-username-credential"))
@@ -470,7 +466,7 @@ var _ = Describe("Set", func() {
 		})
 
 		It("puts a secret using explicit user type in json format", func() {
-			SetupPutUserServer("my-username-credential", `{"username": "my-username", "password": "test-password"}`, "my-username", "test-password", "passw0rd-H4$h")
+			setupSetServer("my-username-credential", "user", `{"username": "my-username", "password": "test-password"}`)
 
 			session := runCommand("set", "-n", "my-username-credential", "-z", "my-username", "-w", "test-password", "-t", "user",
 				"--output-json")
@@ -483,8 +479,7 @@ var _ = Describe("Set", func() {
 		})
 
 		It("accepts case-insensitive type", func() {
-			SetupPutUserServer("my-username-credential", `{"username": "my-username", "password": "test-password"}`, "my-username", "test-password", "passw0rd-H4$h")
-
+			setupSetServer("my-username-credential", "user", `{"username": "my-username", "password": "test-password"}`)
 			session := runCommand("set", "-n", "my-username-credential", "-z", "my-username", "-w", "test-password", "-t", "USER")
 
 			Eventually(session).Should(Exit(0))
@@ -538,115 +533,20 @@ var _ = Describe("Set", func() {
 	})
 })
 
-func SetupPutRsaServer(name, keyType, publicKey, privateKey string) {
-	var jsonRequest string
-	jsonRequest = fmt.Sprintf(RSA_SSH_CREDENTIAL_REQUEST_JSON, keyType, name, publicKey, privateKey)
+const SET_CREDENTIAL_REQUEST_JSON = `{"type":"%s","name":"%s","value":%s}`
+const SET_CREDENTIAL_RESPONSE_JSON = `{"type":"%s","id":"` + UUID + `","name":"%s","version_created_at":"` + TIMESTAMP + `","value":%s,"version_created_at":"` + TIMESTAMP + `"}`
+
+func setupSetServer(name, keyType, value string) {
 	server.AppendHandlers(
 		CombineHandlers(
 			VerifyRequest("PUT", "/api/v1/data"),
-			VerifyJSON(jsonRequest),
-			RespondWith(http.StatusOK, fmt.Sprintf(RSA_CREDENTIAL_RESPONSE_JSON, keyType, name, publicKey, privateKey)),
+			VerifyJSON(fmt.Sprintf(SET_CREDENTIAL_REQUEST_JSON, keyType, name, value)),
+			RespondWith(http.StatusOK, fmt.Sprintf(SET_CREDENTIAL_RESPONSE_JSON, keyType, name, value)),
 		),
 	)
 }
 
-func SetupPutSshServer(name, keyType, publicKey, privateKey string) {
-	var jsonRequest string
-	jsonRequest = fmt.Sprintf(RSA_SSH_CREDENTIAL_REQUEST_JSON, keyType, name, publicKey, privateKey)
-	server.AppendHandlers(
-		CombineHandlers(
-			VerifyRequest("PUT", "/api/v1/data"),
-			VerifyJSON(jsonRequest),
-			RespondWith(http.StatusOK, fmt.Sprintf(SSH_CREDENTIAL_RESPONSE_JSON, keyType, name, publicKey, privateKey)),
-		),
-	)
-}
-
-func SetupPutValueServer(name, credentialType, value string) {
-	var jsonRequest string
-	jsonRequest = fmt.Sprintf(STRING_CREDENTIAL_REQUEST_JSON, credentialType, name, value)
-	server.AppendHandlers(
-		CombineHandlers(
-			VerifyRequest("PUT", "/api/v1/data"),
-			VerifyJSON(jsonRequest),
-			RespondWith(http.StatusOK, fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_JSON, credentialType, name, value)),
-		),
-	)
-}
-
-func setupPutJsonServer(name, value string) {
-	var jsonRequest string
-	jsonRequest = fmt.Sprintf(JSON_CREDENTIAL_REQUEST_JSON, name, value)
-	server.AppendHandlers(
-		CombineHandlers(
-			VerifyRequest("PUT", "/api/v1/data"),
-			VerifyJSON(jsonRequest),
-			RespondWith(http.StatusOK, fmt.Sprintf(JSON_CREDENTIAL_RESPONSE_JSON, name, value)),
-		),
-	)
-}
-
-func SetupPutCertificateServer(name, ca, cert, priv string) {
-	var jsonRequest string
-	jsonRequest = fmt.Sprintf(CERTIFICATE_CREDENTIAL_REQUEST_JSON, name, ca, cert, priv)
-	server.AppendHandlers(
-		CombineHandlers(
-			VerifyRequest("PUT", "/api/v1/data"),
-			VerifyJSON(jsonRequest),
-			RespondWith(http.StatusOK, fmt.Sprintf(CERTIFICATE_CREDENTIAL_RESPONSE_JSON, name, ca, cert, priv)),
-		),
-	)
-}
-
-func SetupPutCertificateWithCaNameServer(name, caName, cert, priv string) {
-	var jsonRequest string
-	jsonRequest = fmt.Sprintf(CERTIFICATE_CREDENTIAL_WITH_NAMED_CA_REQUEST_JSON, name, caName, cert, priv)
-	server.AppendHandlers(
-		CombineHandlers(
-			VerifyRequest("PUT", "/api/v1/data"),
-			VerifyJSON(jsonRequest),
-			RespondWith(http.StatusOK, fmt.Sprintf(CERTIFICATE_CREDENTIAL_RESPONSE_JSON, name, "known-ca-value", cert, priv)),
-		),
-	)
-}
-
-func SetupPutCertificateWithCaNameForImportServer(name, caName, cert, priv string) {
-	var jsonRequest string
-	jsonRequest = fmt.Sprintf(CERTIFICATE_CREDENTIAL_WITH_NAMED_CA_REQUEST_JSON_FOR_IMPORT, name, caName, cert, priv)
-	server.AppendHandlers(
-		CombineHandlers(
-			VerifyRequest("PUT", "/api/v1/data"),
-			VerifyJSON(jsonRequest),
-			RespondWith(http.StatusOK, fmt.Sprintf(CERTIFICATE_CREDENTIAL_RESPONSE_JSON, name, "known-ca-value", cert, priv)),
-		),
-	)
-}
-
-func SetupPutUserServer(name, value, username, password, passwordHash string) {
-	var jsonRequest string
-	jsonRequest = fmt.Sprintf(USER_SET_CREDENTIAL_REQUEST_JSON, name, value)
-	server.AppendHandlers(
-		CombineHandlers(
-			VerifyRequest("PUT", "/api/v1/data"),
-			VerifyJSON(jsonRequest),
-			RespondWith(http.StatusOK, fmt.Sprintf(USER_CREDENTIAL_RESPONSE_JSON, name, username, password, passwordHash)),
-		),
-	)
-}
-
-func SetupPutUserWithoutUsernameServer(name, value, password, passwordHash string) {
-	var jsonRequest string
-	jsonRequest = fmt.Sprintf(USER_SET_CREDENTIAL_REQUEST_JSON, name, value)
-	server.AppendHandlers(
-		CombineHandlers(
-			VerifyRequest("PUT", "/api/v1/data"),
-			VerifyJSON(jsonRequest),
-			RespondWith(http.StatusOK, fmt.Sprintf(USER_WITHOUT_USERNAME_CREDENTIAL_RESPONSE_JSON, name, password, passwordHash)),
-		),
-	)
-}
-
-func SetupPutBadRequestServer(body string) {
+func setupPutBadRequestServer(body string) {
 	server.AppendHandlers(
 		CombineHandlers(
 			VerifyRequest("PUT", "/api/v1/data"),

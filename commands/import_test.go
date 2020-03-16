@@ -80,7 +80,7 @@ Failed to set: 0
 		Describe("when importing yaml", func() {
 			It("passes through the server error", func() {
 				jsonBody := `{"name":"","type":"password","value":"test-password"}`
-				SetupPutBadRequestServer(jsonBody)
+				setupPutBadRequestServer(jsonBody)
 
 				session := runCommand("import", "-f", "../test/test_import_missing_name.yml")
 
@@ -90,7 +90,7 @@ Failed to set: 0
 		Describe("when importing json", func() {
 			It("passes through the server error", func() {
 				jsonBody := `{"name":"","type":"password","value":"test-password"}`
-				SetupPutBadRequestServer(jsonBody)
+				setupPutBadRequestServer(jsonBody)
 
 				session := runCommand("import", "-f", "../test/test_import_missing_name.json", "-j")
 
@@ -125,9 +125,9 @@ Failed to set: 0
 			It("should display error message", func() {
 				request := `{"type":"invalid_type","name":"/test/invalid_type","value":"some string"}`
 				request1 := `{"type":"invalid_type","name":"/test/invalid_type1","value":"some string"}`
-				SetupPutBadRequestServer(request)
-				SetupPutBadRequestServer(request1)
-				SetupPutUserServer("/test/user", `{"username": "covfefe", "password": "test-user-password"}`, "covfefe", "test-user-password", "P455W0rd-H45H")
+				setupPutBadRequestServer(request)
+				setupPutBadRequestServer(request1)
+				setupSetServer("/test/user", "user", `{"username": "covfefe", "password": "test-user-password"}`)
 
 				session := runCommand("import", "-f", "../test/test_import_partial_fail_set.yml")
 				summaryMessage := `Import complete.
@@ -146,9 +146,9 @@ Failed to set: 2
 			It("should display error message", func() {
 				request := `{"type":"invalid_type","name":"/test/invalid_type","value":"some string"}`
 				request1 := `{"type":"invalid_type","name":"/test/invalid_type1","value":"some string"}`
-				SetupPutBadRequestServer(request)
-				SetupPutBadRequestServer(request1)
-				SetupPutUserServer("/test/user", `{"username": "covfefe", "password": "test-user-password"}`, "covfefe", "test-user-password", "P455W0rd-H45H")
+				setupPutBadRequestServer(request)
+				setupPutBadRequestServer(request1)
+				setupSetServer("/test/user", "user", `{"username": "covfefe", "password": "test-user-password"}`)
 
 				session := runCommand("import", "-f", "../test/test_import_partial_fail_set.json", "-j")
 				summaryMessage := `Import complete.
@@ -187,7 +187,7 @@ Failed to set: 2
 	Describe("when importing an ssh type with key public_key_fingerprint", func() {
 		Describe("when importing yaml", func() {
 			It("ignore public_key_fingerprint", func() {
-				SetupPutSshServer("/test/sshCred", "ssh", "some-key", "some-private-key")
+				setupSetServer("/test/sshCred", "ssh", `{"public_key":"some-key","private_key":"some-private-key"}`)
 
 				session := runCommand("import", "-f", "../test/test_import_ssh_type_with_public_key_fingerprint.yml")
 				Eventually(session).Should(Exit(0))
@@ -199,7 +199,7 @@ Failed to set: 0
 		})
 		Describe("when importing json", func() {
 			It("ignore public_key_fingerprint", func() {
-				SetupPutSshServer("/test/sshCred", "ssh", "some-key", "some-private-key")
+				setupSetServer("/test/sshCred", "ssh", `{"public_key":"some-key","private_key":"some-private-key"}`)
 
 				session := runCommand("import", "-f", "../test/test_import_ssh_type_with_public_key_fingerprint.json", "-j")
 				Eventually(session).Should(Exit(0))
@@ -215,7 +215,7 @@ Failed to set: 0
 	Describe("when importing a user type with password_hash", func() {
 		Describe("when importing yaml", func() {
 			It("ignore password_hash", func() {
-				SetupPutUserServer("/test/userCred", `{"username": "sample-username", "password": "test-user-password"}`, "sample-username", "test-user-password", "P455W0rd-H45H")
+				setupSetServer("/test/userCred", "user", `{"username": "sample-username", "password": "test-user-password"}`)
 
 				session := runCommand("import", "-f", "../test/test_import_user_type_with_password_hash.yml")
 				Eventually(session).Should(Exit(0))
@@ -227,7 +227,7 @@ Failed to set: 0
 		})
 		Describe("when importing json", func() {
 			It("ignore password_hash", func() {
-				SetupPutUserServer("/test/userCred", `{"username": "sample-username", "password": "test-user-password"}`, "sample-username", "test-user-password", "P455W0rd-H45H")
+				setupSetServer("/test/userCred", "user", `{"username": "sample-username", "password": "test-user-password"}`)
 
 				session := runCommand("import", "-f", "../test/test_import_user_type_with_password_hash.json", "-j")
 				Eventually(session).Should(Exit(0))
@@ -243,7 +243,7 @@ Failed to set: 0
 	Describe("when importing a value as a integer", func() {
 		Describe("when importing yaml", func() {
 			It("casts int to string and successfully imports", func() {
-				SetupPutValueServer("/test/intStringValue", "value", "123")
+				setupSetServer("/test/intStringValue", "value", `"123"`)
 
 				session := runCommand("import", "-f", "../test/test_import_with_int_for_value.yml")
 
@@ -257,7 +257,7 @@ Failed to set: 0
 		})
 		Describe("when importing json", func() {
 			It("casts int to string and successfully imports", func() {
-				SetupPutValueServer("/test/intStringValue", "value", "123")
+				setupSetServer("/test/intStringValue", "value", `"123"`)
 
 				session := runCommand("import", "-f", "../test/test_import_with_int_for_value.json", "-j")
 
@@ -276,18 +276,9 @@ Failed to set: 0
 		Context("and leaf comes after signing CA", func() {
 			Describe("when importing yaml", func() {
 				It("imports the signing CA first", func() {
-					SetupPutCertificateServer("/root_ca",
-						"root ca",
-						"root certificate",
-						"root private key")
-					SetupPutCertificateWithCaNameForImportServer("/intermediate_ca",
-						"/root_ca",
-						"intermediate certificate",
-						"intermediate private key")
-					SetupPutCertificateWithCaNameForImportServer("/leaf_cert",
-						"/intermediate_ca",
-						"leaf certificate",
-						"leaf private key")
+					setupSetServer("/root_ca", "certificate", `{"ca":"root-ca","certificate":"root-certificate","private_key":"root-private-key"}`)
+					setupSetServer("/intermediate_ca", "certificate", `{"ca_name":"/root_ca","certificate":"intermediate-certificate","private_key":"intermediate-private-key"}`)
+					setupSetServer("/leaf_cert", "certificate", `{"ca_name":"/intermediate_ca","certificate":"leaf-certificate","private_key":"leaf-private-key"}`)
 
 					session := runCommand("import", "-f", "../test/certificate-chain.yml")
 					Eventually(session).Should(Exit(0))
@@ -300,18 +291,10 @@ Failed to set: 0
 			})
 			Describe("when importing json", func() {
 				It("imports the signing CA first", func() {
-					SetupPutCertificateServer("/root_ca",
-						"root ca",
-						"root certificate",
-						"root private key")
-					SetupPutCertificateWithCaNameForImportServer("/intermediate_ca",
-						"/root_ca",
-						"intermediate certificate",
-						"intermediate private key")
-					SetupPutCertificateWithCaNameForImportServer("/leaf_cert",
-						"/intermediate_ca",
-						"leaf certificate",
-						"leaf private key")
+					setupSetServer("/root_ca", "certificate", `{"ca":"root-ca","certificate":"root-certificate","private_key":"root-private-key"}`)
+					setupSetServer("/intermediate_ca", "certificate", `{"ca_name":"/root_ca","certificate":"intermediate-certificate","private_key":"intermediate-private-key"}`)
+					setupSetServer("/leaf_cert", "certificate", `{"ca_name":"/intermediate_ca","certificate":"leaf-certificate","private_key":"leaf-private-key"}`)
+
 
 					session := runCommand("import", "-f", "../test/certificate-chain.json", "-j")
 					Eventually(session).Should(Exit(0))
@@ -328,14 +311,11 @@ Failed to set: 0
 })
 
 func setUpImportRequests() {
-	SetupPutValueServer("/test/password", "password", "test-password-value")
-	SetupPutValueServer("/test/value", "value", "test-value")
-	SetupPutCertificateServer("/test/certificate",
-		`ca-certificate`,
-		`certificate`,
-		`private-key`)
-	SetupPutRsaServer("/test/rsa", "rsa", "public-key", "private-key")
-	SetupPutRsaServer("/test/ssh", "ssh", "ssh-public-key", "private-key")
-	SetupPutUserServer("/test/user", `{"username": "covfefe", "password": "test-user-password"}`, "covfefe", "test-user-password", "P455W0rd-H45H")
-	setupPutJsonServer("/test/json", `{"1":"key is not a string","3.14":"pi","true":"key is a bool","arbitrary_object":{"nested_array":["array_val1",{"array_object_subvalue":"covfefe"}]}}`)
+	setupSetServer("/test/password", "password", `"test-password-value"`)
+	setupSetServer("/test/value", "value", `"test-value"`)
+	setupSetServer("/test/certificate", "certificate", `{"ca":"ca-certificate","certificate":"certificate","private_key":"private-key"}`)
+	setupSetServer("/test/rsa", "rsa", `{"public_key":"public-key","private_key":"private-key"}`)
+	setupSetServer("/test/ssh", "ssh", `{"public_key":"ssh-public-key","private_key":"private-key"}`)
+	setupSetServer("/test/user", "user", `{"username": "covfefe", "password": "test-user-password"}`)
+	setupSetServer("/test/json", "json", `{"1":"key is not a string","3.14":"pi","true":"key is a bool","arbitrary_object":{"nested_array":["array_val1",{"array_object_subvalue":"covfefe"}]}}`)
 }

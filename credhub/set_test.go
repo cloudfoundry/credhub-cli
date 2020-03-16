@@ -18,20 +18,33 @@ import (
 )
 
 var _ = Describe("Set", func() {
-	Describe("SetCertificate()", func() {
-		It("requests to set the certificate", func() {
-			requestBody := `
-{
-	"name":"/example-certificate",
-    "type":"certificate",
-	"value":{
-		"ca":"some-ca",
-		"ca_name":"/some-ca-name",
-		"certificate":"some-certificate",
-		"private_key":"some-private-key"
-	}
-}
-`
+	Describe("SetCredential()", func() {
+		It("returns the credential that has been set", func() {
+			dummy := &DummyAuth{Response: &http.Response{
+				StatusCode: http.StatusOK,
+				Body: ioutil.NopCloser(bytes.NewBufferString(`{
+		  "id": "some-credential",
+		  "name": "some-credential",
+		  "type": "some-type",
+		  "value": "some-value",
+		  "version_created_at": "2017-01-01T04:07:18Z"
+		}`)),
+			}}
+
+			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
+			Expect(err).ToNot(HaveOccurred())
+
+			cred, err := ch.SetCredential("some-credential", "some-type", "some-value")
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(cred.Name).To(Equal("some-credential"))
+			Expect(cred.Type).To(Equal("some-type"))
+			val, ok := cred.Value.(string)
+			Expect(ok).To(BeTrue())
+			Expect(val).To(Equal("some-value"))
+		})
+
+		It("sends a request for server version when server version is not provided", func() {
 			server := ghttp.NewServer()
 			server.AppendHandlers(
 				ghttp.CombineHandlers(
@@ -40,88 +53,73 @@ var _ = Describe("Set", func() {
 				),
 				ghttp.CombineHandlers(
 					ghttp.VerifyRequest("GET", "/version"),
-					ghttp.RespondWith(http.StatusOK, `{"version": "2.0.0"}`),
+					ghttp.RespondWith(http.StatusOK, `{"version": "1.9.0"}`),
 				),
 				ghttp.CombineHandlers(
 					ghttp.VerifyRequest("PUT", "/api/v1/data"),
-					ghttp.VerifyJSON(requestBody),
 					ghttp.RespondWith(http.StatusOK, `{}`),
 				),
 			)
-
 			ch, err := New(server.URL())
-
 			Expect(err).ToNot(HaveOccurred())
+			_, err = ch.SetCredential("some-credential", "some-type", "some-value")
+			Expect(err).NotTo(HaveOccurred())
+		})
 
-			certificate := values.Certificate{
-				Ca:          "some-ca",
-				CaName:      "/some-ca-name",
-				Certificate: "some-certificate",
-				PrivateKey:  "some-private-key",
+		It("sets overwrite mode when server version is older than 2.x", func() {
+			dummy := &DummyAuth{Response: &http.Response{
+				StatusCode: http.StatusOK,
+				Body:       ioutil.NopCloser(bytes.NewBufferString("{}")),
+			},
+				Error: nil,
 			}
-			_, err = ch.SetCertificate("/example-certificate", certificate)
+
+			version := fmt.Sprintf("1.%d.0", rand.Intn(10))
+			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion(version))
 			Expect(err).ToNot(HaveOccurred())
+			_, err = ch.SetCredential("some-credential", "some-type", "some-value")
+			Expect(err).NotTo(HaveOccurred())
+
+			var requestBody map[string]interface{}
+			body, err := ioutil.ReadAll(dummy.Request.Body)
+			Expect(json.Unmarshal(body, &requestBody)).To(Succeed())
+
+			Expect(requestBody["mode"]).To(Equal("overwrite"))
 		})
 
-		Context("when server version is not provided", func() {
-			var server *ghttp.Server
-
-			BeforeEach(func() {
-				server = ghttp.NewServer()
-				server.AppendHandlers(
-					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("GET", "/info"),
-						ghttp.RespondWith(http.StatusOK, `{}`),
-					),
-					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("GET", "/version"),
-						ghttp.RespondWith(http.StatusOK, `{"version": "1.9.0"}`),
-					),
-					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("PUT", "/api/v1/data"),
-						ghttp.RespondWith(http.StatusOK, `{}`),
-					),
-				)
-			})
-
-			It("send request for server version", func() {
-				ch, _ := New(server.URL())
-				_, err := ch.SetCertificate("/example-certificate", values.Certificate{})
-				Expect(err).NotTo(HaveOccurred())
-			})
+		It("returns an error when server version is invalid", func() {
+			ch, err := New("https://example.com", ServerVersion("invalid-version"))
+			Expect(err).ToNot(HaveOccurred())
+			_, err = ch.SetCredential("some-credential", "some-type", "some-value")
+			Expect(err).To(MatchError("Malformed version: invalid-version"))
 		})
 
-		Context("when server version is older than 2.x", func() {
-			It("set overwrite mode", func() {
-				dummy := &DummyAuth{Response: &http.Response{
-					Body: ioutil.NopCloser(bytes.NewBufferString("")),
-				}}
+		It("returns an error when request fails", func() {
+			dummy := &DummyAuth{Error: errors.New("network error occurred")}
+			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
+			Expect(err).ToNot(HaveOccurred())
 
-				version := fmt.Sprintf("1.%d.0", rand.Intn(10))
-				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion(version))
-				ch.SetCertificate("/example-certificate", values.Certificate{})
-
-				var requestBody map[string]interface{}
-				body, _ := ioutil.ReadAll(dummy.Request.Body)
-				json.Unmarshal(body, &requestBody)
-
-				Expect(requestBody["mode"]).To(Equal("overwrite"))
-			})
+			_, err = ch.SetCredential("some-credential", "some-type", "some-value")
+			Expect(err).To(MatchError("network error occurred"))
 		})
 
-		Context("when server version is invalid", func() {
-			It("returns an error", func() {
-				ch, _ := New("https://example.com", ServerVersion("invalid-version"))
-				_, err := ch.SetCertificate("/example-certificate", values.Certificate{})
-				Expect(err).To(MatchError("Malformed version: invalid-version"))
-			})
-		})
+		It("returns an error when response body cannot be unmarshalled", func() {
+			dummy := &DummyAuth{Response: &http.Response{
+				Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
+			}}
+			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
+			Expect(err).ToNot(HaveOccurred())
 
-		Context("when successful", func() {
-			It("returns the credential that has been set", func() {
-				dummy := &DummyAuth{Response: &http.Response{
-					StatusCode: http.StatusOK,
-					Body: ioutil.NopCloser(bytes.NewBufferString(`{
+			_, err = ch.SetCredential("some-credential", "some-type", "some-value")
+			Expect(err).To(MatchError(ContainSubstring("invalid character 's'")))
+		})
+	})
+
+	Describe("SetCertificate()", func() {
+		It("returns the credential that has been set", func() {
+			dummy := &DummyAuth{Response: &http.Response{
+				StatusCode: http.StatusOK,
+				Body: ioutil.NopCloser(bytes.NewBufferString(`{
 		  "id": "some-id",
 		  "name": "/example-certificate",
 		  "type": "certificate",
@@ -132,271 +130,79 @@ var _ = Describe("Set", func() {
 		  },
 		  "version_created_at": "2017-01-01T04:07:18Z"
 		}`)),
-				}}
+			}}
 
-				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
+			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
+			Expect(err).NotTo(HaveOccurred())
 
-				certificate := values.Certificate{
-					Certificate: "some-cert",
-				}
-				cred, _ := ch.SetCertificate("/example-certificate", certificate)
+			certificate := values.Certificate{
+				Certificate: "some-cert",
+			}
+			cred, err := ch.SetCertificate("/example-certificate", certificate)
+			Expect(err).NotTo(HaveOccurred())
 
-				Expect(cred.Name).To(Equal("/example-certificate"))
-				Expect(cred.Type).To(Equal("certificate"))
-				Expect(cred.Value.Ca).To(Equal("some-ca"))
-				Expect(cred.Value.Certificate).To(Equal("some-certificate"))
-				Expect(cred.Value.PrivateKey).To(Equal("some-private-key"))
-			})
+			Expect(cred.Name).To(Equal("/example-certificate"))
+			Expect(cred.Type).To(Equal("certificate"))
+			Expect(cred.Value.Ca).To(Equal("some-ca"))
+			Expect(cred.Value.Certificate).To(Equal("some-certificate"))
+			Expect(cred.Value.PrivateKey).To(Equal("some-private-key"))
 		})
-		Context("when request fails", func() {
-			It("returns an error", func() {
-				dummy := &DummyAuth{Error: errors.New("network error occurred")}
-				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
-				certificate := values.Certificate{
-					Ca: "some-ca",
-				}
-				_, err := ch.SetCertificate("/example-certificate", certificate)
+		It("returns an error when request fails", func() {
+			dummy := &DummyAuth{Error: errors.New("network error occurred")}
+			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
+			Expect(err).NotTo(HaveOccurred())
+			certificate := values.Certificate{
+				Ca: "some-ca",
+			}
 
-				Expect(err).To(MatchError("network error occurred"))
-			})
-		})
-
-		Context("when response body cannot be unmarshalled", func() {
-			It("returns an error", func() {
-				dummy := &DummyAuth{Response: &http.Response{
-					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
-				}}
-				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
-				certificate := values.Certificate{
-					Ca: "some-ca",
-				}
-				_, err := ch.SetCertificate("/example-certificate", certificate)
-
-				Expect(err).To(MatchError(ContainSubstring("invalid character 's'")))
-			})
+			_, err = ch.SetCertificate("/example-certificate", certificate)
+			Expect(err).To(MatchError("network error occurred"))
 		})
 	})
 
 	Describe("SetPassword()", func() {
-		It("requests to set the password", func() {
+		It("returns the credential that has been set", func() {
 			dummy := &DummyAuth{Response: &http.Response{
-				Body: ioutil.NopCloser(bytes.NewBufferString("")),
-			}}
-
-			ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
-			password := values.Password("some-password")
-
-			ch.SetPassword("/example-password", password)
-
-			urlPath := dummy.Request.URL.Path
-			Expect(urlPath).To(Equal("/api/v1/data"))
-			Expect(dummy.Request.Method).To(Equal(http.MethodPut))
-
-			var requestBody map[string]interface{}
-			body, _ := ioutil.ReadAll(dummy.Request.Body)
-			json.Unmarshal(body, &requestBody)
-
-			Expect(requestBody["name"]).To(Equal("/example-password"))
-			Expect(requestBody["type"]).To(Equal("password"))
-			Expect(requestBody["value"]).To(BeEquivalentTo("some-password"))
-		})
-
-		Context("when server version is not provided", func() {
-			var server *ghttp.Server
-
-			BeforeEach(func() {
-				server = ghttp.NewServer()
-				server.AppendHandlers(
-					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("GET", "/info"),
-						ghttp.RespondWith(http.StatusOK, `{}`),
-					),
-					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("GET", "/version"),
-						ghttp.RespondWith(http.StatusOK, `{"version": "1.9.0"}`),
-					),
-					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("PUT", "/api/v1/data"),
-						ghttp.RespondWith(http.StatusOK, `{}`),
-					),
-				)
-			})
-
-			It("send request for server version", func() {
-				ch, _ := New(server.URL())
-				_, err := ch.SetPassword("/example-password", values.Password(""))
-				Expect(err).NotTo(HaveOccurred())
-			})
-		})
-
-		Context("when server version is older than 2.x", func() {
-			It("set overwrite mode", func() {
-				dummy := &DummyAuth{Response: &http.Response{
-					Body: ioutil.NopCloser(bytes.NewBufferString("")),
-				}}
-
-				version := fmt.Sprintf("1.%d.0", rand.Intn(10))
-				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion(version))
-				ch.SetPassword("/example-password", values.Password(""))
-
-				var requestBody map[string]interface{}
-				body, _ := ioutil.ReadAll(dummy.Request.Body)
-				json.Unmarshal(body, &requestBody)
-
-				Expect(requestBody["mode"]).To(Equal("overwrite"))
-			})
-		})
-
-		Context("when server version is invalid", func() {
-			It("returns an error", func() {
-				ch, _ := New("https://example.com", ServerVersion("invalid-version"))
-				_, err := ch.SetPassword("/example-password", values.Password(""))
-				Expect(err).To(MatchError("Malformed version: invalid-version"))
-			})
-		})
-
-		Context("when successful", func() {
-			It("returns the credential that has been set", func() {
-				dummy := &DummyAuth{Response: &http.Response{
-					StatusCode: http.StatusOK,
-					Body: ioutil.NopCloser(bytes.NewBufferString(`{
+				StatusCode: http.StatusOK,
+				Body: ioutil.NopCloser(bytes.NewBufferString(`{
 		  "id": "some-id",
 		  "name": "/example-password",
 		  "type": "password",
 		  "value": "some-password",
 		  "version_created_at": "2017-01-01T04:07:18Z"
 		}`)),
-				}}
+			}}
 
-				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
+			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
+			Expect(err).NotTo(HaveOccurred())
 
-				password := values.Password("some-password")
+			password := values.Password("some-password")
 
-				cred, _ := ch.SetPassword("/example-password", password)
+			cred, err := ch.SetPassword("/example-password", password)
+			Expect(err).NotTo(HaveOccurred())
 
-				Expect(cred.Name).To(Equal("/example-password"))
-				Expect(cred.Type).To(Equal("password"))
+			Expect(cred.Name).To(Equal("/example-password"))
+			Expect(cred.Type).To(Equal("password"))
 
-				Expect(cred.Value).To(BeEquivalentTo("some-password"))
+			Expect(cred.Value).To(BeEquivalentTo("some-password"))
 
-			})
 		})
-		Context("when request fails", func() {
-			It("returns an error", func() {
-				dummy := &DummyAuth{Error: errors.New("network error occurred")}
-				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
-				password := values.Password("some-password")
+		It("returns an error when request fails", func() {
+			dummy := &DummyAuth{Error: errors.New("network error occurred")}
+			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
+			Expect(err).NotTo(HaveOccurred())
+			password := values.Password("some-password")
 
-				_, err := ch.SetPassword("/example-password", password)
-
-				Expect(err).To(MatchError("network error occurred"))
-			})
-		})
-
-		Context("when response body cannot be unmarshalled", func() {
-			It("returns an error", func() {
-				dummy := &DummyAuth{Response: &http.Response{
-					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
-				}}
-
-				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
-				password := values.Password("some-password")
-
-				_, err := ch.SetPassword("/example-password", password)
-
-				Expect(err).To(MatchError(ContainSubstring("invalid character 's'")))
-			})
+			_, err = ch.SetPassword("/example-password", password)
+			Expect(err).To(MatchError("network error occurred"))
 		})
 	})
 
 	Describe("SetUser()", func() {
-		It("requests to set the user", func() {
-			username := "some-user"
+		It("returns the credential that has been set", func() {
 			dummy := &DummyAuth{Response: &http.Response{
-				Body: ioutil.NopCloser(bytes.NewBufferString("")),
-			}}
-
-			ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
-			user := values.User{Username: username, Password: "some-password"}
-
-			ch.SetUser("/example-user", user)
-
-			urlPath := dummy.Request.URL.Path
-			Expect(urlPath).To(Equal("/api/v1/data"))
-			Expect(dummy.Request.Method).To(Equal(http.MethodPut))
-
-			body, _ := ioutil.ReadAll(dummy.Request.Body)
-			Expect(body).To(MatchJSON(`
-			{
-				"name" : "/example-user",
-				"type" : "user",
-				"value": {
-					"username" : "some-user",
-					"password" : "some-password"
-				}
-			}`))
-		})
-
-		Context("when server version is not provided", func() {
-			var server *ghttp.Server
-
-			BeforeEach(func() {
-				server = ghttp.NewServer()
-				server.AppendHandlers(
-					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("GET", "/info"),
-						ghttp.RespondWith(http.StatusOK, `{}`),
-					),
-					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("GET", "/version"),
-						ghttp.RespondWith(http.StatusOK, `{"version": "1.9.0"}`),
-					),
-					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("PUT", "/api/v1/data"),
-						ghttp.RespondWith(http.StatusOK, `{}`),
-					),
-				)
-			})
-
-			It("send request for server version", func() {
-				ch, _ := New(server.URL())
-				_, err := ch.SetUser("/example-user", values.User{})
-				Expect(err).NotTo(HaveOccurred())
-			})
-		})
-
-		Context("when server version is older than 2.x", func() {
-			It("set overwrite mode", func() {
-				dummy := &DummyAuth{Response: &http.Response{
-					Body: ioutil.NopCloser(bytes.NewBufferString("")),
-				}}
-
-				version := fmt.Sprintf("1.%d.0", rand.Intn(10))
-				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion(version))
-				ch.SetUser("/example-user", values.User{})
-
-				var requestBody map[string]interface{}
-				body, _ := ioutil.ReadAll(dummy.Request.Body)
-				json.Unmarshal(body, &requestBody)
-
-				Expect(requestBody["mode"]).To(Equal("overwrite"))
-			})
-		})
-
-		Context("when server version is invalid", func() {
-			It("returns an error", func() {
-				ch, _ := New("https://example.com", ServerVersion("invalid-version"))
-				_, err := ch.SetUser("/example-user", values.User{})
-				Expect(err).To(MatchError("Malformed version: invalid-version"))
-			})
-		})
-
-		user := "username"
-		Context("when successful", func() {
-			It("returns the credential that has been set", func() {
-				dummy := &DummyAuth{Response: &http.Response{
-					StatusCode: http.StatusOK,
-					Body: ioutil.NopCloser(bytes.NewBufferString(`
+				StatusCode: http.StatusOK,
+				Body: ioutil.NopCloser(bytes.NewBufferString(`
 					{
 						"id": "67fc3def-bbfb-4953-83f8-4ab0682ad675",
 						"name": "/example-user",
@@ -408,136 +214,40 @@ var _ = Describe("Set", func() {
 						},
 						"version_created_at": "2017-01-05T01:01:01Z"
 					}`)),
-				}}
+			}}
 
-				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
+			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
+			Expect(err).NotTo(HaveOccurred())
 
-				user := values.User{Username: user, Password: "some-password"}
-				cred, _ := ch.SetUser("/example-user", user)
+			user := values.User{Username: "username", Password: "some-password"}
+			cred, err := ch.SetUser("/example-user", user)
+			Expect(err).NotTo(HaveOccurred())
 
-				Expect(cred.Name).To(Equal("/example-user"))
-				Expect(cred.Type).To(Equal("user"))
-				alternateUsername := "FQnwWoxgSrDuqDLmeLpU"
-				Expect(cred.Value.User).To(Equal(values.User{
-					Username: alternateUsername,
-					Password: "6mRPZB3bAfb8lRpacnXsHfDhlPqFcjH2h9YDvLpL",
-				}))
-
-				Expect(cred.Value.PasswordHash).To(Equal("some-hash"))
-
-			})
+			Expect(cred.Name).To(Equal("/example-user"))
+			Expect(cred.Type).To(Equal("user"))
+			alternateUsername := "FQnwWoxgSrDuqDLmeLpU"
+			Expect(cred.Value.User).To(Equal(values.User{
+				Username: alternateUsername,
+				Password: "6mRPZB3bAfb8lRpacnXsHfDhlPqFcjH2h9YDvLpL",
+			}))
+			Expect(cred.Value.PasswordHash).To(Equal("some-hash"))
 		})
 
-		Context("when request fails", func() {
-			It("returns an error", func() {
-				dummy := &DummyAuth{Error: errors.New("network error occurred")}
-				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
-				user := values.User{Username: user, Password: "some-password"}
-				_, err := ch.SetUser("/example-user", user)
-				Expect(err).To(MatchError("network error occurred"))
-			})
-		})
-
-		Context("when response body cannot be unmarshalled", func() {
-			It("returns an error", func() {
-				dummy := &DummyAuth{Response: &http.Response{
-					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
-				}}
-				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
-
-				user := values.User{Username: user, Password: "some-password"}
-				_, err := ch.SetUser("/example-user", user)
-				Expect(err).To(MatchError(ContainSubstring("invalid character 's'")))
-			})
+		It("returns an error", func() {
+			dummy := &DummyAuth{Error: errors.New("network error occurred")}
+			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
+			Expect(err).NotTo(HaveOccurred())
+			user := values.User{Username: "username", Password: "some-password"}
+			_, err = ch.SetUser("/example-user", user)
+			Expect(err).To(MatchError("network error occurred"))
 		})
 	})
 
 	Describe("SetRSA()", func() {
-		It("requests to set the RSA", func() {
+		It("returns the credential that has been set", func() {
 			dummy := &DummyAuth{Response: &http.Response{
-				Body: ioutil.NopCloser(bytes.NewBufferString("")),
-			}}
-
-			ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
-			RSA := values.RSA{PrivateKey: "private-key", PublicKey: "public-key"}
-
-			ch.SetRSA("/example-rsa", RSA)
-
-			urlPath := dummy.Request.URL.Path
-			Expect(urlPath).To(Equal("/api/v1/data"))
-			Expect(dummy.Request.Method).To(Equal(http.MethodPut))
-
-			body, _ := ioutil.ReadAll(dummy.Request.Body)
-			Expect(body).To(MatchJSON(`
-			{
-				"name": "/example-rsa",
-				"type": "rsa",
-				"value": {
-					"public_key": "public-key",
-					"private_key": "private-key"
-				}
-			}`))
-		})
-
-		Context("when server version is not provided", func() {
-			var server *ghttp.Server
-
-			BeforeEach(func() {
-				server = ghttp.NewServer()
-				server.AppendHandlers(
-					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("GET", "/info"),
-						ghttp.RespondWith(http.StatusOK, `{}`),
-					),
-					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("GET", "/version"),
-						ghttp.RespondWith(http.StatusOK, `{"version": "1.9.0"}`),
-					),
-					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("PUT", "/api/v1/data"),
-						ghttp.RespondWith(http.StatusOK, `{}`),
-					),
-				)
-			})
-
-			It("send request for server version", func() {
-				ch, _ := New(server.URL())
-				_, err := ch.SetRSA("/example-rsa", values.RSA{})
-				Expect(err).NotTo(HaveOccurred())
-			})
-		})
-
-		Context("when server version is older than 2.x", func() {
-			It("set overwrite mode", func() {
-				dummy := &DummyAuth{Response: &http.Response{
-					Body: ioutil.NopCloser(bytes.NewBufferString("")),
-				}}
-
-				version := fmt.Sprintf("1.%d.0", rand.Intn(10))
-				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion(version))
-				ch.SetRSA("/example-rsa", values.RSA{})
-
-				var requestBody map[string]interface{}
-				body, _ := ioutil.ReadAll(dummy.Request.Body)
-				json.Unmarshal(body, &requestBody)
-
-				Expect(requestBody["mode"]).To(Equal("overwrite"))
-			})
-		})
-
-		Context("when server version is invalid", func() {
-			It("returns an error", func() {
-				ch, _ := New("https://example.com", ServerVersion("invalid-version"))
-				_, err := ch.SetRSA("/example-rsa", values.RSA{})
-				Expect(err).To(MatchError("Malformed version: invalid-version"))
-			})
-		})
-
-		Context("when successful", func() {
-			It("returns the credential that has been set", func() {
-				dummy := &DummyAuth{Response: &http.Response{
-					StatusCode: http.StatusOK,
-					Body: ioutil.NopCloser(bytes.NewBufferString(`
+				StatusCode: http.StatusOK,
+				Body: ioutil.NopCloser(bytes.NewBufferString(`
 					{
 						"id": "67fc3def-bbfb-4953-83f8-4ab0682ad676",
 						"name": "/example-rsa",
@@ -548,129 +258,36 @@ var _ = Describe("Set", func() {
 						},
 						"version_created_at": "2017-01-01T04:07:18Z"
 					}`)),
-				}}
+			}}
 
-				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
+			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
+			Expect(err).NotTo(HaveOccurred())
 
-				cred, _ := ch.SetRSA("/example-rsa", values.RSA{})
+			cred, err := ch.SetRSA("/example-rsa", values.RSA{})
+			Expect(err).NotTo(HaveOccurred())
 
-				Expect(cred.Name).To(Equal("/example-rsa"))
-				Expect(cred.Type).To(Equal("rsa"))
-				Expect(cred.Value).To(Equal(values.RSA{
-					PrivateKey: "private-key",
-					PublicKey:  "public-key",
-				}))
-			})
+			Expect(cred.Name).To(Equal("/example-rsa"))
+			Expect(cred.Type).To(Equal("rsa"))
+			Expect(cred.Value).To(Equal(values.RSA{
+				PrivateKey: "private-key",
+				PublicKey:  "public-key",
+			}))
 		})
 
-		Context("when request fails", func() {
-			It("returns an error", func() {
-				dummy := &DummyAuth{Error: errors.New("network error occurred")}
-				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
-				_, err := ch.SetRSA("/example-rsa", values.RSA{})
-				Expect(err).To(MatchError("network error occurred"))
-			})
-		})
-
-		Context("when response body cannot be unmarshalled", func() {
-			It("returns an error", func() {
-				dummy := &DummyAuth{Response: &http.Response{
-					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
-				}}
-
-				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
-				_, err := ch.SetRSA("/example-rsa", values.RSA{})
-				Expect(err).To(MatchError(ContainSubstring("invalid character 's'")))
-			})
+		It("returns an error", func() {
+			dummy := &DummyAuth{Error: errors.New("network error occurred")}
+			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
+			Expect(err).NotTo(HaveOccurred())
+			_, err = ch.SetRSA("/example-rsa", values.RSA{})
+			Expect(err).To(MatchError("network error occurred"))
 		})
 	})
 
 	Describe("SetSSH()", func() {
-		It("requests to set the SSH", func() {
+		It("returns the credential that has been set", func() {
 			dummy := &DummyAuth{Response: &http.Response{
-				Body: ioutil.NopCloser(bytes.NewBufferString("")),
-			}}
-
-			ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
-			SSH := values.SSH{PrivateKey: "private-key", PublicKey: "public-key"}
-
-			ch.SetSSH("/example-ssh", SSH)
-
-			urlPath := dummy.Request.URL.Path
-			Expect(urlPath).To(Equal("/api/v1/data"))
-			Expect(dummy.Request.Method).To(Equal(http.MethodPut))
-
-			body, _ := ioutil.ReadAll(dummy.Request.Body)
-			Expect(body).To(MatchJSON(`
-			{
-				"name": "/example-ssh",
-				"type": "ssh",
-				"value": {
-					"public_key": "public-key",
-					"private_key": "private-key"
-				}
-			}`))
-		})
-
-		Context("when server version is not provided", func() {
-			var server *ghttp.Server
-
-			BeforeEach(func() {
-				server = ghttp.NewServer()
-				server.AppendHandlers(
-					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("GET", "/info"),
-						ghttp.RespondWith(http.StatusOK, `{}`),
-					),
-					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("GET", "/version"),
-						ghttp.RespondWith(http.StatusOK, `{"version": "1.9.0"}`),
-					),
-					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("PUT", "/api/v1/data"),
-						ghttp.RespondWith(http.StatusOK, `{}`),
-					),
-				)
-			})
-
-			It("send request for server version", func() {
-				ch, _ := New(server.URL())
-				_, err := ch.SetSSH("/example-ssh", values.SSH{})
-				Expect(err).NotTo(HaveOccurred())
-			})
-		})
-
-		Context("when server version is older than 2.x", func() {
-			It("set overwrite mode", func() {
-				dummy := &DummyAuth{Response: &http.Response{
-					Body: ioutil.NopCloser(bytes.NewBufferString("")),
-				}}
-
-				version := fmt.Sprintf("1.%d.0", rand.Intn(10))
-				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion(version))
-				ch.SetSSH("/example-ssh", values.SSH{})
-
-				var requestBody map[string]interface{}
-				body, _ := ioutil.ReadAll(dummy.Request.Body)
-				json.Unmarshal(body, &requestBody)
-
-				Expect(requestBody["mode"]).To(Equal("overwrite"))
-			})
-		})
-
-		Context("when server version is invalid", func() {
-			It("returns an error", func() {
-				ch, _ := New("https://example.com", ServerVersion("invalid-version"))
-				_, err := ch.SetSSH("/example-ssh", values.SSH{})
-				Expect(err).To(MatchError("Malformed version: invalid-version"))
-			})
-		})
-
-		Context("when successful", func() {
-			It("returns the credential that has been set", func() {
-				dummy := &DummyAuth{Response: &http.Response{
-					StatusCode: http.StatusOK,
-					Body: ioutil.NopCloser(bytes.NewBufferString(`
+				StatusCode: http.StatusOK,
+				Body: ioutil.NopCloser(bytes.NewBufferString(`
 					{
 						"id": "67fc3def-bbfb-4953-83f8-4ab0682ad676",
 						"name": "/example-ssh",
@@ -681,45 +298,34 @@ var _ = Describe("Set", func() {
 						},
 						"version_created_at": "2017-01-01T04:07:18Z"
 					}`)),
-				}}
+			}}
 
-				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
+			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
+			Expect(err).NotTo(HaveOccurred())
 
-				cred, _ := ch.SetSSH("/example-ssh", values.SSH{})
+			cred, err := ch.SetSSH("/example-ssh", values.SSH{})
+			Expect(err).NotTo(HaveOccurred())
 
-				Expect(cred.Name).To(Equal("/example-ssh"))
-				Expect(cred.Type).To(Equal("ssh"))
-				Expect(cred.Value.SSH).To(Equal(values.SSH{
-					PrivateKey: "private-key",
-					PublicKey:  "public-key",
-				}))
-			})
+			Expect(cred.Name).To(Equal("/example-ssh"))
+			Expect(cred.Type).To(Equal("ssh"))
+			Expect(cred.Value.SSH).To(Equal(values.SSH{
+				PrivateKey: "private-key",
+				PublicKey:  "public-key",
+			}))
 		})
 
-		Context("when request fails", func() {
-			It("returns an error", func() {
-				dummy := &DummyAuth{Error: errors.New("network error occurred")}
-				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
-				_, err := ch.SetSSH("/example-ssh", values.SSH{})
-				Expect(err).To(MatchError("network error occurred"))
-			})
-		})
-
-		Context("when response body cannot be unmarshalled", func() {
-			It("returns an error", func() {
-				dummy := &DummyAuth{Response: &http.Response{
-					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
-				}}
-
-				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
-				_, err := ch.SetSSH("/example-ssh", values.SSH{})
-				Expect(err).To(MatchError(ContainSubstring("invalid character 's'")))
-			})
+		It("returns an error", func() {
+			dummy := &DummyAuth{Error: errors.New("network error occurred")}
+			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
+			Expect(err).NotTo(HaveOccurred())
+			_, err = ch.SetSSH("/example-ssh", values.SSH{})
+			Expect(err).To(MatchError("network error occurred"))
 		})
 	})
 
 	Describe("SetJSON()", func() {
-		JSONValue := `{
+		It("returns the credential that has been set", func() {
+			JSONValue := `{
 					"key": 123,
 					"key_list": [
 					  "val1",
@@ -727,230 +333,46 @@ var _ = Describe("Set", func() {
 					],
 					"is_true": true
 				}`
-		It("requests to set the JSON", func() {
 			dummy := &DummyAuth{Response: &http.Response{
-				Body: ioutil.NopCloser(bytes.NewBufferString("")),
-			}}
-
-			ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
-			JSON := make(map[string]interface{})
-			json.Unmarshal([]byte(JSONValue), &JSON)
-
-			ch.SetJSON("/example-json", JSON)
-
-			urlPath := dummy.Request.URL.Path
-			Expect(urlPath).To(Equal("/api/v1/data"))
-			Expect(dummy.Request.Method).To(Equal(http.MethodPut))
-
-			body, _ := ioutil.ReadAll(dummy.Request.Body)
-			Expect(body).To(MatchJSON(`
-			{
-			  "name": "/example-json",
-			  "type": "json",
-			  "value": {
-				"key": 123,
-				"key_list": [
-				  "val1",
-				  "val2"
-				],
-				"is_true": true
-			  }
-			}`))
-		})
-
-		Context("when server version is not provided", func() {
-			var server *ghttp.Server
-
-			BeforeEach(func() {
-				server = ghttp.NewServer()
-				server.AppendHandlers(
-					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("GET", "/info"),
-						ghttp.RespondWith(http.StatusOK, `{}`),
-					),
-					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("GET", "/version"),
-						ghttp.RespondWith(http.StatusOK, `{"version": "1.9.0"}`),
-					),
-					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("PUT", "/api/v1/data"),
-						ghttp.RespondWith(http.StatusOK, `{}`),
-					),
-				)
-			})
-
-			It("send request for server version", func() {
-				ch, _ := New(server.URL())
-				_, err := ch.SetJSON("/example-json", nil)
-				Expect(err).NotTo(HaveOccurred())
-			})
-		})
-
-		Context("when server version is older than 2.x", func() {
-			It("set overwrite mode", func() {
-				dummy := &DummyAuth{Response: &http.Response{
-					Body: ioutil.NopCloser(bytes.NewBufferString("")),
-				}}
-
-				version := fmt.Sprintf("1.%d.0", rand.Intn(10))
-				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion(version))
-				ch.SetJSON("/example-json", nil)
-
-				var requestBody map[string]interface{}
-				body, _ := ioutil.ReadAll(dummy.Request.Body)
-				json.Unmarshal(body, &requestBody)
-
-				Expect(requestBody["mode"]).To(Equal("overwrite"))
-			})
-		})
-
-		Context("when server version is invalid", func() {
-			It("returns an error", func() {
-				ch, _ := New("https://example.com", ServerVersion("invalid-version"))
-				_, err := ch.SetJSON("/example-json", nil)
-				Expect(err).To(MatchError("Malformed version: invalid-version"))
-			})
-		})
-
-		Context("when successful", func() {
-			It("returns the credential that has been set", func() {
-				dummy := &DummyAuth{Response: &http.Response{
-					StatusCode: http.StatusOK,
-					Body: ioutil.NopCloser(bytes.NewBufferString(`
+				StatusCode: http.StatusOK,
+				Body: ioutil.NopCloser(bytes.NewBufferString(fmt.Sprintf(`
 					{
 						"id": "some-id",
 						"name": "/example-json",
 						"type": "json",
-						"value": {
-							"key": 123,
-							"key_list": [
-							  "val1",
-							  "val2"
-							],
-							"is_true": true
-						  },
+						"value": %s,
 						"version_created_at": "2017-01-01T04:07:18Z"
-					}`)),
-				}}
+					}`, JSONValue))),
+			}}
 
-				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
+			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
+			Expect(err).NotTo(HaveOccurred())
 
-				cred, _ := ch.SetJSON("/example-json", nil)
+			cred, err := ch.SetJSON("/example-json", nil)
+			Expect(err).NotTo(HaveOccurred())
 
-				var unmarshalled values.JSON
-				json.Unmarshal([]byte(JSONValue), &unmarshalled)
+			var unmarshalled values.JSON
+			Expect(json.Unmarshal([]byte(JSONValue), &unmarshalled)).To(Succeed())
 
-				Expect(cred.Name).To(Equal("/example-json"))
-				Expect(cred.Type).To(Equal("json"))
-				Expect(cred.Value).To(Equal(unmarshalled))
-			})
+			Expect(cred.Name).To(Equal("/example-json"))
+			Expect(cred.Type).To(Equal("json"))
+			Expect(cred.Value).To(Equal(unmarshalled))
 		})
 
-		Context("when request fails", func() {
-			It("returns an error", func() {
-				dummy := &DummyAuth{Error: errors.New("network error occurred")}
-				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
-				_, err := ch.SetJSON("/example-json", nil)
-				Expect(err).To(MatchError("network error occurred"))
-			})
-		})
-
-		Context("when response body cannot be unmarshalled", func() {
-			It("returns an error", func() {
-				dummy := &DummyAuth{Response: &http.Response{
-					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
-				}}
-
-				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
-				_, err := ch.SetJSON("/example-json", nil)
-				Expect(err).To(MatchError(ContainSubstring("invalid character 's'")))
-			})
+		It("returns an error when request fails", func() {
+			dummy := &DummyAuth{Error: errors.New("network error occurred")}
+			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
+			Expect(err).NotTo(HaveOccurred())
+			_, err = ch.SetJSON("/example-json", nil)
+			Expect(err).To(MatchError("network error occurred"))
 		})
 	})
 
 	Describe("SetValue()", func() {
-		It("requests to set the Value", func() {
+		It("returns the credential that has been set", func() {
 			dummy := &DummyAuth{Response: &http.Response{
-				Body: ioutil.NopCloser(bytes.NewBufferString("")),
-			}}
-
-			ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
-			value := values.Value("some string value")
-
-			ch.SetValue("/example-value", value)
-
-			urlPath := dummy.Request.URL.Path
-			Expect(urlPath).To(Equal("/api/v1/data"))
-			Expect(dummy.Request.Method).To(Equal(http.MethodPut))
-
-			body, _ := ioutil.ReadAll(dummy.Request.Body)
-			Expect(body).To(MatchJSON(`
-			{
-			  "name": "/example-value",
-			  "type": "value",
-			  "value": "some string value"
-			}`))
-		})
-
-		Context("when server version is not provided", func() {
-			var server *ghttp.Server
-
-			BeforeEach(func() {
-				server = ghttp.NewServer()
-				server.AppendHandlers(
-					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("GET", "/info"),
-						ghttp.RespondWith(http.StatusOK, `{}`),
-					),
-					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("GET", "/version"),
-						ghttp.RespondWith(http.StatusOK, `{"version": "1.9.0"}`),
-					),
-					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("PUT", "/api/v1/data"),
-						ghttp.RespondWith(http.StatusOK, `{}`),
-					),
-				)
-			})
-
-			It("send request for server version", func() {
-				ch, _ := New(server.URL())
-				_, err := ch.SetValue("/example-value", values.Value(""))
-				Expect(err).NotTo(HaveOccurred())
-			})
-		})
-
-		Context("when server version is older than 2.x", func() {
-			It("set overwrite mode", func() {
-				dummy := &DummyAuth{Response: &http.Response{
-					Body: ioutil.NopCloser(bytes.NewBufferString("")),
-				}}
-
-				version := fmt.Sprintf("1.%d.0", rand.Intn(10))
-				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion(version))
-				ch.SetValue("/example-value", values.Value(""))
-
-				var requestBody map[string]interface{}
-				body, _ := ioutil.ReadAll(dummy.Request.Body)
-				json.Unmarshal(body, &requestBody)
-
-				Expect(requestBody["mode"]).To(Equal("overwrite"))
-			})
-		})
-
-		Context("when server version is invalid", func() {
-			It("returns an error", func() {
-				ch, _ := New("https://example.com", ServerVersion("invalid-version"))
-				_, err := ch.SetValue("/example-value", values.Value(""))
-				Expect(err).To(MatchError("Malformed version: invalid-version"))
-			})
-		})
-
-		Context("when successful", func() {
-			It("returns the credential that has been set", func() {
-				dummy := &DummyAuth{Response: &http.Response{
-					StatusCode: http.StatusOK,
-					Body: ioutil.NopCloser(bytes.NewBufferString(`
+				StatusCode: http.StatusOK,
+				Body: ioutil.NopCloser(bytes.NewBufferString(`
 					{
 						"id": "some-id",
 						"name": "/example-value",
@@ -958,38 +380,25 @@ var _ = Describe("Set", func() {
 						"value": "some string value",
 						"version_created_at": "2017-01-01T04:07:18Z"
 					}`)),
-				}}
+			}}
 
-				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
+			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
+			Expect(err).NotTo(HaveOccurred())
 
-				cred, _ := ch.SetValue("/example-value", values.Value(""))
+			cred, err := ch.SetValue("/example-value", values.Value(""))
+			Expect(err).NotTo(HaveOccurred())
 
-				Expect(cred.Name).To(Equal("/example-value"))
-				Expect(cred.Type).To(Equal("value"))
-				Expect(cred.Value).To(Equal(values.Value("some string value")))
-			})
+			Expect(cred.Name).To(Equal("/example-value"))
+			Expect(cred.Type).To(Equal("value"))
+			Expect(cred.Value).To(Equal(values.Value("some string value")))
 		})
 
-		Context("when request fails", func() {
-			It("returns an error", func() {
-				dummy := &DummyAuth{Error: errors.New("network error occurred")}
-				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
-				_, err := ch.SetValue("/example-value", values.Value(""))
-				Expect(err).To(MatchError("network error occurred"))
-			})
-		})
-
-		Context("when response body cannot be unmarshalled", func() {
-			It("returns an error", func() {
-				dummy := &DummyAuth{Response: &http.Response{
-					Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
-				}}
-
-				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
-				_, err := ch.SetValue("/example-value", values.Value(""))
-				Expect(err).To(MatchError(ContainSubstring("invalid character 's'")))
-			})
+		It("returns an error when request fails", func() {
+			dummy := &DummyAuth{Error: errors.New("network error occurred")}
+			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
+			Expect(err).NotTo(HaveOccurred())
+			_, err = ch.SetValue("/example-value", values.Value(""))
+			Expect(err).To(MatchError("network error occurred"))
 		})
 	})
-
 })
