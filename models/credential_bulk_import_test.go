@@ -77,10 +77,10 @@ var _ = Describe("CredentialBulkImport", func() {
 
 			Expect(credentialBulkImport.Credentials[5]).To(Equal(expectedUser))
 
-			expectedJson := make(map[string]interface{})
-			expectedJson["name"] = "/test/json"
-			expectedJson["type"] = "json"
-			expectedJson["value"] = map[string]interface{}{
+			expectedJSON := make(map[string]interface{})
+			expectedJSON["name"] = "/test/json"
+			expectedJSON["type"] = "json"
+			expectedJSON["value"] = map[string]interface{}{
 				"arbitrary_object": map[string]interface{}{
 					"nested_array": []interface{}{
 						"array_val1",
@@ -91,9 +91,9 @@ var _ = Describe("CredentialBulkImport", func() {
 				"3.14": "pi",
 				"true": "key is a bool",
 			}
-			expectedJson["overwrite"] = true
+			expectedJSON["overwrite"] = true
 
-			Expect(credentialBulkImport.Credentials[6]).To(Equal(expectedJson))
+			Expect(credentialBulkImport.Credentials[6]).To(Equal(expectedJSON))
 		})
 		It("parses JSON", func() {
 			var credentialBulkImport models.CredentialBulkImport
@@ -163,10 +163,10 @@ var _ = Describe("CredentialBulkImport", func() {
 
 			Expect(credentialBulkImport.Credentials[5]).To(Equal(expectedUser))
 
-			expectedJson := make(map[string]interface{})
-			expectedJson["name"] = "/test/json"
-			expectedJson["type"] = "json"
-			expectedJson["value"] = map[string]interface{}{
+			expectedJSON := make(map[string]interface{})
+			expectedJSON["name"] = "/test/json"
+			expectedJSON["type"] = "json"
+			expectedJSON["value"] = map[string]interface{}{
 				"arbitrary_object": map[string]interface{}{
 					"nested_array": []interface{}{
 						"array_val1",
@@ -177,9 +177,9 @@ var _ = Describe("CredentialBulkImport", func() {
 				"3.14": "pi",
 				"true": "key is a bool",
 			}
-			expectedJson["overwrite"] = true
+			expectedJSON["overwrite"] = true
 
-			Expect(credentialBulkImport.Credentials[6]).To(Equal(expectedJson))
+			Expect(credentialBulkImport.Credentials[6]).To(Equal(expectedJSON))
 		})
 	})
 	Describe("formatting", func() {
@@ -231,7 +231,7 @@ var _ = Describe("CredentialBulkImport", func() {
   ]
 }`
 					err := credentialBulkImport.ReadBytes([]byte(credentials), true)
-					Expect(err).To(Equal(errors.NewInvalidImportJsonError()))
+					Expect(err).To(Equal(errors.NewInvalidImportJSONError()))
 				})
 			})
 		})

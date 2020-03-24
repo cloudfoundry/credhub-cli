@@ -633,7 +633,7 @@ var _ = Describe("Login", func() {
 						"error_description":"Bad credentials"
 						}`),
 						))
-					badUaaServer.RouteToHandler("DELETE", "/oauth/token/revoke/"+VALID_ACCESS_TOKEN_JTI,
+					badUaaServer.RouteToHandler("DELETE", "/oauth/token/revoke/"+validAccessTokenJTI,
 						RespondWith(http.StatusOK, ""),
 					)
 					badUaaServer.RouteToHandler("GET", "/info", RespondWith(http.StatusOK, ""))
@@ -643,7 +643,7 @@ var _ = Describe("Login", func() {
 
 					cfg := config.ReadConfig()
 					cfg.AuthURL = badUaaServer.URL()
-					cfg.AccessToken = VALID_ACCESS_TOKEN
+					cfg.AccessToken = validAccessToken
 					config.WriteConfig(cfg)
 				})
 
@@ -687,7 +687,7 @@ var _ = Describe("Login", func() {
 						"error_description":"Unauthorized grant type: password"
 						}`),
 						))
-					badUaaServer.RouteToHandler("DELETE", "/oauth/token/revoke/"+VALID_ACCESS_TOKEN_JTI,
+					badUaaServer.RouteToHandler("DELETE", "/oauth/token/revoke/"+validAccessTokenJTI,
 						RespondWith(http.StatusOK, ""),
 					)
 					badUaaServer.RouteToHandler("GET", "/info", RespondWith(http.StatusOK, ""))
@@ -697,7 +697,7 @@ var _ = Describe("Login", func() {
 
 					cfg := config.ReadConfig()
 					cfg.AuthURL = badUaaServer.URL()
-					cfg.AccessToken = VALID_ACCESS_TOKEN
+					cfg.AccessToken = validAccessToken
 					config.WriteConfig(cfg)
 				})
 
@@ -738,7 +738,7 @@ var _ = Describe("Login", func() {
 							VerifyBody([]byte(`client_id=`+config.AuthClient+`&client_secret=`+config.AuthPassword+`&grant_type=password&password=pass&response_type=token&username=user`)),
 							RespondWith(http.StatusInternalServerError, ``),
 						))
-					badUaaServer.RouteToHandler("DELETE", "/oauth/token/revoke/"+VALID_ACCESS_TOKEN_JTI,
+					badUaaServer.RouteToHandler("DELETE", "/oauth/token/revoke/"+validAccessTokenJTI,
 						RespondWith(http.StatusOK, ""),
 					)
 					badUaaServer.RouteToHandler("GET", "/info", RespondWith(http.StatusOK, ""))
@@ -748,7 +748,7 @@ var _ = Describe("Login", func() {
 
 					cfg := config.ReadConfig()
 					cfg.AuthURL = badUaaServer.URL()
-					cfg.AccessToken = VALID_ACCESS_TOKEN
+					cfg.AccessToken = validAccessToken
 					config.WriteConfig(cfg)
 				})
 
@@ -793,7 +793,7 @@ var _ = Describe("Login", func() {
 						"token_type":"bearer",
 						"expires_in":3600}`),
 						))
-					badUaaServer.RouteToHandler("DELETE", "/oauth/token/revoke/"+VALID_ACCESS_TOKEN_JTI,
+					badUaaServer.RouteToHandler("DELETE", "/oauth/token/revoke/"+validAccessTokenJTI,
 						RespondWith(http.StatusOK, ""),
 					)
 					badUaaServer.RouteToHandler("GET", "/info", RespondWith(http.StatusInternalServerError, ""))
@@ -802,7 +802,7 @@ var _ = Describe("Login", func() {
 
 					cfg := config.ReadConfig()
 					cfg.AuthURL = badUaaServer.URL()
-					cfg.AccessToken = VALID_ACCESS_TOKEN
+					cfg.AccessToken = validAccessToken
 					config.WriteConfig(cfg)
 				})
 
@@ -825,7 +825,7 @@ var _ = Describe("Login", func() {
 			It("reads the timeout from the environment and writes it to disk", func() {
 				config.RemoveConfig()
 
-				session := runCommandWithEnv([]string{"CREDHUB_HTTP_TIMEOUT=60s"},"login", "-s", apiServer.URL(), "-u", "user", "-p", "pass", "--skip-tls-validation")
+				session := runCommandWithEnv([]string{"CREDHUB_HTTP_TIMEOUT=60s"}, "login", "-s", apiServer.URL(), "-u", "user", "-p", "pass", "--skip-tls-validation")
 
 				Eventually(session).Should(Exit(0))
 

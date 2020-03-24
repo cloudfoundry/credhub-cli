@@ -35,8 +35,8 @@ func initializeCredhubClient(cfg config.Config) (*credhub.CredHub, error) {
 	return credhubClient, err
 }
 
-func formatOutput(outputJson bool, v interface{}) {
-	if outputJson {
+func formatOutput(outputJSON bool, v interface{}) {
+	if outputJSON {
 
 		s, _ := json.MarshalIndent(v, "", "\t")
 		a := bytes.Replace(s, []byte("\\u003c"), []byte("<"), -1)

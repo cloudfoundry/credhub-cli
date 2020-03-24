@@ -52,7 +52,7 @@ var _ = Describe("Find", func() {
 	Describe("finds a set of credentials matching a supplied string", func() {
 		Describe("when searching for 'name-like'", func() {
 			It("gets a list of string secret names and last-modified dates", func() {
-				responseJson := `{
+				responseJSON := `{
 					"credentials": [
 							{
 								"name": "dan.password",
@@ -71,7 +71,7 @@ var _ = Describe("Find", func() {
 				server.RouteToHandler("GET", "/api/v1/data",
 					CombineHandlers(
 						VerifyRequest("GET", "/api/v1/data", "name-like=dan"),
-						RespondWith(http.StatusOK, responseJson),
+						RespondWith(http.StatusOK, responseJSON),
 					),
 				)
 
@@ -85,14 +85,14 @@ var _ = Describe("Find", func() {
 				var session *Session
 
 				BeforeEach(func() {
-					responseJson := `{
+					responseJSON := `{
 						"credentials": []
 					}`
 
 					server.RouteToHandler("GET", "/api/v1/data",
 						CombineHandlers(
 							VerifyRequest("GET", "/api/v1/data", "name-like=dan"),
-							RespondWith(http.StatusOK, responseJson),
+							RespondWith(http.StatusOK, responseJSON),
 						),
 					)
 
@@ -113,7 +113,7 @@ var _ = Describe("Find", func() {
 
 		Describe("when searching by path", func() {
 			It("gets a list of string secret names and last-modified dates", func() {
-				responseJson := `{
+				responseJSON := `{
 					"credentials": [
 							{
 								"name": "deploy123/dan.password",
@@ -136,7 +136,7 @@ var _ = Describe("Find", func() {
 				server.RouteToHandler("GET", "/api/v1/data",
 					CombineHandlers(
 						VerifyRequest("GET", "/api/v1/data", "path=deploy123"),
-						RespondWith(http.StatusOK, responseJson),
+						RespondWith(http.StatusOK, responseJSON),
 					),
 				)
 

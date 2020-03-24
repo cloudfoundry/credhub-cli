@@ -59,13 +59,7 @@ var _ = Describe("Generate", func() {
 			session := runCommand("generate", "-n", "my-password", "-t", "password", "--output-json")
 
 			Eventually(session).Should(Exit(0))
-			Expect(session.Out.Contents()).To(MatchJSON(`{
-				"id" :"` + UUID + `",
-				"type": "password",
-				"name": "my-password",
-				"version_created_at": "` + TIMESTAMP + `",
-				"value": "<redacted>"
-			}`))
+			Expect(string(session.Out.Contents())).To(MatchJSON(fmt.Sprintf(redactedResponseJSON, "password", "my-password", "{}")))
 		})
 
 		It("allows the type to be any case", func() {
@@ -86,13 +80,7 @@ var _ = Describe("Generate", func() {
 			)
 
 			Eventually(session).Should(Exit(0))
-			Expect(string(session.Out.Contents())).To(MatchJSON(`{
-				"id" :"` + UUID + `",
-				"type": "password",
-				"name": "my-password",
-				"version_created_at": "` + TIMESTAMP + `",
-				"value": "<redacted>"
-			}`))
+			Expect(string(session.Out.Contents())).To(MatchJSON(fmt.Sprintf(redactedResponseJSON, "password", "my-password", "{}")))
 		})
 
 		It("with with no-overwrite", func() {
@@ -149,13 +137,7 @@ var _ = Describe("Generate", func() {
 			session := runCommand("generate", "-n", "foo-ssh-key", "-t", "ssh", "--output-json")
 
 			Eventually(session).Should(Exit(0))
-			Expect(string(session.Out.Contents())).To(MatchJSON(`{
-				"id" :"` + UUID + `",
-				"type": "ssh",
-				"name": "foo-ssh-key",
-				"version_created_at": "` + TIMESTAMP + `",
-				"value": "<redacted>"
-			}`))
+			Expect(string(session.Out.Contents())).To(MatchJSON(fmt.Sprintf(redactedResponseJSON, "ssh", "foo-ssh-key", "{}")))
 		})
 
 		It("with with no-overwrite", func() {
@@ -204,13 +186,7 @@ var _ = Describe("Generate", func() {
 			session := runCommand("generate", "-n", "foo-rsa-key", "-t", "rsa", "--output-json")
 
 			Eventually(session).Should(Exit(0))
-			Expect(string(session.Out.Contents())).To(MatchJSON(`{
-				"id" :"` + UUID + `",
-				"type": "rsa",
-				"name": "foo-rsa-key",
-				"version_created_at": "` + TIMESTAMP + `",
-				"value": "<redacted>"
-			}`))
+			Expect(string(session.Out.Contents())).To(MatchJSON(fmt.Sprintf(redactedResponseJSON, "rsa", "foo-rsa-key", "{}")))
 		})
 
 		It("with with no-overwrite", func() {
@@ -253,13 +229,7 @@ var _ = Describe("Generate", func() {
 			session := runCommand("generate", "-n", "my-secret", "-t", "certificate", "--common-name", "common.name.io", "--output-json")
 
 			Eventually(session).Should(Exit(0))
-			Expect(string(session.Out.Contents())).To(MatchJSON(`{
-				"id" :"` + UUID + `",
-				"version_created_at": "` + TIMESTAMP + `",
-				"type": "certificate",
-				"name": "my-secret",
-				"value": "<redacted>"
-			}`))
+			Expect(string(session.Out.Contents())).To(MatchJSON(fmt.Sprintf(redactedResponseJSON, "certificate", "my-secret", "{}")))
 		})
 
 		It("including common name with no-overwrite", func() {
@@ -528,8 +498,8 @@ func setupGenerateServer(keyType, name, generatedValue, params string, overwrite
 	server.AppendHandlers(
 		CombineHandlers(
 			VerifyRequest("POST", "/api/v1/data"),
-			VerifyJSON(fmt.Sprintf(GENERATE_CREDENTIAL_REQUEST_JSON, keyType, name, params, overwrite)),
-			RespondWith(http.StatusOK, fmt.Sprintf(GENERATE_CREDENTIAL_RESPONSE_JSON, keyType, name, generatedValue)),
+			VerifyJSON(fmt.Sprintf(generateRequestJSON, keyType, name, params, overwrite)),
+			RespondWith(http.StatusOK, fmt.Sprintf(generateResponseJSON, keyType, name, generatedValue)),
 		),
 	)
 }
@@ -538,8 +508,8 @@ func setupGenerateServerWithValue(keyType, name, generatedValue, params, value s
 	server.AppendHandlers(
 		CombineHandlers(
 			VerifyRequest("POST", "/api/v1/data"),
-			VerifyJSON(fmt.Sprintf(GENERATE_CREDENTIAL_WITH_VALUE_REQUEST_JSON, keyType, name, params, overwrite, value)),
-			RespondWith(http.StatusOK, fmt.Sprintf(GENERATE_CREDENTIAL_RESPONSE_JSON, keyType, name, generatedValue)),
+			VerifyJSON(fmt.Sprintf(generateWithValueRequestJSON, keyType, name, params, overwrite, value)),
+			RespondWith(http.StatusOK, fmt.Sprintf(generateResponseJSON, keyType, name, generatedValue)),
 		),
 	)
 }

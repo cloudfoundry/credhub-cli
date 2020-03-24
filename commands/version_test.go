@@ -23,10 +23,10 @@ var _ = Describe("Version", func() {
 
 		Context("when the info endpoint returns the server version", func() {
 			BeforeEach(func() {
-				responseJson := `{"app":{"name":"CredHub","version":"0.2.0"}}`
+				responseJSON := `{"app":{"name":"CredHub","version":"0.2.0"}}`
 
 				server.RouteToHandler("GET", "/info",
-					RespondWith(http.StatusOK, responseJson),
+					RespondWith(http.StatusOK, responseJSON),
 				)
 			})
 
@@ -59,15 +59,15 @@ var _ = Describe("Version", func() {
 
 		Context("when the info endpoint does not return the server version", func() {
 			BeforeEach(func() {
-				infoResponseJson := `{"app":{"name":"CredHub"}}`
-				versionResponseJson := `{"version":"1.2.3"}`
+				infoResponseJSON := `{"app":{"name":"CredHub"}}`
+				versionResponseJSON := `{"version":"1.2.3"}`
 
 				server.RouteToHandler("GET", "/info",
-					RespondWith(http.StatusOK, infoResponseJson),
+					RespondWith(http.StatusOK, infoResponseJSON),
 				)
 
 				server.RouteToHandler("GET", "/version",
-					RespondWith(http.StatusOK, versionResponseJson),
+					RespondWith(http.StatusOK, versionResponseJSON),
 				)
 			})
 
@@ -101,10 +101,10 @@ var _ = Describe("Version", func() {
 
 	Context("when the user is logged out", func() {
 		BeforeEach(func() {
-			responseJson := `{"app":{"name":"CredHub","version":"0.2.0"}}`
+			responseJSON := `{"app":{"name":"CredHub","version":"0.2.0"}}`
 
 			server.RouteToHandler("GET", "/info",
-				RespondWith(http.StatusOK, responseJson),
+				RespondWith(http.StatusOK, responseJSON),
 			)
 		})
 
@@ -120,10 +120,10 @@ var _ = Describe("Version", func() {
 
 	Context("when the config contains invalid tokens", func() {
 		BeforeEach(func() {
-			responseJson := "Server Version: Not Found. Have you targeted and authenticated against a CredHub server?"
+			responseJSON := "Server Version: Not Found. Have you targeted and authenticated against a CredHub server?"
 
 			server.RouteToHandler("GET", "/info",
-				RespondWith(http.StatusOK, responseJson),
+				RespondWith(http.StatusOK, responseJSON),
 			)
 
 			server.RouteToHandler("GET", "/api/v1/data",

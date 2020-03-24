@@ -3,10 +3,11 @@
 package config_test
 
 import (
+	"time"
+
 	"code.cloudfoundry.org/credhub-cli/config"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"time"
 )
 
 var _ = Describe("ConfigWithoutSecrets", func() {

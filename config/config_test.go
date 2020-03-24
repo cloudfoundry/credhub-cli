@@ -3,14 +3,15 @@
 package config_test
 
 import (
-	"code.cloudfoundry.org/credhub-cli/config"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"io/ioutil"
 	"os"
 	"path"
 	"runtime"
 	"time"
+
+	"code.cloudfoundry.org/credhub-cli/config"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Config", func() {
@@ -103,7 +104,7 @@ var _ = Describe("Config", func() {
 
 			configFile, err := ioutil.ReadFile(path.Join(os.Getenv("HOME"), ".credhub", "config.json"))
 			Expect(err).NotTo(HaveOccurred())
-			Expect(string(configFile)).NotTo(ContainSubstring(string(60*time.Second)))
+			Expect(string(configFile)).NotTo(ContainSubstring(string(60 * time.Second)))
 		})
 	})
 

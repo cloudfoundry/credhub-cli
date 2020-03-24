@@ -2,11 +2,12 @@ package main // import "code.cloudfoundry.org/credhub-cli"
 
 import (
 	"fmt"
-	"github.com/cloudfoundry/bosh-utils/errors"
 	"os"
 	"runtime"
 	"runtime/debug"
 	"time"
+
+	"github.com/cloudfoundry/bosh-utils/errors"
 
 	"code.cloudfoundry.org/credhub-cli/commands"
 	"code.cloudfoundry.org/credhub-cli/config"

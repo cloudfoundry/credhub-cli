@@ -13,7 +13,7 @@ import (
 	. "github.com/onsi/gomega/ghttp"
 )
 
-const REGENERATE_CREDENTIAL_REQUEST_JSON = `{"name":"my-password-stuffs", "regenerate":true}`
+const RegenerateCredentialRequestJson = `{"name":"my-password-stuffs", "regenerate":true}`
 
 var _ = Describe("Regenerate", func() {
 	BeforeEach(func() {
@@ -36,8 +36,8 @@ var _ = Describe("Regenerate", func() {
 		It("prints the regenerated password secret in yaml format", func() {
 			server.RouteToHandler("POST", "/api/v1/data",
 				CombineHandlers(
-					VerifyJSON(REGENERATE_CREDENTIAL_REQUEST_JSON),
-					RespondWith(http.StatusOK, fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_JSON, "password", "my-password-stuffs", "nu-potatoes")),
+					VerifyJSON(RegenerateCredentialRequestJson),
+					RespondWith(http.StatusOK, fmt.Sprintf(defaultResponseJSON, "password", "my-password-stuffs", `"nu-potatoes"`, `{}`)),
 				),
 			)
 
@@ -47,27 +47,26 @@ var _ = Describe("Regenerate", func() {
 			Eventually(session.Out).Should(Say("name: my-password-stuff"))
 			Eventually(session.Out).Should(Say("type: password"))
 			Eventually(session.Out).Should(Say("value: <redacted>"))
-
 		})
 
 		It("prints the regenerated password secret in json format", func() {
 			server.RouteToHandler("POST", "/api/v1/data",
 				CombineHandlers(
-					VerifyJSON(REGENERATE_CREDENTIAL_REQUEST_JSON),
-					RespondWith(http.StatusOK, fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_JSON, "password", "my-password-stuffs", "nu-potatoes")),
+					VerifyJSON(RegenerateCredentialRequestJson),
+					RespondWith(http.StatusOK, fmt.Sprintf(defaultResponseJSON, "password", "my-password-stuffs", `"nu-potatoes"`, `{}`)),
 				),
 			)
 
 			session := runCommand("regenerate", "--name", "my-password-stuffs", "--output-json")
 
 			Eventually(session).Should(Exit(0))
-			Expect(string(session.Out.Contents())).To(MatchJSON(fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_JSON, "password", "my-password-stuffs", "<redacted>")))
+			Expect(string(session.Out.Contents())).To(MatchJSON(fmt.Sprintf(defaultResponseJSON, "password", "my-password-stuffs", `"<redacted>"`, `{}`)))
 		})
 
 		It("prints error when server returns an error", func() {
 			server.RouteToHandler("POST", "/api/v1/data",
 				CombineHandlers(
-					VerifyJSON(REGENERATE_CREDENTIAL_REQUEST_JSON),
+					VerifyJSON(RegenerateCredentialRequestJson),
 					RespondWith(http.StatusBadRequest, `{"error":"The password could not be regenerated because the value was statically set. Only generated passwords may be regenerated."}`),
 				),
 			)

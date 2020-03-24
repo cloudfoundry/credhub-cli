@@ -1,9 +1,10 @@
 package commands
 
 import (
+	"time"
+
 	"code.cloudfoundry.org/credhub-cli/config"
 	"code.cloudfoundry.org/credhub-cli/credhub"
-	"time"
 )
 
 type CredhubCommand struct {

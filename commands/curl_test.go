@@ -50,7 +50,7 @@ var _ = Describe("Curl", func() {
 	Context("the user provides an invalid path", func() {
 		It("receives what the server returns", func() {
 			//language=json
-			responseJson := `
+			responseJSON := `
         {
           "error": "An application error occurred. Please contact your CredHub administrator."
         }
@@ -58,7 +58,7 @@ var _ = Describe("Curl", func() {
 			server.RouteToHandler("GET", "/api/v1/data/bogus",
 				CombineHandlers(
 					VerifyRequest("GET", "/api/v1/data/bogus"),
-					RespondWith(http.StatusOK, responseJson),
+					RespondWith(http.StatusOK, responseJSON),
 				),
 			)
 
@@ -76,7 +76,7 @@ var _ = Describe("Curl", func() {
 	Context("When the api returns an array", func() {
 		It("can be parsed successfully", func() {
 			//language=json
-			responseJson := `
+			responseJSON := `
         [
           {
             "id": "2993f622-cb1e-4e00-a267-4b23c273bf3d",
@@ -90,7 +90,7 @@ var _ = Describe("Curl", func() {
 			server.RouteToHandler("GET", "/api/v1/data/valid-credential-id",
 				CombineHandlers(
 					VerifyRequest("GET", "/api/v1/data/valid-credential-id"),
-					RespondWith(http.StatusOK, responseJson),
+					RespondWith(http.StatusOK, responseJSON),
 				),
 			)
 
@@ -115,7 +115,7 @@ var _ = Describe("Curl", func() {
 	Context("the user provides a valid path", func() {
 		It("receives what the server returns", func() {
 			//language=json
-			responseJson := `
+			responseJSON := `
         {
           "id": "2993f622-cb1e-4e00-a267-4b23c273bf3d",
           "name": "/example-password",
@@ -127,7 +127,7 @@ var _ = Describe("Curl", func() {
 			server.RouteToHandler("GET", "/api/v1/data/valid-credential-id",
 				CombineHandlers(
 					VerifyRequest("GET", "/api/v1/data/valid-credential-id"),
-					RespondWith(http.StatusOK, responseJson),
+					RespondWith(http.StatusOK, responseJSON),
 				),
 			)
 
@@ -148,7 +148,7 @@ var _ = Describe("Curl", func() {
 		Context("the user does not specify required parameters", func() {
 			It("returns a wrapped error", func() {
 				//language=json
-				responseJson := `
+				responseJSON := `
           {
             "error": "The query parameter name is required for this request."
           }
@@ -156,7 +156,7 @@ var _ = Describe("Curl", func() {
 				server.RouteToHandler("GET", "/api/v1/data",
 					CombineHandlers(
 						VerifyRequest("GET", "/api/v1/data"),
-						RespondWith(http.StatusBadRequest, responseJson),
+						RespondWith(http.StatusBadRequest, responseJSON),
 					),
 				)
 
@@ -174,7 +174,7 @@ var _ = Describe("Curl", func() {
 		Context("when parameters are provided by the user", func() {
 			It("returns what the server returns", func() {
 				//language=json
-				responseJson := `
+				responseJSON := `
           {
             "data": [
               {
@@ -192,7 +192,7 @@ var _ = Describe("Curl", func() {
 						VerifyRequest("GET", "/api/v1/data"),
 						VerifyForm(url.Values{"name": []string{"/example-password"},
 							"current": []string{"true"}}),
-						RespondWith(http.StatusOK, responseJson),
+						RespondWith(http.StatusOK, responseJSON),
 					),
 				)
 
@@ -218,7 +218,7 @@ var _ = Describe("Curl", func() {
 		Context("the user specifies a method with -X", func() {
 			It("returns what the server returns", func() {
 				//language=json
-				responseJson := `
+				responseJSON := `
           {
             "error": "The request could not be fulfilled because the request path or body did not meet expectation. Please check the documentation for required formatting and retry your request."
           }
@@ -226,7 +226,7 @@ var _ = Describe("Curl", func() {
 				server.RouteToHandler("PUT", "/api/v1/data",
 					CombineHandlers(
 						VerifyRequest("PUT", "/api/v1/data"),
-						RespondWith(http.StatusOK, responseJson),
+						RespondWith(http.StatusOK, responseJSON),
 					),
 				)
 
@@ -244,7 +244,7 @@ var _ = Describe("Curl", func() {
 		Context("the user provides a request body", func() {
 			It("receives what the server returns", func() {
 				//language=json
-				responseJson := `
+				responseJSON := `
           {
             "type": "password",
             "version_created_at": "2018-03-06T09:10:18Z",
@@ -259,7 +259,7 @@ var _ = Describe("Curl", func() {
 					CombineHandlers(
 						VerifyRequest("PUT", "/api/v1/data"),
 						VerifyBody([]byte(body)),
-						RespondWith(http.StatusOK, responseJson),
+						RespondWith(http.StatusOK, responseJSON),
 					),
 				)
 
@@ -280,11 +280,11 @@ var _ = Describe("Curl", func() {
 
 		Context("the user provides a -i flag", func() {
 			It("displays the response headers to the user", func() {
-				responseJson := `{"id":"2993f622-cb1e-4e00-a267-4b23c273bf3d","name":"/example-password","type":"password","value":"6mRPZB3bAfb8lRpacnXsHfDhlPqFcjH2h9YDvLpL","version_created_at":"2017-01-05T01:01:01Z"}`
+				responseJSON := `{"id":"2993f622-cb1e-4e00-a267-4b23c273bf3d","name":"/example-password","type":"password","value":"6mRPZB3bAfb8lRpacnXsHfDhlPqFcjH2h9YDvLpL","version_created_at":"2017-01-05T01:01:01Z"}`
 				server.RouteToHandler("GET", "/api/v1/data/valid-credential-id",
 					CombineHandlers(
 						VerifyRequest("GET", "/api/v1/data/valid-credential-id"),
-						RespondWith(http.StatusOK, responseJson, http.Header{"Test1": []string{"test1"}, "Test2": []string{"test2"}}),
+						RespondWith(http.StatusOK, responseJSON, http.Header{"Test1": []string{"test1"}, "Test2": []string{"test2"}}),
 					),
 				)
 
@@ -308,7 +308,7 @@ var _ = Describe("Curl", func() {
 			Context("when the request fails", func() {
 				It("the request fails silently", func() {
 					//language=json
-					responseJson := `
+					responseJSON := `
        				{
 					"error": "The request could not be completed because the credential does not exist or you do not have sufficient authorization."
         			}
@@ -317,7 +317,7 @@ var _ = Describe("Curl", func() {
 						CombineHandlers(
 							VerifyRequest("GET", "/api/v1/data"),
 							VerifyForm(url.Values{"name": []string{"/doesNotExist"}}),
-							RespondWith(http.StatusNotFound, responseJson),
+							RespondWith(http.StatusNotFound, responseJSON),
 						),
 					)
 
@@ -329,7 +329,7 @@ var _ = Describe("Curl", func() {
 				Context("when request includes -i flag", func() {
 					It("displays response headers to the user and exits with proper code", func() {
 						//language=json
-						responseJson := `
+						responseJSON := `
 						{
 						"error": "The request could not be completed because the credential does not exist or you do not have sufficient authorization."
 						}
@@ -338,7 +338,7 @@ var _ = Describe("Curl", func() {
 							CombineHandlers(
 								VerifyRequest("GET", "/api/v1/data"),
 								VerifyForm(url.Values{"name": []string{"/doesNotExist"}}),
-								RespondWith(http.StatusNotFound, responseJson),
+								RespondWith(http.StatusNotFound, responseJSON),
 							),
 						)
 
@@ -351,7 +351,7 @@ var _ = Describe("Curl", func() {
 			})
 
 			It("the request continues to succeed", func() {
-				responseJson := `
+				responseJSON := `
 				  {
 					"type": "password",
 					"version_created_at": "2018-03-06T09:10:18Z",
@@ -365,7 +365,7 @@ var _ = Describe("Curl", func() {
 					CombineHandlers(
 						VerifyRequest("PUT", "/api/v1/data"),
 						VerifyBody([]byte(body)),
-						RespondWith(http.StatusOK, responseJson),
+						RespondWith(http.StatusOK, responseJSON),
 					),
 				)
 

@@ -295,14 +295,12 @@ Failed to set: 0
 					setupSetServer("/intermediate_ca", "certificate", `{"ca_name":"/root_ca","certificate":"intermediate-certificate","private_key":"intermediate-private-key"}`)
 					setupSetServer("/leaf_cert", "certificate", `{"ca_name":"/intermediate_ca","certificate":"leaf-certificate","private_key":"leaf-private-key"}`)
 
-
 					session := runCommand("import", "-f", "../test/certificate-chain.json", "-j")
 					Eventually(session).Should(Exit(0))
 					Expect(string(session.Out.Contents())).To(Equal(`Import complete.
 Successfully set: 3
 Failed to set: 0
 `))
-
 				})
 			})
 

@@ -14,24 +14,20 @@ import (
 var _ = Describe("ExportCredentials", func() {
 	credentials := []credentials.Credential{
 		{
-			Metadata: credentials.Metadata{
-				Id: "valueID",
-				Base: credentials.Base{
-					Name:             "valueName",
-					VersionCreatedAt: "valueCreatedAt",
-				},
-				Type: "value",
+			Base: credentials.Base{
+				Id:               "valueID",
+				Name:             "valueName",
+				Type:             "value",
+				VersionCreatedAt: "valueCreatedAt",
 			},
 			Value: "test",
 		},
 		{
-			Metadata: credentials.Metadata{
-				Id: "passwordID",
-				Base: credentials.Base{
-					Name:             "passwordName",
-					VersionCreatedAt: "passwordCreatedAt",
-				},
-				Type: "password",
+			Base: credentials.Base{
+				Id:               "passwordID",
+				Name:             "passwordName",
+				Type:             "password",
+				VersionCreatedAt: "passwordCreatedAt",
 			},
 			Value: "test",
 		},

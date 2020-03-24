@@ -7,6 +7,8 @@ import (
 	"os"
 	"strings"
 
+	"code.cloudfoundry.org/credhub-cli/credhub"
+
 	"code.cloudfoundry.org/credhub-cli/credhub/credentials"
 	"code.cloudfoundry.org/credhub-cli/credhub/credentials/values"
 	"code.cloudfoundry.org/credhub-cli/errors"
@@ -26,6 +28,7 @@ type SetCommand struct {
 	Username             string `short:"z" long:"username" description:"[User] Sets the username value of the credential"`
 	Password             string `short:"w" long:"password" description:"[Password, User] Sets the password value of the credential"`
 	OutputJSON           bool   `short:"j" long:"output-json" description:"Return response in JSON format"`
+	Metadata             string `long:"metadata" description:"[JSON] Sets additional metadata on the credential"`
 	ClientCommand
 }
 
@@ -50,7 +53,6 @@ func (c *SetCommand) Execute([]string) error {
 
 	credential.Value = "<redacted>"
 	formatOutput(c.OutputJSON, credential)
-
 	return nil
 }
 
@@ -126,7 +128,21 @@ func (c *SetCommand) setCredential() (credentials.Credential, error) {
 	default:
 		value = values.Value(c.Value)
 	}
-	return c.client.SetCredential(c.CredentialIdentifier, c.Type, value)
+
+	var options []credhub.SetOption
+	if c.Metadata != "" {
+		var metadata credentials.Metadata
+		if err := json.Unmarshal([]byte(c.Metadata), &metadata); err != nil {
+			return credentials.Credential{}, errors.NewInvalidJSONMetadataError()
+		}
+		options = append(options, credhub.WithMetadata(metadata))
+	}
+
+	cred, err := c.client.SetCredential(c.CredentialIdentifier, c.Type, value, options...)
+	if err == credhub.ServerDoesNotSupportMetadataError {
+		return credentials.Credential{}, errors.NewServerDoesNotSupportMetadataError()
+	}
+	return cred, err
 }
 
 func promptForInput(prompt string, value *string) {

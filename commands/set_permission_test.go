@@ -72,28 +72,28 @@ var _ = Describe("Set Permission", func() {
 		Context("when permission exists", func() {
 			Context("when output json flag is used", func() {
 				It("updates existing permission", func() {
-					responseJsonWithoutDelete := fmt.Sprintf(PERMISSIONS_RESPONSE_JSON, "'/some-path'", "some-actor", `["read", "write"]`)
-					responseJsonWithDelete := fmt.Sprintf(PERMISSIONS_RESPONSE_JSON, "'/some-path'", "some-actor", `["read", "write", "delete"]`)
+					responseJSONWithoutDelete := fmt.Sprintf(permissionsResponseJSON, "'/some-path'", "some-actor", `["read", "write"]`)
+					responseJSONWithDelete := fmt.Sprintf(permissionsResponseJSON, "'/some-path'", "some-actor", `["read", "write", "delete"]`)
 					server.RouteToHandler("GET", "/api/v2/permissions",
 						CombineHandlers(
 							VerifyRequest("GET", "/api/v2/permissions"),
-							RespondWith(http.StatusOK, responseJsonWithoutDelete),
+							RespondWith(http.StatusOK, responseJSONWithoutDelete),
 						),
 					)
 
-					body := fmt.Sprintf(ADD_PERMISSIONS_REQUEST_JSON, "'/some-path'", "some-actor", `["read", "write", "delete"]`)
-					server.RouteToHandler("PUT", "/api/v2/permissions/"+UUID,
+					body := fmt.Sprintf(addPermissionsRequestJSON, "'/some-path'", "some-actor", `["read", "write", "delete"]`)
+					server.RouteToHandler("PUT", "/api/v2/permissions/"+uuid,
 						CombineHandlers(
-							VerifyRequest("PUT", "/api/v2/permissions/"+UUID),
+							VerifyRequest("PUT", "/api/v2/permissions/"+uuid),
 							VerifyJSON(body),
-							RespondWith(http.StatusOK, responseJsonWithDelete),
+							RespondWith(http.StatusOK, responseJSONWithDelete),
 						),
 					)
 					session := runCommand("set-permission", "-a", "some-actor", "-p", "'/some-path'", "-o", "read, write, delete", "-j")
 					Eventually(session).Should(Exit(0))
 					Eventually(session.Out.Contents()).Should(MatchJSON(`
 				{
-					"uuid": "` + UUID + `",
+					"uuid": "` + uuid + `",
 					"actor": "some-actor",
 					"path": "'/some-path'",
 					"operations": ["read", "write", "delete"]
@@ -102,21 +102,21 @@ var _ = Describe("Set Permission", func() {
 				})
 			})
 			It("updates existing permission", func() {
-				responseJsonWithoutDelete := fmt.Sprintf(PERMISSIONS_RESPONSE_JSON, "'/some-path'", "some-actor", `["read", "write"]`)
-				responseJsonWithDelete := fmt.Sprintf(PERMISSIONS_RESPONSE_JSON, "'/some-path'", "some-actor", `["read", "write", "delete"]`)
+				responseJSONWithoutDelete := fmt.Sprintf(permissionsResponseJSON, "'/some-path'", "some-actor", `["read", "write"]`)
+				responseJSONWithDelete := fmt.Sprintf(permissionsResponseJSON, "'/some-path'", "some-actor", `["read", "write", "delete"]`)
 				server.RouteToHandler("GET", "/api/v2/permissions",
 					CombineHandlers(
 						VerifyRequest("GET", "/api/v2/permissions"),
-						RespondWith(http.StatusOK, responseJsonWithoutDelete),
+						RespondWith(http.StatusOK, responseJSONWithoutDelete),
 					),
 				)
 
-				body := fmt.Sprintf(ADD_PERMISSIONS_REQUEST_JSON, "'/some-path'", "some-actor", `["read", "write", "delete"]`)
-				server.RouteToHandler("PUT", "/api/v2/permissions/"+UUID,
+				body := fmt.Sprintf(addPermissionsRequestJSON, "'/some-path'", "some-actor", `["read", "write", "delete"]`)
+				server.RouteToHandler("PUT", "/api/v2/permissions/"+uuid,
 					CombineHandlers(
-						VerifyRequest("PUT", "/api/v2/permissions/"+UUID),
+						VerifyRequest("PUT", "/api/v2/permissions/"+uuid),
 						VerifyJSON(body),
-						RespondWith(http.StatusOK, responseJsonWithDelete),
+						RespondWith(http.StatusOK, responseJSONWithDelete),
 					),
 				)
 				session := runCommand("set-permission", "-a", "some-actor", "-p", "'/some-path'", "-o", "read, write, delete")
@@ -127,7 +127,7 @@ var _ = Describe("Set Permission", func() {
 - write
 - delete`))
 				Eventually(session.Out).Should(Say("path: .*'/some-path'.*"))
-				Eventually(session.Out).Should(Say("uuid: " + UUID))
+				Eventually(session.Out).Should(Say("uuid: " + uuid))
 			})
 		})
 
@@ -139,14 +139,14 @@ var _ = Describe("Set Permission", func() {
 						RespondWith(http.StatusNotFound, `{"error": "The request could not be completed because the permission does not exist or you do not have sufficient authorization."}`),
 					))
 
-				responseJson := fmt.Sprintf(PERMISSIONS_RESPONSE_JSON, "'/some-path'", "some-actor", `["read", "write", "delete"]`)
-				body := fmt.Sprintf(ADD_PERMISSIONS_REQUEST_JSON, "'/some-path'", "some-actor", `["read", "write", "delete"]`)
+				responseJSON := fmt.Sprintf(permissionsResponseJSON, "'/some-path'", "some-actor", `["read", "write", "delete"]`)
+				body := fmt.Sprintf(addPermissionsRequestJSON, "'/some-path'", "some-actor", `["read", "write", "delete"]`)
 
 				server.RouteToHandler("POST", "/api/v2/permissions",
 					CombineHandlers(
 						VerifyRequest("POST", "/api/v2/permissions"),
 						VerifyJSON(body),
-						RespondWith(http.StatusOK, responseJson),
+						RespondWith(http.StatusOK, responseJSON),
 					))
 
 				session := runCommand("set-permission", "-a", "some-actor", "-p", "'/some-path'", "-o", "read, write, delete")
@@ -157,7 +157,7 @@ var _ = Describe("Set Permission", func() {
 - write
 - delete`))
 				Eventually(session.Out).Should(Say("path: .*'/some-path'.*"))
-				Eventually(session.Out).Should(Say("uuid: " + UUID))
+				Eventually(session.Out).Should(Say("uuid: " + uuid))
 			})
 
 			Context("when output json flag is used", func() {
@@ -168,21 +168,21 @@ var _ = Describe("Set Permission", func() {
 							RespondWith(http.StatusNotFound, `{"error": "The request could not be completed because the permission does not exist or you do not have sufficient authorization."}`),
 						))
 
-					responseJson := fmt.Sprintf(PERMISSIONS_RESPONSE_JSON, "'/some-path'", "some-actor", `["read", "write", "delete"]`)
-					body := fmt.Sprintf(ADD_PERMISSIONS_REQUEST_JSON, "'/some-path'", "some-actor", `["read", "write", "delete"]`)
+					responseJSON := fmt.Sprintf(permissionsResponseJSON, "'/some-path'", "some-actor", `["read", "write", "delete"]`)
+					body := fmt.Sprintf(addPermissionsRequestJSON, "'/some-path'", "some-actor", `["read", "write", "delete"]`)
 
 					server.RouteToHandler("POST", "/api/v2/permissions",
 						CombineHandlers(
 							VerifyRequest("POST", "/api/v2/permissions"),
 							VerifyJSON(body),
-							RespondWith(http.StatusOK, responseJson),
+							RespondWith(http.StatusOK, responseJSON),
 						))
 
 					session := runCommand("set-permission", "-a", "some-actor", "-p", "'/some-path'", "-o", "read, write, delete", "-j")
 					Eventually(session).Should(Exit(0))
 					Eventually(session.Out.Contents()).Should(MatchJSON(`
 				{
-					"uuid": "` + UUID + `",
+					"uuid": "` + uuid + `",
 					"actor": "some-actor",
 					"path": "'/some-path'",
 					"operations": ["read", "write", "delete"]

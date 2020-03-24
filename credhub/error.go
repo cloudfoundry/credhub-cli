@@ -1,6 +1,7 @@
 package credhub
 
 import (
+	"errors"
 	"fmt"
 )
 
@@ -31,3 +32,5 @@ type NotFoundError struct {
 func (e *NotFoundError) Error() string {
 	return e.Description
 }
+
+var ServerDoesNotSupportMetadataError = errors.New("the server does not support credential metadata, requires >= 2.6.x")

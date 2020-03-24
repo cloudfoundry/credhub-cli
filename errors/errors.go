@@ -17,10 +17,6 @@ func NewCatchAllError() error {
 	return errors.New("The targeted API was unable to perform the request. Please validate and retry your request.")
 }
 
-func NewEmptyTemplateError(filepath string) error {
-	return errors.New(fmt.Sprintf("Error: %s was an empty file", filepath))
-}
-
 func NewFailedToImportError() error {
 	return errors.New("One or more credentials failed to import.")
 }
@@ -77,7 +73,7 @@ func NewInvalidImportYamlError() error {
 	return errors.New("The referenced file does not contain valid yaml structure. Please update and retry your request.")
 }
 
-func NewInvalidImportJsonError() error {
+func NewInvalidImportJSONError() error {
 	return errors.New("The referenced file does not contain valid json structure. Please update and retry your request.")
 }
 
@@ -89,7 +85,7 @@ func NewGetVersionAndKeyError() error {
 	return errors.New("The --version flag and --key flag are incompatible")
 }
 
-func NewOutputJsonAndQuietError() error {
+func NewOutputJSONAndQuietError() error {
 	return errors.New("The --output-json flag and --quiet flag are incompatible")
 }
 
@@ -99,4 +95,12 @@ func NewUserNameOnlyValidForUserType() error {
 
 func NewUAAError(err error) error {
 	return errors.New("UAA error: " + err.Error())
+}
+
+func NewInvalidJSONMetadataError() error {
+	return errors.New("The argument for --metadata is not a valid json object. Please update and retry your request.")
+}
+
+func NewServerDoesNotSupportMetadataError() error {
+	return errors.New("The --metadata flag is not supported for this version of the credhub server (requires >= 2.6.x). Please remove the flag and retry your request.")
 }

@@ -32,7 +32,7 @@ var _ = Describe("Delete Permission", func() {
 			method:              "DELETE",
 			responseFixtureFile: "set_permission_response.json",
 			responseStatus:      http.StatusOK,
-			endpoint:            "/api/v2/permissions/" + UUID,
+			endpoint:            "/api/v2/permissions/" + uuid,
 		},
 	}
 	ItAutomaticallyLogsIn(testAutoLogIns, "delete-permission", "-a", "some-actor", "-p", "'/some-path'")
@@ -64,17 +64,17 @@ var _ = Describe("Delete Permission", func() {
 
 		Context("when permission exists", func() {
 			It("deletes existing permission", func() {
-				responseJson := fmt.Sprintf(PERMISSIONS_RESPONSE_JSON, "'/some-path'", "some-actor", `["read", "write"]`)
+				responseJSON := fmt.Sprintf(permissionsResponseJSON, "'/some-path'", "some-actor", `["read", "write"]`)
 				server.RouteToHandler("GET", "/api/v2/permissions",
 					CombineHandlers(
 						VerifyRequest("GET", "/api/v2/permissions"),
-						RespondWith(http.StatusOK, responseJson),
+						RespondWith(http.StatusOK, responseJSON),
 					),
 				)
-				server.RouteToHandler("DELETE", "/api/v2/permissions/"+UUID,
+				server.RouteToHandler("DELETE", "/api/v2/permissions/"+uuid,
 					CombineHandlers(
-						VerifyRequest("DELETE", "/api/v2/permissions/"+UUID),
-						RespondWith(http.StatusOK, responseJson),
+						VerifyRequest("DELETE", "/api/v2/permissions/"+uuid),
+						RespondWith(http.StatusOK, responseJSON),
 					),
 				)
 				session := runCommand("delete-permission", "-a", "some-actor", "-p", "'/some-path'")
@@ -84,7 +84,7 @@ var _ = Describe("Delete Permission", func() {
 - read
 - write`))
 				Eventually(session.Out).Should(Say("path: .*'/some-path'.*"))
-				Eventually(session.Out).Should(Say("uuid: " + UUID))
+				Eventually(session.Out).Should(Say("uuid: " + uuid))
 			})
 		})
 	})
@@ -97,11 +97,11 @@ var _ = Describe("Delete Permission", func() {
 					RespondWith(http.StatusNotFound, `{"error": "The request could not be completed because the permission does not exist or you do not have sufficient authorization."}`),
 				))
 
-			errorJson := `{"error": "The request includes a permission that does not exist."}`
+			errorJSON := `{"error": "The request includes a permission that does not exist."}`
 			server.RouteToHandler("DELETE", "/api/v2/permissions",
 				CombineHandlers(
 					VerifyRequest("DELETE", "/api/v2/permissions"),
-					RespondWith(http.StatusOK, errorJson),
+					RespondWith(http.StatusOK, errorJSON),
 				))
 
 			session := runCommand("delete-permission", "-a", "some-actor", "-p", "'/some-path'")

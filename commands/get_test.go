@@ -55,12 +55,12 @@ var _ = Describe("Get", func() {
 
 	Describe("value type", func() {
 		It("gets a value secret", func() {
-			responseJson := fmt.Sprintf(STRING_CREDENTIAL_ARRAY_RESPONSE_JSON, "value", "my-value", "potatoes")
+			responseJSON := fmt.Sprintf(arrayResponseJSON, "value", "my-value", `"potatoes"`, `{}`)
 
 			server.RouteToHandler("GET", "/api/v1/data",
 				CombineHandlers(
 					VerifyRequest("GET", "/api/v1/data", "current=true&name=my-value"),
-					RespondWith(http.StatusOK, responseJson),
+					RespondWith(http.StatusOK, responseJSON),
 				),
 			)
 
@@ -74,12 +74,12 @@ var _ = Describe("Get", func() {
 
 		Context("with --quiet flag", func() {
 			It("returns only the value", func() {
-				responseJson := fmt.Sprintf(STRING_CREDENTIAL_ARRAY_RESPONSE_JSON, "value", "my-value", "potatoes")
+				responseJSON := fmt.Sprintf(arrayResponseJSON, "value", "my-value", `"potatoes"`, `{}`)
 
 				server.RouteToHandler("GET", "/api/v1/data",
 					CombineHandlers(
 						VerifyRequest("GET", "/api/v1/data", "current=true&name=my-value"),
-						RespondWith(http.StatusOK, responseJson),
+						RespondWith(http.StatusOK, responseJSON),
 					),
 				)
 
@@ -93,12 +93,12 @@ var _ = Describe("Get", func() {
 
 		Context("multiple versions with --quiet flag", func() {
 			It("returns array of values", func() {
-				responseJson := fmt.Sprintf(MULTIPLE_STRING_CREDENTIAL_ARRAY_RESPONSE_JSON, "value", "my-cred", "potatoes", "value", "my-cred", "tomatoes")
+				responseJSON := fmt.Sprintf(multipleCredentialArrayResponseJSON, "value", "my-cred", `"potatoes"`, `{}`, "value", "my-cred", `"tomatoes"`, `{}`)
 
 				server.RouteToHandler("GET", "/api/v1/data",
 					CombineHandlers(
 						VerifyRequest("GET", "/api/v1/data", "name=my-cred&versions=2"),
-						RespondWith(http.StatusOK, responseJson),
+						RespondWith(http.StatusOK, responseJSON),
 					),
 				)
 
@@ -114,12 +114,11 @@ var _ = Describe("Get", func() {
 
 		Context("--quiet flag with multi-line value", func() {
 			It("should not return the value with yaml formatting", func() {
-				responseJson := `{"data":[{"type":"value","id":"` + UUID + `","name":"my-value","version_created_at":"` + TIMESTAMP + `","value":"potatoes\nand\ntomatoes"}]}`
-
+				responseJSON := fmt.Sprintf(arrayResponseJSON, "value", "my-value", "\"potatoes\\nand\\ntomatoes\"", `{}`)
 				server.RouteToHandler("GET", "/api/v1/data",
 					CombineHandlers(
 						VerifyRequest("GET", "/api/v1/data", "current=true&name=my-value"),
-						RespondWith(http.StatusOK, responseJson),
+						RespondWith(http.StatusOK, responseJSON),
 					),
 				)
 
@@ -136,12 +135,12 @@ tomatoes`))
 
 	Describe("password type", func() {
 		It("gets a password secret", func() {
-			responseJson := fmt.Sprintf(STRING_CREDENTIAL_ARRAY_RESPONSE_JSON, "password", "my-password", "potatoes")
+			responseJSON := fmt.Sprintf(arrayResponseJSON, "password", "my-password", `"potatoes"`, `{}`)
 
 			server.RouteToHandler("GET", "/api/v1/data",
 				CombineHandlers(
 					VerifyRequest("GET", "/api/v1/data", "current=true&name=my-password"),
-					RespondWith(http.StatusOK, responseJson),
+					RespondWith(http.StatusOK, responseJSON),
 				),
 			)
 
@@ -154,16 +153,16 @@ tomatoes`))
 		})
 
 		It("gets a secret by ID", func() {
-			responseJson := fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_JSON, "password", "my-password", "potatoes")
+			responseJSON := fmt.Sprintf(defaultResponseJSON, "password", "my-password", `"potatoes"`, `{}`)
 
-			server.RouteToHandler("GET", "/api/v1/data/"+UUID,
+			server.RouteToHandler("GET", "/api/v1/data/"+uuid,
 				CombineHandlers(
-					VerifyRequest("GET", "/api/v1/data/"+UUID),
-					RespondWith(http.StatusOK, responseJson),
+					VerifyRequest("GET", "/api/v1/data/"+uuid),
+					RespondWith(http.StatusOK, responseJSON),
 				),
 			)
 
-			session := runCommand("get", "--id", UUID)
+			session := runCommand("get", "--id", uuid)
 
 			Eventually(session).Should(Exit(0))
 			Eventually(session).Should(Exit(0))
@@ -175,15 +174,6 @@ tomatoes`))
 
 		Context("with key and version", func() {
 			It("returns an error", func() {
-				responseJson := `{"data":[{"type":"password","id":"` + UUID + `","name":"my-password","version_created_at":"` + TIMESTAMP + `","value":"old-password"},{"type":"password","id":"` + UUID + `","name":"my-password","version_created_at":"` + TIMESTAMP + `","value":"new-password"}]}`
-
-				server.RouteToHandler("GET", "/api/v1/data",
-					CombineHandlers(
-						VerifyRequest("GET", "/api/v1/data", "name=my-password&versions=2"),
-						RespondWith(http.StatusOK, responseJson),
-					),
-				)
-
 				session := runCommand("get", "-n", "my-password", "--versions", "2", "-k", "someflag")
 				Eventually(session).Should(Exit(1))
 				Eventually(session.Err).Should(Say("The --version flag and --key flag are incompatible"))
@@ -192,12 +182,12 @@ tomatoes`))
 
 		Context("with --quiet flag", func() {
 			It("can quiet output for password", func() {
-				responseJson := fmt.Sprintf(STRING_CREDENTIAL_ARRAY_RESPONSE_JSON, "password", "my-password", "potatoes")
+				responseJSON := fmt.Sprintf(arrayResponseJSON, "password", "my-password", `"potatoes"`, `{}`)
 
 				server.RouteToHandler("GET", "/api/v1/data",
 					CombineHandlers(
 						VerifyRequest("GET", "/api/v1/data", "current=true&name=my-password"),
-						RespondWith(http.StatusOK, responseJson),
+						RespondWith(http.StatusOK, responseJSON),
 					),
 				)
 
@@ -211,12 +201,12 @@ tomatoes`))
 
 		Context("with --versions flag", func() {
 			It("gets the specified number of versions of a secret", func() {
-				responseJson := `{"data":[{"type":"password","id":"` + UUID + `","name":"my-password","version_created_at":"` + TIMESTAMP + `","value":"old-password"},{"type":"password","id":"` + UUID + `","name":"my-password","version_created_at":"` + TIMESTAMP + `","value":"new-password"}]}`
+				responseJSON := `{"data":[{"type":"password","id":"` + uuid + `","name":"my-password","version_created_at":"` + timestamp + `","value":"old-password"},{"type":"password","id":"` + uuid + `","name":"my-password","version_created_at":"` + timestamp + `","value":"new-password"}]}`
 
 				server.RouteToHandler("GET", "/api/v1/data",
 					CombineHandlers(
 						VerifyRequest("GET", "/api/v1/data", "name=my-password&versions=2"),
-						RespondWith(http.StatusOK, responseJson),
+						RespondWith(http.StatusOK, responseJSON),
 					),
 				)
 
@@ -224,16 +214,16 @@ tomatoes`))
 
 				Eventually(session).Should(Exit(0))
 				Eventually(session.Out).Should(Say(`versions:
-- id: ` + UUID + `
+- id: ` + uuid + `
   name: my-password
   type: password
   value: old-password
-  version_created_at: "` + TIMESTAMP + `"
-- id: ` + UUID + `
+  version_created_at: "` + timestamp + `"
+- id: ` + uuid + `
   name: my-password
   type: password
   value: new-password
-  version_created_at: "` + TIMESTAMP + `"
+  version_created_at: "` + timestamp + `"
 `))
 
 			})
@@ -241,12 +231,12 @@ tomatoes`))
 
 		Context("multiple versions with --quiet flag", func() {
 			It("returns an error", func() {
-				responseJson := `{"data":[{"type":"password","id":"` + UUID + `","name":"my-password","version_created_at":"` + TIMESTAMP + `","value":"new-password"},{"type":"password","id":"` + UUID + `","name":"my-password","version_created_at":"` + TIMESTAMP + `","value":"old-password"}]}`
+				responseJSON := `{"data":[{"type":"password","id":"` + uuid + `","name":"my-password","version_created_at":"` + timestamp + `","value":"new-password"},{"type":"password","id":"` + uuid + `","name":"my-password","version_created_at":"` + timestamp + `","value":"old-password"}]}`
 
 				server.RouteToHandler("GET", "/api/v1/data",
 					CombineHandlers(
 						VerifyRequest("GET", "/api/v1/data", "name=my-password&versions=2"),
-						RespondWith(http.StatusOK, responseJson),
+						RespondWith(http.StatusOK, responseJSON),
 					),
 				)
 
@@ -264,7 +254,7 @@ tomatoes`))
 
 	Describe("json type", func() {
 		It("gets a json secret", func() {
-			serverResponse := fmt.Sprintf(JSON_CREDENTIAL_ARRAY_RESPONSE_JSON, "json-secret", `{"foo":"bar","nested":{"a":1},"an":["array"]}`)
+			serverResponse := fmt.Sprintf(arrayResponseJSON, "json", "json-secret", `{"foo":"bar","nested":{"a":1},"an":["array"]}`, `{}`)
 
 			server.RouteToHandler("GET", "/api/v1/data",
 				CombineHandlers(
@@ -289,36 +279,30 @@ tomatoes`))
 
 		Context("with --output-json flag", func() {
 			It("can output json", func() {
-				responseJson := fmt.Sprintf(STRING_CREDENTIAL_ARRAY_RESPONSE_JSON, "password", "my-password", "potatoes")
+				responseJSON := fmt.Sprintf(arrayResponseJSON, "password", "my-password", `"potatoes"`, `{}`)
 
 				server.RouteToHandler("GET", "/api/v1/data",
 					CombineHandlers(
 						VerifyRequest("GET", "/api/v1/data", "current=true&name=my-password"),
-						RespondWith(http.StatusOK, responseJson),
+						RespondWith(http.StatusOK, responseJSON),
 					),
 				)
 
 				session := runCommand("get", "-n", "my-password", "--output-json")
 
 				Eventually(session).Should(Exit(0))
-				Eventually(string(session.Out.Contents())).Should(MatchJSON(`{
-			"id": "` + UUID + `",
-			"type": "password",
-			"name": "my-password",
-			"version_created_at": "` + TIMESTAMP + `",
-			"value": "potatoes"
-		}`))
+				Expect(string(session.Out.Contents())).To(MatchJSON(fmt.Sprintf(defaultResponseJSON, "password", "my-password", `"potatoes"`, `{}`)))
 			})
 		})
 
 		Context("with --output-json and --quiet flags", func() {
 			It("should return an error", func() {
-				responseJson := fmt.Sprintf(STRING_CREDENTIAL_ARRAY_RESPONSE_JSON, "password", "my-password", "potatoes")
+				responseJSON := fmt.Sprintf(arrayResponseJSON, "password", "my-password", `"potatoes"`, `{}`)
 
 				server.RouteToHandler("GET", "/api/v1/data",
 					CombineHandlers(
 						VerifyRequest("GET", "/api/v1/data", "current=true&name=my-password"),
-						RespondWith(http.StatusOK, responseJson),
+						RespondWith(http.StatusOK, responseJSON),
 					),
 				)
 
@@ -331,12 +315,12 @@ tomatoes`))
 
 		Context("with --key flag", func() {
 			It("returns only the requested JSON field from the value object", func() {
-				responseJson := fmt.Sprintf(JSON_CREDENTIAL_ARRAY_RESPONSE_JSON, "json-secret", `{"foo":"bar","nested":{"a":1},"an":["array"]}`)
+				responseJSON := fmt.Sprintf(arrayResponseJSON, "json", "json-secret", `{"foo":"bar","nested":{"a":1},"an":["array"]}`, `{}`)
 
 				server.RouteToHandler("GET", "/api/v1/data",
 					CombineHandlers(
 						VerifyRequest("GET", "/api/v1/data", "current=true&name=json-secret"),
-						RespondWith(http.StatusOK, responseJson),
+						RespondWith(http.StatusOK, responseJSON),
 					),
 				)
 
@@ -351,12 +335,12 @@ tomatoes`))
 
 		Context("with --quiet flag", func() {
 			It("only return the value", func() {
-				responseJson := fmt.Sprintf(JSON_CREDENTIAL_ARRAY_RESPONSE_JSON, "json-secret", `{"foo":"bar","nested":{"a":1},"an":["array"]}`)
+				responseJSON := fmt.Sprintf(arrayResponseJSON, "json", "json-secret", `{"foo":"bar","nested":{"a":1},"an":["array"]}`, `{}`)
 
 				server.RouteToHandler("GET", "/api/v1/data",
 					CombineHandlers(
 						VerifyRequest("GET", "/api/v1/data", "current=true&name=json-secret"),
-						RespondWith(http.StatusOK, responseJson),
+						RespondWith(http.StatusOK, responseJSON),
 					),
 				)
 
@@ -374,11 +358,11 @@ nested:
 
 		Context("multiple versions with --quiet flag", func() {
 			It("returns an array of values", func() {
-				responseJson := `{"data":[{"type":"json","id":"` + UUID + `","name":"my-json","version_created_at":"` + TIMESTAMP + `","value":{"secret":"newSecret"}},{"type":"json","id":"` + UUID + `","name":"my-json","version_created_at":"` + TIMESTAMP + `","value":{"secret":"oldSecret"}}]}`
+				responseJSON := `{"data":[{"type":"json","id":"` + uuid + `","name":"my-json","version_created_at":"` + timestamp + `","value":{"secret":"newSecret"}},{"type":"json","id":"` + uuid + `","name":"my-json","version_created_at":"` + timestamp + `","value":{"secret":"oldSecret"}}]}`
 				server.RouteToHandler("GET", "/api/v1/data",
 					CombineHandlers(
 						VerifyRequest("GET", "/api/v1/data", "name=my-json&versions=2"),
-						RespondWith(http.StatusOK, responseJson),
+						RespondWith(http.StatusOK, responseJSON),
 					),
 				)
 
@@ -391,17 +375,16 @@ nested:
 - secret: oldSecret`))
 			})
 		})
-
 	})
 
 	Describe("certificate type", func() {
 		It("gets a certificate secret", func() {
-			responseJson := fmt.Sprintf(CERTIFICATE_CREDENTIAL_ARRAY_RESPONSE_JSON, "my-secret", "my-ca", "my-cert", "my-priv")
+			responseJSON := fmt.Sprintf(arrayResponseJSON, "certificate", "my-secret", `{"ca":"my-ca","certificate":"my-cert","private_key":"my-priv"}`, `{}`)
 
 			server.RouteToHandler("GET", "/api/v1/data",
 				CombineHandlers(
 					VerifyRequest("GET", "/api/v1/data", "current=true&name=my-secret"),
-					RespondWith(http.StatusOK, responseJson),
+					RespondWith(http.StatusOK, responseJSON),
 				),
 			)
 
@@ -417,33 +400,30 @@ nested:
 
 		Context("with --key flag", func() {
 			It("only returns the request field from the value object", func() {
-				responseJson := fmt.Sprintf(CERTIFICATE_CREDENTIAL_ARRAY_RESPONSE_JSON, "my-secret", "----begin----\\nmy-ca\\n-----end------", "my-cert", "my-priv")
+				responseJSON := fmt.Sprintf(arrayResponseJSON, "certificate", "my-secret", `{"ca":"----begin----my-ca-----end------","certificate":"my-cert","private_key":"my-priv"}`, `{}`)
 
 				server.RouteToHandler("GET", "/api/v1/data",
 					CombineHandlers(
 						VerifyRequest("GET", "/api/v1/data", "current=true&name=my-secret"),
-						RespondWith(http.StatusOK, responseJson),
+						RespondWith(http.StatusOK, responseJSON),
 					),
 				)
 
 				session := runCommand("get", "-n", "my-secret", "-k", "ca")
 
 				Eventually(session).Should(Exit(0))
-				Eventually(string(session.Out.Contents())).Should(Equal(`----begin----
-my-ca
------end------
-`))
+				Eventually(string(session.Out.Contents())).Should(Equal("----begin----my-ca-----end------\n"))
 			})
 		})
 
 		Context("with invalid key", func() {
 			It("returns nothing", func() {
-				responseJson := fmt.Sprintf(CERTIFICATE_CREDENTIAL_ARRAY_RESPONSE_JSON, "my-secret", "my-ca", "my-cert", "my-priv")
+				responseJSON := fmt.Sprintf(arrayResponseJSON, "certificate", "my-secret", `{"ca":"my-ca","certificate":"my-cert","private_key":"my-priv"}`, `{}`)
 
 				server.RouteToHandler("GET", "/api/v1/data",
 					CombineHandlers(
 						VerifyRequest("GET", "/api/v1/data", "current=true&name=my-secret"),
-						RespondWith(http.StatusOK, responseJson),
+						RespondWith(http.StatusOK, responseJSON),
 					),
 				)
 
@@ -457,50 +437,39 @@ my-ca
 
 		Context("with --quiet flag", func() {
 			It("only returns the value", func() {
-				responseJson := fmt.Sprintf(CERTIFICATE_CREDENTIAL_ARRAY_RESPONSE_JSON, "my-secret", "----begin----\\nmy-ca\\n-----end------", "----begin----\\nmy-cert\\n-----end------", "----begin----\\nmy-priv\\n-----end------")
+				responseJSON := fmt.Sprintf(arrayResponseJSON, "certificate", "my-secret", `{"ca":"----begin----my-ca-----end------","certificate":"----begin----my-cert-----end------","private_key":"----begin----my-priv-----end------"}`, `{}`)
 
 				server.RouteToHandler("GET", "/api/v1/data",
 					CombineHandlers(
 						VerifyRequest("GET", "/api/v1/data", "current=true&name=my-secret"),
-						RespondWith(http.StatusOK, responseJson),
+						RespondWith(http.StatusOK, responseJSON),
 					),
 				)
 
 				session := runCommand("get", "-n", "my-secret", "-q")
 
 				Eventually(session).Should(Exit(0))
-				Eventually(string(session.Out.Contents())).Should(Equal(`ca: |-
-  ----begin----
-  my-ca
-  -----end------
-certificate: |-
-  ----begin----
-  my-cert
-  -----end------
-private_key: |-
-  ----begin----
-  my-priv
-  -----end------
-
-`))
+				Eventually(string(session.Out.Contents())).Should(ContainSubstring(`ca: '----begin----my-ca-----end------'
+certificate: '----begin----my-cert-----end------'
+private_key: '----begin----my-priv-----end------'`))
 			})
 		})
 
 		Context("multiple versions with --quiet flag", func() {
 			It("only returns the value", func() {
-				responseJson := fmt.Sprintf(MULTIPLE_CERTIFICATE_CREDENTIAL_ARRAY_RESPONSE_JSON,
+				responseJSON := fmt.Sprintf(multipleCredentialArrayResponseJSON,
+					"certificate",
 					"my-secret",
-					"----begin----\\nmy-new-ca\\n-----end------",
-					"----begin----\\nmy-new-cert\\n-----end------",
-					"----begin----\\nmy-new-priv\\n-----end------",
+					`{"ca":"----begin----my-new-ca-----end------","certificate":"----begin----my-new-cert-----end------","private_key":"----begin----my-new-priv-----end------"}`,
+					"{}",
+					"certificate",
 					"my-secret",
-					"----begin----\\nmy-old-ca\\n-----end------",
-					"----begin----\\nmy-old-cert\\n-----end------",
-					"----begin----\\nmy-old-priv\\n-----end------")
+					`{"ca":"----begin----my-old-ca-----end------","certificate":"----begin----my-old-cert-----end------","private_key":"----begin----my-old-priv-----end------"}`,
+					"{}")
 				server.RouteToHandler("GET", "/api/v1/data",
 					CombineHandlers(
 						VerifyRequest("GET", "/api/v1/data", "name=my-secret&versions=2"),
-						RespondWith(http.StatusOK, responseJson),
+						RespondWith(http.StatusOK, responseJSON),
 					),
 				)
 
@@ -508,41 +477,23 @@ private_key: |-
 
 				Eventually(session).Should(Exit(0))
 				Eventually(string(bytes.TrimSpace(session.Out.Contents()))).Should(Equal(`versions:
-- ca: |-
-    ----begin----
-    my-new-ca
-    -----end------
-  certificate: |-
-    ----begin----
-    my-new-cert
-    -----end------
-  private_key: |-
-    ----begin----
-    my-new-priv
-    -----end------
-- ca: |-
-    ----begin----
-    my-old-ca
-    -----end------
-  certificate: |-
-    ----begin----
-    my-old-cert
-    -----end------
-  private_key: |-
-    ----begin----
-    my-old-priv
-    -----end------`))
+- ca: '----begin----my-new-ca-----end------'
+  certificate: '----begin----my-new-cert-----end------'
+  private_key: '----begin----my-new-priv-----end------'
+- ca: '----begin----my-old-ca-----end------'
+  certificate: '----begin----my-old-cert-----end------'
+  private_key: '----begin----my-old-priv-----end------'`))
 			})
 		})
 
 		Context("--quiet flag with key", func() {
 			It("should not only return the value", func() {
-				responseJson := fmt.Sprintf(CERTIFICATE_CREDENTIAL_ARRAY_RESPONSE_JSON, "my-secret", "----begin----\\nmy-ca\\n-----end------", "----begin----\\nmy-cert\\n-----end------", "----begin----\\nmy-priv\\n-----end------")
+				responseJSON := fmt.Sprintf(arrayResponseJSON, "certificate", "my-secret", `{"ca":"----begin----my-ca-----end------","certificate":"----begin----my-cert-----end------","private_key":"----begin----my-priv-----end------"}`, `{}`)
 
 				server.RouteToHandler("GET", "/api/v1/data",
 					CombineHandlers(
 						VerifyRequest("GET", "/api/v1/data", "current=true&name=my-secret"),
-						RespondWith(http.StatusOK, responseJson),
+						RespondWith(http.StatusOK, responseJSON),
 					),
 				)
 
@@ -550,17 +501,11 @@ private_key: |-
 
 				Eventually(session).Should(Exit(0))
 				Eventually(string(session.Out.Contents())).ShouldNot(Equal(`ca: |-
-  ----begin----
-  my-ca
-  -----end------
+  ----begin----my-ca-----end------
 certificate: |-
-  ----begin----
-  my-cert
-  -----end------
+  ----begin----my-cert-----end------
 private_key: |-
-  ----begin----
-  my-priv
-  -----end------
+  ----begin----my-priv-----end------
 
 `))
 			})
@@ -570,12 +515,12 @@ private_key: |-
 
 	Describe("rsa type", func() {
 		It("gets an rsa secret", func() {
-			responseJson := fmt.Sprintf(RSA_SSH_CREDENTIAL_ARRAY_RESPONSE_JSON, "rsa", "foo-rsa-key", "some-public-key", "some-private-key")
+			responseJSON := fmt.Sprintf(arrayResponseJSON, "rsa", "foo-rsa-key", `{"public_key":"some-public-key","private_key":"some-private-key"}`, `{}`)
 
 			server.RouteToHandler("GET", "/api/v1/data",
 				CombineHandlers(
 					VerifyRequest("GET", "/api/v1/data", "current=true&name=foo-rsa-key"),
-					RespondWith(http.StatusOK, responseJson),
+					RespondWith(http.StatusOK, responseJSON),
 				),
 			)
 
@@ -590,12 +535,12 @@ private_key: |-
 
 		Context("with --quiet flag", func() {
 			It("gets only the value", func() {
-				responseJson := fmt.Sprintf(RSA_SSH_CREDENTIAL_ARRAY_RESPONSE_JSON, "rsa", "foo-rsa-key", "some-public-key", "some-private-key")
+				responseJSON := fmt.Sprintf(arrayResponseJSON, "rsa", "foo-rsa-key", `{"public_key":"some-public-key","private_key":"some-private-key"}`, `{}`)
 
 				server.RouteToHandler("GET", "/api/v1/data",
 					CombineHandlers(
 						VerifyRequest("GET", "/api/v1/data", "current=true&name=foo-rsa-key"),
-						RespondWith(http.StatusOK, responseJson),
+						RespondWith(http.StatusOK, responseJSON),
 					),
 				)
 
@@ -611,20 +556,20 @@ private_key: |-
 
 		Context("multiple versions with --quiet flag", func() {
 			It("only returns the value", func() {
-				responseJson := fmt.Sprintf(MULTIPLE_RSA_SSH_CREDENTIAL_ARRAY_RESPONSE_JSON,
+				responseJSON := fmt.Sprintf(multipleCredentialArrayResponseJSON,
 					"rsa",
 					"foo-rsa-key",
-					"new-public-key",
-					"new-private-key",
+					`{"public_key":"new-public-key","private_key":"new-private-key"}`,
+					`{}`,
 					"rsa",
 					"foo-rsa-key",
-					"old-public-key",
-					"old-private-key")
+					`{"public_key":"old-public-key","private_key":"old-private-key"}`,
+					`{}`)
 
 				server.RouteToHandler("GET", "/api/v1/data",
 					CombineHandlers(
 						VerifyRequest("GET", "/api/v1/data", "versions=2&name=foo-rsa-key"),
-						RespondWith(http.StatusOK, responseJson),
+						RespondWith(http.StatusOK, responseJSON),
 					),
 				)
 
@@ -642,12 +587,12 @@ private_key: |-
 
 		Context("--quiet flag with key", func() {
 			It("should not only return the value", func() {
-				responseJson := fmt.Sprintf(RSA_SSH_CREDENTIAL_ARRAY_RESPONSE_JSON, "rsa", "foo-rsa-key", "some-public-key", "some-private-key")
+				responseJSON := fmt.Sprintf(arrayResponseJSON, "rsa", "foo-rsa-key", `{"public_key":"some-public-key","private_key":"some-private-key"}`, `{}`)
 
 				server.RouteToHandler("GET", "/api/v1/data",
 					CombineHandlers(
 						VerifyRequest("GET", "/api/v1/data", "current=true&name=foo-rsa-key"),
-						RespondWith(http.StatusOK, responseJson),
+						RespondWith(http.StatusOK, responseJSON),
 					),
 				)
 
@@ -663,12 +608,12 @@ private_key: |-
 
 	Describe("user type", func() {
 		It("gets a user secret", func() {
-			responseJson := fmt.Sprintf(USER_CREDENTIAL_ARRAY_RESPONSE_JSON, "my-username-credential", "my-username", "test-password", "passw0rd-H4$h")
+			responseJSON := fmt.Sprintf(arrayResponseJSON, "user", "my-username-credential", `{"username":"my-username", "password":"test-password", "password_hash":"passw0rd-H4$h"}`, `{}`)
 
 			server.RouteToHandler("GET", "/api/v1/data",
 				CombineHandlers(
 					VerifyRequest("GET", "/api/v1/data", "current=true&name=my-username-credential"),
-					RespondWith(http.StatusOK, responseJson),
+					RespondWith(http.StatusOK, responseJSON),
 				),
 			)
 
@@ -684,12 +629,12 @@ private_key: |-
 
 		Context("with --quiet flag", func() {
 			It("gets only the value", func() {
-				responseJson := fmt.Sprintf(USER_CREDENTIAL_ARRAY_RESPONSE_JSON, "my-username-credential", "my-username", "test-password", "passw0rd-H4$h")
+				responseJSON := fmt.Sprintf(arrayResponseJSON, "user", "my-username-credential", `{"username":"my-username", "password":"test-password", "password_hash":"passw0rd-H4$h"}`, `{}`)
 
 				server.RouteToHandler("GET", "/api/v1/data",
 					CombineHandlers(
 						VerifyRequest("GET", "/api/v1/data", "current=true&name=my-username"),
-						RespondWith(http.StatusOK, responseJson),
+						RespondWith(http.StatusOK, responseJSON),
 					),
 				)
 
@@ -706,20 +651,20 @@ private_key: |-
 
 		Context("multiple versions with the --quiet flag", func() {
 			It("returns an array of values", func() {
-				responseJson := fmt.Sprintf(MULTIPLE_USER_CREDENTIAL_ARRAY_RESPONSE_JSON,
+				responseJSON := fmt.Sprintf(multipleCredentialArrayResponseJSON,
+					"user",
 					"my-username-credential",
-					"new-username",
-					"new-password",
-					"new-passw0rd-H4$h",
+					`{"username":"new-username", "password":"new-password", "password_hash":"new-passw0rd-H4$h"}`,
+					`{}`,
+					"user",
 					"my-username-credential",
-					"old-username",
-					"old-password",
-					"old-passw0rd-H4$h")
+					`{"username":"old-username", "password":"old-password", "password_hash":"old-passw0rd-H4$h"}`,
+					`{}`)
 
 				server.RouteToHandler("GET", "/api/v1/data",
 					CombineHandlers(
 						VerifyRequest("GET", "/api/v1/data", "name=my-username-credential&versions=2"),
-						RespondWith(http.StatusOK, responseJson),
+						RespondWith(http.StatusOK, responseJSON),
 					),
 				)
 
@@ -740,12 +685,12 @@ private_key: |-
 
 		Context("--quiet flag with key", func() {
 			It("ignores the quiet flag", func() {
-				responseJson := fmt.Sprintf(USER_CREDENTIAL_ARRAY_RESPONSE_JSON, "my-username-credential", "my-username", "test-password", "passw0rd-H4$h")
+				responseJSON := fmt.Sprintf(arrayResponseJSON, "user", "my-username-credential", `{"username":"my-username", "password":"test-password", "password_hash":"passw0rd-H4$h"}`, `{}`)
 
 				server.RouteToHandler("GET", "/api/v1/data",
 					CombineHandlers(
 						VerifyRequest("GET", "/api/v1/data", "current=true&name=my-username"),
-						RespondWith(http.StatusOK, responseJson),
+						RespondWith(http.StatusOK, responseJSON),
 					),
 				)
 
@@ -760,19 +705,19 @@ private_key: |-
 	})
 
 	It("does not use Printf on user-supplied data", func() {
-		responseJson := fmt.Sprintf(STRING_CREDENTIAL_ARRAY_RESPONSE_JSON, "password", "injected", "et''%/7(V&`|?m|Ckih$")
+		responseJSON := fmt.Sprintf(arrayResponseJSON, "password", "injected", `"et''%/7(V&|?m|Ckih$"`, `{}`)
 
 		server.RouteToHandler("GET", "/api/v1/data",
 			CombineHandlers(
 				VerifyRequest("GET", "/api/v1/data", "current=true&name=injected"),
-				RespondWith(http.StatusOK, responseJson),
+				RespondWith(http.StatusOK, responseJSON),
 			),
 		)
 
 		session := runCommand("get", "-n", "injected")
 
 		Eventually(session).Should(Exit(0))
-		outStr := "et''%/7\\(V&`|\\?m\\|Ckih\\$"
-		Eventually(session.Out).Should(Say(outStr + TIMESTAMP))
+		outStr := "et''%/7\\(V&|\\?m\\|Ckih\\$"
+		Eventually(session.Out).Should(Say(outStr + timestamp))
 	})
 })

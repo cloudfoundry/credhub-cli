@@ -1,13 +1,14 @@
 package config
 
 import (
-	"code.cloudfoundry.org/credhub-cli/util"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"path"
 	"time"
+
+	"code.cloudfoundry.org/credhub-cli/util"
 )
 
 const AuthClient = "credhub_cli"

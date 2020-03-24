@@ -60,7 +60,7 @@ var _ = Describe("Export", func() {
 
 	Describe("Exporting", func() {
 		It("queries for the most recent version of all credentials", func() {
-			findJson := `{
+			findJSON := `{
 				"credentials": [
 					{
 						"version_created_at": "idc",
@@ -73,7 +73,7 @@ var _ = Describe("Export", func() {
 				]
 			}`
 
-			getJson := `{
+			getJSON := `{
 				"data": [{
 					"type":"value",
 					"id":"some_uuid",
@@ -94,15 +94,15 @@ var _ = Describe("Export", func() {
 			server.AppendHandlers(
 				CombineHandlers(
 					VerifyRequest("GET", "/api/v1/data", "path="),
-					RespondWith(http.StatusOK, findJson),
+					RespondWith(http.StatusOK, findJSON),
 				),
 				CombineHandlers(
 					VerifyRequest("GET", "/api/v1/data", "name=/path/to/cred&current=true"),
-					RespondWith(http.StatusOK, getJson),
+					RespondWith(http.StatusOK, getJSON),
 				),
 				CombineHandlers(
 					VerifyRequest("GET", "/api/v1/data", "name=/path/to/another/cred&current=true"),
-					RespondWith(http.StatusOK, getJson),
+					RespondWith(http.StatusOK, getJSON),
 				),
 			)
 
@@ -242,12 +242,12 @@ var _ = Describe("Export", func() {
 
 		Context("when given a path", func() {
 			It("queries for credentials matching that path", func() {
-				noCredsJson := `{ "credentials" : [] }`
+				noCredsJSON := `{ "credentials" : [] }`
 
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest("GET", "/api/v1/data", "path=some/path"),
-						RespondWith(http.StatusOK, noCredsJson),
+						RespondWith(http.StatusOK, noCredsJSON),
 					),
 				)
 
@@ -261,13 +261,13 @@ var _ = Describe("Export", func() {
 			Context("when given output-json flag", func() {
 				It("writes the JSON to that file", func() {
 					withTemporaryFile(func(filename string) {
-						noCredsJson := `{ "credentials" : [] }`
+						noCredsJSON := `{ "credentials" : [] }`
 						jsonOutput := `{"Credentials":[]}`
 
 						server.AppendHandlers(
 							CombineHandlers(
 								VerifyRequest("GET", "/api/v1/data", "path="),
-								RespondWith(http.StatusOK, noCredsJson),
+								RespondWith(http.StatusOK, noCredsJSON),
 							),
 						)
 
@@ -287,14 +287,14 @@ var _ = Describe("Export", func() {
 			Context("when not given output-json flag", func() {
 				It("writes the YAML to that file", func() {
 					withTemporaryFile(func(filename string) {
-						noCredsJson := `{ "credentials" : [] }`
+						noCredsJSON := `{ "credentials" : [] }`
 						noCredsYaml := `credentials: []
 `
 
 						server.AppendHandlers(
 							CombineHandlers(
 								VerifyRequest("GET", "/api/v1/data", "path="),
-								RespondWith(http.StatusOK, noCredsJson),
+								RespondWith(http.StatusOK, noCredsJSON),
 							),
 						)
 
@@ -322,16 +322,16 @@ var _ = Describe("Export", func() {
 			session := runCommand("export")
 
 			Eventually(session).Should(Exit(1))
-			Eventually(string(session.Err.Contents())).Should(ContainSubstring("Get mashed://potatoes/api/v1/data?path=: unsupported protocol scheme \"mashed\""))
+			Eventually(string(session.Err.Contents())).Should(ContainSubstring("unsupported protocol scheme"))
 		})
 
 		It("prints an error if the specified output file cannot be opened", func() {
-			noCredsJson := `{ "credentials" : [] }`
+			noCredsJSON := `{ "credentials" : [] }`
 
 			server.AppendHandlers(
 				CombineHandlers(
 					VerifyRequest("GET", "/api/v1/data", "path="),
-					RespondWith(http.StatusOK, noCredsJson),
+					RespondWith(http.StatusOK, noCredsJSON),
 				),
 			)
 

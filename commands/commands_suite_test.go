@@ -9,7 +9,6 @@ import (
 	. "github.com/onsi/gomega/gexec"
 	. "github.com/onsi/gomega/ghttp"
 
-	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -24,49 +23,23 @@ import (
 	test_util "code.cloudfoundry.org/credhub-cli/test"
 )
 
-const TIMESTAMP = `2016-01-01T12:00:00Z`
-const UUID = `5a2edd4f-1686-4c8d-80eb-5daa866f9f86`
+const timestamp = `2016-01-01T12:00:00Z`
+const uuid = `5a2edd4f-1686-4c8d-80eb-5daa866f9f86`
 
-const VALID_ACCESS_TOKEN = "eyJhbGciOiJSUzI1NiIsImtpZCI6ImxlZ2FjeS10b2tlbi1rZXkiLCJ0eXAiOiJKV1QifQ.eyJqdGkiOiI3NTY5MTc5OTgzOTY0M2Y4OWI2NGZlNDQ2MWU0OWJlMCIsInN1YiI6IjY3ODdiYjdlLTc4YmItNGJlNi05NTgzLTQyYTc1ZGRiYTNkNSIsInNjb3BlIjpbImNyZWRodWIud3JpdGUiLCJjcmVkaHViLnJlYWQiXSwiY2xpZW50X2lkIjoiY3JlZGh1Yl9jbGkiLCJjaWQiOiJjcmVkaHViX2NsaSIsImF6cCI6ImNyZWRodWJfY2xpIiwicmV2b2NhYmxlIjp0cnVlLCJncmFudF90eXBlIjoicGFzc3dvcmQiLCJ1c2VyX2lkIjoiNjc4N2JiN2UtNzhiYi00YmU2LTk1ODMtNDJhNzVkZGJhM2Q1Iiwib3JpZ2luIjoidWFhIiwidXNlcl9uYW1lIjoiY3JlZGh1YiIsImVtYWlsIjoiY3JlZGh1YiIsImF1dGhfdGltZSI6MTUwNDgyMTU4NSwicmV2X3NpZyI6ImU0Yjg2ODVlIiwiaWF0IjoxNTA0ODIxNTg1LCJleHAiOjE1MDQ5MDc5ODUsImlzcyI6Imh0dHBzOi8vMzQuMjA2LjIzMy4xOTU6ODQ0My9vYXV0aC90b2tlbiIsInppZCI6InVhYSIsImF1ZCI6WyJjcmVkaHViX2NsaSIsImNyZWRodWIiXX0.Ubi5k3Sy4CkcTqKvKuSkLJFpA5zfwWPlhImuwMW3HyKd6iEPuteXqnSE9r6ndvcKf_B3PS0ZduPg7v81RiZyfTGu3ObWIEdYExlmI97yfg4OQMCfo4jdr2wSzpcwixTK2FeZ2RcDklMfaSp_CTAnNcY4Lj2Jlk2eagWOCXizxsB1SHfegtGWH3FSUT5I3nJVcWAsRCMLqjHzRWYdP3CfpnMhnrjic1Ok_f2HKygiG44uUx2u3yQOV1CiZJwhxPODTuhI8X9kkQ0rLW9jW9ADVFstfXOglr-_k6tJMKMNpbXuCd_XaxOIXsxrSdFwcZw56KjuAA4iMuSfMxCbu1UyFw"
-const VALID_ACCESS_TOKEN_JTI = "75691799839643f89b64fe4461e49be0"
+const validAccessToken = "eyJhbGciOiJSUzI1NiIsImtpZCI6ImxlZ2FjeS10b2tlbi1rZXkiLCJ0eXAiOiJKV1QifQ.eyJqdGkiOiI3NTY5MTc5OTgzOTY0M2Y4OWI2NGZlNDQ2MWU0OWJlMCIsInN1YiI6IjY3ODdiYjdlLTc4YmItNGJlNi05NTgzLTQyYTc1ZGRiYTNkNSIsInNjb3BlIjpbImNyZWRodWIud3JpdGUiLCJjcmVkaHViLnJlYWQiXSwiY2xpZW50X2lkIjoiY3JlZGh1Yl9jbGkiLCJjaWQiOiJjcmVkaHViX2NsaSIsImF6cCI6ImNyZWRodWJfY2xpIiwicmV2b2NhYmxlIjp0cnVlLCJncmFudF90eXBlIjoicGFzc3dvcmQiLCJ1c2VyX2lkIjoiNjc4N2JiN2UtNzhiYi00YmU2LTk1ODMtNDJhNzVkZGJhM2Q1Iiwib3JpZ2luIjoidWFhIiwidXNlcl9uYW1lIjoiY3JlZGh1YiIsImVtYWlsIjoiY3JlZGh1YiIsImF1dGhfdGltZSI6MTUwNDgyMTU4NSwicmV2X3NpZyI6ImU0Yjg2ODVlIiwiaWF0IjoxNTA0ODIxNTg1LCJleHAiOjE1MDQ5MDc5ODUsImlzcyI6Imh0dHBzOi8vMzQuMjA2LjIzMy4xOTU6ODQ0My9vYXV0aC90b2tlbiIsInppZCI6InVhYSIsImF1ZCI6WyJjcmVkaHViX2NsaSIsImNyZWRodWIiXX0.Ubi5k3Sy4CkcTqKvKuSkLJFpA5zfwWPlhImuwMW3HyKd6iEPuteXqnSE9r6ndvcKf_B3PS0ZduPg7v81RiZyfTGu3ObWIEdYExlmI97yfg4OQMCfo4jdr2wSzpcwixTK2FeZ2RcDklMfaSp_CTAnNcY4Lj2Jlk2eagWOCXizxsB1SHfegtGWH3FSUT5I3nJVcWAsRCMLqjHzRWYdP3CfpnMhnrjic1Ok_f2HKygiG44uUx2u3yQOV1CiZJwhxPODTuhI8X9kkQ0rLW9jW9ADVFstfXOglr-_k6tJMKMNpbXuCd_XaxOIXsxrSdFwcZw56KjuAA4iMuSfMxCbu1UyFw"
+const validAccessTokenJTI = "75691799839643f89b64fe4461e49be0"
 
-const GENERATE_CREDENTIAL_REQUEST_JSON = `{"type":"%s","name":"%s","parameters":%s,"overwrite":%t}`
-const GENERATE_CREDENTIAL_WITH_VALUE_REQUEST_JSON = `{"type":"%s","name":"%s","parameters":%s,"overwrite":%t,"value":%s}`
-const GENERATE_CREDENTIAL_RESPONSE_JSON = `{"type":"%s","id":"` + UUID + `","name":"%s","version_created_at":"` + TIMESTAMP + `","value":%s,"version_created_at":"` + TIMESTAMP + `"}`
+const defaultResponseJSON = `{"type":"%s","id":"` + uuid + `","name":"%s","version_created_at":"` + timestamp + `","value":%s,"metadata":%s}`
+const redactedResponseJSON = `{"type":"%s","id":"` + uuid + `","name":"%s","version_created_at":"` + timestamp + `","value":"<redacted>", "metadata":%s}`
+const arrayResponseJSON = `{"data":[` + defaultResponseJSON + `]}`
+const multipleCredentialArrayResponseJSON = `{"data":[` + defaultResponseJSON + `,` + defaultResponseJSON + `]}`
 
-const JSON_CREDENTIAL_RESPONSE_JSON = `{"type":"json","id":"` + UUID + `","name":"%s","version_created_at":"` + TIMESTAMP + `","value":%s}`
-const STRING_CREDENTIAL_RESPONSE_JSON = `{"type":"%s","id":"` + UUID + `","name":"%s","version_created_at":"` + TIMESTAMP + `","value":"%s"}`
-const CERTIFICATE_CREDENTIAL_RESPONSE_JSON = `{"type":"certificate","id":"` + UUID + `","name":"%s","version_created_at":"` + TIMESTAMP + `","value":{"ca":"%s","certificate":"%s","private_key":"%s"}}`
-const RSA_CREDENTIAL_RESPONSE_JSON = `{"type":"%s","id":"` + UUID + `","name":"%s","version_created_at":"` + TIMESTAMP + `","value":{"public_key":"%s","private_key":"%s"},"version_created_at":"` + TIMESTAMP + `"}`
-const USER_CREDENTIAL_RESPONSE_JSON = `{"type":"user","id":"` + UUID + `","name":"%s","version_created_at":"` + TIMESTAMP + `","value":{"username":"%s", "password":"%s", "password_hash":"%s"}}`
+const generateRequestJSON = `{"type":"%s","name":"%s","parameters":%s,"overwrite":%t}`
+const generateWithValueRequestJSON = `{"type":"%s","name":"%s","parameters":%s,"overwrite":%t,"value":%s}`
+const generateResponseJSON = `{"type":"%s","id":"` + uuid + `","name":"%s","version_created_at":"` + timestamp + `","value":%s,"metadata":{}}`
 
-const SET_CERTIFICATE_CREDENTIAL_RESPONSE_JSON = `{"type":"certificate","id":"` + UUID + `","name":"%s","version_created_at":"` + TIMESTAMP + `","value": "<redacted>"}`
-const SET_RSA_CREDENTIAL_RESPONSE_JSON = `{"type":"%s","id":"` + UUID + `","name":"%s","version_created_at":"` + TIMESTAMP + `","value": "<redacted>","version_created_at":"` + TIMESTAMP + `"}`
-const SET_STRING_CREDENTIAL_RESPONSE_JSON = `{"type":"%s","id":"` + UUID + `","name":"%s","version_created_at":"` + TIMESTAMP + `","value": "<redacted>"}`
-
-const STRING_CREDENTIAL_ARRAY_RESPONSE_JSON = `{"data":[` + STRING_CREDENTIAL_RESPONSE_JSON + `]}`
-const JSON_CREDENTIAL_ARRAY_RESPONSE_JSON = `{"data":[` + JSON_CREDENTIAL_RESPONSE_JSON + `]}`
-const CERTIFICATE_CREDENTIAL_ARRAY_RESPONSE_JSON = `{"data":[` + CERTIFICATE_CREDENTIAL_RESPONSE_JSON + `]}`
-const RSA_SSH_CREDENTIAL_ARRAY_RESPONSE_JSON = `{"data":[` + RSA_CREDENTIAL_RESPONSE_JSON + `]}`
-const USER_CREDENTIAL_ARRAY_RESPONSE_JSON = `{"data":[` + USER_CREDENTIAL_RESPONSE_JSON + `]}`
-
-const MULTIPLE_CERTIFICATE_CREDENTIAL_ARRAY_RESPONSE_JSON = `{"data":[` + CERTIFICATE_CREDENTIAL_RESPONSE_JSON + `,` + CERTIFICATE_CREDENTIAL_RESPONSE_JSON + `]}`
-const MULTIPLE_STRING_CREDENTIAL_ARRAY_RESPONSE_JSON = `{"data":[` + STRING_CREDENTIAL_RESPONSE_JSON + `,` + STRING_CREDENTIAL_RESPONSE_JSON + `]}`
-const MULTIPLE_RSA_SSH_CREDENTIAL_ARRAY_RESPONSE_JSON = `{"data":[` + RSA_CREDENTIAL_RESPONSE_JSON + `,` + RSA_CREDENTIAL_RESPONSE_JSON + `]}`
-const MULTIPLE_USER_CREDENTIAL_ARRAY_RESPONSE_JSON = `{"data":[` + USER_CREDENTIAL_RESPONSE_JSON + `,` + USER_CREDENTIAL_RESPONSE_JSON + `]}`
-
-const ADD_PERMISSIONS_REQUEST_JSON = `{"path":"%s","actor":"%s","operations":%s}`
-const PERMISSIONS_RESPONSE_JSON = `{"uuid":"` + UUID + `","path":"%s","actor":"%s","operations":%s}`
-
-var responseMyValuePotatoesJson = fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_JSON, "value", "my-value", "potatoes")
-var responseMyPasswordPotatoesJson = fmt.Sprintf(STRING_CREDENTIAL_RESPONSE_JSON, "password", "my-password", "potatoes")
-var responseMyCertificateWithNewlinesJson = fmt.Sprintf(CERTIFICATE_CREDENTIAL_RESPONSE_JSON, "my-secret", `my\nca`, `my\ncert`, `my\npriv`)
-var responseMyRSAWithNewlinesJson = fmt.Sprintf(RSA_CREDENTIAL_RESPONSE_JSON, "rsa", "foo-rsa-key", `some\npublic\nkey`, `some\nprivate\nkey`)
-
-var responseSetMyCertificateWithNewlinesJson = fmt.Sprintf(SET_CERTIFICATE_CREDENTIAL_RESPONSE_JSON, "my-secret")
-var responseSetMyRSAWithNewlinesJson = fmt.Sprintf(SET_RSA_CREDENTIAL_RESPONSE_JSON, "rsa", "foo-rsa-key")
-var responseSetMyPasswordPotatoesJson = fmt.Sprintf(SET_STRING_CREDENTIAL_RESPONSE_JSON, "password", "my-password")
-var responseSetMyValuePotatoesJson = fmt.Sprintf(SET_STRING_CREDENTIAL_RESPONSE_JSON, "value", "my-value")
+const addPermissionsRequestJSON = `{"path":"%s","actor":"%s","operations":%s}`
+const permissionsResponseJSON = `{"uuid":"` + uuid + `","path":"%s","actor":"%s","operations":%s}`
 
 func TestCommands(t *testing.T) {
 	RegisterFailHandler(Fail)
@@ -112,9 +85,9 @@ var _ = AfterEach(func() {
 })
 
 var _ = SynchronizedBeforeSuite(func() []byte {
-	executable_path, err := Build("code.cloudfoundry.org/credhub-cli", "-ldflags", "-X code.cloudfoundry.org/credhub-cli/version.Version=test-version")
+	executablePath, err := Build("code.cloudfoundry.org/credhub-cli", "-ldflags", "-X code.cloudfoundry.org/credhub-cli/version.Version=test-version")
 	Expect(err).NotTo(HaveOccurred())
-	return []byte(executable_path)
+	return []byte(executablePath)
 }, func(data []byte) {
 	commandPath = string(data)
 	credhubEnv = test_util.UnsetAndCacheCredHubEnvVars()

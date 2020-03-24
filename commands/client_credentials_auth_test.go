@@ -17,7 +17,7 @@ var _ = Describe("Find", func() {
 		It("successfully authenticates", func() {
 			config.WriteConfig(config.Config{})
 
-			responseJson := `{
+			responseJSON := `{
 			"credentials": []
 			}`
 
@@ -31,7 +31,7 @@ var _ = Describe("Find", func() {
 			server.RouteToHandler("GET", "/api/v1/data",
 				CombineHandlers(
 					VerifyRequest("GET", "/api/v1/data"),
-					RespondWith(http.StatusOK, responseJson),
+					RespondWith(http.StatusOK, responseJSON),
 				),
 			)
 
@@ -70,7 +70,7 @@ var _ = Describe("Find", func() {
 				},
 			)
 
-			responseJson := `{
+			responseJSON := `{
 			"credentials": []
 			}`
 
@@ -90,7 +90,7 @@ var _ = Describe("Find", func() {
 				} else if strings.HasSuffix(r.Header.Get("Authorization"), newAccessToken) {
 					CombineHandlers(
 						VerifyRequest("GET", "/api/v1/data"),
-						RespondWith(http.StatusOK, responseJson),
+						RespondWith(http.StatusOK, responseJSON),
 					)(w, r)
 				} else {
 					RespondWith(http.StatusBadRequest, `{"error": "Invalid access token"}`)

@@ -64,13 +64,13 @@ var _ = Describe("API", func() {
 						}`),
 			)
 
-			authServer.RouteToHandler("DELETE", "/oauth/token/revoke/"+VALID_ACCESS_TOKEN_JTI, RespondWith(http.StatusOK, ""))
+			authServer.RouteToHandler("DELETE", "/oauth/token/revoke/"+validAccessTokenJTI, RespondWith(http.StatusOK, ""))
 
 			newAuthServer.RouteToHandler("GET", "/info", RespondWith(http.StatusOK, ""))
 
 			cfg := config.ReadConfig()
 			cfg.AuthURL = authServer.URL()
-			cfg.AccessToken = VALID_ACCESS_TOKEN
+			cfg.AccessToken = validAccessToken
 			config.WriteConfig(cfg)
 
 			session := runCommand("api", apiServer.URL())

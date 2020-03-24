@@ -92,7 +92,7 @@ func (c *GetCommand) printCredential() error {
 		}
 	} else if c.Quiet {
 		if c.OutputJSON {
-			return errors.NewOutputJsonAndQuietError()
+			return errors.NewOutputJSONAndQuietError()
 		}
 		value, ok := credential.Value.(interface{})
 		if !ok {

@@ -28,7 +28,7 @@ func (credentialBulkImport *CredentialBulkImport) ReadFile(filepath string, impo
 func (credentialBulkImport *CredentialBulkImport) ReadBytes(data []byte, importJSON bool) error {
 	if importJSON {
 		if err := json.Unmarshal(data, credentialBulkImport); err != nil {
-			return errors.NewInvalidImportJsonError()
+			return errors.NewInvalidImportJSONError()
 		}
 	} else {
 		if err := yaml.Unmarshal(data, credentialBulkImport); err != nil {
@@ -37,7 +37,7 @@ func (credentialBulkImport *CredentialBulkImport) ReadBytes(data []byte, importJ
 	}
 
 	if credentialBulkImport.Credentials == nil {
-			return errors.NewNoCredentialsTagError()
+		return errors.NewNoCredentialsTagError()
 	}
 
 	for i, credential := range credentialBulkImport.Credentials {

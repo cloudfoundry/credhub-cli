@@ -59,25 +59,25 @@ var _ = Describe("interpolate", func() {
 value-cred: ((relative/value/cred/path))
 static-value: a normal string`
 			templateFile.WriteString(templateText)
-			responseValueJson := fmt.Sprintf(STRING_CREDENTIAL_ARRAY_RESPONSE_JSON, "value", "relative/value/cred/path", `{\"value\": \"should not be interpolated\"}`)
+			responseValueJSON := fmt.Sprintf(arrayResponseJSON, "value", "relative/value/cred/path", `"should not be interpolated"`, `{}`)
 
-			credentialListJson, err := credentialsListJSON([]string{"/relative/value/cred/path"})
+			credentialListJSON, err := credentialsListJSON([]string{"/relative/value/cred/path"})
 			Expect(err).Should(BeNil())
 			server.AppendHandlers(
 				CombineHandlers(
 					VerifyRequest("GET", "/api/v1/data", "path="),
-					RespondWith(http.StatusOK, credentialListJson),
+					RespondWith(http.StatusOK, credentialListJSON),
 				),
 				CombineHandlers(
 					VerifyRequest("GET", "/api/v1/data", "current=true&name=/relative/value/cred/path"),
-					RespondWith(http.StatusOK, responseValueJson),
+					RespondWith(http.StatusOK, responseValueJSON),
 				),
 			)
 
 			session = runCommand("interpolate", "-f", templateFile.Name())
 			Eventually(session).Should(gexec.Exit(0))
 			Expect(string(session.Out.Contents())).To(MatchYAML(`
-value-cred: "{\"value\": \"should not be interpolated\"}"
+value-cred: should not be interpolated
 static-value: a normal string
 `))
 		})
@@ -89,18 +89,18 @@ cert-only-certificate-cred: ((relative/certificate/cred/path.certificate))
 static-value: a normal string`
 			templateFile.WriteString(templateText)
 
-			responseCertJson := fmt.Sprintf(CERTIFICATE_CREDENTIAL_ARRAY_RESPONSE_JSON, "test-cert", "", "-----BEGIN FAKE CERTIFICATE-----\\n-----END FAKE CERTIFICATE-----", "-----BEGIN FAKE RSA PRIVATE KEY-----\\n-----END FAKE RSA PRIVATE KEY-----")
+			responseCertJSON := fmt.Sprintf(arrayResponseJSON, "certificate", "test-cert", "{\"ca\":\"\",\"certificate\":\"-----BEGIN FAKE CERTIFICATE-----\\n-----END FAKE CERTIFICATE-----\",\"private_key\":\"-----BEGIN FAKE RSA PRIVATE KEY-----\\n-----END FAKE RSA PRIVATE KEY-----\"}", `{}`)
 
-			credentialListJson, err := credentialsListJSON([]string{"/relative/certificate/cred/path"})
+			credentialListJSON, err := credentialsListJSON([]string{"/relative/certificate/cred/path"})
 			Expect(err).Should(BeNil())
 			server.AppendHandlers(
 				CombineHandlers(
 					VerifyRequest("GET", "/api/v1/data", "path="),
-					RespondWith(http.StatusOK, credentialListJson),
+					RespondWith(http.StatusOK, credentialListJSON),
 				),
 				CombineHandlers(
 					VerifyRequest("GET", "/api/v1/data", "current=true&name=/relative/certificate/cred/path"),
-					RespondWith(http.StatusOK, responseCertJson),
+					RespondWith(http.StatusOK, responseCertJSON),
 				),
 			)
 
@@ -126,17 +126,17 @@ static-value: a normal string
 			templateText = `json-cred: ((relative/json/cred/path))`
 			templateFile.WriteString(templateText)
 
-			responseJson := fmt.Sprintf(JSON_CREDENTIAL_ARRAY_RESPONSE_JSON, "test-json", `{"whatthing":"something"}`)
-			credentialListJson, err := credentialsListJSON([]string{"/relative/json/cred/path"})
+			responseJSON := fmt.Sprintf(arrayResponseJSON, "json", "test-json", `{"whatthing":"something"}`, `{}`)
+			credentialListJSON, err := credentialsListJSON([]string{"/relative/json/cred/path"})
 			Expect(err).Should(BeNil())
 			server.AppendHandlers(
 				CombineHandlers(
 					VerifyRequest("GET", "/api/v1/data", "path="),
-					RespondWith(http.StatusOK, credentialListJson),
+					RespondWith(http.StatusOK, credentialListJSON),
 				),
 				CombineHandlers(
 					VerifyRequest("GET", "/api/v1/data", "current=true&name=/relative/json/cred/path"),
-					RespondWith(http.StatusOK, responseJson),
+					RespondWith(http.StatusOK, responseJSON),
 				),
 			)
 
@@ -154,17 +154,17 @@ cert-only-certificate-cred: ((/relative/certificate/cred/path.certificate))
 static-value: a normal string`
 			templateFile.WriteString(templateText)
 
-			responseCertJson := fmt.Sprintf(CERTIFICATE_CREDENTIAL_ARRAY_RESPONSE_JSON, "test-cert", "", "-----BEGIN FAKE CERTIFICATE-----\\n-----END FAKE CERTIFICATE-----", "-----BEGIN FAKE RSA PRIVATE KEY-----\\n-----END FAKE RSA PRIVATE KEY-----")
-			credentialListJson, err := credentialsListJSON([]string{"/relative/certificate/cred/path"})
+			responseCertJSON := fmt.Sprintf(arrayResponseJSON, "certificate", "test-cert", "{\"ca\":\"\",\"certificate\":\"-----BEGIN FAKE CERTIFICATE-----\\n-----END FAKE CERTIFICATE-----\",\"private_key\":\"-----BEGIN FAKE RSA PRIVATE KEY-----\\n-----END FAKE RSA PRIVATE KEY-----\"}", `{}`)
+			credentialListJSON, err := credentialsListJSON([]string{"/relative/certificate/cred/path"})
 			Expect(err).Should(BeNil())
 			server.AppendHandlers(
 				CombineHandlers(
 					VerifyRequest("GET", "/api/v1/data", "path="),
-					RespondWith(http.StatusOK, credentialListJson),
+					RespondWith(http.StatusOK, credentialListJSON),
 				),
 				CombineHandlers(
 					VerifyRequest("GET", "/api/v1/data", "current=true&name=/relative/certificate/cred/path"),
-					RespondWith(http.StatusOK, responseCertJson),
+					RespondWith(http.StatusOK, responseCertJSON),
 				),
 			)
 		})
@@ -189,15 +189,15 @@ static-value: a normal string
 	})
 
 	Describe("when template has different paths than prefix", func() {
-		var credentialListJson string
+		var credentialListJSON string
 		var err error
 		BeforeEach(func() {
-			credentialListJson, err = credentialsListJSON([]string{"/a/pass1", "/a/myval", "/b/pass2", "/b/pass"})
+			credentialListJSON, err = credentialsListJSON([]string{"/a/pass1", "/a/myval", "/b/pass2", "/b/pass"})
 			Expect(err).Should(BeNil())
 			server.AppendHandlers(
 				CombineHandlers(
 					VerifyRequest("GET", "/api/v1/data", "path="),
-					RespondWith(http.StatusOK, credentialListJson),
+					RespondWith(http.StatusOK, credentialListJSON),
 				),
 			)
 		})
@@ -207,7 +207,7 @@ static-value: a normal string
 			server.AppendHandlers(
 				CombineHandlers(
 					VerifyRequest("GET", "/api/v1/data", "current=true&name=/a/pass1"),
-					RespondWith(http.StatusOK, fmt.Sprintf(STRING_CREDENTIAL_ARRAY_RESPONSE_JSON, "value", "a/pass1", "pass1")),
+					RespondWith(http.StatusOK, fmt.Sprintf(arrayResponseJSON, "value", "a/pass1", `"pass1"`, `{}`)),
 				),
 			)
 			session = runCommand("interpolate", "-f", templateFile.Name(), "-p=/a")
@@ -223,7 +223,7 @@ static-value: a normal string
 			server.AppendHandlers(
 				CombineHandlers(
 					VerifyRequest("GET", "/api/v1/data", "current=true&name=/b/pass"),
-					RespondWith(http.StatusOK, fmt.Sprintf(STRING_CREDENTIAL_ARRAY_RESPONSE_JSON, "value", "b/pass", "pass")),
+					RespondWith(http.StatusOK, fmt.Sprintf(arrayResponseJSON, "value", "b/pass", `"pass"`, `{}`)),
 				),
 			)
 			session = runCommand("interpolate", "-f", templateFile.Name(), "-p=/a")
@@ -260,12 +260,12 @@ static-value: a normal string
 				templateText = `---
 yaml-key-with-static-value: a normal string`
 				templateFile.WriteString(templateText)
-				credentialListJson, err := credentialsListJSON([]string{""})
+				credentialListJSON, err := credentialsListJSON([]string{""})
 				Expect(err).Should(BeNil())
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest("GET", "/api/v1/data", "path="),
-						RespondWith(http.StatusOK, credentialListJson),
+						RespondWith(http.StatusOK, credentialListJSON),
 					),
 				)
 			})
@@ -283,12 +283,12 @@ yaml-key-with-template-value: ((relative/cred/path))
 yaml-key-with-static-value: a normal string`
 				templateFile.WriteString(templateText)
 
-				credentialListJson, err := credentialsListJSON([]string{"/relative/cred/path"})
+				credentialListJSON, err := credentialsListJSON([]string{"/relative/cred/path"})
 				Expect(err).Should(BeNil())
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest("GET", "/api/v1/data", "path="),
-						RespondWith(http.StatusOK, credentialListJson),
+						RespondWith(http.StatusOK, credentialListJSON),
 					),
 					CombineHandlers(
 						VerifyRequest("GET", "/api/v1/data", "current=true&name=/relative/cred/path"),
@@ -311,12 +311,12 @@ yaml-key-with-template-value: ((not_a_cred))
 yaml-key-with-static-value: a normal string`
 				templateFile.WriteString(templateText)
 
-				credentialListJson, err := credentialsListJSON([]string{""})
+				credentialListJSON, err := credentialsListJSON([]string{""})
 				Expect(err).Should(BeNil())
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest("GET", "/api/v1/data", "path="),
-						RespondWith(http.StatusOK, credentialListJson),
+						RespondWith(http.StatusOK, credentialListJSON),
 					),
 				)
 			})
@@ -335,12 +335,12 @@ yaml-key-with-static-value: a normal string`))
 				templateText = `key: - value`
 				templateFile.WriteString(templateText)
 
-				credentialListJson, err := credentialsListJSON([]string{""})
+				credentialListJSON, err := credentialsListJSON([]string{""})
 				Expect(err).Should(BeNil())
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest("GET", "/api/v1/data", "path="),
-						RespondWith(http.StatusOK, credentialListJson),
+						RespondWith(http.StatusOK, credentialListJSON),
 					),
 				)
 

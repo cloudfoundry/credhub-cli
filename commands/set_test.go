@@ -16,7 +16,7 @@ import (
 	. "github.com/onsi/gomega/ghttp"
 )
 
-var _ = FDescribe("Set", func() {
+var _ = Describe("Set", func() {
 	BeforeEach(func() {
 		login()
 	})
@@ -33,13 +33,20 @@ var _ = FDescribe("Set", func() {
 	}
 	ItAutomaticallyLogsIn(testAutoLogin, "set", "-n", "test-credential", "-t", "password", "-w", "test-value")
 
-	Describe("not specifying type", func() {
-		It("returns an error", func() {
-			session := runCommand("set", "-n", "my-password", "-w", "potatoes")
+	It("returns an error when not specifying type", func() {
+		session := runCommand("set", "-n", "my-password", "-w", "potatoes")
 
-			Eventually(session).Should(Exit(1))
-			Eventually(session.Err).Should(Say("A type must be specified when setting a credential. Valid types include 'value', 'json', 'password', 'user', 'certificate', 'ssh' and 'rsa'."))
-		})
+		Eventually(session).Should(Exit(1))
+		Eventually(session.Err).Should(Say("A type must be specified when setting a credential. Valid types include 'value', 'json', 'password', 'user', 'certificate', 'ssh' and 'rsa'."))
+	})
+
+	It("returns an error when metadata json is invalid", func() {
+		setupSetServerWithMetadata("my-value", "value", `"potatoes"`, `"not-valid-json"`)
+
+		session := runCommand("set", "-n", "my-value", "-v", "potatoes", "-t", "value", "--metadata", "not-valid-json")
+
+		Eventually(session).Should(Exit(1))
+		Expect(string(session.Err.Contents())).To(ContainSubstring("The argument for --metadata is not a valid json object. Please update and retry your request."))
 	})
 
 	Describe("setting value secrets", func() {
@@ -49,9 +56,25 @@ var _ = FDescribe("Set", func() {
 			session := runCommand("set", "-n", "my-value", "-v", "potatoes", "-t", "value")
 
 			Eventually(session).Should(Exit(0))
-			Eventually(string(session.Out.Contents())).Should(ContainSubstring("name: my-value"))
-			Eventually(string(session.Out.Contents())).Should(ContainSubstring("type: value"))
-			Eventually(string(session.Out.Contents())).Should(ContainSubstring("value: <redacted>"))
+			Expect(string(session.Out.Contents())).To(ContainSubstring("name: my-value"))
+			Expect(string(session.Out.Contents())).To(ContainSubstring("type: value"))
+			Expect(string(session.Out.Contents())).To(ContainSubstring("value: <redacted>"))
+			Expect(string(session.Out.Contents())).NotTo(ContainSubstring("metadata:"))
+		})
+
+		It("puts a secret with metadata", func() {
+			setupSetServerWithMetadata("my-value", "value", `"potatoes"`, `{"some":{"example":"metadata"}, "array":["metadata"]}`)
+
+			session := runCommand("set", "-n", "my-value", "-v", "potatoes", "-t", "value", "--metadata", `{"some":{"example":"metadata"}, "array":["metadata"]}`)
+
+			Eventually(session).Should(Exit(0), string(session.Err.Contents()))
+			metadataOutput := `
+metadata:
+  array:
+  - metadata
+  some:
+    example: metadata`
+			Expect(string(session.Out.Contents())).To(ContainSubstring(metadataOutput))
 		})
 
 		It("escapes special characters in the value", func() {
@@ -71,7 +94,7 @@ var _ = FDescribe("Set", func() {
 			session := runCommand("set", "-n", "my-value", "-v", "potatoes", "-t", "value", "--output-json")
 
 			Eventually(session).Should(Exit(0))
-			Eventually(string(session.Out.Contents())).Should(MatchJSON(responseSetMyValuePotatoesJson))
+			Eventually(string(session.Out.Contents())).Should(MatchJSON(fmt.Sprintf(redactedResponseJSON, "value", "my-value", "null")))
 		})
 
 		It("accepts case-insensitive type", func() {
@@ -80,7 +103,7 @@ var _ = FDescribe("Set", func() {
 			session := runCommand("set", "-n", "my-value", "-v", "potatoes", "-t", "VALUE", "--output-json")
 
 			Eventually(session).Should(Exit(0))
-			Eventually(string(session.Out.Contents())).Should(MatchJSON(responseSetMyValuePotatoesJson))
+			Eventually(string(session.Out.Contents())).Should(MatchJSON(fmt.Sprintf(redactedResponseJSON, "value", "my-value", "null")))
 		})
 	})
 
@@ -92,9 +115,27 @@ var _ = FDescribe("Set", func() {
 			session := runCommand("set", "-n", "json-secret", "-v", jsonValue, "-t", "json")
 
 			Eventually(session).Should(Exit(0))
-			Eventually(string(session.Out.Contents())).Should(ContainSubstring("name: json-secret"))
-			Eventually(string(session.Out.Contents())).Should(ContainSubstring("type: json"))
-			Eventually(string(session.Out.Contents())).Should(ContainSubstring("value: <redacted>"))
+			Expect(string(session.Out.Contents())).To(ContainSubstring("name: json-secret"))
+			Expect(string(session.Out.Contents())).To(ContainSubstring("type: json"))
+			Expect(string(session.Out.Contents())).To(ContainSubstring("value: <redacted>"))
+			Expect(string(session.Out.Contents())).NotTo(ContainSubstring("metadata:"))
+		})
+
+		It("puts a secret with metadata", func() {
+			jsonValue := `{"foo":"bar","nested":{"a":1},"an":["array"]}`
+
+			setupSetServerWithMetadata("json-secret", "json", jsonValue, `{"some":{"example":"metadata"}, "array":["metadata"]}`)
+
+			session := runCommand("set", "-n", "json-secret", "-v", jsonValue, "-t", "json", "--metadata", `{"some":{"example":"metadata"}, "array":["metadata"]}`)
+
+			Eventually(session).Should(Exit(0))
+			metadataOutput := `
+metadata:
+  array:
+  - metadata
+  some:
+    example: metadata`
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring(metadataOutput))
 		})
 
 		It("escapes special characters in the json", func() {
@@ -108,21 +149,14 @@ var _ = FDescribe("Set", func() {
 			Eventually(string(session.Out.Contents())).Should(ContainSubstring("value: <redacted>"))
 		})
 
-		It("puts a secret using explicit json type and returns in json format", func() {
+		It("puts a secret and returns in json format", func() {
 			jsonValue := `{"foo":"bar","nested":{"a":1},"an":["array"]}`
 			setupSetServer("json-secret", "json", jsonValue)
 
 			session := runCommand("set", "-n", "json-secret", "-v", jsonValue, "-t", "json", "--output-json")
 
 			Eventually(session).Should(Exit(0))
-			responseJson := `{
-			"id": "5a2edd4f-1686-4c8d-80eb-5daa866f9f86",
-			"name": "json-secret",
-			"type": "json",
-			"value": "<redacted>",
-			"version_created_at": "2016-01-01T12:00:00Z"
-			}`
-			Eventually(string(session.Out.Contents())).Should(MatchJSON(responseJson))
+			Eventually(string(session.Out.Contents())).Should(MatchJSON(fmt.Sprintf(redactedResponseJSON, "json", "json-secret", "null")))
 		})
 
 		It("accepts case-insensitive type", func() {
@@ -139,15 +173,31 @@ var _ = FDescribe("Set", func() {
 	})
 
 	Describe("setting SSH secrets", func() {
-		It("puts a secret using explicit ssh type", func() {
+		It("puts a secret", func() {
 			setupSetServer("foo-ssh-key", "ssh", `{"public_key":"some-public-key","private_key":"some-private-key"}`)
 
 			session := runCommand("set", "-n", "foo-ssh-key", "-u", "some-public-key", "-p", "some-private-key", "-t", "ssh")
 
 			Eventually(session).Should(Exit(0))
-			Eventually(string(session.Out.Contents())).Should(ContainSubstring("name: foo-ssh-key"))
-			Eventually(string(session.Out.Contents())).Should(ContainSubstring("type: ssh"))
-			Eventually(string(session.Out.Contents())).Should(ContainSubstring("value: <redacted>"))
+			Expect(string(session.Out.Contents())).To(ContainSubstring("name: foo-ssh-key"))
+			Expect(string(session.Out.Contents())).To(ContainSubstring("type: ssh"))
+			Expect(string(session.Out.Contents())).To(ContainSubstring("value: <redacted>"))
+			Expect(string(session.Out.Contents())).NotTo(ContainSubstring("metadata:"))
+		})
+
+		It("puts a secret with metadata", func() {
+			setupSetServerWithMetadata("foo-ssh-key", "ssh", `{"public_key":"some-public-key","private_key":"some-private-key"}`, `{"some":{"example":"metadata"}, "array":["metadata"]}`)
+
+			session := runCommand("set", "-n", "foo-ssh-key", "-u", "some-public-key", "-p", "some-private-key", "-t", "ssh", "--metadata", `{"some":{"example":"metadata"}, "array":["metadata"]}`)
+
+			Eventually(session).Should(Exit(0))
+			metadataOutput := `
+metadata:
+  array:
+  - metadata
+  some:
+    example: metadata`
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring(metadataOutput))
 		})
 
 		It("puts a secret using values read from files", func() {
@@ -162,27 +212,20 @@ var _ = FDescribe("Set", func() {
 				"-u", publicFileName,
 				"-p", privateFilename)
 
-			os.RemoveAll(tempDir)
+			Expect(os.RemoveAll(tempDir)).To(Succeed())
 			Eventually(session).Should(Exit(0))
 			Eventually(string(session.Out.Contents())).Should(ContainSubstring("name: foo-ssh-key"))
 			Eventually(string(session.Out.Contents())).Should(ContainSubstring("type: ssh"))
 			Eventually(string(session.Out.Contents())).Should(ContainSubstring("value: <redacted>"))
 		})
 
-		It("puts a secret using explicit ssh type and returns in json format", func() {
+		It("puts a secret and returns in json format", func() {
 			setupSetServer("foo-ssh-key", "ssh", `{"public_key":"some-public-key","private_key":"some-private-key"}`)
 
 			session := runCommand("set", "-n", "foo-ssh-key", "-u", "some-public-key", "-p", "some-private-key", "-t", "ssh", "--output-json")
 
 			Eventually(session).Should(Exit(0))
-			responseJson := `{
-        	"id": "5a2edd4f-1686-4c8d-80eb-5daa866f9f86",
-        	"name": "foo-ssh-key",
-        	"type": "ssh",
-        	"value": "<redacted>",
-        	"version_created_at": "2016-01-01T12:00:00Z"
-        	}`
-			Eventually(string(session.Out.Contents())).Should(MatchJSON(responseJson))
+			Eventually(string(session.Out.Contents())).Should(MatchJSON(fmt.Sprintf(redactedResponseJSON, "ssh", "foo-ssh-key", "null")))
 		})
 
 		It("accepts case-insensitive type", func() {
@@ -200,28 +243,36 @@ var _ = FDescribe("Set", func() {
 			setupSetServer("foo-ssh-key", "ssh", `{"public_key":"some\npublic\nkey","private_key":"some\nprivate\nkey"}`)
 			session := runCommand("set", "-n", "foo-ssh-key", "-u", `some\npublic\nkey`, "-p", `some\nprivate\nkey`, "-t", "ssh", "--output-json")
 
-			responseJson := `{
-        	"id": "5a2edd4f-1686-4c8d-80eb-5daa866f9f86",
-        	"name": "foo-ssh-key",
-        	"type": "ssh",
-        	"value": "<redacted>",
-        	"version_created_at": "2016-01-01T12:00:00Z"
-        	}`
-
 			Eventually(session).Should(Exit(0))
-			Eventually(string(session.Out.Contents())).Should(MatchJSON(responseJson))
+			Eventually(string(session.Out.Contents())).Should(MatchJSON(fmt.Sprintf(redactedResponseJSON, "ssh", "foo-ssh-key", "null")))
 		})
 	})
 
 	Describe("setting RSA secrets", func() {
-		It("puts a secret using explicit rsa type", func() {
+		It("puts a secret ", func() {
 			setupSetServer("foo-rsa-key", "rsa", `{"public_key":"some-public-key","private_key":"some-private-key"}`)
 			session := runCommand("set", "-n", "foo-rsa-key", "-u", "some-public-key", "-p", "some-private-key", "-t", "rsa")
 
 			Eventually(session).Should(Exit(0))
-			Eventually(string(session.Out.Contents())).Should(ContainSubstring("name: foo-rsa-key"))
-			Eventually(string(session.Out.Contents())).Should(ContainSubstring("type: rsa"))
-			Eventually(string(session.Out.Contents())).Should(ContainSubstring("value: <redacted>"))
+			Expect(string(session.Out.Contents())).To(ContainSubstring("name: foo-rsa-key"))
+			Expect(string(session.Out.Contents())).To(ContainSubstring("type: rsa"))
+			Expect(string(session.Out.Contents())).To(ContainSubstring("value: <redacted>"))
+			Expect(string(session.Out.Contents())).NotTo(ContainSubstring("metadata:"))
+		})
+
+		It("puts a secret with metadata", func() {
+			setupSetServerWithMetadata("foo-rsa-key", "rsa", `{"public_key":"some-public-key","private_key":"some-private-key"}`, `{"some":{"example":"metadata"}, "array":["metadata"]}`)
+
+			session := runCommand("set", "-n", "foo-rsa-key", "-u", "some-public-key", "-p", "some-private-key", "-t", "rsa", "--metadata", `{"some":{"example":"metadata"}, "array":["metadata"]}`)
+
+			Eventually(session).Should(Exit(0), string(session.Err.Contents()))
+			metadataOutput := `
+metadata:
+  array:
+  - metadata
+  some:
+    example: metadata`
+			Expect(string(session.Out.Contents())).To(ContainSubstring(metadataOutput))
 		})
 
 		It("puts a secret using values read from files", func() {
@@ -236,14 +287,14 @@ var _ = FDescribe("Set", func() {
 				"-u", publicFileName,
 				"-p", privateFilename)
 
-			os.RemoveAll(tempDir)
+			Expect(os.RemoveAll(tempDir)).To(Succeed())
 			Eventually(session).Should(Exit(0))
 			Eventually(string(session.Out.Contents())).Should(ContainSubstring("name: foo-rsa-key"))
 			Eventually(string(session.Out.Contents())).Should(ContainSubstring("type: rsa"))
 			Eventually(string(session.Out.Contents())).Should(ContainSubstring("value: <redacted>"))
 		})
 
-		It("puts a secret using explicit rsa type and returns in json format", func() {
+		It("puts a secret and returns in json format", func() {
 			setupSetServer("foo-rsa-key", "rsa", `{"public_key":"some-public-key","private_key":"some-private-key"}`)
 
 			session := runCommand("set", "-n", "foo-rsa-key", "-u", "some-public-key", "-p", "some-private-key", "-t", "rsa", "--output-json")
@@ -272,13 +323,12 @@ var _ = FDescribe("Set", func() {
 			session := runCommand("set", "-n", "foo-rsa-key", "-u", `some\npublic\nkey`, "-p", `some\nprivate\nkey`, "-t", "rsa", "--output-json")
 
 			Eventually(session).Should(Exit(0))
-			Expect(string(session.Out.Contents())).Should(MatchJSON(responseSetMyRSAWithNewlinesJson))
+			Expect(string(session.Out.Contents())).Should(MatchJSON(fmt.Sprintf(redactedResponseJSON, "rsa", "foo-rsa-key", "null")))
 		})
 	})
 
 	Describe("setting password secrets", func() {
-
-		It("puts a secret using explicit password type  and returns in yaml format", func() {
+		It("puts a secret and returns in yaml format", func() {
 			setupSetServer("my-password", "password", `"potatoes"`)
 
 			session := runCommand("set", "-n", "my-password", "-w", "potatoes", "-t", "password")
@@ -287,6 +337,22 @@ var _ = FDescribe("Set", func() {
 			Eventually(string(session.Out.Contents())).Should(ContainSubstring("name: my-password"))
 			Eventually(string(session.Out.Contents())).Should(ContainSubstring("type: password"))
 			Eventually(string(session.Out.Contents())).Should(ContainSubstring("value: <redacted>"))
+			Expect(string(session.Out.Contents())).NotTo(ContainSubstring("metadata:"))
+		})
+
+		It("puts a secret with metadata", func() {
+			setupSetServerWithMetadata("my-password", "password", `"potatoes"`, `{"some":{"example":"metadata"}, "array":["metadata"]}`)
+
+			session := runCommand("set", "-n", "my-password", "-w", "potatoes", "-t", "password", "--metadata", `{"some":{"example":"metadata"}, "array":["metadata"]}`)
+
+			Eventually(session).Should(Exit(0), string(session.Err.Contents()))
+			metadataOutput := `
+metadata:
+  array:
+  - metadata
+  some:
+    example: metadata`
+			Expect(string(session.Out.Contents())).To(ContainSubstring(metadataOutput))
 		})
 
 		It("prompts for value if value is not provided", func() {
@@ -322,13 +388,13 @@ var _ = FDescribe("Set", func() {
 			Eventually(string(session.Out.Contents())).Should(ContainSubstring(`value: <redacted>`))
 		})
 
-		It("puts a secret using explicit password type and returns in json format", func() {
+		It("puts a secret and returns in json format", func() {
 			setupSetServer("my-password", "password", `"potatoes"`)
 
 			session := runCommand("set", "-n", "my-password", "-w", "potatoes", "-t", "password", "--output-json")
 
 			Eventually(session).Should(Exit(0))
-			Eventually(string(session.Out.Contents())).Should(MatchJSON(responseSetMyPasswordPotatoesJson))
+			Eventually(string(session.Out.Contents())).Should(MatchJSON(fmt.Sprintf(redactedResponseJSON, "password", "my-password", "null")))
 		})
 
 		It("accepts case-insensitive type", func() {
@@ -344,7 +410,7 @@ var _ = FDescribe("Set", func() {
 	})
 
 	Describe("setting certificate secrets", func() {
-		It("puts a secret using explicit certificate type and string values", func() {
+		It("puts a secret and string values", func() {
 			setupSetServer("my-secret", "certificate", `{"ca":"my-ca","certificate":"my-cert","private_key":"my-priv"}`)
 			session := runCommand("set", "-n", "my-secret",
 				"-t", "certificate", "--root", "my-ca",
@@ -354,9 +420,28 @@ var _ = FDescribe("Set", func() {
 			Eventually(string(session.Out.Contents())).Should(ContainSubstring("name: my-secret"))
 			Eventually(string(session.Out.Contents())).Should(ContainSubstring("type: certificate"))
 			Eventually(string(session.Out.Contents())).Should(ContainSubstring("value: <redacted>"))
+			Expect(string(session.Out.Contents())).NotTo(ContainSubstring("metadata:"))
 		})
 
-		It("puts a secret using explicit certificate type, string values, and certificate authority name", func() {
+		It("puts a secret with metadata", func() {
+			setupSetServerWithMetadata("my-secret", "certificate", `{"ca":"my-ca","certificate":"my-cert","private_key":"my-priv"}`, `{"some":{"example":"metadata"}, "array":["metadata"]}`)
+
+			session := runCommand("set", "-n", "my-secret",
+				"-t", "certificate", "--root", "my-ca",
+				"--certificate", "my-cert", "--private", "my-priv",
+				"--metadata", `{"some":{"example":"metadata"}, "array":["metadata"]}`)
+
+			Eventually(session).Should(Exit(0), string(session.Err.Contents()))
+			metadataOutput := `
+metadata:
+  array:
+  - metadata
+  some:
+    example: metadata`
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring(metadataOutput))
+		})
+
+		It("puts a secret, string values, and certificate authority name", func() {
 			setupSetServer("my-secret", "certificate", `{"ca": "", "ca_name":"my-ca","certificate":"my-cert","private_key":"my-priv"}`)
 
 			session := runCommand("set", "-n", "my-secret",
@@ -369,7 +454,7 @@ var _ = FDescribe("Set", func() {
 			Eventually(string(session.Out.Contents())).Should(ContainSubstring("value: <redacted>"))
 		})
 
-		It("puts a secret using explicit certificate type and values read from files", func() {
+		It("puts a secret and values read from files", func() {
 			setupSetServer("my-secret", "certificate", `{"ca":"my-ca","certificate":"my-cert","private_key":"my-priv"}`)
 			tempDir := test.CreateTempDir("certFilesForTesting")
 			caFilename := test.CreateCredentialFile(tempDir, "ca.txt", "my-ca")
@@ -380,7 +465,7 @@ var _ = FDescribe("Set", func() {
 				"-t", "certificate", "--root", caFilename,
 				"--certificate", certificateFilename, "--private", privateFilename)
 
-			os.RemoveAll(tempDir)
+			Expect(os.RemoveAll(tempDir)).To(Succeed())
 			Eventually(session).Should(Exit(0))
 			Eventually(string(session.Out.Contents())).Should(ContainSubstring("name: my-secret"))
 			Eventually(string(session.Out.Contents())).Should(ContainSubstring("type: certificate"))
@@ -395,7 +480,7 @@ var _ = FDescribe("Set", func() {
 			})
 		}
 
-		It("puts a secret using explicit certificate type and string values in json format", func() {
+		It("puts a secret and string values in json format", func() {
 			setupSetServer("my-secret", "certificate", `{"ca":"my-ca","certificate":"my-cert","private_key":"my-priv"}`)
 
 			session := runCommand("set", "-n", "my-secret",
@@ -427,13 +512,12 @@ var _ = FDescribe("Set", func() {
 				"-t", "certificate", "--root", `my\nca`,
 				"--certificate", `my\ncert`, "--private", `my\npriv`, "--output-json")
 			Eventually(session).Should(Exit(0))
-			Expect(string(session.Out.Contents())).Should(MatchJSON(responseSetMyCertificateWithNewlinesJson))
+			Expect(string(session.Out.Contents())).Should(MatchJSON(fmt.Sprintf(redactedResponseJSON, "certificate", "my-secret", "null")))
 		})
 	})
 
 	Describe("setting User secrets", func() {
-		It("puts a secret using explicit user type", func() {
-			//SetupPutUserServer("my-username-credential", `{"username": "my-username", "password": "test-password"}`, "my-username", "test-password", "passw0rd-H4$h")
+		It("puts a secret", func() {
 			setupSetServer("my-username-credential", "user", `{"username": "my-username", "password": "test-password"}`)
 			session := runCommand("set", "-n", "my-username-credential", "-z", "my-username", "-w", "test-password", "-t", "user")
 
@@ -442,6 +526,21 @@ var _ = FDescribe("Set", func() {
 			Eventually(string(session.Out.Contents())).Should(ContainSubstring("type: user"))
 			Eventually(string(session.Out.Contents())).Should(ContainSubstring("value: <redacted>"))
 			Eventually(string(session.Out.Contents())).Should(ContainSubstring(`version_created_at: "2016-01-01T12:00:00Z"`))
+			Expect(string(session.Out.Contents())).NotTo(ContainSubstring("metadata:"))
+		})
+
+		It("puts a secret with metadata", func() {
+			setupSetServerWithMetadata("my-username-credential", "user", `{"username": "my-username", "password": "test-password"}`, `{"some":{"example":"metadata"}, "array":["metadata"]}`)
+			session := runCommand("set", "-n", "my-username-credential", "-z", "my-username", "-w", "test-password", "-t", "user", "--metadata", `{"some":{"example":"metadata"}, "array":["metadata"]}`)
+
+			Eventually(session).Should(Exit(0), string(session.Err.Contents()))
+			metadataOutput := `
+metadata:
+  array:
+  - metadata
+  some:
+    example: metadata`
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring(metadataOutput))
 		})
 
 		It("should set password interactively for user", func() {
@@ -465,7 +564,7 @@ var _ = FDescribe("Set", func() {
 			Eventually(string(session.Out.Contents())).Should(ContainSubstring("value: <redacted>"))
 		})
 
-		It("puts a secret using explicit user type in json format", func() {
+		It("puts a secret in json format", func() {
 			setupSetServer("my-username-credential", "user", `{"username": "my-username", "password": "test-password"}`)
 
 			session := runCommand("set", "-n", "my-username-credential", "-z", "my-username", "-w", "test-password", "-t", "user",
@@ -533,15 +632,27 @@ var _ = FDescribe("Set", func() {
 	})
 })
 
-const SET_CREDENTIAL_REQUEST_JSON = `{"type":"%s","name":"%s","value":%s}`
-const SET_CREDENTIAL_RESPONSE_JSON = `{"type":"%s","id":"` + UUID + `","name":"%s","version_created_at":"` + TIMESTAMP + `","value":%s,"version_created_at":"` + TIMESTAMP + `"}`
+const setCredentialRequestJSON = `{"type":"%s","name":"%s","value":%s}`
+const setCredentialResponseJSON = `{"type":"%s","id":"` + uuid + `","name":"%s","value":%s,"version_created_at":"` + timestamp + `"}`
+const setCredentialRequestJSONWithMetadata = `{"type":"%s","name":"%s","value":%s,"metadata":%s}`
+const setCredentialResponseJSONWithMetadata = `{"type":"%s","id":"` + uuid + `","name":"%s","value":%s,"metadata":%s,"version_created_at":"` + timestamp + `"}`
 
 func setupSetServer(name, keyType, value string) {
 	server.AppendHandlers(
 		CombineHandlers(
 			VerifyRequest("PUT", "/api/v1/data"),
-			VerifyJSON(fmt.Sprintf(SET_CREDENTIAL_REQUEST_JSON, keyType, name, value)),
-			RespondWith(http.StatusOK, fmt.Sprintf(SET_CREDENTIAL_RESPONSE_JSON, keyType, name, value)),
+			VerifyJSON(fmt.Sprintf(setCredentialRequestJSON, keyType, name, value)),
+			RespondWith(http.StatusOK, fmt.Sprintf(setCredentialResponseJSON, keyType, name, value)),
+		),
+	)
+}
+
+func setupSetServerWithMetadata(name, keyType, value, metadata string) {
+	server.AppendHandlers(
+		CombineHandlers(
+			VerifyRequest("PUT", "/api/v1/data"),
+			VerifyJSON(fmt.Sprintf(setCredentialRequestJSONWithMetadata, keyType, name, value, metadata)),
+			RespondWith(http.StatusOK, fmt.Sprintf(setCredentialResponseJSONWithMetadata, keyType, name, value, metadata)),
 		),
 	)
 }

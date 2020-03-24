@@ -5,9 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"math/rand"
 	"net/http"
+
+	"code.cloudfoundry.org/credhub-cli/credhub/credentials"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -20,6 +23,10 @@ import (
 var _ = Describe("Set", func() {
 	Describe("SetCredential()", func() {
 		It("returns the credential that has been set", func() {
+			metadataStr := `{"some":{"json":"metadata"}}`
+			var metadata credentials.Metadata
+			Expect(json.Unmarshal([]byte(metadataStr), &metadata)).To(Succeed())
+
 			dummy := &DummyAuth{Response: &http.Response{
 				StatusCode: http.StatusOK,
 				Body: ioutil.NopCloser(bytes.NewBufferString(`{
@@ -27,21 +34,29 @@ var _ = Describe("Set", func() {
 		  "name": "some-credential",
 		  "type": "some-type",
 		  "value": "some-value",
+          "metadata": {"some":{"json":"metadata"}},
 		  "version_created_at": "2017-01-01T04:07:18Z"
 		}`)),
 			}}
 
-			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
+			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.6.0"))
 			Expect(err).ToNot(HaveOccurred())
 
-			cred, err := ch.SetCredential("some-credential", "some-type", "some-value")
+			cred, err := ch.SetCredential("some-credential", "some-type", "some-value", WithMetadata(metadata))
 			Expect(err).ToNot(HaveOccurred())
+
+			requestBody := getBody(dummy.Request.Body)
+
+			Expect(requestBody["name"]).To(Equal("some-credential"))
+			Expect(requestBody["type"]).To(Equal("some-type"))
+			Expect(requestBody["value"]).To(BeEquivalentTo("some-value"))
+			Expect(requestBody["metadata"]).To(BeEquivalentTo(metadata))
 
 			Expect(cred.Name).To(Equal("some-credential"))
 			Expect(cred.Type).To(Equal("some-type"))
-			val, ok := cred.Value.(string)
-			Expect(ok).To(BeTrue())
-			Expect(val).To(Equal("some-value"))
+			Expect(cred.Value).To(BeAssignableToTypeOf(""))
+			Expect(cred.Value).To(BeEquivalentTo("some-value"))
+			Expect(cred.Metadata).To(Equal(metadata))
 		})
 
 		It("sends a request for server version when server version is not provided", func() {
@@ -96,7 +111,7 @@ var _ = Describe("Set", func() {
 
 		It("returns an error when request fails", func() {
 			dummy := &DummyAuth{Error: errors.New("network error occurred")}
-			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
+			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.6.0"))
 			Expect(err).ToNot(HaveOccurred())
 
 			_, err = ch.SetCredential("some-credential", "some-type", "some-value")
@@ -107,7 +122,7 @@ var _ = Describe("Set", func() {
 			dummy := &DummyAuth{Response: &http.Response{
 				Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
 			}}
-			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
+			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.6.0"))
 			Expect(err).ToNot(HaveOccurred())
 
 			_, err = ch.SetCredential("some-credential", "some-type", "some-value")
@@ -117,6 +132,10 @@ var _ = Describe("Set", func() {
 
 	Describe("SetCertificate()", func() {
 		It("returns the credential that has been set", func() {
+			metadataStr := `{"some":{"json":"metadata"}}`
+			var metadata credentials.Metadata
+			Expect(json.Unmarshal([]byte(metadataStr), &metadata)).To(Succeed())
+
 			dummy := &DummyAuth{Response: &http.Response{
 				StatusCode: http.StatusOK,
 				Body: ioutil.NopCloser(bytes.NewBufferString(`{
@@ -128,28 +147,39 @@ var _ = Describe("Set", func() {
 		    "certificate": "some-certificate",
 		    "private_key": "some-private-key"
 		  },
+          "metadata": {"some":{"json":"metadata"}},
 		  "version_created_at": "2017-01-01T04:07:18Z"
 		}`)),
 			}}
 
-			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
+			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.6.0"))
 			Expect(err).NotTo(HaveOccurred())
 
 			certificate := values.Certificate{
-				Certificate: "some-cert",
+				Certificate: "some-certificate",
 			}
-			cred, err := ch.SetCertificate("/example-certificate", certificate)
+			cred, err := ch.SetCertificate("/example-certificate", certificate, WithMetadata(metadata))
 			Expect(err).NotTo(HaveOccurred())
+
+			requestBody := getBody(dummy.Request.Body)
+
+			Expect(requestBody["name"]).To(Equal("/example-certificate"))
+			Expect(requestBody["type"]).To(Equal("certificate"))
+			Expect(requestBody["value"]).To(HaveKeyWithValue("ca", ""))
+			Expect(requestBody["value"]).To(HaveKeyWithValue("certificate", "some-certificate"))
+			Expect(requestBody["value"]).To(HaveKeyWithValue("private_key", ""))
+			Expect(requestBody["metadata"]).To(BeEquivalentTo(metadata))
 
 			Expect(cred.Name).To(Equal("/example-certificate"))
 			Expect(cred.Type).To(Equal("certificate"))
 			Expect(cred.Value.Ca).To(Equal("some-ca"))
 			Expect(cred.Value.Certificate).To(Equal("some-certificate"))
 			Expect(cred.Value.PrivateKey).To(Equal("some-private-key"))
+			Expect(cred.Metadata).To(Equal(metadata))
 		})
 		It("returns an error when request fails", func() {
 			dummy := &DummyAuth{Error: errors.New("network error occurred")}
-			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
+			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.6.0"))
 			Expect(err).NotTo(HaveOccurred())
 			certificate := values.Certificate{
 				Ca: "some-ca",
@@ -162,6 +192,10 @@ var _ = Describe("Set", func() {
 
 	Describe("SetPassword()", func() {
 		It("returns the credential that has been set", func() {
+			metadataStr := `{"some":{"json":"metadata"}}`
+			var metadata credentials.Metadata
+			Expect(json.Unmarshal([]byte(metadataStr), &metadata)).To(Succeed())
+
 			dummy := &DummyAuth{Response: &http.Response{
 				StatusCode: http.StatusOK,
 				Body: ioutil.NopCloser(bytes.NewBufferString(`{
@@ -169,27 +203,35 @@ var _ = Describe("Set", func() {
 		  "name": "/example-password",
 		  "type": "password",
 		  "value": "some-password",
+		  "metadata": {"some":{"json":"metadata"}},
 		  "version_created_at": "2017-01-01T04:07:18Z"
 		}`)),
 			}}
 
-			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
+			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.6.0"))
 			Expect(err).NotTo(HaveOccurred())
 
 			password := values.Password("some-password")
 
-			cred, err := ch.SetPassword("/example-password", password)
+			cred, err := ch.SetPassword("/example-password", password, WithMetadata(metadata))
 			Expect(err).NotTo(HaveOccurred())
+
+			requestBody := getBody(dummy.Request.Body)
+
+			Expect(requestBody["name"]).To(Equal("/example-password"))
+			Expect(requestBody["type"]).To(Equal("password"))
+			Expect(requestBody["value"]).To(Equal("some-password"))
+			Expect(requestBody["metadata"]).To(BeEquivalentTo(metadata))
 
 			Expect(cred.Name).To(Equal("/example-password"))
 			Expect(cred.Type).To(Equal("password"))
-
 			Expect(cred.Value).To(BeEquivalentTo("some-password"))
+			Expect(cred.Metadata).To(Equal(metadata))
 
 		})
 		It("returns an error when request fails", func() {
 			dummy := &DummyAuth{Error: errors.New("network error occurred")}
-			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
+			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.6.0"))
 			Expect(err).NotTo(HaveOccurred())
 			password := values.Password("some-password")
 
@@ -200,6 +242,10 @@ var _ = Describe("Set", func() {
 
 	Describe("SetUser()", func() {
 		It("returns the credential that has been set", func() {
+			metadataStr := `{"some":{"json":"metadata"}}`
+			var metadata credentials.Metadata
+			Expect(json.Unmarshal([]byte(metadataStr), &metadata)).To(Succeed())
+
 			dummy := &DummyAuth{Response: &http.Response{
 				StatusCode: http.StatusOK,
 				Body: ioutil.NopCloser(bytes.NewBufferString(`
@@ -212,16 +258,25 @@ var _ = Describe("Set", func() {
 							"password": "6mRPZB3bAfb8lRpacnXsHfDhlPqFcjH2h9YDvLpL",
 							"password_hash": "some-hash"
 						},
+		  				"metadata": {"some":{"json":"metadata"}},
 						"version_created_at": "2017-01-05T01:01:01Z"
 					}`)),
 			}}
 
-			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
+			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.6.0"))
 			Expect(err).NotTo(HaveOccurred())
 
-			user := values.User{Username: "username", Password: "some-password"}
-			cred, err := ch.SetUser("/example-user", user)
+			user := values.User{Username: "some-username", Password: "some-password"}
+			cred, err := ch.SetUser("/example-user", user, WithMetadata(metadata))
 			Expect(err).NotTo(HaveOccurred())
+
+			requestBody := getBody(dummy.Request.Body)
+
+			Expect(requestBody["name"]).To(Equal("/example-user"))
+			Expect(requestBody["type"]).To(Equal("user"))
+			Expect(requestBody["value"]).To(HaveKeyWithValue("username", "some-username"))
+			Expect(requestBody["value"]).To(HaveKeyWithValue("password", "some-password"))
+			Expect(requestBody["metadata"]).To(BeEquivalentTo(metadata))
 
 			Expect(cred.Name).To(Equal("/example-user"))
 			Expect(cred.Type).To(Equal("user"))
@@ -231,11 +286,12 @@ var _ = Describe("Set", func() {
 				Password: "6mRPZB3bAfb8lRpacnXsHfDhlPqFcjH2h9YDvLpL",
 			}))
 			Expect(cred.Value.PasswordHash).To(Equal("some-hash"))
+			Expect(cred.Metadata).To(Equal(metadata))
 		})
 
 		It("returns an error", func() {
 			dummy := &DummyAuth{Error: errors.New("network error occurred")}
-			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
+			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.6.0"))
 			Expect(err).NotTo(HaveOccurred())
 			user := values.User{Username: "username", Password: "some-password"}
 			_, err = ch.SetUser("/example-user", user)
@@ -245,6 +301,10 @@ var _ = Describe("Set", func() {
 
 	Describe("SetRSA()", func() {
 		It("returns the credential that has been set", func() {
+			metadataStr := `{"some":{"json":"metadata"}}`
+			var metadata credentials.Metadata
+			Expect(json.Unmarshal([]byte(metadataStr), &metadata)).To(Succeed())
+
 			dummy := &DummyAuth{Response: &http.Response{
 				StatusCode: http.StatusOK,
 				Body: ioutil.NopCloser(bytes.NewBufferString(`
@@ -256,15 +316,24 @@ var _ = Describe("Set", func() {
 							"public_key": "public-key",
 							"private_key": "private-key"
 						},
+		  				"metadata": {"some":{"json":"metadata"}},
 						"version_created_at": "2017-01-01T04:07:18Z"
 					}`)),
 			}}
 
-			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
+			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.6.0"))
 			Expect(err).NotTo(HaveOccurred())
 
-			cred, err := ch.SetRSA("/example-rsa", values.RSA{})
+			cred, err := ch.SetRSA("/example-rsa", values.RSA{}, WithMetadata(metadata))
 			Expect(err).NotTo(HaveOccurred())
+
+			requestBody := getBody(dummy.Request.Body)
+
+			Expect(requestBody["name"]).To(Equal("/example-rsa"))
+			Expect(requestBody["type"]).To(Equal("rsa"))
+			Expect(requestBody["value"]).To(HaveKeyWithValue("private_key", ""))
+			Expect(requestBody["value"]).To(HaveKeyWithValue("public_key", ""))
+			Expect(requestBody["metadata"]).To(BeEquivalentTo(metadata))
 
 			Expect(cred.Name).To(Equal("/example-rsa"))
 			Expect(cred.Type).To(Equal("rsa"))
@@ -272,11 +341,12 @@ var _ = Describe("Set", func() {
 				PrivateKey: "private-key",
 				PublicKey:  "public-key",
 			}))
+			Expect(cred.Metadata).To(Equal(metadata))
 		})
 
 		It("returns an error", func() {
 			dummy := &DummyAuth{Error: errors.New("network error occurred")}
-			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
+			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.6.0"))
 			Expect(err).NotTo(HaveOccurred())
 			_, err = ch.SetRSA("/example-rsa", values.RSA{})
 			Expect(err).To(MatchError("network error occurred"))
@@ -285,6 +355,10 @@ var _ = Describe("Set", func() {
 
 	Describe("SetSSH()", func() {
 		It("returns the credential that has been set", func() {
+			metadataStr := `{"some":{"json":"metadata"}}`
+			var metadata credentials.Metadata
+			Expect(json.Unmarshal([]byte(metadataStr), &metadata)).To(Succeed())
+
 			dummy := &DummyAuth{Response: &http.Response{
 				StatusCode: http.StatusOK,
 				Body: ioutil.NopCloser(bytes.NewBufferString(`
@@ -296,15 +370,24 @@ var _ = Describe("Set", func() {
 							"public_key": "public-key",
 							"private_key": "private-key"
 						},
+		  				"metadata": {"some":{"json":"metadata"}},
 						"version_created_at": "2017-01-01T04:07:18Z"
 					}`)),
 			}}
 
-			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
+			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.6.0"))
 			Expect(err).NotTo(HaveOccurred())
 
-			cred, err := ch.SetSSH("/example-ssh", values.SSH{})
+			cred, err := ch.SetSSH("/example-ssh", values.SSH{}, WithMetadata(metadata))
 			Expect(err).NotTo(HaveOccurred())
+
+			requestBody := getBody(dummy.Request.Body)
+
+			Expect(requestBody["name"]).To(Equal("/example-ssh"))
+			Expect(requestBody["type"]).To(Equal("ssh"))
+			Expect(requestBody["value"]).To(HaveKeyWithValue("private_key", ""))
+			Expect(requestBody["value"]).To(HaveKeyWithValue("public_key", ""))
+			Expect(requestBody["metadata"]).To(BeEquivalentTo(metadata))
 
 			Expect(cred.Name).To(Equal("/example-ssh"))
 			Expect(cred.Type).To(Equal("ssh"))
@@ -312,11 +395,12 @@ var _ = Describe("Set", func() {
 				PrivateKey: "private-key",
 				PublicKey:  "public-key",
 			}))
+			Expect(cred.Metadata).To(Equal(metadata))
 		})
 
 		It("returns an error", func() {
 			dummy := &DummyAuth{Error: errors.New("network error occurred")}
-			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
+			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.6.0"))
 			Expect(err).NotTo(HaveOccurred())
 			_, err = ch.SetSSH("/example-ssh", values.SSH{})
 			Expect(err).To(MatchError("network error occurred"))
@@ -325,6 +409,10 @@ var _ = Describe("Set", func() {
 
 	Describe("SetJSON()", func() {
 		It("returns the credential that has been set", func() {
+			metadataStr := `{"some":{"json":"metadata"}}`
+			var metadata credentials.Metadata
+			Expect(json.Unmarshal([]byte(metadataStr), &metadata)).To(Succeed())
+
 			JSONValue := `{
 					"key": 123,
 					"key_list": [
@@ -333,6 +421,9 @@ var _ = Describe("Set", func() {
 					],
 					"is_true": true
 				}`
+			var unmarshalledJSONValue values.JSON
+			Expect(json.Unmarshal([]byte(JSONValue), &unmarshalledJSONValue)).To(Succeed())
+
 			dummy := &DummyAuth{Response: &http.Response{
 				StatusCode: http.StatusOK,
 				Body: ioutil.NopCloser(bytes.NewBufferString(fmt.Sprintf(`
@@ -341,27 +432,33 @@ var _ = Describe("Set", func() {
 						"name": "/example-json",
 						"type": "json",
 						"value": %s,
+					 	"metadata": {"some":{"json":"metadata"}},
 						"version_created_at": "2017-01-01T04:07:18Z"
 					}`, JSONValue))),
 			}}
 
-			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
+			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.6.0"))
 			Expect(err).NotTo(HaveOccurred())
 
-			cred, err := ch.SetJSON("/example-json", nil)
+			cred, err := ch.SetJSON("/example-json", unmarshalledJSONValue, WithMetadata(metadata))
 			Expect(err).NotTo(HaveOccurred())
 
-			var unmarshalled values.JSON
-			Expect(json.Unmarshal([]byte(JSONValue), &unmarshalled)).To(Succeed())
+			requestBody := getBody(dummy.Request.Body)
+
+			Expect(requestBody["name"]).To(Equal("/example-json"))
+			Expect(requestBody["type"]).To(Equal("json"))
+			Expect(requestBody["value"]).To(BeEquivalentTo(unmarshalledJSONValue))
+			Expect(requestBody["metadata"]).To(BeEquivalentTo(metadata))
 
 			Expect(cred.Name).To(Equal("/example-json"))
 			Expect(cred.Type).To(Equal("json"))
-			Expect(cred.Value).To(Equal(unmarshalled))
+			Expect(cred.Value).To(Equal(unmarshalledJSONValue))
+			Expect(cred.Metadata).To(Equal(metadata))
 		})
 
 		It("returns an error when request fails", func() {
 			dummy := &DummyAuth{Error: errors.New("network error occurred")}
-			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
+			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.6.0"))
 			Expect(err).NotTo(HaveOccurred())
 			_, err = ch.SetJSON("/example-json", nil)
 			Expect(err).To(MatchError("network error occurred"))
@@ -370,6 +467,9 @@ var _ = Describe("Set", func() {
 
 	Describe("SetValue()", func() {
 		It("returns the credential that has been set", func() {
+			metadataStr := `{"some":{"json":"metadata"}}`
+			var metadata credentials.Metadata
+			Expect(json.Unmarshal([]byte(metadataStr), &metadata)).To(Succeed())
 			dummy := &DummyAuth{Response: &http.Response{
 				StatusCode: http.StatusOK,
 				Body: ioutil.NopCloser(bytes.NewBufferString(`
@@ -378,27 +478,44 @@ var _ = Describe("Set", func() {
 						"name": "/example-value",
 						"type": "value",
 						"value": "some string value",
+						"metadata": {"some":{"json":"metadata"}},
 						"version_created_at": "2017-01-01T04:07:18Z"
 					}`)),
 			}}
 
-			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
+			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.6.0"))
 			Expect(err).NotTo(HaveOccurred())
 
-			cred, err := ch.SetValue("/example-value", values.Value(""))
+			cred, err := ch.SetValue("/example-value", values.Value("some string value"), WithMetadata(metadata))
 			Expect(err).NotTo(HaveOccurred())
+
+			requestBody := getBody(dummy.Request.Body)
+
+			Expect(requestBody["name"]).To(Equal("/example-value"))
+			Expect(requestBody["type"]).To(Equal("value"))
+			Expect(requestBody["value"]).To(BeEquivalentTo("some string value"))
+			Expect(requestBody["metadata"]).To(BeEquivalentTo(metadata))
 
 			Expect(cred.Name).To(Equal("/example-value"))
 			Expect(cred.Type).To(Equal("value"))
 			Expect(cred.Value).To(Equal(values.Value("some string value")))
+			Expect(cred.Metadata).To(Equal(metadata))
 		})
 
 		It("returns an error when request fails", func() {
 			dummy := &DummyAuth{Error: errors.New("network error occurred")}
-			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
+			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.6.0"))
 			Expect(err).NotTo(HaveOccurred())
 			_, err = ch.SetValue("/example-value", values.Value(""))
 			Expect(err).To(MatchError("network error occurred"))
 		})
 	})
 })
+
+func getBody(body io.ReadCloser) map[string]interface{} {
+	var requestBody map[string]interface{}
+	bodyBytes, err := ioutil.ReadAll(body)
+	Expect(err).ToNot(HaveOccurred())
+	Expect(json.Unmarshal(bodyBytes, &requestBody)).To(Succeed())
+	return requestBody
+}
