@@ -2,6 +2,7 @@ package credhub_test
 
 import (
 	"bytes"
+	"code.cloudfoundry.org/credhub-cli/credhub/credentials"
 	"errors"
 	"io/ioutil"
 	"net/http"
@@ -17,6 +18,7 @@ import (
 )
 
 var _ = Describe("Get", func() {
+	var nilMetadata credentials.Metadata = nil
 
 	Describe("GetLatestVersion()", func() {
 		It("requests the credential by name using the 'current' query parameter", func() {
@@ -41,6 +43,7 @@ var _ = Describe("Get", func() {
       "name": "/example-password",
       "type": "password",
       "value": "some-password",
+      "metadata": {"some":"metadata"},
       "version_created_at": "2017-01-05T01:01:01Z"
     }
     ]}`
@@ -57,6 +60,7 @@ var _ = Describe("Get", func() {
 				Expect(cred.Name).To(Equal("/example-password"))
 				Expect(cred.Type).To(Equal("password"))
 				Expect(cred.Value.(string)).To(Equal("some-password"))
+				Expect(cred.Metadata).To(Equal(credentials.Metadata{"some": "metadata"}))
 				Expect(cred.VersionCreatedAt).To(Equal("2017-01-05T01:01:01Z"))
 			})
 		})
@@ -96,6 +100,7 @@ var _ = Describe("Get", func() {
       "name": "/reasonable-password",
       "type": "password",
       "value": "some-password",
+	  "metadata": {"some":"metadata"},
       "version_created_at": "2017-01-05T01:01:01Z"
     }`
 				dummyAuth := &DummyAuth{Response: &http.Response{
@@ -111,6 +116,7 @@ var _ = Describe("Get", func() {
 				Expect(cred.Name).To(Equal("/reasonable-password"))
 				Expect(cred.Type).To(Equal("password"))
 				Expect(cred.Value.(string)).To(Equal("some-password"))
+				Expect(cred.Metadata).To(Equal(credentials.Metadata{"some": "metadata"}))
 				Expect(cred.VersionCreatedAt).To(Equal("2017-01-05T01:01:01Z"))
 			})
 		})
@@ -139,6 +145,7 @@ var _ = Describe("Get", func() {
       "name": "/example-password",
       "type": "password",
       "value": "some-password",
+	  "metadata": {"some":"metadata"},
       "version_created_at": "2017-01-05T01:01:01Z"
     },
 	{
@@ -146,6 +153,7 @@ var _ = Describe("Get", func() {
       "name": "/example-password",
       "type": "password",
       "value": "some-other-password",
+	  "metadata": null,
       "version_created_at": "2017-01-05T01:01:01Z"
     }
     ]}`
@@ -162,9 +170,15 @@ var _ = Describe("Get", func() {
 				Expect(creds[0].Name).To(Equal("/example-password"))
 				Expect(creds[0].Type).To(Equal("password"))
 				Expect(creds[0].Value.(string)).To(Equal("some-password"))
+				Expect(creds[0].Metadata).To(Equal(credentials.Metadata{"some": "metadata"}))
 				Expect(creds[0].VersionCreatedAt).To(Equal("2017-01-05T01:01:01Z"))
 
+				Expect(creds[1].Id).To(Equal("some-id"))
+				Expect(creds[1].Name).To(Equal("/example-password"))
+				Expect(creds[1].Type).To(Equal("password"))
 				Expect(creds[1].Value.(string)).To(Equal("some-other-password"))
+				Expect(creds[1].Metadata).To(Equal(nilMetadata))
+				Expect(creds[1].VersionCreatedAt).To(Equal("2017-01-05T01:01:01Z"))
 			})
 
 			It("returns a list of all users", func() {
@@ -179,6 +193,7 @@ var _ = Describe("Get", func() {
       	"password": "dummy_password",
       	"password_hash": "$6$kjhlkjh$lkjhasdflkjhasdflkjh"
       },
+      "metadata": null,
       "version_created_at": "2017-01-05T01:01:01Z"
     },
 	{
@@ -190,6 +205,7 @@ var _ = Describe("Get", func() {
       	"password": "another_random_dummy_password",
       	"password_hash": "$6$kjhlkjh$lkjhasdflkjhasdflkjh"
       },
+      "metadata": {"some":"metadata"},
       "version_created_at": "2017-01-05T01:01:01Z"
     }
     ]}`
@@ -209,9 +225,18 @@ var _ = Describe("Get", func() {
 				Expect(firstCredValue["username"]).To(Equal("first-username"))
 				Expect(firstCredValue["password"]).To(Equal("dummy_password"))
 				Expect(firstCredValue["password_hash"]).To(Equal("$6$kjhlkjh$lkjhasdflkjhasdflkjh"))
+				Expect(creds[0].Metadata).To(Equal(nilMetadata))
 				Expect(creds[0].VersionCreatedAt).To(Equal("2017-01-05T01:01:01Z"))
 
-				Expect(creds[1].Value.(map[string]interface{})["username"]).To(Equal("second-username"))
+				Expect(creds[1].Id).To(Equal("some-id"))
+				Expect(creds[1].Name).To(Equal("/example-user"))
+				Expect(creds[1].Type).To(Equal("user"))
+				secondCredValue := creds[1].Value.(map[string]interface{})
+				Expect(secondCredValue["username"]).To(Equal("second-username"))
+				Expect(secondCredValue["password"]).To(Equal("another_random_dummy_password"))
+				Expect(secondCredValue["password_hash"]).To(Equal("$6$kjhlkjh$lkjhasdflkjhasdflkjh"))
+				Expect(creds[1].Metadata).To(Equal(credentials.Metadata{"some": "metadata"}))
+				Expect(creds[1].VersionCreatedAt).To(Equal("2017-01-05T01:01:01Z"))
 			})
 		})
 
@@ -252,6 +277,7 @@ var _ = Describe("Get", func() {
       "name": "/example-password",
       "type": "password",
       "value": "some-password",
+	  "metadata": {"some":"metadata"},
       "version_created_at": "2017-01-05T01:01:01Z"
     },
 	{
@@ -259,6 +285,7 @@ var _ = Describe("Get", func() {
       "name": "/example-password",
       "type": "password",
       "value": "some-other-password",
+	  "metadata": null,
       "version_created_at": "2017-01-05T01:01:01Z"
     }
     ]}`
@@ -275,9 +302,15 @@ var _ = Describe("Get", func() {
 				Expect(creds[0].Name).To(Equal("/example-password"))
 				Expect(creds[0].Type).To(Equal("password"))
 				Expect(creds[0].Value.(string)).To(Equal("some-password"))
+				Expect(creds[0].Metadata).To(Equal(credentials.Metadata{"some": "metadata"}))
 				Expect(creds[0].VersionCreatedAt).To(Equal("2017-01-05T01:01:01Z"))
 
+				Expect(creds[1].Id).To(Equal("some-id"))
+				Expect(creds[1].Name).To(Equal("/example-password"))
+				Expect(creds[1].Type).To(Equal("password"))
 				Expect(creds[1].Value.(string)).To(Equal("some-other-password"))
+				Expect(creds[1].Metadata).To(Equal(nilMetadata))
+				Expect(creds[1].VersionCreatedAt).To(Equal("2017-01-05T01:01:01Z"))
 			})
 
 			It("returns a list of N users", func() {
@@ -292,6 +325,7 @@ var _ = Describe("Get", func() {
       	"password": "dummy_password",
       	"password_hash": "$6$kjhlkjh$lkjhasdflkjhasdflkjh"
       },
+	  "metadata": null,
       "version_created_at": "2017-01-05T01:01:01Z"
     },
 	{
@@ -303,6 +337,7 @@ var _ = Describe("Get", func() {
       	"password": "another_random_dummy_password",
       	"password_hash": "$6$kjhlkjh$lkjhasdflkjhasdflkjh"
       },
+	  "metadata": {"some":"metadata"},
       "version_created_at": "2017-01-05T01:01:01Z"
     }
     ]}`
@@ -322,9 +357,18 @@ var _ = Describe("Get", func() {
 				Expect(firstCredValue["username"]).To(Equal("first-username"))
 				Expect(firstCredValue["password"]).To(Equal("dummy_password"))
 				Expect(firstCredValue["password_hash"]).To(Equal("$6$kjhlkjh$lkjhasdflkjhasdflkjh"))
+				Expect(creds[0].Metadata).To(Equal(nilMetadata))
 				Expect(creds[0].VersionCreatedAt).To(Equal("2017-01-05T01:01:01Z"))
 
-				Expect(creds[1].Value.(map[string]interface{})["username"]).To(Equal("second-username"))
+				Expect(creds[1].Id).To(Equal("some-id"))
+				Expect(creds[1].Name).To(Equal("/example-user"))
+				Expect(creds[1].Type).To(Equal("user"))
+				secondCredValue := creds[1].Value.(map[string]interface{})
+				Expect(secondCredValue["username"]).To(Equal("second-username"))
+				Expect(secondCredValue["password"]).To(Equal("another_random_dummy_password"))
+				Expect(secondCredValue["password_hash"]).To(Equal("$6$kjhlkjh$lkjhasdflkjhasdflkjh"))
+				Expect(creds[1].Metadata).To(Equal(credentials.Metadata{"some": "metadata"}))
+				Expect(creds[1].VersionCreatedAt).To(Equal("2017-01-05T01:01:01Z"))
 			})
 		})
 
@@ -383,6 +427,7 @@ var _ = Describe("Get", func() {
       "name": "/example-password",
       "type": "password",
       "value": "some-password",
+	  "metadata": {"some":"metadata"},
       "version_created_at": "2017-01-05T01:01:01Z"
     }]}`
 				dummyAuth := &DummyAuth{Response: &http.Response{
@@ -393,7 +438,12 @@ var _ = Describe("Get", func() {
 				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
 				cred, err := ch.GetLatestPassword("/example-password")
 				Expect(err).ToNot(HaveOccurred())
+				Expect(cred.Id).To(Equal("some-id"))
+				Expect(cred.Name).To(Equal("/example-password"))
+				Expect(cred.Type).To(Equal("password"))
+				Expect(cred.Metadata).To(Equal(credentials.Metadata{"some": "metadata"}))
 				Expect(cred.Value).To(BeEquivalentTo("some-password"))
+				Expect(cred.VersionCreatedAt).To(Equal("2017-01-05T01:01:01Z"))
 			})
 		})
 	})
@@ -426,6 +476,7 @@ var _ = Describe("Get", func() {
 		"certificate": "-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----",
 		"private_key": "-----BEGIN RSA PRIVATE KEY-----\n...\n-----END RSA PRIVATE KEY-----"
 	},
+    "metadata": {"some":"metadata"},
 	"version_created_at": "2017-01-01T04:07:18Z"
 }]}`
 				dummyAuth := &DummyAuth{Response: &http.Response{
@@ -437,9 +488,13 @@ var _ = Describe("Get", func() {
 
 				cred, err := ch.GetLatestCertificate("/example-certificate")
 				Expect(err).ToNot(HaveOccurred())
+				Expect(cred.Id).To(Equal("some-id"))
+				Expect(cred.Name).To(Equal("/example-certificate"))
+				Expect(cred.Type).To(Equal("certificate"))
 				Expect(cred.Value.Ca).To(Equal("-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----"))
 				Expect(cred.Value.Certificate).To(Equal("-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----"))
 				Expect(cred.Value.PrivateKey).To(Equal("-----BEGIN RSA PRIVATE KEY-----\n...\n-----END RSA PRIVATE KEY-----"))
+				Expect(cred.Metadata).To(Equal(credentials.Metadata{"some": "metadata"}))
 				Expect(cred.VersionCreatedAt).To(Equal("2017-01-01T04:07:18Z"))
 			})
 		})
@@ -474,7 +529,8 @@ var _ = Describe("Get", func() {
 						"password": "some-password",
 						"password_hash": "some-hash"
 					  },
-					  "version_created_at": "2017-01-05T01:01:01Z"
+					  "metadata": {"some":"metadata"},
+       				  "version_created_at": "2017-01-05T01:01:01Z"
 					}
 				  ]
 				}`
@@ -486,12 +542,16 @@ var _ = Describe("Get", func() {
 				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
 				cred, err := ch.GetLatestUser("/example-user")
 				Expect(err).ToNot(HaveOccurred())
+				Expect(cred.Id).To(Equal("some-id"))
+				Expect(cred.Name).To(Equal("/example-user"))
+				Expect(cred.Type).To(Equal("user"))
 				Expect(cred.Value.PasswordHash).To(Equal("some-hash"))
-				username := "some-username"
 				Expect(cred.Value.User).To(Equal(values.User{
-					Username: username,
+					Username: "some-username",
 					Password: "some-password",
 				}))
+				Expect(cred.Metadata).To(Equal(credentials.Metadata{"some": "metadata"}))
+				Expect(cred.VersionCreatedAt).To(Equal("2017-01-05T01:01:01Z"))
 			})
 		})
 	})
@@ -517,13 +577,14 @@ var _ = Describe("Get", func() {
 				responseString := `{
 				  "data": [
 					{
-					  "id": "67fc3def-bbfb-4953-83f8-4ab0682ad677",
+					  "id": "some-id",
 					  "name": "/example-rsa",
 					  "type": "rsa",
 					  "value": {
 						"public_key": "public-key",
 						"private_key": "private-key"
 					  },
+					  "metadata": {"some":"metadata"},
 					  "version_created_at": "2017-01-01T04:07:18Z"
 					}
 				  ]
@@ -537,10 +598,15 @@ var _ = Describe("Get", func() {
 				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
 				cred, err := ch.GetLatestRSA("/example-rsa")
 				Expect(err).ToNot(HaveOccurred())
+				Expect(cred.Id).To(Equal("some-id"))
+				Expect(cred.Name).To(Equal("/example-rsa"))
+				Expect(cred.Type).To(Equal("rsa"))
 				Expect(cred.Value).To(Equal(values.RSA{
 					PublicKey:  "public-key",
 					PrivateKey: "private-key",
 				}))
+				Expect(cred.Metadata).To(Equal(credentials.Metadata{"some": "metadata"}))
+				Expect(cred.VersionCreatedAt).To(Equal("2017-01-01T04:07:18Z"))
 			})
 		})
 	})
@@ -574,6 +640,7 @@ var _ = Describe("Get", func() {
 						"private_key": "private-key",
 						"public_key_fingerprint": "public-key-fingerprint"
 					  },
+					  "metadata": {"some":"metadata"},
 					  "version_created_at": "2017-01-01T04:07:18Z"
 					}
 				  ]
@@ -587,11 +654,16 @@ var _ = Describe("Get", func() {
 				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
 				cred, err := ch.GetLatestSSH("/example-ssh")
 				Expect(err).ToNot(HaveOccurred())
+				Expect(cred.Id).To(Equal("some-id"))
+				Expect(cred.Name).To(Equal("/example-ssh"))
+				Expect(cred.Type).To(Equal("ssh"))
 				Expect(cred.Value.PublicKeyFingerprint).To(Equal("public-key-fingerprint"))
 				Expect(cred.Value.SSH).To(Equal(values.SSH{
 					PublicKey:  "public-key",
 					PrivateKey: "private-key",
 				}))
+				Expect(cred.Metadata).To(Equal(credentials.Metadata{"some": "metadata"}))
+				Expect(cred.VersionCreatedAt).To(Equal("2017-01-01T04:07:18Z"))
 			})
 		})
 	})
@@ -628,6 +700,7 @@ var _ = Describe("Get", func() {
 						],
 						"is_true": true
 					  },
+					  "metadata": {"some":"metadata"},
 					  "version_created_at": "2017-01-01T04:07:18Z"
 					}
 				  ]
@@ -649,12 +722,16 @@ var _ = Describe("Get", func() {
 						],
 						"is_true": true
 					}`
-
 				var unmarshalled values.JSON
 				json.Unmarshal([]byte(JSONResult), &unmarshalled)
-
 				Expect(err).ToNot(HaveOccurred())
+
+				Expect(cred.Id).To(Equal("some-id"))
+				Expect(cred.Name).To(Equal("/example-json"))
+				Expect(cred.Type).To(Equal("json"))
 				Expect(cred.Value).To(Equal(unmarshalled))
+				Expect(cred.Metadata).To(Equal(credentials.Metadata{"some": "metadata"}))
+				Expect(cred.VersionCreatedAt).To(Equal("2017-01-01T04:07:18Z"))
 			})
 		})
 
@@ -685,6 +762,7 @@ var _ = Describe("Get", func() {
 					  "name": "/example-value",
 					  "type": "value",
 					  "value": "some-value",
+					  "metadata": {"some":"metadata"},
 					  "version_created_at": "2017-01-05T01:01:01Z"
 				}]}`
 
@@ -696,7 +774,12 @@ var _ = Describe("Get", func() {
 				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
 				cred, err := ch.GetLatestValue("/example-value")
 				Expect(err).ToNot(HaveOccurred())
+				Expect(cred.Id).To(Equal("some-id"))
+				Expect(cred.Name).To(Equal("/example-value"))
+				Expect(cred.Type).To(Equal("value"))
 				Expect(cred.Value).To(Equal(values.Value("some-value")))
+				Expect(cred.Metadata).To(Equal(credentials.Metadata{"some": "metadata"}))
+				Expect(cred.VersionCreatedAt).To(Equal("2017-01-05T01:01:01Z"))
 			})
 		})
 	})

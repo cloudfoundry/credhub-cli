@@ -13,7 +13,7 @@ import (
 
 func (ch *CredHub) GetAllCertificatesMetadata() ([]credentials.CertificateMetadata, error) {
 	query := url.Values{}
-	
+
 	return ch.makeGetCertificatesRequest(query)
 }
 
