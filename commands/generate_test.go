@@ -1,6 +1,7 @@
 package commands_test
 
 import (
+	"code.cloudfoundry.org/credhub-cli/errors"
 	"net/http"
 	"runtime"
 
@@ -431,6 +432,54 @@ var _ = Describe("Generate", func() {
 		})
 	})
 
+	FDescribe("with metadata", func() {
+		It("generates a secret with metadata", func() {
+			setupGenerateServerWithMetadata(
+				"user",
+				"my-cred",
+				`{"username":"my-username", "password":"test-password", "password_hash":"passw0rd-H4Sh"}`,
+				`{}`,
+				true,
+				`{"some":{"example":"metadata"}, "array":["metadata"]}`,
+			)
+
+			session := runCommand("generate", "-t", "user", "-n", "my-cred", "--metadata", `{"some":{"example":"metadata"}, "array":["metadata"]}`)
+
+			Eventually(session).Should(Exit(0))
+			metadataOutput := `
+metadata:
+  array:
+  - metadata
+  some:
+    example: metadata`
+			Eventually(string(session.Out.Contents())).Should(ContainSubstring(metadataOutput))
+		})
+
+		It("errors when metadata is malformed", func() {
+			setupGenerateServerWithMetadata(
+				"user",
+				"my-cred",
+				`{error}`,
+				`{}`,
+				true,
+				`"not-valid-json"`)
+
+			session := runCommand("generate", "-t", "user", "-n", "my-cred", "--metadata", `"not-valid-json"`)
+
+			Eventually(session).Should(Exit(1))
+			Expect(string(session.Err.Contents())).To(ContainSubstring("The argument for --metadata is not a valid json object. Please update and retry your request."))
+		})
+
+		It("errors when server does not support metadata", func() {
+			setupGenerateServerToReturnServerError(errors.NewServerDoesNotSupportMetadataError())
+
+			session := runCommand("generate", "-t", "user", "-n", "my-cred", "--metadata", `{"some":{"example":"metadata"}, "array":["metadata"]}`)
+
+			Eventually(session).Should(Exit(1))
+			Expect(string(session.Err.Contents())).To(ContainSubstring("The --metadata flag is not supported for this version of the credhub server (requires >= 2.6.x). Please remove the flag and retry your request."))
+		})
+	})
+
 	Describe("When username parameter is included for non-user types", func() {
 		It("returns a sensible error", func() {
 			session := runCommand("generate", "-n", "test-ssh-value", "-t", "ssh", "-z", "my-username")
@@ -500,6 +549,28 @@ func setupGenerateServer(keyType, name, generatedValue, params string, overwrite
 			VerifyRequest("POST", "/api/v1/data"),
 			VerifyJSON(fmt.Sprintf(generateRequestJSON, keyType, name, params, overwrite)),
 			RespondWith(http.StatusOK, fmt.Sprintf(generateResponseJSON, keyType, name, generatedValue)),
+		),
+	)
+}
+
+const generateRequestJSONWithMetadata = `{"type":"%s","name":"%s","parameters":%s,"overwrite":%t, "metadata":%s}`
+const generateResponseJSONWithMetadata = `{"type":"%s","id":"` + uuid + `","name":"%s","version_created_at":"` + timestamp + `","value":%s,"metadata":%s}`
+
+func setupGenerateServerWithMetadata(keyType, name, generatedValue, params string, overwrite bool, metadata string) {
+	server.AppendHandlers(
+		CombineHandlers(
+			VerifyRequest("POST", "/api/v1/data"),
+			VerifyJSON(fmt.Sprintf(generateRequestJSONWithMetadata, keyType, name, params, overwrite, metadata)),
+			RespondWith(http.StatusOK, fmt.Sprintf(generateResponseJSONWithMetadata, keyType, name, generatedValue, metadata)),
+		),
+	)
+}
+
+func setupGenerateServerToReturnServerError(err error) {
+	server.AppendHandlers(
+		CombineHandlers(
+			VerifyRequest("POST", "/api/v1/data"),
+			RespondWith(http.StatusInternalServerError, err),
 		),
 	)
 }

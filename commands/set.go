@@ -135,7 +135,13 @@ func (c *SetCommand) setCredential() (credentials.Credential, error) {
 		if err := json.Unmarshal([]byte(c.Metadata), &metadata); err != nil {
 			return credentials.Credential{}, errors.NewInvalidJSONMetadataError()
 		}
-		options = append(options, credhub.WithMetadata(metadata))
+
+		withMetadata := func(s *credhub.SetRequest) error {
+			s.Metadata = metadata
+			return nil
+		}
+
+		options = append(options, withMetadata)
 	}
 
 	cred, err := c.client.SetCredential(c.CredentialIdentifier, c.Type, value, options...)

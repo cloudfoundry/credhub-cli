@@ -10,6 +10,8 @@ import (
 	"code.cloudfoundry.org/credhub-cli/credhub/credentials/generate"
 )
 
+type GenerateOption func(*generateRequest) error
+
 // GeneratePassword generates a password credential based on the provided parameters.
 func (ch *CredHub) GeneratePassword(name string, gen generate.Password, overwrite Mode) (credentials.Password, error) {
 	var cred credentials.Password
@@ -50,6 +52,18 @@ func (ch *CredHub) GenerateCredential(name, credType string, gen interface{}, ov
 	var cred credentials.Credential
 	err := ch.generateCredential(name, credType, gen, overwrite, &cred)
 	return cred, err
+}
+
+func WithMetadata(metadata credentials.Metadata) GenerateOption {
+
+}
+
+type generateRequest struct {
+	Name     string               `json:"name"`
+	Type     string               `json:"type"`
+	Value    interface{}          `json:"value"`
+	Mode     string               `json:"mode,omitempty"`
+	Metadata credentials.Metadata `json:"metadata,omitempty"`
 }
 
 func (ch *CredHub) generateCredential(name, credType string, gen interface{}, overwrite Mode, cred interface{}) error {

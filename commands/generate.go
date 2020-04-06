@@ -35,6 +35,7 @@ type GenerateCommand struct {
 	Ca                   string   `long:"ca" description:"[Certificate] Name of CA used to sign the generated certificate"`
 	IsCA                 bool     `long:"is-ca" description:"[Certificate] The generated certificate is a certificate authority"`
 	SelfSign             bool     `long:"self-sign" description:"[Certificate] The generated certificate will be self-signed"`
+	Metadata             string   `long:"metadata" description:"[JSON] Sets additional metadata on the credential"`
 	ClientCommand
 }
 
@@ -87,12 +88,11 @@ func (c GenerateCommand) Execute([]string) error {
 	}
 
 	mode := credhub.Overwrite
-
 	if c.NoOverwrite {
 		mode = credhub.NoOverwrite
 	}
 
-	credential, err := c.client.GenerateCredential(c.CredentialIdentifier, c.CredentialType, parameters, mode)
+	credential, err := c.client.GenerateCredential(c.CredentialIdentifier, c.CredentialType, parameters, mode, c.Metadata)
 
 	if err != nil {
 		return err
