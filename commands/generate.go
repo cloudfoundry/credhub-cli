@@ -1,6 +1,8 @@
 package commands
 
 import (
+	"code.cloudfoundry.org/credhub-cli/credhub/credentials"
+	"encoding/json"
 	"strings"
 
 	"code.cloudfoundry.org/credhub-cli/credhub"
@@ -35,6 +37,7 @@ type GenerateCommand struct {
 	Ca                   string   `long:"ca" description:"[Certificate] Name of CA used to sign the generated certificate"`
 	IsCA                 bool     `long:"is-ca" description:"[Certificate] The generated certificate is a certificate authority"`
 	SelfSign             bool     `long:"self-sign" description:"[Certificate] The generated certificate will be self-signed"`
+	Metadata             string   `long:"metadata" description:"[JSON] Sets additional metadata on the credential"`
 	ClientCommand
 }
 
@@ -87,12 +90,30 @@ func (c GenerateCommand) Execute([]string) error {
 	}
 
 	mode := credhub.Overwrite
-
 	if c.NoOverwrite {
 		mode = credhub.NoOverwrite
 	}
 
-	credential, err := c.client.GenerateCredential(c.CredentialIdentifier, c.CredentialType, parameters, mode)
+	var options []credhub.GenerateOption
+	if c.Metadata != "" {
+		var metadata credentials.Metadata
+		if err := json.Unmarshal([]byte(c.Metadata), &metadata); err != nil {
+			return errors.NewInvalidJSONMetadataError()
+		}
+
+		withMetadata := func(g *credhub.GenerateOptions) error {
+			g.Metadata = metadata
+			return nil
+		}
+
+		options = append(options, withMetadata)
+	}
+
+	credential, err := c.client.GenerateCredential(c.CredentialIdentifier, c.CredentialType, parameters, mode, options...)
+
+	if err == credhub.ServerDoesNotSupportMetadataError {
+		return errors.NewServerDoesNotSupportMetadataError()
+	}
 
 	if err != nil {
 		return err

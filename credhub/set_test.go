@@ -21,6 +21,14 @@ import (
 )
 
 var _ = Describe("Set", func() {
+
+	withMetadata := func(metadata credentials.Metadata) func(s *SetOptions) error {
+		return func(s *SetOptions) error {
+			s.Metadata = metadata
+			return nil
+		}
+	}
+
 	Describe("SetCredential()", func() {
 		It("returns the credential that has been set", func() {
 			metadataStr := `{"some":{"json":"metadata"}}`
@@ -42,7 +50,7 @@ var _ = Describe("Set", func() {
 			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.6.0"))
 			Expect(err).ToNot(HaveOccurred())
 
-			cred, err := ch.SetCredential("some-credential", "some-type", "some-value", WithMetadata(metadata))
+			cred, err := ch.SetCredential("some-credential", "some-type", "some-value", withMetadata(metadata))
 			Expect(err).ToNot(HaveOccurred())
 
 			requestBody := getBody(dummy.Request.Body)
@@ -158,7 +166,7 @@ var _ = Describe("Set", func() {
 			certificate := values.Certificate{
 				Certificate: "some-certificate",
 			}
-			cred, err := ch.SetCertificate("/example-certificate", certificate, WithMetadata(metadata))
+			cred, err := ch.SetCertificate("/example-certificate", certificate, withMetadata(metadata))
 			Expect(err).NotTo(HaveOccurred())
 
 			requestBody := getBody(dummy.Request.Body)
@@ -213,7 +221,7 @@ var _ = Describe("Set", func() {
 
 			password := values.Password("some-password")
 
-			cred, err := ch.SetPassword("/example-password", password, WithMetadata(metadata))
+			cred, err := ch.SetPassword("/example-password", password, withMetadata(metadata))
 			Expect(err).NotTo(HaveOccurred())
 
 			requestBody := getBody(dummy.Request.Body)
@@ -267,7 +275,7 @@ var _ = Describe("Set", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			user := values.User{Username: "some-username", Password: "some-password"}
-			cred, err := ch.SetUser("/example-user", user, WithMetadata(metadata))
+			cred, err := ch.SetUser("/example-user", user, withMetadata(metadata))
 			Expect(err).NotTo(HaveOccurred())
 
 			requestBody := getBody(dummy.Request.Body)
@@ -324,7 +332,7 @@ var _ = Describe("Set", func() {
 			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.6.0"))
 			Expect(err).NotTo(HaveOccurred())
 
-			cred, err := ch.SetRSA("/example-rsa", values.RSA{}, WithMetadata(metadata))
+			cred, err := ch.SetRSA("/example-rsa", values.RSA{}, withMetadata(metadata))
 			Expect(err).NotTo(HaveOccurred())
 
 			requestBody := getBody(dummy.Request.Body)
@@ -378,7 +386,7 @@ var _ = Describe("Set", func() {
 			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.6.0"))
 			Expect(err).NotTo(HaveOccurred())
 
-			cred, err := ch.SetSSH("/example-ssh", values.SSH{}, WithMetadata(metadata))
+			cred, err := ch.SetSSH("/example-ssh", values.SSH{}, withMetadata(metadata))
 			Expect(err).NotTo(HaveOccurred())
 
 			requestBody := getBody(dummy.Request.Body)
@@ -440,7 +448,7 @@ var _ = Describe("Set", func() {
 			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.6.0"))
 			Expect(err).NotTo(HaveOccurred())
 
-			cred, err := ch.SetJSON("/example-json", unmarshalledJSONValue, WithMetadata(metadata))
+			cred, err := ch.SetJSON("/example-json", unmarshalledJSONValue, withMetadata(metadata))
 			Expect(err).NotTo(HaveOccurred())
 
 			requestBody := getBody(dummy.Request.Body)
@@ -486,7 +494,7 @@ var _ = Describe("Set", func() {
 			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.6.0"))
 			Expect(err).NotTo(HaveOccurred())
 
-			cred, err := ch.SetValue("/example-value", values.Value("some string value"), WithMetadata(metadata))
+			cred, err := ch.SetValue("/example-value", values.Value("some string value"), withMetadata(metadata))
 			Expect(err).NotTo(HaveOccurred())
 
 			requestBody := getBody(dummy.Request.Body)

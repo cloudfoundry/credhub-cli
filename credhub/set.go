@@ -14,7 +14,7 @@ import (
 
 // Option can be provided to New() to specify additional parameters for
 // connecting to the CredHub server
-type SetOption func(*setRequest) error
+type SetOption func(*SetOptions) error
 
 // SetValue sets a value credential with a user-provided value.
 func (ch *CredHub) SetValue(name string, value values.Value, options ...SetOption) (credentials.Value, error) {
@@ -80,19 +80,15 @@ func (ch *CredHub) SetCredential(name, credType string, value interface{}, optio
 	return cred, err
 }
 
-// WithMetadata includes user-provided metadata for the credential
-func WithMetadata(metadata credentials.Metadata) SetOption {
-	return func(s *setRequest) error {
-		s.Metadata = metadata
-		return nil
-	}
+type setRequest struct {
+	Name  string      `json:"name"`
+	Type  string      `json:"type"`
+	Value interface{} `json:"value"`
+	Mode  string      `json:"mode,omitempty"`
+	SetOptions
 }
 
-type setRequest struct {
-	Name     string               `json:"name"`
-	Type     string               `json:"type"`
-	Value    interface{}          `json:"value"`
-	Mode     string               `json:"mode,omitempty"`
+type SetOptions struct {
 	Metadata credentials.Metadata `json:"metadata,omitempty"`
 }
 
@@ -102,6 +98,7 @@ func (ch *CredHub) setCredential(name, credType string, value, cred interface{},
 		Type:  credType,
 		Value: value,
 	}
+
 	serverVersion, err := ch.ServerVersion()
 	if err != nil {
 		return err
@@ -111,7 +108,7 @@ func (ch *CredHub) setCredential(name, credType string, value, cred interface{},
 	}
 
 	for _, option := range options {
-		if err := option(request); err != nil {
+		if err := option(&request.SetOptions); err != nil {
 			return err
 		}
 	}
