@@ -1,6 +1,8 @@
 package commands
 
 import (
+	"code.cloudfoundry.org/credhub-cli/credhub/credentials"
+	"encoding/json"
 	"strings"
 
 	"code.cloudfoundry.org/credhub-cli/credhub"
@@ -92,7 +94,26 @@ func (c GenerateCommand) Execute([]string) error {
 		mode = credhub.NoOverwrite
 	}
 
-	credential, err := c.client.GenerateCredential(c.CredentialIdentifier, c.CredentialType, parameters, mode, c.Metadata)
+	var options []credhub.GenerateOption
+	if c.Metadata != "" {
+		var metadata credentials.Metadata
+		if err := json.Unmarshal([]byte(c.Metadata), &metadata); err != nil {
+			return errors.NewInvalidJSONMetadataError()
+		}
+
+		withMetadata := func(g *credhub.GenerateOptions) error {
+			g.Metadata = metadata
+			return nil
+		}
+
+		options = append(options, withMetadata)
+	}
+
+	credential, err := c.client.GenerateCredential(c.CredentialIdentifier, c.CredentialType, parameters, mode, options...)
+
+	if err == credhub.ServerDoesNotSupportMetadataError {
+		return errors.NewServerDoesNotSupportMetadataError()
+	}
 
 	if err != nil {
 		return err

@@ -1,7 +1,6 @@
 package commands_test
 
 import (
-	"code.cloudfoundry.org/credhub-cli/errors"
 	"net/http"
 	"runtime"
 
@@ -432,7 +431,7 @@ var _ = Describe("Generate", func() {
 		})
 	})
 
-	FDescribe("with metadata", func() {
+	Describe("with metadata", func() {
 		It("generates a secret with metadata", func() {
 			setupGenerateServerWithMetadata(
 				"user",
@@ -471,7 +470,7 @@ metadata:
 		})
 
 		It("errors when server does not support metadata", func() {
-			setupGenerateServerToReturnServerError(errors.NewServerDoesNotSupportMetadataError())
+			setCachedServerVersion("2.5.0")
 
 			session := runCommand("generate", "-t", "user", "-n", "my-cred", "--metadata", `{"some":{"example":"metadata"}, "array":["metadata"]}`)
 
@@ -562,15 +561,6 @@ func setupGenerateServerWithMetadata(keyType, name, generatedValue, params strin
 			VerifyRequest("POST", "/api/v1/data"),
 			VerifyJSON(fmt.Sprintf(generateRequestJSONWithMetadata, keyType, name, params, overwrite, metadata)),
 			RespondWith(http.StatusOK, fmt.Sprintf(generateResponseJSONWithMetadata, keyType, name, generatedValue, metadata)),
-		),
-	)
-}
-
-func setupGenerateServerToReturnServerError(err error) {
-	server.AppendHandlers(
-		CombineHandlers(
-			VerifyRequest("POST", "/api/v1/data"),
-			RespondWith(http.StatusInternalServerError, err),
 		),
 	)
 }
