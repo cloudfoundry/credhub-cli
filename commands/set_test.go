@@ -49,6 +49,15 @@ var _ = Describe("Set", func() {
 		Expect(string(session.Err.Contents())).To(ContainSubstring("The argument for --metadata is not a valid json object. Please update and retry your request."))
 	})
 
+	It("errors when server does not support metadata", func() {
+		setCachedServerVersion("2.5.0")
+
+		session := runCommand("set", "-n", "my-value", "-v", "potatoes", "-t", "value", "--metadata", `{"some":{"example":"metadata"}, "array":["metadata"]}`)
+
+		Eventually(session).Should(Exit(1))
+		Expect(string(session.Err.Contents())).To(ContainSubstring("The --metadata flag is not supported for this version of the credhub server (requires >= 2.6.x). Please remove the flag and retry your request."))
+	})
+
 	Describe("setting value secrets", func() {
 		It("puts a secret", func() {
 			setupSetServer("my-value", "value", `"potatoes"`)

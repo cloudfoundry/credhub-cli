@@ -127,8 +127,12 @@ func login() {
 }
 
 func resetCachedServerVersion() {
+	setCachedServerVersion("")
+}
+
+func setCachedServerVersion(version string) {
 	cfg := config.ReadConfig()
-	cfg.ServerVersion = ""
+	cfg.ServerVersion = version
 	config.WriteConfig(cfg)
 }
 
