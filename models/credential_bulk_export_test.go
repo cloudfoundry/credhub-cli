@@ -59,7 +59,7 @@ var _ = Describe("ExportCredentials", func() {
 		})
 
 		It("includes only a name, type and value in each credential", func() {
-			expectedKeys := []string{"Name", "Type", "Value"}
+			expectedKeys := []string{"Name", "Type", "Value", "Metadata"}
 			exportCreds, _ := models.ExportCredentials(credentials, true)
 
 			var v map[string]interface{}
@@ -112,7 +112,7 @@ var _ = Describe("ExportCredentials", func() {
 		})
 
 		It("includes only a name, type and value in each credential", func() {
-			expectedKeys := []string{"name", "type", "value"}
+			expectedKeys := []string{"name", "type", "value", "metadata"}
 			exportCreds, _ := models.ExportCredentials(credentials, false)
 
 			var v map[string]interface{}
