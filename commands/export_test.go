@@ -79,7 +79,10 @@ var _ = Describe("Export", func() {
 					"id":"some_uuid",
 					"name":"/path/to/cred",
 					"version_created_at":"idc",
-					"value": "foo"
+					"value": "foo",
+					"metadata": {
+						"some": "thing"
+					}
 				}]
 			}`
 
@@ -87,9 +90,13 @@ var _ = Describe("Export", func() {
 - name: /path/to/cred
   type: value
   value: foo
+  metadata:
+    some: thing
 - name: /path/to/cred
   type: value
-  value: foo`
+  value: foo
+  metadata:
+    some: thing`
 
 			server.AppendHandlers(
 				CombineHandlers(

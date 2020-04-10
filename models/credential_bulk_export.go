@@ -11,6 +11,7 @@ type exportCredential struct {
 	Name  string
 	Type  string
 	Value interface{}
+	Metadata interface{}
 }
 
 type exportCredentials struct {
@@ -25,7 +26,12 @@ func ExportCredentials(credentials []credentials.Credential, outputJSON bool) (*
 	exportCreds := exportCredentials{make([]exportCredential, len(credentials))}
 
 	for i, credential := range credentials {
-		exportCreds.Credentials[i] = exportCredential{credential.Name, credential.Type, credential.Value}
+		exportCreds.Credentials[i] = exportCredential{
+			credential.Name,
+			credential.Type,
+			credential.Value,
+			credential.Metadata,
+		}
 	}
 
 	result, err := yaml.Marshal(exportCreds)
