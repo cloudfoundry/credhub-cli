@@ -1,6 +1,8 @@
 package commands
 
 import (
+	"code.cloudfoundry.org/credhub-cli/credhub"
+	"code.cloudfoundry.org/credhub-cli/credhub/credentials"
 	"fmt"
 	"strconv"
 
@@ -84,7 +86,8 @@ func (c *ImportCommand) setCredentials(bulkImport models.CredentialBulkImport) e
 		if certWithCaName {
 			certsWithCaName[name] = CaAndIndex{caName, i}
 		} else {
-			err := c.setCredentialInCredHub(name, credential["type"].(string), credential["value"], &errorInfo, i)
+			err := c.setCredentialInCredHub(
+				name, credential["type"].(string), credential["value"], credential["metadata"], &errorInfo, i)
 			if err != nil {
 				return err
 			}
@@ -118,8 +121,21 @@ func isAuthenticationError(err error) bool {
 		reflect.DeepEqual(err, errors.NewRefreshError())
 }
 
-func (c *ImportCommand) setCredentialInCredHub(name, credType string, value interface{}, errorInfo *ErrorInfo, index int) error {
-	_, err := c.client.SetCredential(name, credType, value)
+func (c *ImportCommand) setCredentialInCredHub(name, credType string, value, metadata interface{}, errorInfo *ErrorInfo, index int) error {
+	var options []credhub.SetOption
+
+	if metadata != nil {
+		var meta credentials.Metadata
+		meta = metadata.(map[string]interface{})
+		withMetadata := func(s *credhub.SetOptions) error {
+			s.Metadata = meta
+			return nil
+		}
+
+		options = append(options, withMetadata)
+	}
+
+	_, err := c.client.SetCredential(name, credType, value, options...)
 
 	if err != nil {
 		if isAuthenticationError(err) {
@@ -149,5 +165,5 @@ func (c *ImportCommand) importCert(cert string, certs map[string]CaAndIndex, cre
 	}
 	delete(certs, cert)
 	credential := credentials[caAndIndex.Index]
-	return c.setCredentialInCredHub(cert, credential["type"].(string), credential["value"], errorInfo, caAndIndex.Index)
+	return c.setCredentialInCredHub(cert, credential["type"].(string), credential["value"], nil, errorInfo, caAndIndex.Index)
 }

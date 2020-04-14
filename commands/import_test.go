@@ -310,7 +310,7 @@ Failed to set: 0
 
 func setUpImportRequests() {
 	setupSetServer("/test/password", "password", `"test-password-value"`)
-	setupSetServer("/test/value", "value", `"test-value"`)
+	setupSetServerWithMetadata("/test/value", "value", `"test-value"`, `{"some":"thing", "nested":{"with":"value"}}`)
 	setupSetServer("/test/certificate", "certificate", `{"ca":"ca-certificate","certificate":"certificate","private_key":"private-key"}`)
 	setupSetServer("/test/rsa", "rsa", `{"public_key":"public-key","private_key":"private-key"}`)
 	setupSetServer("/test/ssh", "ssh", `{"public_key":"ssh-public-key","private_key":"private-key"}`)

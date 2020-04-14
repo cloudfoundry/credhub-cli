@@ -8,9 +8,9 @@ import (
 )
 
 type exportCredential struct {
-	Name  string
-	Type  string
-	Value interface{}
+	Name     string
+	Type     string
+	Value    interface{}
 	Metadata interface{}
 }
 

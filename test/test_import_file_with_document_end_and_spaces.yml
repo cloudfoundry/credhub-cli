@@ -6,6 +6,10 @@ credentials:
 - name: /test/value
   type: value
   value: test-value
+  metadata:
+    some: thing
+    nested:
+      with: value
 - name: /test/certificate
   type: certificate
   value:

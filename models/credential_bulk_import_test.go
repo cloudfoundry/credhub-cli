@@ -28,6 +28,12 @@ var _ = Describe("CredentialBulkImport", func() {
 			expectedValue["name"] = "/test/value"
 			expectedValue["type"] = "value"
 			expectedValue["value"] = "test-value"
+			expectedValue["metadata"] = map[string]interface{}{
+				"some": "thing",
+				"nested": map[string]interface{}{
+					"with": "value",
+				},
+			}
 			expectedValue["overwrite"] = true
 
 			Expect(credentialBulkImport.Credentials[1]).To(Equal(expectedValue))
@@ -114,6 +120,12 @@ var _ = Describe("CredentialBulkImport", func() {
 			expectedValue["name"] = "/test/value"
 			expectedValue["type"] = "value"
 			expectedValue["value"] = "test-value"
+			expectedValue["metadata"] = map[string]interface{}{
+				"some": "thing",
+				"nested": map[string]interface{}{
+					"with": "value",
+				},
+			}
 			expectedValue["overwrite"] = true
 
 			Expect(credentialBulkImport.Credentials[1]).To(Equal(expectedValue))

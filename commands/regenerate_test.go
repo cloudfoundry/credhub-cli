@@ -132,6 +132,7 @@ func setupRegenerateServer(keyType, name, value, params string) {
 		),
 	)
 }
+
 const regenerateCredentialRequestJson = `{"name":"%s", "regenerate":true}`
 const regenerateRequestJSONWithMetadata = `{"name":"%s", "regenerate":true, "metadata":%s}`
 const regenerateResponseJSONWithMetadata = `{"type":"%s","id":"` + uuid + `","name":"%s","version_created_at":"` + timestamp + `","value":%s,"metadata":%s}`
