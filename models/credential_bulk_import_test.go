@@ -42,9 +42,12 @@ var _ = Describe("CredentialBulkImport", func() {
 			expectedCertificate["name"] = "/test/certificate"
 			expectedCertificate["type"] = "certificate"
 			expectedCertificate["value"] = map[string]interface{}{
-				"ca":          "ca-certificate",
 				"certificate": "certificate",
 				"private_key": "private-key",
+				"ca":          "ca-certificate",
+			}
+			expectedCertificate["metadata"] = map[string]interface{}{
+				"certs": "metadata",
 			}
 			expectedCertificate["overwrite"] = true
 
@@ -138,6 +141,9 @@ var _ = Describe("CredentialBulkImport", func() {
 				"certificate": "certificate",
 				"private_key": "private-key",
 			}
+			expectedCertificate["metadata"] = map[string]interface{}{
+				"certs": "metadata",
+			}
 			expectedCertificate["overwrite"] = true
 
 			Expect(credentialBulkImport.Credentials[2]).To(Equal(expectedCertificate))
@@ -148,6 +154,9 @@ var _ = Describe("CredentialBulkImport", func() {
 			expectedRsa["value"] = map[string]interface{}{
 				"public_key":  "public-key",
 				"private_key": "private-key",
+			}
+			expectedCertificate["metadata"] = map[string]interface{}{
+				"certs": "metadata",
 			}
 			expectedRsa["overwrite"] = true
 

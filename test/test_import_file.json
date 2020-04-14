@@ -23,6 +23,9 @@
         "ca": "ca-certificate",
         "certificate": "certificate",
         "private_key": "private-key"
+      },
+      "metadata": {
+        "certs": "metadata"
       }
     },
     {

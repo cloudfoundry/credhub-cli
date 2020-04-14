@@ -165,5 +165,5 @@ func (c *ImportCommand) importCert(cert string, certs map[string]CaAndIndex, cre
 	}
 	delete(certs, cert)
 	credential := credentials[caAndIndex.Index]
-	return c.setCredentialInCredHub(cert, credential["type"].(string), credential["value"], nil, errorInfo, caAndIndex.Index)
+	return c.setCredentialInCredHub(cert, credential["type"].(string), credential["value"], credential["metadata"], errorInfo, caAndIndex.Index)
 }

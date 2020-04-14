@@ -15,6 +15,8 @@ credentials:
     ca: ca-certificate
     certificate: certificate
     private_key: private-key
+  metadata:
+    certs: metadata
 - name: /test/rsa
   type: rsa
   value:
