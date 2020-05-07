@@ -22,12 +22,14 @@ func (c *RegenerateCommand) Execute([]string) error {
 			return errors.NewInvalidJSONMetadataError()
 		}
 
-		withMetadata := func(g *credhub.RegenerateOptions) error {
-			g.Metadata = metadata
-			return nil
+		options = appendMetadataOptions(metadata, options)
+	} else {
+		credential, err := c.client.GetLatestVersion(c.CredentialIdentifier)
+		if err != nil {
+			return err
 		}
 
-		options = append(options, withMetadata)
+		options = appendMetadataOptions(credential.Metadata, options)
 	}
 
 	credential, err := c.client.Regenerate(c.CredentialIdentifier, options...)
@@ -44,4 +46,14 @@ func (c *RegenerateCommand) Execute([]string) error {
 	formatOutput(c.OutputJSON, credential)
 
 	return nil
+}
+
+func appendMetadataOptions(metadata credentials.Metadata, options []credhub.RegenerateOption) []credhub.RegenerateOption {
+	withMetadata := func(g *credhub.RegenerateOptions) error {
+		g.Metadata = metadata
+		return nil
+	}
+
+	options = append(options, withMetadata)
+	return options
 }

@@ -22,6 +22,12 @@ var _ = Describe("Regenerate", func() {
 	ItRequiresAnAPIToBeSet("regenerate", "-n", "test-credential")
 	testAutoLogin := []TestAutoLogin{
 		{
+			method: "GET",
+			responseFixtureFile: "get_response.json",
+			responseStatus: http.StatusOK,
+			endpoint: "/api/v1/data",
+		},
+		{
 			method:              "POST",
 			responseFixtureFile: "regenerate_response.json",
 			responseStatus:      http.StatusOK,
@@ -33,6 +39,7 @@ var _ = Describe("Regenerate", func() {
 	Describe("Regenerating password", func() {
 		It("prints the regenerated password secret in yaml format", func() {
 			setupRegenerateServer("password", "my-password-stuffs", `"nu-potatoes"`, `{}`)
+			setupGetLatestVersionServerWithoutMetadata("password", "my-password-stuffs")
 
 			session := runCommand("regenerate", "--name", "my-password-stuffs")
 
@@ -44,6 +51,7 @@ var _ = Describe("Regenerate", func() {
 
 		It("prints the regenerated password secret in json format", func() {
 			setupRegenerateServer("password", "my-password-stuffs", `"nu-potatoes"`, `{}`)
+			setupGetLatestVersionServerWithoutMetadata("password", "my-password-stuffs")
 
 			session := runCommand("regenerate", "--name", "my-password-stuffs", "--output-json")
 
@@ -58,6 +66,7 @@ var _ = Describe("Regenerate", func() {
 					RespondWith(http.StatusBadRequest, `{"error":"The password could not be regenerated because the value was statically set. Only generated passwords may be regenerated."}`),
 				),
 			)
+			setupGetLatestVersionServerWithoutMetadata("password", "my-password-stuffs")
 
 			session := runCommand("regenerate", "--name", "my-password-stuffs")
 
@@ -65,7 +74,34 @@ var _ = Describe("Regenerate", func() {
 			Expect(string(session.Err.Contents())).To(ContainSubstring("The password could not be regenerated because the value was statically set. Only generated passwords may be regenerated."))
 		})
 
-		Describe("with metadata", func() {
+		Describe("setting metadata", func() {
+			Context("when metadata is not provided", func() {
+				It("preserves existing metadata", func() {
+					setupGetLatestVersionServerWithMetadata(
+						"password",
+						"my-password-stuffs",
+						`{"some":{"example":"metadata"}, "array":["metadata"]}`,
+					)
+					setupRegenerateServerWithMetadata(
+						"password",
+						"my-password-stuffs",
+						`"nu-potatoes"`,
+						`{"some":{"example":"metadata"}, "array":["metadata"]}`,
+					)
+
+					session := runCommand("regenerate", "-n", "my-password-stuffs")
+
+					Eventually(session).Should(Exit(0))
+					metadataOutput := `
+metadata:
+  array:
+  - metadata
+  some:
+    example: metadata`
+					Eventually(string(session.Out.Contents())).Should(ContainSubstring(metadataOutput))
+				})
+			})
+
 			It("regenerates a secret with metadata", func() {
 				setupRegenerateServerWithMetadata(
 					"password",
@@ -136,6 +172,8 @@ func setupRegenerateServer(keyType, name, value, params string) {
 const regenerateCredentialRequestJson = `{"name":"%s", "regenerate":true}`
 const regenerateRequestJSONWithMetadata = `{"name":"%s", "regenerate":true, "metadata":%s}`
 const regenerateResponseJSONWithMetadata = `{"type":"%s","id":"` + uuid + `","name":"%s","version_created_at":"` + timestamp + `","value":%s,"metadata":%s}`
+const getLatestVersionResponseJSONWithMetadata = `{ "data": [ { "id": "` + uuid + `", "name": "%s", "type": "%s", "value": "some-password", "metadata": %s, "version_created_at": "` + timestamp + `" } ]}`
+const getLatestVersionResponseJSONWithoutMetadata = `{ "data": [ { "id": "` + uuid + `", "name": "%s", "type": "%s", "value": "some-password", "version_created_at": "` + timestamp + `" } ]}`
 
 func setupRegenerateServerWithMetadata(keyType, name, generatedValue, metadata string) {
 	server.AppendHandlers(
@@ -143,6 +181,24 @@ func setupRegenerateServerWithMetadata(keyType, name, generatedValue, metadata s
 			VerifyRequest("POST", "/api/v1/data"),
 			VerifyJSON(fmt.Sprintf(regenerateRequestJSONWithMetadata, name, metadata)),
 			RespondWith(http.StatusOK, fmt.Sprintf(regenerateResponseJSONWithMetadata, keyType, name, generatedValue, metadata)),
+		),
+	)
+}
+
+func setupGetLatestVersionServerWithoutMetadata(keyType, name string) {
+	server.AppendHandlers(
+		CombineHandlers(
+			VerifyRequest("GET", "/api/v1/data", fmt.Sprintf("current=true&name=%s", name)),
+			RespondWith(http.StatusOK, fmt.Sprintf(getLatestVersionResponseJSONWithoutMetadata, name, keyType)),
+		),
+	)
+}
+
+func setupGetLatestVersionServerWithMetadata(keyType, name, metadata string) {
+	server.AppendHandlers(
+		CombineHandlers(
+			VerifyRequest("GET", "/api/v1/data", fmt.Sprintf("current=true&name=%s", name)),
+			RespondWith(http.StatusOK, fmt.Sprintf(getLatestVersionResponseJSONWithMetadata, name, keyType, metadata)),
 		),
 	)
 }
