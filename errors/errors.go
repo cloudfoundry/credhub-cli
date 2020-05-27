@@ -33,6 +33,14 @@ func NewMissingGetParametersError() error {
 	return errors.New("A name or ID must be provided. Please update and retry your request.")
 }
 
+func NewMissingDeleteParametersError() error {
+	return errors.New("A name or path must be provided. Please update and retry your request.")
+}
+
+func NewBulkDeleteFailureError() error {
+	return errors.New("Some or all of the credential under the provided path could not be deleted. Please refer to the error output.")
+}
+
 func NewMissingInterpolateParametersError() error {
 	return errors.New("A file to interpolate must be provided. Please add a file flag and try again.")
 }

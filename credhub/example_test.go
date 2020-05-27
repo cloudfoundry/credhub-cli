@@ -106,7 +106,7 @@ func Example() {
 		// If the certificate already exists, delete it
 		cert, err := ch.GetLatestCertificate(path + name)
 		if err == nil {
-			ch.Delete(cert.Name)
+			ch.DeleteByName(cert.Name)
 		}
 
 		// Generate a new certificate

@@ -21,7 +21,7 @@ type RegenerateOptions struct {
 	Metadata credentials.Metadata `json:"metadata,omitempty"`
 }
 
-// Regenerate generates and returns a new credential version using the same parameters existing credential. The returned credential may be of any type.
+// Regenerate generates and returns a new credential version using the same parameters as the existing credential. The returned credential may be of any type.
 func (ch *CredHub) Regenerate(name string, options ...RegenerateOption) (credentials.Credential, error) {
 	var cred credentials.Credential
 
