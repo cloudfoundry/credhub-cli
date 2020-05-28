@@ -13,8 +13,6 @@ require (
 	github.com/cppforlife/go-patch v0.2.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fatih/color v1.9.0
-	github.com/fsnotify/fsnotify v1.4.9 // indirect
-	github.com/golang/protobuf v1.3.5 // indirect
 	github.com/hashicorp/go-version v1.2.0
 	github.com/howeyc/gopass v0.0.0-20190910152052-7cb4b85ec19c
 	github.com/jessevdk/go-flags v1.4.0
@@ -22,15 +20,13 @@ require (
 	github.com/mattn/go-colorable v0.1.6 // indirect
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d // indirect
-	github.com/onsi/ginkgo v1.12.0
-	github.com/onsi/gomega v1.10.0
+	github.com/onsi/ginkgo v1.12.2
+	github.com/onsi/gomega v1.10.1
 	github.com/stretchr/testify v1.5.1 // indirect
 	golang.org/x/crypto v0.0.0-20200510223506-06a226fb4e37 // indirect
 	golang.org/x/net v0.0.0-20200520182314-0ba52f642ac2
 	golang.org/x/sync v0.0.0-20200317015054-43a5402ce75a // indirect
 	golang.org/x/sys v0.0.0-20200523222454-059865788121 // indirect
-	golang.org/x/text v0.3.2 // indirect
-	golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543 // indirect
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 	gopkg.in/yaml.v2 v2.3.0
 )
