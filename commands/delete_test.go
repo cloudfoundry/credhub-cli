@@ -125,7 +125,7 @@ var _ = Describe("Delete", func() {
 				),
 				CombineHandlers(
 					VerifyRequest("DELETE", "/api/v1/data", "name=deploy123/dan.password"),
-					RespondWith(http.StatusNotFound, `{"error": "The request could not be completed because the credential does not exist or you do not have sufficient authorization."}`),
+					RespondWith(http.StatusNotFound, `{"error": "Some error message from server."}`),
 				),
 				CombineHandlers(
 					VerifyRequest("DELETE", "/api/v1/data", "name=deploy123/dan.key"),
@@ -139,7 +139,7 @@ var _ = Describe("Delete", func() {
 			actualOutput := string(session.Err.Contents())
 			Expect(actualOutput).To(ContainSubstring("1 out of 2 credentials under the provided path are successfully deleted. The following credentials failed to delete:"))
 			Expect(actualOutput).To(ContainSubstring("deploy123/dan.password"))
-			Expect(actualOutput).To(ContainSubstring("The request could not be completed because the credential does not exist or you do not have sufficient authorization."))
+			Expect(actualOutput).To(ContainSubstring("Some error message from server."))
 			Expect(actualOutput).To(ContainSubstring("Some or all of the credential under the provided path could not be deleted. Please refer to the error output."))
 		})
 	})
