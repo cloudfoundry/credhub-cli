@@ -20,7 +20,7 @@ var _ = Describe("Delete", func() {
 		}}
 
 		ch, _ := New("https://example.com", Auth(dummy.Builder()))
-		ch.DeleteByName("/example-password")
+		ch.Delete("/example-password")
 
 		url := dummy.Request.URL.String()
 		Expect(url).To(Equal("https://example.com/api/v1/data?name=%2Fexample-password"))
@@ -36,7 +36,7 @@ var _ = Describe("Delete", func() {
 			}}
 
 			ch, _ := New("https://example.com", Auth(dummy.Builder()))
-			err := ch.DeleteByName("/example-password")
+			err := ch.Delete("/example-password")
 			Expect(err).ToNot(HaveOccurred())
 		})
 	})
@@ -49,7 +49,7 @@ var _ = Describe("Delete", func() {
 			}}
 
 			ch, _ := New("https://example.com", Auth(dummy.Builder()))
-			err := ch.DeleteByName("/example-password")
+			err := ch.Delete("/example-password")
 			Expect(err).To(MatchError("The request could not be completed because the credential does not exist or you do not have sufficient authorization."))
 		})
 	})

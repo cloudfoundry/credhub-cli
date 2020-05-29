@@ -24,7 +24,7 @@ func (c *DeleteCommand) Execute([]string) error {
 }
 
 func (c *DeleteCommand) handleDeleteByName() error {
-	err := c.client.DeleteByName(c.CredentialIdentifier)
+	err := c.client.Delete(c.CredentialIdentifier)
 
 	if err == nil {
 		fmt.Println("Credential successfully deleted")
@@ -67,7 +67,7 @@ func (c *DeleteCommand) deleteByPath(path string) ([]DeleteFailedCredential, int
 
 	var failedCredentials []DeleteFailedCredential
 	for _, cred := range results.Credentials {
-		err = c.client.DeleteByName(cred.Name)
+		err = c.client.Delete(cred.Name)
 
 		if err != nil {
 			failedCredentials = append(failedCredentials, DeleteFailedCredential{
