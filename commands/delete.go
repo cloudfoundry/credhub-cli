@@ -45,7 +45,7 @@ func (c *DeleteCommand) handleDeleteByPath() error {
 		return nil
 	}
 
-	failureMessage := fmt.Sprintf("%v out of %v credentials under the provided path are successfully deleted. The following credentials failed to delete:", failedCredentialsCount, credentialsCount)
+	failureMessage := fmt.Sprintf("%v out of %v credentials under the provided path failed to delete. The following credentials failed to delete:", failedCredentialsCount, credentialsCount)
 	fmt.Fprintln(os.Stderr, failureMessage)
 
 	s, _ := yaml.Marshal(failedCredentials)

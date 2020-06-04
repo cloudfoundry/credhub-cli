@@ -137,7 +137,7 @@ var _ = Describe("Delete", func() {
 
 			Expect(session.ExitCode()).To(Equal(1))
 			actualOutput := string(session.Err.Contents())
-			Expect(actualOutput).To(ContainSubstring("1 out of 2 credentials under the provided path are successfully deleted. The following credentials failed to delete:"))
+			Expect(actualOutput).To(ContainSubstring("1 out of 2 credentials under the provided path failed to delete. The following credentials failed to delete:"))
 			Expect(actualOutput).To(ContainSubstring("deploy123/dan.password"))
 			Expect(actualOutput).To(ContainSubstring("Some error message from server."))
 			Expect(actualOutput).To(ContainSubstring("Some or all of the credential under the provided path could not be deleted. Please refer to the error output."))
