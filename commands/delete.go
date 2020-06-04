@@ -9,7 +9,7 @@ import (
 
 type DeleteCommand struct {
 	CredentialIdentifier string `short:"n" long:"name" description:"Name of the credential to delete"`
-	CredentialPath       string `short:"p" long:"path" description:"Name of the credentials to delete"`
+	CredentialPath       string `short:"p" long:"path" description:"Path of the credentials to delete"`
 	ClientCommand
 }
 
