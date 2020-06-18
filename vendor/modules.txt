@@ -7,10 +7,10 @@ github.com/bmatcuk/doublestar
 # github.com/charlievieth/fs v0.0.0-20170613215519-7dc373669fa1
 ## explicit
 github.com/charlievieth/fs
-# github.com/cloudfoundry/bosh-cli v6.2.1+incompatible
+# github.com/cloudfoundry/bosh-cli v6.3.0+incompatible
 ## explicit
 github.com/cloudfoundry/bosh-cli/director/template
-# github.com/cloudfoundry/bosh-utils v0.0.0-20200530100232-5bc6670a4f89
+# github.com/cloudfoundry/bosh-utils v0.0.0-20200613100316-d1b4b59227c6
 ## explicit
 github.com/cloudfoundry/bosh-utils/errors
 github.com/cloudfoundry/bosh-utils/logger
@@ -34,7 +34,7 @@ github.com/fatih/color
 # github.com/golang/protobuf v1.3.5
 ## explicit
 github.com/golang/protobuf/proto
-# github.com/hashicorp/go-version v1.2.0
+# github.com/hashicorp/go-version v1.2.1
 ## explicit
 github.com/hashicorp/go-version
 # github.com/howeyc/gopass v0.0.0-20190910152052-7cb4b85ec19c
@@ -100,7 +100,7 @@ github.com/onsi/gomega/matchers/support/goraph/util
 github.com/onsi/gomega/types
 # github.com/stretchr/testify v1.5.1
 ## explicit
-# golang.org/x/crypto v0.0.0-20200510223506-06a226fb4e37
+# golang.org/x/crypto v0.0.0-20200604202706-70a84ac30bf9
 ## explicit
 golang.org/x/crypto/blowfish
 golang.org/x/crypto/chacha20
@@ -122,7 +122,7 @@ golang.org/x/net/internal/socks
 golang.org/x/net/proxy
 # golang.org/x/sync v0.0.0-20200317015054-43a5402ce75a
 ## explicit
-# golang.org/x/sys v0.0.0-20200602100848-8d3cce7afc34
+# golang.org/x/sys v0.0.0-20200615200032-f1bc736245b1
 ## explicit
 golang.org/x/sys/cpu
 golang.org/x/sys/internal/unsafeheader
