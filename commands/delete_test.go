@@ -67,6 +67,47 @@ var _ = Describe("Delete", func() {
 	})
 
 	Describe("delete by path", func() {
+		When("--quiet flag is passed in", func() {
+			It("deletes successfully and only prints the final successful delete message", func() {
+				responseJSON := `{
+					"credentials": [
+							{
+								"name": "deploy123/dan.password",
+								"version_created_at": "2016-09-06T23:26:58Z"
+							},
+							{
+								"name": "deploy123/dan.key",
+								"version_created_at": "2016-09-06T23:26:58Z"
+							}
+					]
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest("GET", "/api/v1/data", "path=deploy123"),
+						RespondWith(http.StatusOK, responseJSON),
+					),
+					CombineHandlers(
+						VerifyRequest("DELETE", "/api/v1/data", "name=deploy123/dan.password"),
+						RespondWith(http.StatusOK, ""),
+					),
+					CombineHandlers(
+						VerifyRequest("DELETE", "/api/v1/data", "name=deploy123/dan.key"),
+						RespondWith(http.StatusOK, ""),
+					),
+				)
+
+				session := runCommand("delete", "-p", "deploy123", "--quiet")
+
+				Expect(session.ExitCode()).To(Equal(0))
+				// first 2 requests that the server receives result from test BeforeEach's login
+				Expect(server.ReceivedRequests()[2].URL.RawQuery).To(Equal("path=deploy123"))
+				Expect(server.ReceivedRequests()[3].URL.RawQuery).To(Equal("name=deploy123%2Fdan.password"))
+				Expect(server.ReceivedRequests()[4].URL.RawQuery).To(Equal("name=deploy123%2Fdan.key"))
+				Expect(string(session.Out.Contents())).NotTo(ContainSubstring("1 out of 2 credentials under the provided path are successfully deleted."))
+				Expect(string(session.Out.Contents())).To(ContainSubstring("2 out of 2 credentials under the provided path are successfully deleted."))
+			})
+		})
+
 		It("deletes successfully", func() {
 			responseJSON := `{
 					"credentials": [
@@ -102,7 +143,8 @@ var _ = Describe("Delete", func() {
 			Expect(server.ReceivedRequests()[2].URL.RawQuery).To(Equal("path=deploy123"))
 			Expect(server.ReceivedRequests()[3].URL.RawQuery).To(Equal("name=deploy123%2Fdan.password"))
 			Expect(server.ReceivedRequests()[4].URL.RawQuery).To(Equal("name=deploy123%2Fdan.key"))
-			Expect(string(session.Out.Contents())).To(ContainSubstring("All 2 out of 2 credentials under the provided path are successfully deleted."))
+			Expect(string(session.Out.Contents())).To(ContainSubstring("1 out of 2 credentials under the provided path are successfully deleted."))
+			Expect(string(session.Out.Contents())).To(ContainSubstring("2 out of 2 credentials under the provided path are successfully deleted."))
 		})
 
 		It("prints an error when some credential deletes fail", func() {

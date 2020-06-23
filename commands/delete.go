@@ -10,6 +10,7 @@ import (
 type DeleteCommand struct {
 	CredentialIdentifier string `short:"n" long:"name" description:"Name of the credential to delete"`
 	CredentialPath       string `short:"p" long:"path" description:"Path of the credentials to delete"`
+	Quiet                bool   `short:"q" long:"quiet" description:"Disable real-time status of delete by path"`
 	ClientCommand
 }
 
@@ -34,15 +35,21 @@ func (c *DeleteCommand) handleDeleteByName() error {
 }
 
 func (c *DeleteCommand) handleDeleteByPath() error {
-	failedCredentials, credentialsCount, err := c.deleteByPath(c.CredentialPath)
+	failedCredentials, credentialsCount, err := c.deleteByPath(c.CredentialPath, c.Quiet)
 	if err != nil {
 		return err
 	}
 
 	failedCredentialsCount := len(failedCredentials)
 	if failedCredentialsCount == 0 {
-		fmt.Printf("\nAll %v out of %v credentials under the provided path are successfully deleted.", credentialsCount, credentialsCount)
+		if c.Quiet {
+			fmt.Printf("All %v out of %v credentials under the provided path are successfully deleted.\n", credentialsCount, credentialsCount)
+		}
 		return nil
+	}
+
+	if c.Quiet {
+		fmt.Printf("%v out of %v credentials under the provided path are successfully deleted.\n", credentialsCount-failedCredentialsCount, credentialsCount)
 	}
 
 	failureMessage := fmt.Sprintf("%v out of %v credentials under the provided path failed to delete. The following credentials failed to delete:", failedCredentialsCount, credentialsCount)
@@ -59,14 +66,15 @@ type DeleteFailedCredential struct {
 	Err  string
 }
 
-func (c *DeleteCommand) deleteByPath(path string) ([]DeleteFailedCredential, int, error) {
+func (c *DeleteCommand) deleteByPath(path string, quiet bool) ([]DeleteFailedCredential, int, error) {
 	results, err := c.client.FindByPath(path)
 	if err != nil {
 		return []DeleteFailedCredential{}, 0, err
 	}
 
+	var totalCount = len(results.Credentials)
 	var failedCredentials []DeleteFailedCredential
-	for _, cred := range results.Credentials {
+	for index, cred := range results.Credentials {
 		err = c.client.Delete(cred.Name)
 
 		if err != nil {
@@ -75,6 +83,11 @@ func (c *DeleteCommand) deleteByPath(path string) ([]DeleteFailedCredential, int
 				err.Error(),
 			})
 		}
+
+		if !quiet {
+			succeeded := index + 1 - len(failedCredentials)
+			fmt.Printf("\033[2K\r%v out of %v credentials under the provided path are successfully deleted.", succeeded, totalCount)
+		}
 	}
-	return failedCredentials, len(results.Credentials), nil
+	return failedCredentials, totalCount, nil
 }
