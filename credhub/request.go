@@ -57,13 +57,12 @@ func (ch *CredHub) request(client requester, method string, pathStr string, quer
 	}
 
 	resp, err := client.Do(req)
+	if err != nil {
+		return resp, err
+	}
 
 	if os.Getenv("CREDHUB_DEBUG") == "true" {
 		dumpResponse(resp)
-	}
-
-	if err != nil {
-		return resp, err
 	}
 
 	if checkServerErr {
