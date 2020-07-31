@@ -208,7 +208,7 @@ var _ = Describe("Export", func() {
 - name: /path/to/cert
   type: certificate
   value:
-    ca: /path/to/cert_ca
+    ca_name: /path/to/cert_ca
     certificate: some_cert
     private_key: private_key
   metadata: {}

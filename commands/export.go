@@ -69,7 +69,8 @@ func getAllCredentialsForPath(path string) ([]credentials.Credential, error) {
 
 			if signedBy != "" && signedBy != credential.Name {
 				if cert, ok := credential.Value.(map[string]interface{}); ok {
-					cert["ca"] = signedBy
+					cert["ca_name"] = signedBy
+					delete(cert, "ca")
 					credential.Value = cert
 				}
 			}
