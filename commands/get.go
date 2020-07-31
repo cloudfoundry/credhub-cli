@@ -27,6 +27,10 @@ func (c *GetCommand) convertToValues(credentials []credentials.Credential) []int
 }
 
 func (c *GetCommand) printArrayOfCredentials() error {
+	if c.ID != "" {
+		return errors.NewGetVersionsAndIDIncompatibleParametersError()
+	}
+
 	if c.Name == "" {
 		return errors.NewMissingGetParametersError()
 	}

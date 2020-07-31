@@ -41,7 +41,7 @@ var _ = Describe("Get", func() {
 		}
 	})
 
-	It("displays missing required parameter", func() {
+	It("returns error when missing required parameter", func() {
 		session := runCommand("get")
 
 		Eventually(session).Should(Exit(1))
@@ -51,6 +51,13 @@ var _ = Describe("Get", func() {
 		} else {
 			Expect(session.Err).To(Say("A name or ID must be provided. Please update and retry your request."))
 		}
+	})
+
+	It("returns error when receiving incompatible parameters", func() {
+		session := runCommand("get", "--id=some-id", "--versions=2")
+
+		Eventually(session).Should(Exit(1))
+		Expect(session.Err).To(Say("The --versions flag and --id flag are incompatible."))
 	})
 
 	Describe("getting a secret without metadata", func() {
