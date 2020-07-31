@@ -90,11 +90,15 @@ func NewNoCredentialsTagError() error {
 }
 
 func NewGetVersionAndKeyError() error {
-	return errors.New("The --version flag and --key flag are incompatible")
+	return errors.New("The --versions flag and --key flag are incompatible.")
+}
+
+func NewGetVersionsAndIDIncompatibleParametersError() error {
+	return errors.New("The --versions flag and --id flag are incompatible.")
 }
 
 func NewOutputJSONAndQuietError() error {
-	return errors.New("The --output-json flag and --quiet flag are incompatible")
+	return errors.New("The --output-json flag and --quiet flag are incompatible.")
 }
 
 func NewUserNameOnlyValidForUserType() error {

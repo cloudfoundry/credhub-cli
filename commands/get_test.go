@@ -41,7 +41,7 @@ var _ = Describe("Get", func() {
 		}
 	})
 
-	It("displays missing required parameter", func() {
+	It("returns error when missing required parameter", func() {
 		session := runCommand("get")
 
 		Eventually(session).Should(Exit(1))
@@ -51,6 +51,13 @@ var _ = Describe("Get", func() {
 		} else {
 			Expect(session.Err).To(Say("A name or ID must be provided. Please update and retry your request."))
 		}
+	})
+
+	It("returns error when receiving incompatible parameters", func() {
+		session := runCommand("get", "--id=some-id", "--versions=2")
+
+		Eventually(session).Should(Exit(1))
+		Expect(session.Err).To(Say("The --versions flag and --id flag are incompatible."))
 	})
 
 	Describe("getting a secret without metadata", func() {
@@ -256,7 +263,7 @@ tomatoes`))
 			It("returns an error", func() {
 				session := runCommand("get", "-n", "my-password", "--versions", "2", "-k", "someflag")
 				Eventually(session).Should(Exit(1))
-				Eventually(session.Err).Should(Say("The --version flag and --key flag are incompatible"))
+				Eventually(session.Err).Should(Say("The --versions flag and --key flag are incompatible."))
 			})
 		})
 
@@ -414,7 +421,7 @@ tomatoes`))
 				session := runCommand("get", "-n", "my-password", "--output-json", "-q")
 
 				Eventually(session).Should(Exit(1))
-				Eventually(session.Err).Should(Say("The --output-json flag and --quiet flag are incompatible"))
+				Eventually(session.Err).Should(Say("The --output-json flag and --quiet flag are incompatible."))
 			})
 		})
 
