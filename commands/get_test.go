@@ -256,7 +256,7 @@ tomatoes`))
 			It("returns an error", func() {
 				session := runCommand("get", "-n", "my-password", "--versions", "2", "-k", "someflag")
 				Eventually(session).Should(Exit(1))
-				Eventually(session.Err).Should(Say("The --version flag and --key flag are incompatible"))
+				Eventually(session.Err).Should(Say("The --versions flag and --key flag are incompatible."))
 			})
 		})
 
@@ -414,7 +414,7 @@ tomatoes`))
 				session := runCommand("get", "-n", "my-password", "--output-json", "-q")
 
 				Eventually(session).Should(Exit(1))
-				Eventually(session.Err).Should(Say("The --output-json flag and --quiet flag are incompatible"))
+				Eventually(session.Err).Should(Say("The --output-json flag and --quiet flag are incompatible."))
 			})
 		})
 
