@@ -8,6 +8,8 @@ import (
 	"path"
 	"time"
 
+	"code.cloudfoundry.org/credhub-cli/credhub"
+	"code.cloudfoundry.org/credhub-cli/credhub/auth"
 	"code.cloudfoundry.org/credhub-cli/util"
 )
 
@@ -91,6 +93,37 @@ func WriteConfig(c Config) error {
 
 func RemoveConfig() error {
 	return os.Remove(ConfigPath())
+}
+
+func (cfg *Config) Client() (*credhub.CredHub, error) {
+	clientId := cfg.ClientID
+	clientSecret := cfg.ClientSecret
+	useClientCredentials := true
+	if clientId == "" {
+		clientId = AuthClient
+		clientSecret = AuthPassword
+		useClientCredentials = false
+	}
+	client, err := credhub.New(cfg.ApiURL,
+		credhub.AuthURL(cfg.AuthURL),
+		credhub.CaCerts(cfg.CaCerts...),
+		credhub.SkipTLSValidation(cfg.InsecureSkipVerify),
+		credhub.Auth(auth.Uaa(
+			clientId,
+			clientSecret,
+			"",
+			"",
+			cfg.AccessToken,
+			cfg.RefreshToken,
+			useClientCredentials,
+		)),
+		credhub.ServerVersion(cfg.ServerVersion),
+		credhub.SetHttpTimeout(cfg.HttpTimeout),
+	)
+	if err != nil {
+		return nil, err
+	}
+	return client, nil
 }
 
 func (cfg *Config) UpdateTrustedCAs(caCerts []string) error {

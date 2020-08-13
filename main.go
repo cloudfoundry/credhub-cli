@@ -12,7 +12,6 @@ import (
 	"code.cloudfoundry.org/credhub-cli/commands"
 	"code.cloudfoundry.org/credhub-cli/config"
 	"code.cloudfoundry.org/credhub-cli/credhub"
-	"code.cloudfoundry.org/credhub-cli/credhub/auth"
 	"github.com/jessevdk/go-flags"
 )
 
@@ -46,30 +45,7 @@ func main() {
 			if err := config.ValidateConfig(cfg); err != nil {
 				return err
 			}
-			clientId := cfg.ClientID
-			clientSecret := cfg.ClientSecret
-			useClientCredentials := true
-			if clientId == "" {
-				clientId = config.AuthClient
-				clientSecret = config.AuthPassword
-				useClientCredentials = false
-			}
-			client, err := credhub.New(cfg.ApiURL,
-				credhub.AuthURL(cfg.AuthURL),
-				credhub.CaCerts(cfg.CaCerts...),
-				credhub.SkipTLSValidation(cfg.InsecureSkipVerify),
-				credhub.Auth(auth.Uaa(
-					clientId,
-					clientSecret,
-					"",
-					"",
-					cfg.AccessToken,
-					cfg.RefreshToken,
-					useClientCredentials,
-				)),
-				credhub.ServerVersion(cfg.ServerVersion),
-				credhub.SetHttpTimeout(cfg.HttpTimeout),
-			)
+			client, err := cfg.Client()
 			if err != nil {
 				return err
 			}
