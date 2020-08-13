@@ -117,7 +117,7 @@ func (c *ImportCommand) setCredentials(bulkImport models.CredentialBulkImport) e
 
 func isAuthenticationError(err error) bool {
 	return reflect.DeepEqual(err, errors.NewNoApiUrlSetError()) ||
-		reflect.DeepEqual(err, errors.NewRevokedTokenError()) ||
+		reflect.DeepEqual(err, errors.NewUnauthenticatedError()) ||
 		reflect.DeepEqual(err, errors.NewRefreshError())
 }
 

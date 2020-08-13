@@ -26,6 +26,7 @@ var _ = Describe("main", func() {
 			}
 		})
 	})
+
 	Context("when extra arguments are provided", func() {
 		It("prints help and exits", func() {
 			cmd := exec.Command(commandPath, "version", "this")
@@ -36,6 +37,7 @@ var _ = Describe("main", func() {
 			Expect(session.Err).To(Say("Usage:"))
 		})
 	})
+
 	Context("when a prepended / is used in the argument", func() {
 		BeforeEach(func() {
 			if runtime.GOOS != "windows" {

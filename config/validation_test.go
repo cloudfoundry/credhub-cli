@@ -42,4 +42,13 @@ var _ = Describe("Config validation", func() {
 		Expect(config.ValidateConfig(cfg)).To(Equal(errors.New("You are not currently authenticated. Please log in to continue.")))
 
 	})
+
+	It("accepts an empty token if a client certificate is set", func() {
+		cfg := config.Config{}
+		cfg.ApiURL = "http://api.example.com"
+		cfg.ClientCertPath = "client.crt"
+
+		Expect(config.ValidateConfig(cfg)).To(BeNil())
+
+	})
 })

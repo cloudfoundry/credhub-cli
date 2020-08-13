@@ -21,7 +21,7 @@ func NewFailedToImportError() error {
 	return errors.New("One or more credentials failed to import.")
 }
 
-func NewRevokedTokenError() error {
+func NewUnauthenticatedError() error {
 	return errors.New("You are not currently authenticated. Please log in to continue.")
 }
 

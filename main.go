@@ -45,7 +45,7 @@ func main() {
 			if err := config.ValidateConfig(cfg); err != nil {
 				return err
 			}
-			client, err := cfg.Client()
+			client, err := config.NewCredhubClientFromConfig(cfg)
 			if err != nil {
 				return err
 			}

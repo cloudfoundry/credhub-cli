@@ -8,8 +8,6 @@ import (
 	"path"
 	"time"
 
-	"code.cloudfoundry.org/credhub-cli/credhub"
-	"code.cloudfoundry.org/credhub-cli/credhub/auth"
 	"code.cloudfoundry.org/credhub-cli/util"
 )
 
@@ -18,8 +16,10 @@ const AuthPassword = ""
 
 type Config struct {
 	ConfigWithoutSecrets
-	ClientID     string
-	ClientSecret string
+	ClientID       string
+	ClientSecret   string
+	ClientCertPath string
+	ClientKeyPath  string
 }
 
 func ConfigDir() string {
@@ -62,6 +62,12 @@ func ReadConfig() Config {
 		}
 		c.CaCerts = certs
 	}
+	if clientCertPath, ok := os.LookupEnv("CREDHUB_CLIENT_CERT_PATH"); ok {
+		c.ClientCertPath = clientCertPath
+	}
+	if clientKeyPath, ok := os.LookupEnv("CREDHUB_CLIENT_KEY_PATH"); ok {
+		c.ClientKeyPath = clientKeyPath
+	}
 	if timeoutString, ok := os.LookupEnv("CREDHUB_HTTP_TIMEOUT"); ok {
 		timeout, err := time.ParseDuration(timeoutString)
 		if err != nil {
@@ -93,37 +99,6 @@ func WriteConfig(c Config) error {
 
 func RemoveConfig() error {
 	return os.Remove(ConfigPath())
-}
-
-func (cfg *Config) Client() (*credhub.CredHub, error) {
-	clientId := cfg.ClientID
-	clientSecret := cfg.ClientSecret
-	useClientCredentials := true
-	if clientId == "" {
-		clientId = AuthClient
-		clientSecret = AuthPassword
-		useClientCredentials = false
-	}
-	client, err := credhub.New(cfg.ApiURL,
-		credhub.AuthURL(cfg.AuthURL),
-		credhub.CaCerts(cfg.CaCerts...),
-		credhub.SkipTLSValidation(cfg.InsecureSkipVerify),
-		credhub.Auth(auth.Uaa(
-			clientId,
-			clientSecret,
-			"",
-			"",
-			cfg.AccessToken,
-			cfg.RefreshToken,
-			useClientCredentials,
-		)),
-		credhub.ServerVersion(cfg.ServerVersion),
-		credhub.SetHttpTimeout(cfg.HttpTimeout),
-	)
-	if err != nil {
-		return nil, err
-	}
-	return client, nil
 }
 
 func (cfg *Config) UpdateTrustedCAs(caCerts []string) error {
