@@ -4,10 +4,10 @@ go 1.14
 
 require (
 	github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
-	github.com/bmatcuk/doublestar v1.3.1 // indirect
+	github.com/bmatcuk/doublestar v1.3.2 // indirect
 	github.com/charlievieth/fs v0.0.0-20170613215519-7dc373669fa1 // indirect
 	github.com/cloudfoundry/bosh-cli v6.3.1+incompatible
-	github.com/cloudfoundry/bosh-utils v0.0.0-20200801100223-2e5178a7d77c
+	github.com/cloudfoundry/bosh-utils v0.0.0-20200815100254-677a8ebab4c4
 	github.com/cloudfoundry/go-socks5 v0.0.0-20180221174514-54f73bdb8a8e // indirect
 	github.com/cloudfoundry/socks5-proxy v0.2.0
 	github.com/cppforlife/go-patch v0.2.0 // indirect
@@ -25,9 +25,9 @@ require (
 	github.com/onsi/gomega v1.10.1
 	github.com/stretchr/testify v1.5.1 // indirect
 	golang.org/x/crypto v0.0.0-20200728195943-123391ffb6de // indirect
-	golang.org/x/net v0.0.0-20200707034311-ab3426394381
+	golang.org/x/net v0.0.0-20200813134508-3edf25e44fcc
 	golang.org/x/sync v0.0.0-20200317015054-43a5402ce75a // indirect
-	golang.org/x/sys v0.0.0-20200803150936-fd5f0c170ac3 // indirect
+	golang.org/x/sys v0.0.0-20200817085935-3ff754bf58a9 // indirect
 	golang.org/x/text v0.3.2 // indirect
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 	gopkg.in/yaml.v2 v2.3.0

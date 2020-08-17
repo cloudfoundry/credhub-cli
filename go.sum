@@ -6,6 +6,8 @@ github.com/bmatcuk/doublestar v1.3.0 h1:1jLE2y0VpSrOn/QR9G4f2RmrCtkM3AuATcWradjH
 github.com/bmatcuk/doublestar v1.3.0/go.mod h1:wiQtGV+rzVYxB7WIlirSN++5HPtPlXEo9MEoZQC/PmE=
 github.com/bmatcuk/doublestar v1.3.1 h1:rT8rxDPsavp9G+4ZULzqhhUSaI/OPsTZNG88Z3i0xvY=
 github.com/bmatcuk/doublestar v1.3.1/go.mod h1:wiQtGV+rzVYxB7WIlirSN++5HPtPlXEo9MEoZQC/PmE=
+github.com/bmatcuk/doublestar v1.3.2 h1:mzUncgFmpzNUhIITFqGdZ8nUU0O7JTJzRO8VdkeLCSo=
+github.com/bmatcuk/doublestar v1.3.2/go.mod h1:wiQtGV+rzVYxB7WIlirSN++5HPtPlXEo9MEoZQC/PmE=
 github.com/charlievieth/fs v0.0.0-20170613215519-7dc373669fa1 h1:vTlpHKxJqykyKdW9bkrDJNWeKNuSIAJ0TP/K4lRsz/Q=
 github.com/charlievieth/fs v0.0.0-20170613215519-7dc373669fa1/go.mod h1:sAoA1zHCH4FJPE2gne5iBiiVG66U7Nyp6JqlOo+FEyg=
 github.com/cloudfoundry/bosh-cli v6.2.1+incompatible h1:pkQSRxwpiVhyDmq+zA4fUW6BK65gKoS+aLNTpuxoxnw=
@@ -34,6 +36,8 @@ github.com/cloudfoundry/bosh-utils v0.0.0-20200725100309-1bb727264972 h1:WZ1H7MD
 github.com/cloudfoundry/bosh-utils v0.0.0-20200725100309-1bb727264972/go.mod h1:JCrKwetZGjxbfq1U139TZuXDBfdGLtjOEAfxMWKV/QM=
 github.com/cloudfoundry/bosh-utils v0.0.0-20200801100223-2e5178a7d77c h1:oGeCXqU9BZCsekegs74Bo5UFhMqb2J7PC1IXzOyPCNc=
 github.com/cloudfoundry/bosh-utils v0.0.0-20200801100223-2e5178a7d77c/go.mod h1:JCrKwetZGjxbfq1U139TZuXDBfdGLtjOEAfxMWKV/QM=
+github.com/cloudfoundry/bosh-utils v0.0.0-20200815100254-677a8ebab4c4 h1:VU3IQZPO5GPdW2vAX3uO04aWFaSW6/lte3zjMu7E8VI=
+github.com/cloudfoundry/bosh-utils v0.0.0-20200815100254-677a8ebab4c4/go.mod h1:JCrKwetZGjxbfq1U139TZuXDBfdGLtjOEAfxMWKV/QM=
 github.com/cloudfoundry/go-socks5 v0.0.0-20180221174514-54f73bdb8a8e h1:FQdRViaoDphGRfgrotl2QGsX1gbloe57dbGBS5CG6KY=
 github.com/cloudfoundry/go-socks5 v0.0.0-20180221174514-54f73bdb8a8e/go.mod h1:PXmcacyJB/pJjSxEl15IU6rEIKXrhZQRzsr0UTkgNNs=
 github.com/cloudfoundry/socks5-proxy v0.2.0 h1:ZRXcJxUqOyKmah+ytXh52K7m7S7SyuBacDUnd2g0ihU=
@@ -144,6 +148,8 @@ golang.org/x/net v0.0.0-20200625001655-4c5254603344 h1:vGXIOMxbNfDTk/aXCmfdLgkrS
 golang.org/x/net v0.0.0-20200625001655-4c5254603344/go.mod h1:/O7V0waA8r7cgGh81Ro3o1hOxt32SMVPicZroKQ2sZA=
 golang.org/x/net v0.0.0-20200707034311-ab3426394381 h1:VXak5I6aEWmAXeQjA+QSZzlgNrpq9mjcfDemuexIKsU=
 golang.org/x/net v0.0.0-20200707034311-ab3426394381/go.mod h1:/O7V0waA8r7cgGh81Ro3o1hOxt32SMVPicZroKQ2sZA=
+golang.org/x/net v0.0.0-20200813134508-3edf25e44fcc h1:zK/HqS5bZxDptfPJNq8v7vJfXtkU7r9TLIoSr1bXaP4=
+golang.org/x/net v0.0.0-20200813134508-3edf25e44fcc/go.mod h1:/O7V0waA8r7cgGh81Ro3o1hOxt32SMVPicZroKQ2sZA=
 golang.org/x/sync v0.0.0-20180314180146-1d60e4601c6f h1:wMNYb4v58l5UBM7MYRLPG6ZhfOqbKu7X5eyFl8ZhKvA=
 golang.org/x/sync v0.0.0-20180314180146-1d60e4601c6f/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
 golang.org/x/sync v0.0.0-20200317015054-43a5402ce75a/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
@@ -174,6 +180,8 @@ golang.org/x/sys v0.0.0-20200724161237-0e2f3a69832c h1:UIcGWL6/wpCfyGuJnRFJRurA+
 golang.org/x/sys v0.0.0-20200724161237-0e2f3a69832c/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20200803150936-fd5f0c170ac3 h1:Q8sHd8ZmZZguDQWkUYcD4pIRG5dG+euDEmNyknTRbGs=
 golang.org/x/sys v0.0.0-20200803150936-fd5f0c170ac3/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
+golang.org/x/sys v0.0.0-20200817085935-3ff754bf58a9 h1:MEU99+Z67sctTw1UjDlQ6wjRF77I43fOt7YKWktVvXw=
+golang.org/x/sys v0.0.0-20200817085935-3ff754bf58a9/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/text v0.3.0 h1:g61tztE5qeGQ89tm6NTjjM9VPIm088od1l6aSorWRWg=
 golang.org/x/text v0.3.0/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
 golang.org/x/text v0.3.2 h1:tW2bmiBqwgJj/UpqtC8EpXEZVYOwU0yG4iWbprSVAcs=
