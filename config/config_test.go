@@ -7,6 +7,7 @@ import (
 	"os"
 	"path"
 	"runtime"
+	"strconv"
 	"time"
 
 	"code.cloudfoundry.org/credhub-cli/config"
@@ -79,7 +80,7 @@ var _ = Describe("Config", func() {
 	})
 
 	Describe("HttpTimeout", func() {
-		It("write the http timeout to disk", func() {
+		It("writes the http timeout to disk", func() {
 			someClientID := "someClientID"
 			someClientSecret := "someClientSecret"
 			timeout := 60 * time.Second
@@ -104,7 +105,7 @@ var _ = Describe("Config", func() {
 
 			configFile, err := ioutil.ReadFile(path.Join(os.Getenv("HOME"), ".credhub", "config.json"))
 			Expect(err).NotTo(HaveOccurred())
-			Expect(string(configFile)).NotTo(ContainSubstring(string(60 * time.Second)))
+			Expect(string(configFile)).To(ContainSubstring(strconv.Itoa(int(60 * time.Second))))
 		})
 	})
 
