@@ -10,7 +10,7 @@ github.com/charlievieth/fs
 # github.com/cloudfoundry/bosh-cli v6.3.1+incompatible
 ## explicit
 github.com/cloudfoundry/bosh-cli/director/template
-# github.com/cloudfoundry/bosh-utils v0.0.0-20200822100227-57addb4ca050
+# github.com/cloudfoundry/bosh-utils v0.0.0-20200829100231-5c0a36794da8
 ## explicit
 github.com/cloudfoundry/bosh-utils/errors
 github.com/cloudfoundry/bosh-utils/logger
@@ -123,7 +123,7 @@ golang.org/x/net/internal/socks
 golang.org/x/net/proxy
 # golang.org/x/sync v0.0.0-20200317015054-43a5402ce75a
 ## explicit
-# golang.org/x/sys v0.0.0-20200821140526-fda516888d29
+# golang.org/x/sys v0.0.0-20200828194041-157a740278f4
 ## explicit
 golang.org/x/sys/cpu
 golang.org/x/sys/internal/unsafeheader

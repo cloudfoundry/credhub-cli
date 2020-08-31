@@ -7,7 +7,7 @@ require (
 	github.com/bmatcuk/doublestar v1.3.2 // indirect
 	github.com/charlievieth/fs v0.0.0-20170613215519-7dc373669fa1 // indirect
 	github.com/cloudfoundry/bosh-cli v6.3.1+incompatible
-	github.com/cloudfoundry/bosh-utils v0.0.0-20200822100227-57addb4ca050
+	github.com/cloudfoundry/bosh-utils v0.0.0-20200829100231-5c0a36794da8
 	github.com/cloudfoundry/go-socks5 v0.0.0-20180221174514-54f73bdb8a8e // indirect
 	github.com/cloudfoundry/socks5-proxy v0.2.0
 	github.com/cppforlife/go-patch v0.2.0 // indirect
@@ -27,7 +27,7 @@ require (
 	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a // indirect
 	golang.org/x/net v0.0.0-20200822124328-c89045814202
 	golang.org/x/sync v0.0.0-20200317015054-43a5402ce75a // indirect
-	golang.org/x/sys v0.0.0-20200821140526-fda516888d29 // indirect
+	golang.org/x/sys v0.0.0-20200828194041-157a740278f4 // indirect
 	golang.org/x/text v0.3.2 // indirect
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 	gopkg.in/yaml.v2 v2.3.0
