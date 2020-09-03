@@ -211,14 +211,12 @@ var _ = Describe("Export", func() {
     ca_name: /path/to/cert_ca
     certificate: some_cert
     private_key: private_key
-  metadata: {}
 - name: /path/to/cert_ca
   type: certificate
   value:
     ca: some_ca
     certificate: some_cert
-    private_key: private_key
-  metadata: {}`
+    private_key: private_key`
 
 			server.AppendHandlers(
 				CombineHandlers(

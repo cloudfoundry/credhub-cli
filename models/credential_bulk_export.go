@@ -11,7 +11,7 @@ type exportCredential struct {
 	Name     string
 	Type     string
 	Value    interface{}
-	Metadata interface{}
+	Metadata credentials.Metadata `json:",omitempty" yaml:",omitempty"`
 }
 
 type exportCredentials struct {
