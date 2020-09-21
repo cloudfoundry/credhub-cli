@@ -5,9 +5,9 @@ go 1.14
 require (
 	github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
 	github.com/bmatcuk/doublestar v1.3.2 // indirect
-	github.com/charlievieth/fs v0.0.0-20170613215519-7dc373669fa1 // indirect
+	github.com/charlievieth/fs v0.0.1 // indirect
 	github.com/cloudfoundry/bosh-cli v6.4.0+incompatible
-	github.com/cloudfoundry/bosh-utils v0.0.0-20200909190919-f6fb70428c10
+	github.com/cloudfoundry/bosh-utils v0.0.0-20200919100115-0b8577b48b1f
 	github.com/cloudfoundry/go-socks5 v0.0.0-20180221174514-54f73bdb8a8e // indirect
 	github.com/cloudfoundry/socks5-proxy v0.2.0
 	github.com/cppforlife/go-patch v0.2.0 // indirect
@@ -28,7 +28,7 @@ require (
 	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a // indirect
 	golang.org/x/net v0.0.0-20200904194848-62affa334b73
 	golang.org/x/sync v0.0.0-20200317015054-43a5402ce75a // indirect
-	golang.org/x/sys v0.0.0-20200909081042-eff7692f9009 // indirect
+	golang.org/x/sys v0.0.0-20200918174421-af09f7315aff // indirect
 	golang.org/x/text v0.3.3 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/protobuf v1.25.0 // indirect

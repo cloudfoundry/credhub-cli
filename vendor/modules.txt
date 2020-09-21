@@ -4,13 +4,13 @@ github.com/armon/go-socks5
 # github.com/bmatcuk/doublestar v1.3.2
 ## explicit
 github.com/bmatcuk/doublestar
-# github.com/charlievieth/fs v0.0.0-20170613215519-7dc373669fa1
+# github.com/charlievieth/fs v0.0.1
 ## explicit
 github.com/charlievieth/fs
 # github.com/cloudfoundry/bosh-cli v6.4.0+incompatible
 ## explicit
 github.com/cloudfoundry/bosh-cli/director/template
-# github.com/cloudfoundry/bosh-utils v0.0.0-20200909190919-f6fb70428c10
+# github.com/cloudfoundry/bosh-utils v0.0.0-20200919100115-0b8577b48b1f
 ## explicit
 github.com/cloudfoundry/bosh-utils/errors
 github.com/cloudfoundry/bosh-utils/logger
@@ -125,7 +125,7 @@ golang.org/x/net/internal/socks
 golang.org/x/net/proxy
 # golang.org/x/sync v0.0.0-20200317015054-43a5402ce75a
 ## explicit
-# golang.org/x/sys v0.0.0-20200909081042-eff7692f9009
+# golang.org/x/sys v0.0.0-20200918174421-af09f7315aff
 ## explicit
 golang.org/x/sys/cpu
 golang.org/x/sys/internal/unsafeheader
