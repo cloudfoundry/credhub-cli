@@ -1,7 +1,6 @@
 package main // import "code.cloudfoundry.org/credhub-cli"
 
 import (
-	"fmt"
 	"os"
 	"runtime"
 	"runtime/debug"
@@ -13,6 +12,7 @@ import (
 	"code.cloudfoundry.org/credhub-cli/config"
 	"code.cloudfoundry.org/credhub-cli/credhub"
 	"code.cloudfoundry.org/credhub-cli/credhub/auth"
+	"code.cloudfoundry.org/credhub-cli/util"
 	"github.com/jessevdk/go-flags"
 )
 
@@ -93,7 +93,7 @@ func main() {
 			}
 		}
 
-		fmt.Fprintln(os.Stderr, err.Error())
+		util.Error(err.Error())
 		os.Exit(1)
 	}
 }
