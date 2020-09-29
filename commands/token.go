@@ -6,13 +6,14 @@ import (
 
 	"code.cloudfoundry.org/credhub-cli/config"
 	"code.cloudfoundry.org/credhub-cli/credhub/auth"
+	"code.cloudfoundry.org/credhub-cli/util"
 )
 
 func init() {
 	CredHub.Token = func() {
 		cfg := config.ReadConfig()
 
-		if cfg.AccessToken != "" && cfg.AccessToken != "revoked" {
+		if util.TokenIsPresent(cfg.AccessToken) {
 			cfg = refreshConfiguration(cfg)
 			config.WriteConfig(cfg)
 			fmt.Println("Bearer " + cfg.AccessToken)

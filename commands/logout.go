@@ -6,6 +6,7 @@ import (
 	"code.cloudfoundry.org/credhub-cli/config"
 	"code.cloudfoundry.org/credhub-cli/credhub"
 	"code.cloudfoundry.org/credhub-cli/credhub/auth/uaa"
+	"code.cloudfoundry.org/credhub-cli/util"
 )
 
 type LogoutCommand struct {
@@ -35,7 +36,7 @@ func RevokeTokenIfNecessary(cfg config.Config) error {
 		Client:  credhubClient.Client(),
 	}
 
-	if cfg.AccessToken != "" && cfg.AccessToken != "revoked" {
+	if util.TokenIsPresent(cfg.AccessToken) {
 		return uaaClient.RevokeToken(cfg.AccessToken)
 	}
 
