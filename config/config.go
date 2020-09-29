@@ -41,6 +41,21 @@ func ReadConfig() Config {
 	json.Unmarshal(data, &c)
 
 	if server, ok := os.LookupEnv("CREDHUB_SERVER"); ok {
+		if util.TokenIsPresent(c.AccessToken) {
+			util.Warning(
+				`WARNING: Two different login methods were detected:
+1. A previously run "credhub login" command created a logged-in state
+2. CREDHUB_* envrionment variables containing credentials and log-in information are present
+
+This command will now proceed after attempting to log you in using the CREDHUB_* environment variables from method 2, hence ignoring the current logged-in state from method 1.
+
+If you want to get rid of this warning message, you have two options:
+a. Run "credhub logout". This will remove the logged-in state created by the "credhub login" command. Subsequent commands will use the environment variables to log you in.
+b. Unset the "CREDHUB_SERVER" environment variable. Subsequent commands will use your logged-in state.
+
+`)
+
+		}
 		c.ApiURL = util.AddDefaultSchemeIfNecessary(server)
 		c.AuthURL = ""
 		c.AccessToken = ""
