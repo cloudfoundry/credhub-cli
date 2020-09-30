@@ -132,7 +132,21 @@ func (c *LoginCommand) Execute([]string) error {
 		fmt.Println("Setting the target url:", c.config.ApiURL)
 	}
 
-	fmt.Println("Login Successful")
+	if c.config.AccessToken == "" {
+		util.Warning(`Login ignored as the CREDHUB_* environment variables are present.
+You do NOT need to run this "login" command in order to run other
+"credhub" commands when you set the CREDHUB_* environment variables.
+
+The command only validates your credentials. For backwards compatibility
+reasons, it (in this particular use case) does not error out. You should
+not use it with the environment variables set.
+The "credhub login" command is useful in the case you do not have the
+environment variables set and you pass your credentials to "credhub login"
+through command line arguments.
+`)
+	} else {
+		fmt.Println("Login Successful")
+	}
 
 	return nil
 }
