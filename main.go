@@ -86,10 +86,14 @@ func main() {
 
 	_, err := parser.Parse()
 	if err != nil {
-		errorType, ok := err.(*flags.Error)
+		flagError, ok := err.(*flags.Error)
 		if ok {
-			if errorType.Type.String() == flags.ErrExpectedArgument.String() && runtime.GOOS == "windows" {
+			errorType := flagError.Type
+			if errorType == flags.ErrExpectedArgument && runtime.GOOS == "windows" {
 				err = errors.WrapError(err, "Flag parsing in windows will interpret any argument with a '/' prefix as an option. Please remove any prepended '/' from flag arguments as it may be causing the following error")
+			} else if errorType == flags.ErrHelp {
+				parser.WriteHelp(os.Stderr)
+				os.Exit(1)
 			}
 		}
 
