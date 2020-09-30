@@ -202,7 +202,7 @@ var _ = Describe("Login", func() {
 
 				Expect(uaaServer.ReceivedRequests()).Should(HaveLen(2))
 				Eventually(session).Should(Exit(0))
-				Eventually(session.Out).Should(Say("Login Successful"))
+				Eventually(session.Err).Should(Say("Login ignored"))
 				Eventually(session.Out.Contents()).ShouldNot(ContainSubstring("Setting the target url:"))
 				cfg := config.ReadConfig()
 				Expect(cfg.AccessToken).To(Equal(""))
