@@ -45,7 +45,7 @@ github.com/howeyc/gopass
 github.com/jessevdk/go-flags
 # github.com/kr/text v0.2.0
 ## explicit
-# github.com/mattn/go-colorable v0.1.7
+# github.com/mattn/go-colorable v0.1.8
 ## explicit
 github.com/mattn/go-colorable
 # github.com/mattn/go-isatty v0.0.12
@@ -54,7 +54,8 @@ github.com/mattn/go-isatty
 ## explicit
 # github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d
 ## explicit
-# github.com/nxadm/tail v1.4.4
+# github.com/nxadm/tail v1.4.5
+## explicit
 github.com/nxadm/tail
 github.com/nxadm/tail/ratelimiter
 github.com/nxadm/tail/util
@@ -103,7 +104,7 @@ github.com/onsi/gomega/types
 ## explicit
 # github.com/stretchr/testify v1.5.1
 ## explicit
-# golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
+# golang.org/x/crypto v0.0.0-20201002170205-7f63de1d35b0
 ## explicit
 golang.org/x/crypto/blowfish
 golang.org/x/crypto/chacha20
@@ -115,7 +116,7 @@ golang.org/x/crypto/poly1305
 golang.org/x/crypto/ssh
 golang.org/x/crypto/ssh/internal/bcrypt_pbkdf
 golang.org/x/crypto/ssh/terminal
-# golang.org/x/net v0.0.0-20200927032502-5d4f70055728
+# golang.org/x/net v0.0.0-20201002202402-0a1ea396d57c
 ## explicit
 golang.org/x/net/context
 golang.org/x/net/html
@@ -125,7 +126,7 @@ golang.org/x/net/internal/socks
 golang.org/x/net/proxy
 # golang.org/x/sync v0.0.0-20200317015054-43a5402ce75a
 ## explicit
-# golang.org/x/sys v0.0.0-20200926100807-9d91bd62050c
+# golang.org/x/sys v0.0.0-20201005065044-765f4ea38db3
 ## explicit
 golang.org/x/sys/cpu
 golang.org/x/sys/internal/unsafeheader
