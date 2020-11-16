@@ -105,7 +105,7 @@ github.com/onsi/gomega/types
 ## explicit
 # github.com/stretchr/testify v1.5.1
 ## explicit
-# golang.org/x/crypto v0.0.0-20201016220609-9e8e0b390897
+# golang.org/x/crypto v0.0.0-20201112155050-0c6587e931a9
 ## explicit
 golang.org/x/crypto/blowfish
 golang.org/x/crypto/chacha20
@@ -117,7 +117,7 @@ golang.org/x/crypto/poly1305
 golang.org/x/crypto/ssh
 golang.org/x/crypto/ssh/internal/bcrypt_pbkdf
 golang.org/x/crypto/ssh/terminal
-# golang.org/x/net v0.0.0-20201031054903-ff519b6c9102
+# golang.org/x/net v0.0.0-20201110031124-69a78807bb2b
 ## explicit
 golang.org/x/net/context
 golang.org/x/net/html
@@ -127,7 +127,7 @@ golang.org/x/net/internal/socks
 golang.org/x/net/proxy
 # golang.org/x/sync v0.0.0-20200317015054-43a5402ce75a
 ## explicit
-# golang.org/x/sys v0.0.0-20201107080550-4d91cf3a1aaf
+# golang.org/x/sys v0.0.0-20201113233024-12cec1faf1ba
 ## explicit
 golang.org/x/sys/cpu
 golang.org/x/sys/internal/unsafeheader
