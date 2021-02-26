@@ -3,7 +3,7 @@ Package credhub is a client library for interacting with a CredHub server.
 
 More information on CredHub can be found at https://code.cloudfoundry.org/credhub
 
-Server HTTP API specification can be found at http://credhub-api.cfapps.io
+Server HTTP API specification can be found at https://docs.cloudfoundry.org/api/credhub/
 */
 package credhub
 

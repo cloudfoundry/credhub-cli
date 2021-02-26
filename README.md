@@ -42,4 +42,4 @@ CredHub CLI can be used to manage credentials stored in a CredHub server. You mu
 
 To see the API calls made by each CLI command, `export CREDHUB_DEBUG=true`.
 
-[1]:https://credhub-api.cfapps.io
+[1]:https://docs.cloudfoundry.org/api/credhub/
