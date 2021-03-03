@@ -86,7 +86,7 @@ func (c *DeleteCommand) deleteByPath(path string, quiet bool) ([]DeleteFailedCre
 
 		if !quiet {
 			succeeded := index + 1 - len(failedCredentials)
-			fmt.Printf("\033[2K\r%v out of %v credentials under the provided path are successfully deleted.", succeeded, totalCount)
+			fmt.Printf("\033[2K\r%v out of %v credentials under the provided path are successfully deleted.\n", succeeded, totalCount)
 		}
 	}
 	return failedCredentials, totalCount, nil
