@@ -21,11 +21,7 @@ var _ = Describe("main", func() {
 			Eventually(session).Should(Exit(1))
 
 			// The command name is printed the same as the credhub cli binary file name
-			if runtime.GOOS == "windows" {
-				Expect(session.Err).To(Say(fmt.Sprintf("%s.exe \\[OPTIONS\\] \\[command\\]", commandName)))
-			} else {
-				Expect(session.Err).To(Say(fmt.Sprintf("%s \\[OPTIONS\\] \\[command\\]", commandName)))
-			}
+			Expect(session.Err).To(Say(fmt.Sprintf("%s \\[OPTIONS\\] \\[command\\]", commandName)))
 		})
 	})
 	Context("when extra arguments are provided", func() {
