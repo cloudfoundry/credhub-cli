@@ -1,6 +1,7 @@
 package main_test
 
 import (
+	"runtime"
 	"strings"
 	"testing"
 
@@ -29,6 +30,11 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 })
 
 func getLeafFileName(path string) string {
-	pathArray := strings.Split(path, "/")
+	var pathArray []string
+	if runtime.GOOS == "windows" {
+		pathArray = strings.Split(path, "\\")
+	} else {
+		pathArray = strings.Split(path, "/")
+	}
 	return pathArray[len(pathArray)-1]
 }
