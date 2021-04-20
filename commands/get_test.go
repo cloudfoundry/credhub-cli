@@ -33,12 +33,7 @@ var _ = Describe("Get", func() {
 	ItAutomaticallyLogsIn(testAutoLogin, "get", "-n", "test-credential")
 
 	ItBehavesLikeHelp("get", "g", func(session *Session) {
-		Expect(session.Err).To(Say("Usage"))
-		if runtime.GOOS == "windows" {
-			Expect(session.Err).To(Say("credhub-cli.exe \\[OPTIONS\\] get \\[get-OPTIONS\\]"))
-		} else {
-			Expect(session.Err).To(Say("credhub-cli \\[OPTIONS\\] get \\[get-OPTIONS\\]"))
-		}
+		Expect(session.Err).To(Say("Usage:\n(.*)\\[OPTIONS\\] get \\[get-OPTIONS\\]"))
 	})
 
 	It("returns error when missing required parameter", func() {

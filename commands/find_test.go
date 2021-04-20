@@ -3,8 +3,6 @@ package commands_test
 import (
 	"net/http"
 
-	"runtime"
-
 	"code.cloudfoundry.org/credhub-cli/commands"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -33,12 +31,7 @@ var _ = Describe("Find", func() {
 
 	Describe("Help", func() {
 		ItBehavesLikeHelp("find", "f", func(session *Session) {
-			Expect(session.Err).To(Say("Usage"))
-			if runtime.GOOS == "windows" {
-				Expect(session.Err).To(Say("credhub-cli.exe \\[OPTIONS\\] find \\[find-OPTIONS\\]"))
-			} else {
-				Expect(session.Err).To(Say("credhub-cli \\[OPTIONS\\] find \\[find-OPTIONS\\]"))
-			}
+			Expect(session.Err).To(Say("Usage:\n(.*)\\[OPTIONS\\] find \\[find-OPTIONS\\]"))
 		})
 
 		It("short flags", func() {

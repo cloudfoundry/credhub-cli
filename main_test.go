@@ -1,6 +1,7 @@
 package main_test
 
 import (
+	"fmt"
 	"os/exec"
 
 	"runtime"
@@ -19,10 +20,11 @@ var _ = Describe("main", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Eventually(session).Should(Exit(1))
 
+			// The command name is printed the same as the credhub cli binary file name
 			if runtime.GOOS == "windows" {
-				Expect(session.Err).To(Say("credhub-cli.exe \\[OPTIONS\\] \\[command\\]"))
+				Expect(session.Err).To(Say(fmt.Sprintf("%s.exe \\[OPTIONS\\] \\[command\\]", commandName)))
 			} else {
-				Expect(session.Err).To(Say("credhub-cli \\[OPTIONS\\] \\[command\\]"))
+				Expect(session.Err).To(Say(fmt.Sprintf("%s \\[OPTIONS\\] \\[command\\]", commandName)))
 			}
 		})
 	})

@@ -50,12 +50,7 @@ var _ = Describe("Export", func() {
 	ItAutomaticallyLogsIn(testAutoLogIns, "export")
 
 	ItBehavesLikeHelp("export", "e", func(session *Session) {
-		Expect(session.Err).To(Say("Usage"))
-		if runtime.GOOS == "windows" {
-			Expect(session.Err).To(Say("credhub-cli.exe \\[OPTIONS\\] export \\[export-OPTIONS\\]"))
-		} else {
-			Expect(session.Err).To(Say("credhub-cli \\[OPTIONS\\] export \\[export-OPTIONS\\]"))
-		}
+		Expect(session.Err).To(Say("Usage:\n(.*)\\[OPTIONS\\] export \\[export-OPTIONS\\]"))
 	})
 
 	Describe("Exporting", func() {

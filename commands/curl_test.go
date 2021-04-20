@@ -1,15 +1,13 @@
 package commands_test
 
 import (
-	"net/http"
-	"net/url"
-	"runtime"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
 	. "github.com/onsi/gomega/ghttp"
+	"net/http"
+	"net/url"
 )
 
 var _ = Describe("Curl", func() {
@@ -31,12 +29,7 @@ var _ = Describe("Curl", func() {
 	ItAutomaticallyLogsIn(testAutoLogIns, "curl", "-p", "api/v1/data")
 
 	ItBehavesLikeHelp("curl", "curl", func(session *Session) {
-		Expect(session.Err).To(Say("Usage"))
-		if runtime.GOOS == "windows" {
-			Expect(session.Err).To(Say("credhub-cli.exe \\[OPTIONS\\] curl \\[curl-OPTIONS\\]"))
-		} else {
-			Expect(session.Err).To(Say("credhub-cli \\[OPTIONS\\] curl \\[curl-OPTIONS\\]"))
-		}
+		Expect(session.Err).To(Say("Usage:\n(.*)\\[OPTIONS\\] curl \\[curl-OPTIONS\\]"))
 	})
 
 	It("displays missing required parameter", func() {

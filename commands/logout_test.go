@@ -1,14 +1,12 @@
 package commands_test
 
 import (
-	"net/http"
-	"runtime"
-
 	"code.cloudfoundry.org/credhub-cli/config"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
+	"net/http"
 )
 
 var _ = Describe("Logout", func() {
@@ -46,12 +44,7 @@ var _ = Describe("Logout", func() {
 	})
 
 	ItBehavesLikeHelp("logout", "o", func(session *Session) {
-		Expect(session.Err).To(Say("Usage:"))
-		if runtime.GOOS == "windows" {
-			Expect(session.Err).To(Say("credhub-cli.exe \\[OPTIONS\\] logout"))
-		} else {
-			Expect(session.Err).To(Say("credhub-cli \\[OPTIONS\\] logout"))
-		}
+		Expect(session.Err).To(Say("Usage:\n(.*)\\[OPTIONS\\] logout"))
 	})
 })
 

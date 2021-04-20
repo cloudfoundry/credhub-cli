@@ -3,16 +3,14 @@ package commands_test
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"net/http"
-	"os"
-	"runtime"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	"github.com/onsi/gomega/gexec"
 	. "github.com/onsi/gomega/ghttp"
+	"io/ioutil"
+	"net/http"
+	"os"
 )
 
 var (
@@ -42,12 +40,7 @@ var _ = Describe("interpolate", func() {
 		ItAutomaticallyLogsIn(testAutoLogin, "interpolate", "-f", templateFile.Name())
 
 		ItBehavesLikeHelp("interpolate", "interpolate", func(session *gexec.Session) {
-			Expect(session.Err).To(Say("Usage"))
-			if runtime.GOOS == "windows" {
-				Expect(session.Err).To(Say("credhub-cli.exe \\[OPTIONS\\] interpolate \\[interpolate-OPTIONS\\]"))
-			} else {
-				Expect(session.Err).To(Say("credhub-cli \\[OPTIONS\\] interpolate \\[interpolate-OPTIONS\\]"))
-			}
+			Expect(session.Err).To(Say("Usage:\n(.*)\\[OPTIONS\\] interpolate \\[interpolate-OPTIONS\\]"))
 		})
 		ItRequiresAuthentication("interpolate", "-f", "testinterpolationtemplate.yml")
 		ItRequiresAnAPIToBeSet("interpolate", "-f", "testinterpolationtemplate.yml")

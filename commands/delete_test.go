@@ -4,8 +4,6 @@ import (
 	"code.cloudfoundry.org/credhub-cli/commands"
 	"net/http"
 
-	"runtime"
-
 	"code.cloudfoundry.org/credhub-cli/config"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -34,12 +32,7 @@ var _ = Describe("Delete", func() {
 
 	Describe("Help", func() {
 		ItBehavesLikeHelp("delete", "d", func(session *Session) {
-			Expect(session.Err).To(Say("Usage"))
-			if runtime.GOOS == "windows" {
-				Expect(session.Err).To(Say("credhub-cli.exe \\[OPTIONS\\] delete \\[delete-OPTIONS\\]"))
-			} else {
-				Expect(session.Err).To(Say("credhub-cli \\[OPTIONS\\] delete \\[delete-OPTIONS\\]"))
-			}
+			Expect(session.Err).To(Say("Usage:\n(.*)\\[OPTIONS\\] delete \\[delete-OPTIONS\\]"))
 		})
 
 		It("short flags", func() {
