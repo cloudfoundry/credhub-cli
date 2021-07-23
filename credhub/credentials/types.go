@@ -15,7 +15,7 @@ type Base struct {
 	Type               string   `json:"type" yaml:"type"`
 	Metadata           Metadata `json:"metadata" yaml:"metadata"`
 	VersionCreatedAt   string   `json:"version_created_at" yaml:"version_created_at"`
-	DurationOverridden bool     `json:"duration_overridden" yaml:"duration_overridden"`
+	DurationOverridden bool     `json:"duration_overridden,omitempty" yaml:"duration_overridden,omitempty"`
 }
 
 // Arbitrary metadata for credentials
