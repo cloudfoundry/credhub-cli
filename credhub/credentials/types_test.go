@@ -14,7 +14,70 @@ import (
 
 var _ = Describe("Types", func() {
 	Describe("Certificate", func() {
-		Specify("when decoding and encoding", func() {
+		Specify("when decoding and encoding with duration_overridden and duration_used in the output", func() {
+			var cred Certificate
+
+			credJSON := `{
+	"id": "some-id",
+	"name": "/example-certificate",
+	"type": "certificate",
+	"duration_overridden": true,
+	"duration_used": 1234,
+	"value": {
+		"ca": "-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----",
+		"certificate": "-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----",
+		"private_key": "-----BEGIN RSA PRIVATE KEY-----\n...\n-----END RSA PRIVATE KEY-----"
+	},
+	"metadata": {"some":"metadata"},
+	"version_created_at": "2017-01-01T04:07:18Z"
+}`
+			credYaml := `id: some-id
+name: /example-certificate
+type: certificate
+duration_overridden: true
+duration_used: 1234
+value:
+  ca: |-
+    -----BEGIN CERTIFICATE-----
+    ...
+    -----END CERTIFICATE-----
+  certificate: |-
+    -----BEGIN CERTIFICATE-----
+    ...
+    -----END CERTIFICATE-----
+  private_key: |-
+    -----BEGIN RSA PRIVATE KEY-----
+    ...
+    -----END RSA PRIVATE KEY-----
+metadata:
+  some: metadata
+version_created_at: 2017-01-01T04:07:18Z`
+
+			err := json.Unmarshal([]byte(credJSON), &cred)
+
+			Expect(err).To(BeNil())
+
+			Expect(cred.Id).To(Equal("some-id"))
+			Expect(cred.Name).To(Equal("/example-certificate"))
+			Expect(cred.Type).To(Equal("certificate"))
+			Expect(cred.DurationOverridden).To(Equal(true))
+			Expect(cred.DurationUsed).To(Equal(1234))
+			Expect(cred.Metadata).To(Equal(Metadata{"some": "metadata"}))
+			Expect(cred.Value.Ca).To(Equal("-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----"))
+			Expect(cred.Value.Certificate).To(Equal("-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----"))
+			Expect(cred.Value.PrivateKey).To(Equal("-----BEGIN RSA PRIVATE KEY-----\n...\n-----END RSA PRIVATE KEY-----"))
+			Expect(cred.VersionCreatedAt).To(Equal("2017-01-01T04:07:18Z"))
+
+			jsonOutput, err := json.Marshal(cred)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(jsonOutput).To(MatchJSON(credJSON))
+
+			yamlOutput, err := yaml.Marshal(cred)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(yamlOutput).To(MatchYAML(credYaml))
+		})
+
+		Specify("when decoding and encoding with NO duration_overridden in the output", func() {
 			var cred Certificate
 
 			credJSON := `{
@@ -121,6 +184,7 @@ version_created_at: '2017-01-05T01:01:01Z'`
 			Expect(err).NotTo(HaveOccurred())
 			Expect(yamlOutput).To(MatchYAML(credYaml))
 		})
+
 	})
 
 	Describe("Password", func() {
