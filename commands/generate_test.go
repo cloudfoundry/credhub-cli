@@ -14,6 +14,10 @@ import (
 	. "github.com/onsi/gomega/ghttp"
 )
 
+const generateRequestJSONWithMetadata = `{"type":"%s","name":"%s","parameters":%s,"overwrite":%t, "metadata":%s}`
+const generateResponseJSONWithMetadata = `{"type":"%s","id":"` + uuid + `","name":"%s","version_created_at":"` + timestamp + `","value":%s,"metadata":%s}`
+const generateResponseJSONWithDurationOverriddenFlag = `{"type":"%s","id":"` + uuid + `","name":"%s","version_created_at":"` + timestamp + `","value":%s,"duration_overridden":%v, "duration_used": 1460 }`
+
 var _ = Describe("Generate", func() {
 	BeforeEach(func() {
 		login()
@@ -212,6 +216,7 @@ var _ = Describe("Generate", func() {
 			Eventually(session.Out).Should(Say("name: my-secret"))
 			Eventually(session.Out).Should(Say("type: certificate"))
 			Eventually(session.Out).Should(Say("value: <redacted>"))
+			Eventually(session.Out).ShouldNot(Say("duration_overridden_to:"))
 		})
 
 		It("allows the type to be any case", func() {
@@ -292,10 +297,25 @@ var _ = Describe("Generate", func() {
 			Eventually(session).Should(Exit(0))
 		})
 
-		It("including duration", func() {
+		It("including duration (missing duration_overridden in API response)", func() {
 			setupGenerateServer("certificate", "my-secret", `{"ca":"","certificate":"my-cert","private_key":"my-priv"}`, `{"duration":1000}`, true)
 			session := runCommand("generate", "-n", "my-secret", "-t", "certificate", "--duration", "1000")
 			Eventually(session).Should(Exit(0))
+			Eventually(session.Out).ShouldNot(Say("duration_overridden_to:"))
+		})
+
+		It("including duration less than minimum duration", func() {
+			setupGenerateServerWithDurationOverriddenFlag("certificate", "my-secret", `{"ca":"","certificate":"my-cert","private_key":"my-priv"}`, `{"duration":365}`, true, true)
+			session := runCommand("generate", "-n", "my-secret", "-t", "certificate", "--duration", "365")
+			Eventually(session).Should(Exit(0))
+			Eventually(session.Out).Should(Say("duration_overridden_to: 1460"))
+		})
+
+		It("including duration greater than minimum duration", func() {
+			setupGenerateServerWithDurationOverriddenFlag("certificate", "my-secret", `{"ca":"","certificate":"my-cert","private_key":"my-priv"}`, `{"duration":365}`, true, false)
+			session := runCommand("generate", "-n", "my-secret", "-t", "certificate", "--duration", "365")
+			Eventually(session).Should(Exit(0))
+			Eventually(session.Out).ShouldNot(Say("duration_overridden_to:"))
 		})
 
 		It("including certificate authority", func() {
@@ -552,9 +572,6 @@ func setupGenerateServer(keyType, name, generatedValue, params string, overwrite
 	)
 }
 
-const generateRequestJSONWithMetadata = `{"type":"%s","name":"%s","parameters":%s,"overwrite":%t, "metadata":%s}`
-const generateResponseJSONWithMetadata = `{"type":"%s","id":"` + uuid + `","name":"%s","version_created_at":"` + timestamp + `","value":%s,"metadata":%s}`
-
 func setupGenerateServerWithMetadata(keyType, name, generatedValue, params string, overwrite bool, metadata string) {
 	server.AppendHandlers(
 		CombineHandlers(
@@ -571,6 +588,16 @@ func setupGenerateServerWithValue(keyType, name, generatedValue, params, value s
 			VerifyRequest("POST", "/api/v1/data"),
 			VerifyJSON(fmt.Sprintf(generateWithValueRequestJSON, keyType, name, params, overwrite, value)),
 			RespondWith(http.StatusOK, fmt.Sprintf(generateResponseJSON, keyType, name, generatedValue)),
+		),
+	)
+}
+
+func setupGenerateServerWithDurationOverriddenFlag(keyType, name, generatedValue, params string, overwrite bool, durationOverridden bool) {
+	server.AppendHandlers(
+		CombineHandlers(
+			VerifyRequest("POST", "/api/v1/data"),
+			VerifyJSON(fmt.Sprintf(generateRequestJSON, keyType, name, params, overwrite)),
+			RespondWith(http.StatusOK, fmt.Sprintf(generateResponseJSONWithDurationOverriddenFlag, keyType, name, generatedValue, durationOverridden)),
 		),
 	)
 }
