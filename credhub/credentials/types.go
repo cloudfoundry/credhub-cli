@@ -10,11 +10,12 @@ import (
 
 // Base fields of a credential
 type Base struct {
-	Id               string   `json:"id" yaml:"id"`
-	Name             string   `json:"name" yaml:"name"`
-	Type             string   `json:"type" yaml:"type"`
-	Metadata         Metadata `json:"metadata" yaml:"metadata"`
-	VersionCreatedAt string   `json:"version_created_at" yaml:"version_created_at"`
+	Id                 string   `json:"id" yaml:"id"`
+	Name               string   `json:"name" yaml:"name"`
+	Type               string   `json:"type" yaml:"type"`
+	Metadata           Metadata `json:"metadata" yaml:"metadata"`
+	VersionCreatedAt   string   `json:"version_created_at" yaml:"version_created_at"`
+	DurationOverridden bool     `json:"duration_overridden" yaml:"duration_overridden"`
 }
 
 // Arbitrary metadata for credentials
@@ -44,18 +45,20 @@ func (c Credential) MarshalJSON() ([]byte, error) {
 
 func (c Credential) convertToOutput() (interface{}, error) {
 	result := struct {
-		Id               string      `json:"id" yaml:"id"`
-		Name             string      `json:"name" yaml:"name"`
-		Type             string      `json:"type" yaml:"type"`
-		Value            interface{} `json:"value"`
-		Metadata         Metadata    `json:"metadata" yaml:"metadata,omitempty"`
-		VersionCreatedAt string      `json:"version_created_at" yaml:"version_created_at"`
+		Id                 string      `json:"id" yaml:"id"`
+		Name               string      `json:"name" yaml:"name"`
+		Type               string      `json:"type" yaml:"type"`
+		Value              interface{} `json:"value"`
+		Metadata           Metadata    `json:"metadata" yaml:"metadata,omitempty"`
+		VersionCreatedAt   string      `json:"version_created_at" yaml:"version_created_at"`
+		DurationOverridden bool        `json:"duration_overridden,omitempty" yaml:"duration_overridden,omitempty"`
 	}{
-		Id:               c.Id,
-		Name:             c.Name,
-		Type:             c.Type,
-		Metadata:         c.Metadata,
-		VersionCreatedAt: c.VersionCreatedAt,
+		Id:                 c.Id,
+		Name:               c.Name,
+		Type:               c.Type,
+		Metadata:           c.Metadata,
+		VersionCreatedAt:   c.VersionCreatedAt,
+		DurationOverridden: c.DurationOverridden,
 	}
 
 	_, ok := c.Value.(string)
