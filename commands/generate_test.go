@@ -297,7 +297,7 @@ var _ = Describe("Generate", func() {
 			Eventually(session).Should(Exit(0))
 		})
 
-		It("including duration (missing duration_overridden in API response)", func() {
+		It("including duration (missing duration_overridden_to in API response)", func() {
 			setupGenerateServer("certificate", "my-secret", `{"ca":"","certificate":"my-cert","private_key":"my-priv"}`, `{"duration":1000}`, true)
 			session := runCommand("generate", "-n", "my-secret", "-t", "certificate", "--duration", "1000")
 			Eventually(session).Should(Exit(0))
