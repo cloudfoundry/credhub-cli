@@ -126,6 +126,8 @@ github.com/cloudfoundry/bosh-utils v0.0.266 h1:HZ/Wt07bJK7rFphrMlML8/Nwi2lJIZaac
 github.com/cloudfoundry/bosh-utils v0.0.266/go.mod h1:CEbBZtiWhfUMdf0+TTuEk/A+YiUukQuRVG3czuXdLqM=
 github.com/cloudfoundry/bosh-utils v0.0.277 h1:+5GxN3tKw7rn2kpD5voE+Da4YVXhythRDezN+zPJAcA=
 github.com/cloudfoundry/bosh-utils v0.0.277/go.mod h1:Wi26EdfYRz+3nIOxiyWjDcN6dNg/rGGWd2L5OEBNKx8=
+github.com/cloudfoundry/bosh-utils v0.0.278 h1:26faFZ7Pb8Dp4+bGQN2DWCDzW9ML+i3HMb2oBt/ghGs=
+github.com/cloudfoundry/bosh-utils v0.0.278/go.mod h1:sA3nMZIE491r8M21yzMpeOIPg15JGrp7uGicqlYq588=
 github.com/cloudfoundry/go-socks5 v0.0.0-20180221174514-54f73bdb8a8e h1:FQdRViaoDphGRfgrotl2QGsX1gbloe57dbGBS5CG6KY=
 github.com/cloudfoundry/go-socks5 v0.0.0-20180221174514-54f73bdb8a8e/go.mod h1:PXmcacyJB/pJjSxEl15IU6rEIKXrhZQRzsr0UTkgNNs=
 github.com/cloudfoundry/socks5-proxy v0.2.0 h1:ZRXcJxUqOyKmah+ytXh52K7m7S7SyuBacDUnd2g0ihU=
@@ -156,6 +158,8 @@ github.com/cloudfoundry/socks5-proxy v0.2.14 h1:1bjqT/92BZrXjDAw3Ag+vtMs3EhOth12
 github.com/cloudfoundry/socks5-proxy v0.2.14/go.mod h1:5zV3PSiZm8ST6qkFbFr+KoaOGc0H/hMdSDhkAULC9T8=
 github.com/cloudfoundry/socks5-proxy v0.2.23 h1:oHlRXVq0T07hZv2hk2aFMqoBfDAmf3kgh5dCWFpmrys=
 github.com/cloudfoundry/socks5-proxy v0.2.23/go.mod h1:sRD+Eaqcq0G5KU1m4gbqMAMVgoSbAI9wOxgP990pzYc=
+github.com/cloudfoundry/socks5-proxy v0.2.24 h1:imO57piKFB2oFcNXcU+D8IcuDQ1Biw/6/VU+vK1SAXM=
+github.com/cloudfoundry/socks5-proxy v0.2.24/go.mod h1:rtxOivDe6qtC0Me/ybhN78CNCPudMhlymw28TbmfZ/U=
 github.com/cppforlife/go-patch v0.2.0 h1:Y14MnCQjDlbw7WXT4k+u6DPAA9XnygN4BfrSpI/19RU=
 github.com/cppforlife/go-patch v0.2.0/go.mod h1:67a7aIi94FHDZdoeGSJRRFDp66l9MhaAG1yGxpUoFD8=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
@@ -458,6 +462,8 @@ golang.org/x/net v0.0.0-20210726213435-c6fcb2dbf985 h1:4CSI6oo7cOjJKajidEljs9h+u
 golang.org/x/net v0.0.0-20210726213435-c6fcb2dbf985/go.mod h1:9nx3DQGgdP8bBQD5qxJ1jj9UTztislL4KSBs9R2vV5Y=
 golang.org/x/net v0.0.0-20210929193557-e81a3d93ecf6 h1:Z04ewVs7JhXaYkmDhBERPi41gnltfQpMWDnTnQbaCqk=
 golang.org/x/net v0.0.0-20210929193557-e81a3d93ecf6/go.mod h1:9nx3DQGgdP8bBQD5qxJ1jj9UTztislL4KSBs9R2vV5Y=
+golang.org/x/net v0.0.0-20211008194852-3b03d305991f h1:1scJEYZBaF48BaG6tYbtxmLcXqwYGSfGcMoStTqkkIw=
+golang.org/x/net v0.0.0-20211008194852-3b03d305991f/go.mod h1:9nx3DQGgdP8bBQD5qxJ1jj9UTztislL4KSBs9R2vV5Y=
 golang.org/x/oauth2 v0.0.0-20180821212333-d2e6202438be/go.mod h1:N/0e6XlmueqKjAGxoOufVs8QHGRruUQn6yWY3a++T0U=
 golang.org/x/sync v0.0.0-20180314180146-1d60e4601c6f h1:wMNYb4v58l5UBM7MYRLPG6ZhfOqbKu7X5eyFl8ZhKvA=
 golang.org/x/sync v0.0.0-20180314180146-1d60e4601c6f/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
@@ -579,6 +585,8 @@ golang.org/x/sys v0.0.0-20210927094055-39ccf1dd6fa6/go.mod h1:oPkhp1MJrh7nUepCBc
 golang.org/x/sys v0.0.0-20211001092434-39dca1131b70/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.0.0-20211004093028-2c5d950f24ef h1:fPxZ3Umkct3LZ8gK9nbk+DWDJ9fstZa2grBn+lWVKPs=
 golang.org/x/sys v0.0.0-20211004093028-2c5d950f24ef/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
+golang.org/x/sys v0.0.0-20211007075335-d3039528d8ac h1:oN6lz7iLW/YC7un8pq+9bOLyXrprv2+DKfkJY+2LJJw=
+golang.org/x/sys v0.0.0-20211007075335-d3039528d8ac/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/term v0.0.0-20201117132131-f5c789dd3221 h1:/ZHdbVpdR/jk3g30/d4yUL0JU9kksj8+F/bnQUVLGDM=
 golang.org/x/term v0.0.0-20201117132131-f5c789dd3221/go.mod h1:Nr5EML6q2oocZ2LXRh80K7BxOlk5/8JxuGnuhpl+muw=
 golang.org/x/term v0.0.0-20201126162022-7de9c90e9dd1 h1:v+OssWQX+hTHEmOBgwxdZxK4zHq3yOs8F9J7mk0PY8E=
