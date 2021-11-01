@@ -10,7 +10,7 @@ github.com/charlievieth/fs
 # github.com/cloudfoundry/bosh-cli v6.4.1+incompatible
 ## explicit
 github.com/cloudfoundry/bosh-cli/director/template
-# github.com/cloudfoundry/bosh-utils v0.0.283
+# github.com/cloudfoundry/bosh-utils v0.0.288
 ## explicit
 github.com/cloudfoundry/bosh-utils/errors
 github.com/cloudfoundry/bosh-utils/logger
@@ -18,7 +18,7 @@ github.com/cloudfoundry/bosh-utils/system
 # github.com/cloudfoundry/go-socks5 v0.0.0-20180221174514-54f73bdb8a8e
 ## explicit
 github.com/cloudfoundry/go-socks5
-# github.com/cloudfoundry/socks5-proxy v0.2.27
+# github.com/cloudfoundry/socks5-proxy v0.2.29
 ## explicit
 github.com/cloudfoundry/socks5-proxy
 # github.com/cppforlife/go-patch v0.2.0
@@ -112,7 +112,7 @@ golang.org/x/crypto/internal/subtle
 golang.org/x/crypto/ssh
 golang.org/x/crypto/ssh/internal/bcrypt_pbkdf
 golang.org/x/crypto/ssh/terminal
-# golang.org/x/net v0.0.0-20211020060615-d418f374d309
+# golang.org/x/net v0.0.0-20211029224645-99673261e6eb
 ## explicit
 golang.org/x/net/context
 golang.org/x/net/html
@@ -120,7 +120,7 @@ golang.org/x/net/html/atom
 golang.org/x/net/html/charset
 golang.org/x/net/internal/socks
 golang.org/x/net/proxy
-# golang.org/x/sys v0.0.0-20211025112917-711f33c9992c
+# golang.org/x/sys v0.0.0-20211031064116-611d5d643895
 ## explicit
 golang.org/x/sys/cpu
 golang.org/x/sys/internal/unsafeheader
