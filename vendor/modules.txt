@@ -10,7 +10,7 @@ github.com/charlievieth/fs
 # github.com/cloudfoundry/bosh-cli v6.4.1+incompatible
 ## explicit
 github.com/cloudfoundry/bosh-cli/director/template
-# github.com/cloudfoundry/bosh-utils v0.0.288
+# github.com/cloudfoundry/bosh-utils v0.0.298
 ## explicit
 github.com/cloudfoundry/bosh-utils/errors
 github.com/cloudfoundry/bosh-utils/logger
@@ -18,7 +18,7 @@ github.com/cloudfoundry/bosh-utils/system
 # github.com/cloudfoundry/go-socks5 v0.0.0-20180221174514-54f73bdb8a8e
 ## explicit
 github.com/cloudfoundry/go-socks5
-# github.com/cloudfoundry/socks5-proxy v0.2.29
+# github.com/cloudfoundry/socks5-proxy v0.2.39
 ## explicit
 github.com/cloudfoundry/socks5-proxy
 # github.com/cppforlife/go-patch v0.2.0
@@ -34,7 +34,7 @@ github.com/fatih/color
 github.com/fsnotify/fsnotify
 # github.com/golang/protobuf v1.5.2
 github.com/golang/protobuf/proto
-# github.com/hashicorp/go-version v1.3.0
+# github.com/hashicorp/go-version v1.4.0
 ## explicit
 github.com/hashicorp/go-version
 # github.com/howeyc/gopass v0.0.0-20210920133722-c8aef6fb66ef
@@ -45,7 +45,7 @@ github.com/howeyc/gopass
 github.com/jessevdk/go-flags
 # github.com/kr/text v0.2.0
 ## explicit
-# github.com/mattn/go-colorable v0.1.11
+# github.com/mattn/go-colorable v0.1.12
 ## explicit
 github.com/mattn/go-colorable
 # github.com/mattn/go-isatty v0.0.14
@@ -84,7 +84,7 @@ github.com/onsi/ginkgo/reporters/stenographer
 github.com/onsi/ginkgo/reporters/stenographer/support/go-colorable
 github.com/onsi/ginkgo/reporters/stenographer/support/go-isatty
 github.com/onsi/ginkgo/types
-# github.com/onsi/gomega v1.16.0
+# github.com/onsi/gomega v1.18.0
 ## explicit
 github.com/onsi/gomega
 github.com/onsi/gomega/format
@@ -92,6 +92,7 @@ github.com/onsi/gomega/gbytes
 github.com/onsi/gomega/gexec
 github.com/onsi/gomega/ghttp
 github.com/onsi/gomega/internal
+github.com/onsi/gomega/internal/gutil
 github.com/onsi/gomega/matchers
 github.com/onsi/gomega/matchers/support/goraph/bipartitegraph
 github.com/onsi/gomega/matchers/support/goraph/edge
@@ -100,7 +101,7 @@ github.com/onsi/gomega/matchers/support/goraph/util
 github.com/onsi/gomega/types
 # github.com/sclevine/agouti v3.0.0+incompatible
 ## explicit
-# golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
+# golang.org/x/crypto v0.0.0-20220112180741-5e0467b6c7ce
 golang.org/x/crypto/blowfish
 golang.org/x/crypto/chacha20
 golang.org/x/crypto/curve25519
@@ -112,7 +113,7 @@ golang.org/x/crypto/internal/subtle
 golang.org/x/crypto/ssh
 golang.org/x/crypto/ssh/internal/bcrypt_pbkdf
 golang.org/x/crypto/ssh/terminal
-# golang.org/x/net v0.0.0-20211029224645-99673261e6eb
+# golang.org/x/net v0.0.0-20220121210141-e204ce36a2ba
 ## explicit
 golang.org/x/net/context
 golang.org/x/net/html
@@ -120,8 +121,7 @@ golang.org/x/net/html/atom
 golang.org/x/net/html/charset
 golang.org/x/net/internal/socks
 golang.org/x/net/proxy
-# golang.org/x/sys v0.0.0-20211031064116-611d5d643895
-## explicit
+# golang.org/x/sys v0.0.0-20220114195835-da31bd327af9
 golang.org/x/sys/cpu
 golang.org/x/sys/internal/unsafeheader
 golang.org/x/sys/plan9
