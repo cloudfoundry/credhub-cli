@@ -20,6 +20,8 @@ github.com/cloudfoundry/bosh-utils v0.0.302 h1:ToI0abrFor614ea4ni0lnB1evohb6zAK6
 github.com/cloudfoundry/bosh-utils v0.0.302/go.mod h1:0UFt7FWc+CmBcvPekLOtiMGAqk03gMZ+MglxgoRbha0=
 github.com/cloudfoundry/bosh-utils v0.0.303 h1:2t5mhtBOeS9pj7kVUHhihoMJceQsN7G5cPWdml/bT+w=
 github.com/cloudfoundry/bosh-utils v0.0.303/go.mod h1:2xVR6Oeg5PB2hnnTPXla32BRXd2IFjfF8msde0GK51c=
+github.com/cloudfoundry/bosh-utils v0.0.304 h1:sn8I46kFYjPdHMO/mfIei17q3CSeFXpIjfREdw8mg0o=
+github.com/cloudfoundry/bosh-utils v0.0.304/go.mod h1:6bneJ4XkuZ6AdG0d347/4VRdyj9vDHH8bObP5u8YhVM=
 github.com/cloudfoundry/go-socks5 v0.0.0-20180221174514-54f73bdb8a8e h1:FQdRViaoDphGRfgrotl2QGsX1gbloe57dbGBS5CG6KY=
 github.com/cloudfoundry/go-socks5 v0.0.0-20180221174514-54f73bdb8a8e/go.mod h1:PXmcacyJB/pJjSxEl15IU6rEIKXrhZQRzsr0UTkgNNs=
 github.com/cloudfoundry/socks5-proxy v0.2.40 h1:zZSZgZm+i9bZ7tQQ9cVJIrDJhaTLdwAQ98Fpve/42tg=
@@ -30,6 +32,8 @@ github.com/cloudfoundry/socks5-proxy v0.2.43 h1:M60GRgzvG2tl/XLCkWLesYTOKLRlfaA9
 github.com/cloudfoundry/socks5-proxy v0.2.43/go.mod h1:tN+hxIxuPan0yYaYJuQlM5seDJZ2BgmcWyklZiCOn6s=
 github.com/cloudfoundry/socks5-proxy v0.2.44 h1:GPL4Yr4KVEm4X5ahJ0IeKOOGwww2KWR3XfqZzYiXz7c=
 github.com/cloudfoundry/socks5-proxy v0.2.44/go.mod h1:Jr+wZWsUHECnIYDNNNigairfBk43OIiI3WcVCqAC0EY=
+github.com/cloudfoundry/socks5-proxy v0.2.45 h1:ypCrWZKd74xdMk9czc23kZYVjXKwe47QRj+hzdr1Uvs=
+github.com/cloudfoundry/socks5-proxy v0.2.45/go.mod h1:ERob4fpGjihx82xEeJ7fm4c+v0FdHg3sG8nEKvxxPlo=
 github.com/cppforlife/go-patch v0.2.0 h1:Y14MnCQjDlbw7WXT4k+u6DPAA9XnygN4BfrSpI/19RU=
 github.com/cppforlife/go-patch v0.2.0/go.mod h1:67a7aIi94FHDZdoeGSJRRFDp66l9MhaAG1yGxpUoFD8=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
