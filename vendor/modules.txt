@@ -10,7 +10,7 @@ github.com/charlievieth/fs
 # github.com/cloudfoundry/bosh-cli v6.4.1+incompatible
 ## explicit
 github.com/cloudfoundry/bosh-cli/director/template
-# github.com/cloudfoundry/bosh-utils v0.0.309
+# github.com/cloudfoundry/bosh-utils v0.0.311
 ## explicit; go 1.18
 github.com/cloudfoundry/bosh-utils/errors
 github.com/cloudfoundry/bosh-utils/logger
@@ -18,7 +18,7 @@ github.com/cloudfoundry/bosh-utils/system
 # github.com/cloudfoundry/go-socks5 v0.0.0-20180221174514-54f73bdb8a8e
 ## explicit
 github.com/cloudfoundry/go-socks5
-# github.com/cloudfoundry/socks5-proxy v0.2.51
+# github.com/cloudfoundry/socks5-proxy v0.2.52
 ## explicit; go 1.18
 github.com/cloudfoundry/socks5-proxy
 # github.com/cppforlife/go-patch v0.2.0
@@ -27,7 +27,7 @@ github.com/cppforlife/go-patch/patch
 # github.com/fatih/color v1.13.0
 ## explicit; go 1.13
 github.com/fatih/color
-# github.com/fsnotify/fsnotify v1.5.1
+# github.com/fsnotify/fsnotify v1.5.3
 ## explicit; go 1.13
 github.com/fsnotify/fsnotify
 # github.com/golang/protobuf v1.5.2
@@ -109,7 +109,7 @@ golang.org/x/crypto/internal/subtle
 golang.org/x/crypto/ssh
 golang.org/x/crypto/ssh/internal/bcrypt_pbkdf
 golang.org/x/crypto/ssh/terminal
-# golang.org/x/net v0.0.0-20220412020605-290c469a71a5
+# golang.org/x/net v0.0.0-20220421235706-1d1ef9303861
 ## explicit; go 1.17
 golang.org/x/net/context
 golang.org/x/net/html
@@ -117,7 +117,7 @@ golang.org/x/net/html/atom
 golang.org/x/net/html/charset
 golang.org/x/net/internal/socks
 golang.org/x/net/proxy
-# golang.org/x/sys v0.0.0-20220412211240-33da011f77ad
+# golang.org/x/sys v0.0.0-20220422013727-9388b58f7150
 ## explicit; go 1.17
 golang.org/x/sys/cpu
 golang.org/x/sys/internal/unsafeheader
