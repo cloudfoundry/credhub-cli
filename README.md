@@ -1,5 +1,5 @@
 # <div align="center"><img src="https://raw.githubusercontent.com/cloudfoundry-incubator/credhub/master/docs/images/logo.png" alt="CredHub"></div>
-test
+
 [![slack.cloudfoundry.org](https://slack.cloudfoundry.org/badge.svg)](https://slack.cloudfoundry.org)
 [![GoDoc](https://godoc.org/github.com/golang/gddo?status.svg)](http://godoc.org/code.cloudfoundry.org/credhub-cli/credhub)
 
