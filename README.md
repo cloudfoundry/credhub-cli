@@ -23,6 +23,9 @@ See additional repos for more info:
 #### Linux and Windows
 Download and install the desired release from the [release page](https://github.com/cloudfoundry-incubator/credhub-cli/releases).
 
+The `credhub` CLI is tested on Linux and Mac OS, and is supported on these systems.
+It is not tested or supported on Windows, though it has been known to work at some point.
+
 ### Building the CLI:
 
 `make` (first time only to get dependencies, will also run specs)
