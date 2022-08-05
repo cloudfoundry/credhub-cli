@@ -51,7 +51,7 @@ value:
     -----END RSA PRIVATE KEY-----
 metadata:
   some: metadata
-version_created_at: 2017-01-01T04:07:18Z`
+version_created_at: '2017-01-01T04:07:18Z'`
 
 			err := json.Unmarshal([]byte(credJSON), &cred)
 
@@ -110,7 +110,7 @@ value:
     -----END RSA PRIVATE KEY-----
 metadata:
   some: metadata
-version_created_at: 2017-01-01T04:07:18Z`
+version_created_at: '2017-01-01T04:07:18Z'`
 
 			err := json.Unmarshal([]byte(credJSON), &cred)
 
