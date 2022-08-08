@@ -5,8 +5,8 @@ go 1.17
 require (
 	github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
 	github.com/cloudfoundry/bosh-cli v6.4.1+incompatible
-	github.com/cloudfoundry/bosh-utils v0.0.325
-	github.com/cloudfoundry/socks5-proxy v0.2.66
+	github.com/cloudfoundry/bosh-utils v0.0.326
+	github.com/cloudfoundry/socks5-proxy v0.2.67
 	github.com/fatih/color v1.13.0
 	github.com/hashicorp/go-version v1.6.0
 	github.com/howeyc/gopass v0.0.0-20210920133722-c8aef6fb66ef
@@ -19,7 +19,7 @@ require (
 
 require (
 	github.com/bmatcuk/doublestar v1.3.4 // indirect
-	github.com/charlievieth/fs v0.0.2 // indirect
+	github.com/charlievieth/fs v0.0.3 // indirect
 	github.com/cloudfoundry/go-socks5 v0.0.0-20180221174514-54f73bdb8a8e // indirect
 	github.com/cppforlife/go-patch v0.2.0 // indirect
 	github.com/fsnotify/fsnotify v1.5.4 // indirect
