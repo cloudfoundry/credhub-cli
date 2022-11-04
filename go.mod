@@ -1,6 +1,6 @@
 module code.cloudfoundry.org/credhub-cli
 
-go 1.17
+go 1.18
 
 require (
 	github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
