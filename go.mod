@@ -5,8 +5,8 @@ go 1.19
 require (
 	github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
 	github.com/cloudfoundry/bosh-cli v6.4.1+incompatible
-	github.com/cloudfoundry/bosh-utils v0.0.361
-	github.com/cloudfoundry/socks5-proxy v0.2.87
+	github.com/cloudfoundry/bosh-utils v0.0.362
+	github.com/cloudfoundry/socks5-proxy v0.2.88
 	github.com/fatih/color v1.15.0
 	github.com/hashicorp/go-version v1.6.0
 	github.com/howeyc/gopass v0.0.0-20210920133722-c8aef6fb66ef
