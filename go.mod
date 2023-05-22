@@ -5,14 +5,14 @@ go 1.19
 require (
 	github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
 	github.com/cloudfoundry/bosh-cli v6.4.1+incompatible
-	github.com/cloudfoundry/bosh-utils v0.0.364
+	github.com/cloudfoundry/bosh-utils v0.0.365
 	github.com/cloudfoundry/socks5-proxy v0.2.90
 	github.com/fatih/color v1.15.0
 	github.com/hashicorp/go-version v1.6.0
 	github.com/howeyc/gopass v0.0.0-20210920133722-c8aef6fb66ef
 	github.com/jessevdk/go-flags v1.5.0
 	github.com/onsi/ginkgo v1.16.5
-	github.com/onsi/gomega v1.27.6
+	github.com/onsi/gomega v1.27.7
 	golang.org/x/net v0.10.0
 	gopkg.in/yaml.v2 v2.4.0
 )
@@ -27,7 +27,7 @@ require (
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
-	github.com/mattn/go-isatty v0.0.18 // indirect
+	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/nxadm/tail v1.4.8 // indirect
 	github.com/rogpeppe/go-internal v1.8.1 // indirect
 	golang.org/x/crypto v0.9.0 // indirect
