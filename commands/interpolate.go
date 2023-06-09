@@ -10,7 +10,7 @@ import (
 
 	"code.cloudfoundry.org/credhub-cli/credhub/credentials"
 	"code.cloudfoundry.org/credhub-cli/errors"
-	"github.com/cloudfoundry/bosh-cli/director/template"
+	"github.com/cloudfoundry/bosh-cli/v7/director/template"
 )
 
 type InterpolateCommand struct {
