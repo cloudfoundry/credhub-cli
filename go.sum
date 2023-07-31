@@ -8,6 +8,8 @@ github.com/cloudfoundry/bosh-cli/v7 v7.3.1 h1:Uf2shJ/QPGeLCCRIT2wCA9yM7yv7OlozKY
 github.com/cloudfoundry/bosh-cli/v7 v7.3.1/go.mod h1:C6YH4jEdp9UczL9OfXGr51+iYhybzibDcjWOQNjhuto=
 github.com/cloudfoundry/bosh-utils v0.0.373 h1:Qp9gInFsyBeZRnnjWgBm9kqTMcw6W8XSHV9MT85ZeN0=
 github.com/cloudfoundry/bosh-utils v0.0.373/go.mod h1:67n5J3/Iq53LCvubJ4sX5BwdtMWnFcs52djGlEtvv74=
+github.com/cloudfoundry/bosh-utils v0.0.377 h1:FtwuEYy6ghmZXdsAYMx/h+fGDAPFy04HH8UX3pWuXPw=
+github.com/cloudfoundry/bosh-utils v0.0.377/go.mod h1:4+2bpZGAWbTlCh2DuqwHpCiBQz9+IO6rNhU6o7rAPF4=
 github.com/cloudfoundry/go-socks5 v0.0.0-20180221174514-54f73bdb8a8e h1:FQdRViaoDphGRfgrotl2QGsX1gbloe57dbGBS5CG6KY=
 github.com/cloudfoundry/go-socks5 v0.0.0-20180221174514-54f73bdb8a8e/go.mod h1:PXmcacyJB/pJjSxEl15IU6rEIKXrhZQRzsr0UTkgNNs=
 github.com/cloudfoundry/socks5-proxy v0.2.94 h1:QxoVf8Ar3hydo6kuFJv9EW4q2hc+kLCzC81hdnd/was=
@@ -44,6 +46,7 @@ github.com/google/go-cmp v0.5.5/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/
 github.com/google/go-cmp v0.5.9 h1:O2Tfq5qg4qc4AmwVlvv0oLiVAGB7enBSJ2x2DqQFi38=
 github.com/google/go-cmp v0.5.9/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeNGIjoY=
 github.com/google/pprof v0.0.0-20230705174524-200ffdc848b8 h1:n6vlPhxsA+BW/XsS5+uqi7GyzaLa5MH7qlSLBZtRdiA=
+github.com/google/pprof v0.0.0-20230728192033-2ba5b33183c6 h1:ZgoomqkdjGbQ3+qQXCkvYMCDvGDNg2k5JJDjjdTB6jY=
 github.com/hashicorp/go-version v1.6.0 h1:feTTfFNnjP967rlCxM/I9g701jU+RN74YKx2mOkIeek=
 github.com/hashicorp/go-version v1.6.0/go.mod h1:fltr4n8CU8Ke44wwGCBoEymUuxUHl09ZGVZPK5anwXA=
 github.com/howeyc/gopass v0.0.0-20210920133722-c8aef6fb66ef h1:A9HsByNhogrvm9cWb28sjiS3i7tcKCkflWFEkHfuAgM=

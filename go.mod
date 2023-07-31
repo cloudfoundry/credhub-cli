@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
 	github.com/cloudfoundry/bosh-cli/v7 v7.3.1
-	github.com/cloudfoundry/bosh-utils v0.0.373
+	github.com/cloudfoundry/bosh-utils v0.0.377
 	github.com/cloudfoundry/socks5-proxy v0.2.94
 	github.com/fatih/color v1.15.0
 	github.com/hashicorp/go-version v1.6.0
