@@ -7,14 +7,13 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
 	"encoding/json"
 
 	. "code.cloudfoundry.org/credhub-cli/credhub"
 	"code.cloudfoundry.org/credhub-cli/credhub/credentials/values"
-	. "github.com/onsi/ginkgo/extensions/table"
 )
 
 var _ = Describe("Get", func() {
@@ -843,7 +842,7 @@ var _ = Describe("Get", func() {
 			Expect(err.Error()).To(ContainSubstring("The response body could not be decoded:"))
 		},
 
-		listOfActions...,
+		listOfActions,
 	)
 
 	DescribeTable("returns credhub error when the cred does not exist",
@@ -858,7 +857,7 @@ var _ = Describe("Get", func() {
 			Expect(err).To(MatchError("The request could not be completed because the credential does not exist or you do not have sufficient authorization."))
 		},
 
-		listOfActions...,
+		listOfActions,
 	)
 
 	DescribeTable("request fails due to network error",
@@ -873,6 +872,6 @@ var _ = Describe("Get", func() {
 			Expect(err).To(Equal(networkError))
 		},
 
-		listOfActions...,
+		listOfActions,
 	)
 })

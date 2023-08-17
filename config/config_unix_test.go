@@ -1,3 +1,4 @@
+//go:build !windows
 // +build !windows
 
 package config_test
@@ -8,7 +9,7 @@ import (
 	"path"
 
 	"code.cloudfoundry.org/credhub-cli/config"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
