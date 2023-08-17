@@ -11,7 +11,7 @@ import (
 	"code.cloudfoundry.org/credhub-cli/credhub/permissions"
 	"github.com/onsi/gomega/ghttp"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 

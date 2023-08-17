@@ -12,7 +12,7 @@ import (
 
 	"code.cloudfoundry.org/credhub-cli/credhub"
 	proxy "github.com/cloudfoundry/socks5-proxy"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
