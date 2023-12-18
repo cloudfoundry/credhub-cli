@@ -10,6 +10,8 @@ github.com/cloudfoundry/bosh-cli/v7 v7.4.1 h1:0Cply5dYl5kDBkpzfxB41SxjfurR2LOS2W
 github.com/cloudfoundry/bosh-cli/v7 v7.4.1/go.mod h1:p5Gmv2C0ySO1jjS/Bzt6qltxfa5ieFWkd3rB/dCvnhk=
 github.com/cloudfoundry/bosh-cli/v7 v7.5.0 h1:pZnEauBvAjiFC9hJB9bY9cmaY4lFUBhDRJKANP9L+yo=
 github.com/cloudfoundry/bosh-cli/v7 v7.5.0/go.mod h1:qGkY9Vg+XWisCv7fZ5zr555geoXrb3LoXCZm7hhQId4=
+github.com/cloudfoundry/bosh-cli/v7 v7.5.1 h1:HsQMmbD0s1N0tOHKQHgp9qwoMV05jbS45iNHxg2EWio=
+github.com/cloudfoundry/bosh-cli/v7 v7.5.1/go.mod h1:VEAjFxV/YvgqqRcMEw9IKQmtEx4citNr4WxuHG+hHSU=
 github.com/cloudfoundry/bosh-utils v0.0.393 h1:VCMwvw5ssGABdzjNHWWSjU2j7tGldmkgFj9aKuRfME0=
 github.com/cloudfoundry/bosh-utils v0.0.393/go.mod h1:myG88e9ONoCrynz1TFDMJ5lG3CPKDf3KcTpHSy2OQIk=
 github.com/cloudfoundry/bosh-utils v0.0.395 h1:Ed/5ElVXO5Twtl9ViuBwDMCsuCOAoyuDDLfI4Ena8CY=
@@ -36,6 +38,8 @@ github.com/cloudfoundry/bosh-utils v0.0.415 h1:mSDV3fuNvEFqz0ZtyJHoRzsPZEp3MMdTv
 github.com/cloudfoundry/bosh-utils v0.0.415/go.mod h1:cDykQYQieA7HuBLobIgnBiqG7euCbHbhq3VXKudgryU=
 github.com/cloudfoundry/bosh-utils v0.0.417 h1:goXFT4cvCOJaiqAVIDzkjh0pOqiD9iPLDXUJnXKoqDY=
 github.com/cloudfoundry/bosh-utils v0.0.417/go.mod h1:SpvoGp6+Nk0brIEB6oVLwE2BTQedS7SKBhS9dBBIVt0=
+github.com/cloudfoundry/bosh-utils v0.0.418 h1:jVCZJ/l3/g3vXy6+fgnwgryseJevVVj6YgZUaUGpY8s=
+github.com/cloudfoundry/bosh-utils v0.0.418/go.mod h1:WcL9lp9GnaB9tpzZhd0M0PbhObhY4g8aHtFmFmNqkqo=
 github.com/cloudfoundry/go-socks5 v0.0.0-20180221174514-54f73bdb8a8e h1:FQdRViaoDphGRfgrotl2QGsX1gbloe57dbGBS5CG6KY=
 github.com/cloudfoundry/go-socks5 v0.0.0-20180221174514-54f73bdb8a8e/go.mod h1:PXmcacyJB/pJjSxEl15IU6rEIKXrhZQRzsr0UTkgNNs=
 github.com/cloudfoundry/socks5-proxy v0.2.99 h1:oT9M+rTPKYCGN2wbEyMlFA4dFPuVZdmZ0MVfClkn0uc=
@@ -50,6 +54,8 @@ github.com/cloudfoundry/socks5-proxy v0.2.103 h1:pocfx/oilmCLu9thtNwHML0TYXRL4V7
 github.com/cloudfoundry/socks5-proxy v0.2.103/go.mod h1:KjkYGfQnoF4G7KbIlK5ez8/GRxIKdoWfomyaY4lFH4g=
 github.com/cloudfoundry/socks5-proxy v0.2.104 h1:Ao3+Kto9Zkic3aS8S11n5wBta6k72325307Oyxy3mGI=
 github.com/cloudfoundry/socks5-proxy v0.2.104/go.mod h1:InqXqRJMVayFCZ9SWgmSub6Lf+QnAWV9Yruk1TXqKcA=
+github.com/cloudfoundry/socks5-proxy v0.2.105 h1:WqP4dg9ExEI6NH/EIkQ90M8dNd6Rg+lPbOiDJzqtPeg=
+github.com/cloudfoundry/socks5-proxy v0.2.105/go.mod h1:vTNNB5Pw6pkWg3Qzzv7OyqkRig9dV5Ofh74yPx8fco8=
 github.com/cppforlife/go-patch v0.2.0 h1:Y14MnCQjDlbw7WXT4k+u6DPAA9XnygN4BfrSpI/19RU=
 github.com/cppforlife/go-patch v0.2.0/go.mod h1:67a7aIi94FHDZdoeGSJRRFDp66l9MhaAG1yGxpUoFD8=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
@@ -92,6 +98,8 @@ github.com/google/pprof v0.0.0-20231203200248-ad67f76aa53d h1:bM3Cipp7U7Sdn0DpYn
 github.com/google/pprof v0.0.0-20231203200248-ad67f76aa53d/go.mod h1:czg5+yv1E0ZGTi6S6vVK1mke0fV+FaUhNGcd6VRS9Ik=
 github.com/google/pprof v0.0.0-20231205033806-a5a03c77bf08 h1:PxlBVtIFHR/mtWk2i0gTEdCz+jBnqiuHNSki0epDbVs=
 github.com/google/pprof v0.0.0-20231205033806-a5a03c77bf08/go.mod h1:czg5+yv1E0ZGTi6S6vVK1mke0fV+FaUhNGcd6VRS9Ik=
+github.com/google/pprof v0.0.0-20231212022811-ec68065c825e h1:bwOy7hAFd0C91URzMIEBfr6BAz29yk7Qj0cy6S7DJlU=
+github.com/google/pprof v0.0.0-20231212022811-ec68065c825e/go.mod h1:czg5+yv1E0ZGTi6S6vVK1mke0fV+FaUhNGcd6VRS9Ik=
 github.com/hashicorp/go-version v1.6.0 h1:feTTfFNnjP967rlCxM/I9g701jU+RN74YKx2mOkIeek=
 github.com/hashicorp/go-version v1.6.0/go.mod h1:fltr4n8CU8Ke44wwGCBoEymUuxUHl09ZGVZPK5anwXA=
 github.com/howeyc/gopass v0.0.0-20210920133722-c8aef6fb66ef h1:A9HsByNhogrvm9cWb28sjiS3i7tcKCkflWFEkHfuAgM=
@@ -200,6 +208,8 @@ golang.org/x/tools v0.15.0 h1:zdAyfUGbYmuVokhzVmghFl2ZJh5QhcfebBgmVPFYA+8=
 golang.org/x/tools v0.15.0/go.mod h1:hpksKq4dtpQWS1uQ61JkdqWM3LscIS6Slf+VVkm+wQk=
 golang.org/x/tools v0.16.0 h1:GO788SKMRunPIBCXiQyo2AaexLstOrVhuAL5YwsckQM=
 golang.org/x/tools v0.16.0/go.mod h1:kYVVN6I1mBNoB1OX+noeBjbRk4IUEPa7JJ+TJMEooJ0=
+golang.org/x/tools v0.16.1 h1:TLyB3WofjdOEepBHAU20JdNC1Zbg87elYofWYAY5oZA=
+golang.org/x/tools v0.16.1/go.mod h1:kYVVN6I1mBNoB1OX+noeBjbRk4IUEPa7JJ+TJMEooJ0=
 golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543/go.mod h1:I/5z698sn9Ka8TeJc9MKroUUfqBBauWjQqLJ2OPfmY0=
 google.golang.org/protobuf v1.26.0-rc.1/go.mod h1:jlhhOSvTdKEhbULTjvd4ARK9grFBp09yW+WbY/TyQbw=
 google.golang.org/protobuf v1.26.0/go.mod h1:9q0QmTI4eRPtz6boOQmLYwt+qCgq0jsYwAQnmE0givc=
