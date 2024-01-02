@@ -1,6 +1,6 @@
 module code.cloudfoundry.org/credhub-cli
 
-go 1.21
+go 1.21.5
 
 toolchain go1.21.0
 
