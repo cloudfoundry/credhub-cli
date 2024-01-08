@@ -4,9 +4,9 @@ go 1.21.5
 
 require (
 	github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
-	github.com/cloudfoundry/bosh-cli/v7 v7.5.1
-	github.com/cloudfoundry/bosh-utils v0.0.420
-	github.com/cloudfoundry/socks5-proxy v0.2.106
+	github.com/cloudfoundry/bosh-cli/v7 v7.5.2
+	github.com/cloudfoundry/bosh-utils v0.0.421
+	github.com/cloudfoundry/socks5-proxy v0.2.107
 	github.com/fatih/color v1.16.0
 	github.com/hashicorp/go-version v1.6.0
 	github.com/howeyc/gopass v0.0.0-20210920133722-c8aef6fb66ef
@@ -32,8 +32,8 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/rogpeppe/go-internal v1.10.0 // indirect
 	golang.org/x/crypto v0.17.0 // indirect
-	golang.org/x/sys v0.15.0 // indirect
-	golang.org/x/term v0.15.0 // indirect
+	golang.org/x/sys v0.16.0 // indirect
+	golang.org/x/term v0.16.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/tools v0.16.1 // indirect
 	google.golang.org/protobuf v1.32.0 // indirect
