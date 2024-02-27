@@ -96,7 +96,7 @@ var _ = Describe("Socksify", func() {
 
 			Context("when the URL after the ssh+ prefix cannot be parsed", func() {
 				BeforeEach(func() {
-					os.Setenv("CREDHUB_PROXY", fmt.Sprintf("ssh+:cannot-start-with-colon"))
+					os.Setenv("CREDHUB_PROXY", "ssh+:cannot-start-with-colon")
 					dialFunc = credhub.SOCKS5DialFuncFromEnvironment(origDial, proxyDialer)
 				})
 				It("returns the dialer that was passed in", func() {
@@ -120,7 +120,7 @@ var _ = Describe("Socksify", func() {
 
 			Context("when the query params do not contain the private key path", func() {
 				BeforeEach(func() {
-					os.Setenv("CREDHUB_PROXY", fmt.Sprintf("ssh+socks5://localhost:12345?foo=bar"))
+					os.Setenv("CREDHUB_PROXY", "ssh+socks5://localhost:12345?foo=bar")
 					dialFunc = credhub.SOCKS5DialFuncFromEnvironment(origDial, proxyDialer)
 				})
 				It("returns the dialer that was passed in", func() {
@@ -132,7 +132,7 @@ var _ = Describe("Socksify", func() {
 
 			Context("when no key exists at the private key path", func() {
 				BeforeEach(func() {
-					os.Setenv("CREDHUB_PROXY", fmt.Sprintf("ssh+socks5://localhost:12345?private-key=/no/file/here"))
+					os.Setenv("CREDHUB_PROXY", "ssh+socks5://localhost:12345?private-key=/no/file/here")
 					dialFunc = credhub.SOCKS5DialFuncFromEnvironment(origDial, proxyDialer)
 				})
 				It("returns the dialer that was passed in", func() {
@@ -147,7 +147,7 @@ var _ = Describe("Socksify", func() {
 			// Happy paths not tested
 			Context("when the URL cannot be parsed", func() {
 				BeforeEach(func() {
-					os.Setenv("CREDHUB_PROXY", fmt.Sprintf(":cannot-start-with-colon"))
+					os.Setenv("CREDHUB_PROXY", ":cannot-start-with-colon")
 					dialFunc = credhub.SOCKS5DialFuncFromEnvironment(origDial, proxyDialer)
 				})
 				It("returns the dialer that was passed in", func() {
@@ -159,7 +159,7 @@ var _ = Describe("Socksify", func() {
 
 			Context("when the URL is not a valid proxy scheme", func() {
 				BeforeEach(func() {
-					os.Setenv("CREDHUB_PROXY", fmt.Sprintf("foo://cannot-start-with-colon"))
+					os.Setenv("CREDHUB_PROXY", "foo://cannot-start-with-colon")
 					dialFunc = credhub.SOCKS5DialFuncFromEnvironment(origDial, proxyDialer)
 				})
 				It("returns the dialer that was passed in", func() {
