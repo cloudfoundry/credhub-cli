@@ -148,9 +148,7 @@ func runCommand(args ...string) *Session {
 func runCommandWithEnv(env []string, args ...string) *Session {
 	cmd := exec.Command(commandPath, args...)
 	existing := os.Environ()
-	for _, env_var := range env {
-		existing = append(existing, env_var)
-	}
+	existing = append(existing, env...)
 	cmd.Env = existing
 	session, err := Start(cmd, GinkgoWriter, GinkgoWriter)
 	Expect(err).NotTo(HaveOccurred())
