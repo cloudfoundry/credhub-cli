@@ -1,10 +1,11 @@
 package commands
 
 import (
-	"code.cloudfoundry.org/credhub-cli/credhub"
-	"code.cloudfoundry.org/credhub-cli/credhub/credentials"
 	"fmt"
 	"strconv"
+
+	"code.cloudfoundry.org/credhub-cli/credhub"
+	"code.cloudfoundry.org/credhub-cli/credhub/credentials"
 
 	"os"
 
@@ -63,13 +64,9 @@ func (c *ImportCommand) setCredentials(bulkImport models.CredentialBulkImport) e
 		var caName string
 		switch credential["type"].(string) {
 		case "ssh":
-			if _, ok := credential["value"].(map[string]interface{})["public_key_fingerprint"]; ok {
-				delete(credential["value"].(map[string]interface{}), "public_key_fingerprint")
-			}
+			delete(credential["value"].(map[string]interface{}), "public_key_fingerprint")
 		case "user":
-			if _, ok := credential["value"].(map[string]interface{})["password_hash"]; ok {
-				delete(credential["value"].(map[string]interface{}), "password_hash")
-			}
+			delete(credential["value"].(map[string]interface{}), "password_hash")
 		case "value":
 			switch value := credential["value"].(type) {
 			case int:
