@@ -5,7 +5,6 @@ import (
 	"strconv"
 
 	"code.cloudfoundry.org/credhub-cli/credhub"
-	"code.cloudfoundry.org/credhub-cli/credhub/credentials"
 
 	"os"
 
@@ -122,8 +121,7 @@ func (c *ImportCommand) setCredentialInCredHub(name, credType string, value, met
 	var options []credhub.SetOption
 
 	if metadata != nil {
-		var meta credentials.Metadata
-		meta = metadata.(map[string]interface{})
+		meta := metadata.(map[string]interface{})
 		withMetadata := func(s *credhub.SetOptions) error {
 			s.Metadata = meta
 			return nil
