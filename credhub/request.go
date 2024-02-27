@@ -59,7 +59,7 @@ func (ch *CredHub) request(client requester, method string, pathStr string, quer
 	resp, err := client.Do(req)
 	if err != nil {
 		if os.Getenv("CREDHUB_DEBUG") == "true" {
-			fmt.Println(fmt.Sprintf("[DEBUG] %s: %v", "An error occurred during the data request.", err))
+			fmt.Printf("[DEBUG] %s: %v", "An error occurred during the data request.\n", err)
 		}
 		return resp, err
 	}
