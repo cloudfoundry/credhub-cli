@@ -69,7 +69,7 @@ func (c Credential) convertToOutput() (interface{}, error) {
 	if ok {
 		result.Value = c.Value
 	} else {
-		value, ok := c.Value.(interface{})
+		value := c.Value
 		if !ok {
 			return nil, errors.NewCatchAllError()
 		}
