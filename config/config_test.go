@@ -8,7 +8,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
-	"runtime"
 	"time"
 
 	"code.cloudfoundry.org/credhub-cli/config"
@@ -40,11 +39,7 @@ var _ = Describe("Config", func() {
 			homeDir, err = ioutil.TempDir("", "credhub-cli-test")
 			Expect(err).NotTo(HaveOccurred())
 
-			if runtime.GOOS == "windows" {
-				os.Setenv("USERPROFILE", homeDir)
-			} else {
-				os.Setenv("HOME", homeDir)
-			}
+			os.Setenv("HOME", homeDir)
 		})
 
 		var _ = AfterEach(func() {
