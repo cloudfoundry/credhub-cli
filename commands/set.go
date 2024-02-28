@@ -152,7 +152,7 @@ func (c *SetCommand) setCredential() (credentials.Credential, error) {
 }
 
 func promptForInput(prompt string, value *string) {
-	fmt.Printf(prompt)
+	fmt.Print(prompt)
 	reader := bufio.NewReader(os.Stdin)
 	val, _ := reader.ReadString('\n')
 	*value = string(strings.TrimSpace(val))
