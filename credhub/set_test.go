@@ -105,6 +105,7 @@ var _ = Describe("Set", func() {
 
 			var requestBody map[string]interface{}
 			body, err := ioutil.ReadAll(dummy.Request.Body)
+			Expect(err).ToNot(HaveOccurred())
 			Expect(json.Unmarshal(body, &requestBody)).To(Succeed())
 
 			Expect(requestBody["mode"]).To(Equal("overwrite"))

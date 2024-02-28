@@ -84,6 +84,7 @@ var _ = Describe("Request()", func() {
 				ch, _ := New("https://example.com", Auth(dummy.Builder()))
 
 				r, err := ch.Request("GET", "/example-password", nil, nil, false)
+				Expect(err).ToNot(HaveOccurred())
 				resp, err := ioutil.ReadAll(r.Body)
 				Expect(err).ToNot(HaveOccurred())
 

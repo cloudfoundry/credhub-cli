@@ -36,6 +36,7 @@ var _ = Describe("ExportCredentials", func() {
 	Describe("outputJSON is set to true", func() {
 		It("returns a JSON map with a root credential object", func() {
 			exportCreds, err := models.ExportCredentials(credentials, true)
+			Expect(err).ToNot(HaveOccurred())
 
 			var v map[string]interface{}
 			var mapOfInterfaces []interface{}
@@ -89,6 +90,7 @@ var _ = Describe("ExportCredentials", func() {
 	Describe("outputJSON is set to false", func() {
 		It("returns a YAML map with a root credential object", func() {
 			exportCreds, err := models.ExportCredentials(credentials, false)
+			Expect(err).ToNot(HaveOccurred())
 
 			var v map[string]interface{}
 			var mapOfInterfaces []interface{}
