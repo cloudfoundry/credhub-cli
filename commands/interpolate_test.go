@@ -3,14 +3,14 @@ package commands_test
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"os"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	"github.com/onsi/gomega/gexec"
 	. "github.com/onsi/gomega/ghttp"
-	"io/ioutil"
-	"net/http"
-	"os"
 )
 
 var (
@@ -23,11 +23,11 @@ var (
 var _ = Describe("interpolate", func() {
 	BeforeEach(func() {
 		login()
-		templateFile, err = ioutil.TempFile("", "credhub_test_interpolate_template_")
+		templateFile, err = os.CreateTemp("", "credhub_test_interpolate_template_")
 	})
 
 	Describe("behavior shared with other commands", func() {
-		templateFile, err = ioutil.TempFile("", "credhub_test_interpolate_template_")
+		templateFile, err = os.CreateTemp("", "credhub_test_interpolate_template_")
 		templateFile.WriteString("---")
 		testAutoLogin := []TestAutoLogin{
 			{

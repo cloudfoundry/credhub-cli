@@ -6,7 +6,6 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"math/big"
 	"net"
@@ -93,7 +92,7 @@ func generateCertificate() (string, string) {
 	caCertificate, err := x509.CreateCertificate(rand.Reader, ca, ca, &privateKey.PublicKey, privateKey)
 	Expect(err).NotTo(HaveOccurred())
 
-	certFile, err := ioutil.TempFile("", "socks5-test")
+	certFile, err := os.CreateTemp("", "socks5-test")
 	Expect(err).NotTo(HaveOccurred())
 
 	pem.Encode(certFile, &pem.Block{
@@ -101,7 +100,7 @@ func generateCertificate() (string, string) {
 		Bytes: caCertificate,
 	})
 
-	keyFile, err := ioutil.TempFile("", "socks5-test")
+	keyFile, err := os.CreateTemp("", "socks5-test")
 	Expect(err).NotTo(HaveOccurred())
 
 	pem.Encode(keyFile, &pem.Block{

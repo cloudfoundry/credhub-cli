@@ -10,7 +10,6 @@ import (
 	. "github.com/onsi/gomega/ghttp"
 
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"os/exec"
@@ -56,7 +55,7 @@ var (
 
 var _ = BeforeEach(func() {
 	var err error
-	homeDir, err = ioutil.TempDir("", "cm-test")
+	homeDir, err = os.MkdirTemp("", "cm-test")
 	Expect(err).NotTo(HaveOccurred())
 
 	if runtime.GOOS == "windows" {
@@ -189,9 +188,9 @@ func setupUAAConfig(uaaResponseStatus int) {
 func NewTlsServer(certPath, keyPath string) *Server {
 	tlsServer := NewUnstartedServer()
 
-	cert, err := ioutil.ReadFile(certPath)
+	cert, err := os.ReadFile(certPath)
 	Expect(err).To(BeNil())
-	key, err := ioutil.ReadFile(keyPath)
+	key, err := os.ReadFile(keyPath)
 	Expect(err).To(BeNil())
 
 	tlsCert, err := tls.X509KeyPair(cert, key)
@@ -288,7 +287,7 @@ func ItAutomaticallyLogsIn(autoLogins []TestAutoLogin, args ...string) {
 	Describe("automatic authentication", func() {
 		BeforeEach(func() {
 			for i, autoLogin := range autoLogins {
-				buf, _ := ioutil.ReadFile(filepath.Join("testdata", autoLogin.responseFixtureFile))
+				buf, _ := os.ReadFile(filepath.Join("testdata", autoLogin.responseFixtureFile))
 				serverResponse[i] = string(buf)
 			}
 		})

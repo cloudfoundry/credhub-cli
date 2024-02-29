@@ -1,10 +1,11 @@
 package credhub_test
 
 import (
+	"io"
+
 	. "code.cloudfoundry.org/credhub-cli/credhub"
 
 	"bytes"
-	"io/ioutil"
 	"net/http"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -16,7 +17,7 @@ var _ = Describe("Delete", func() {
 	It("requests a delete by name", func() {
 		dummy := &DummyAuth{Response: &http.Response{
 			StatusCode: http.StatusOK,
-			Body:       ioutil.NopCloser(bytes.NewBufferString("")),
+			Body:       io.NopCloser(bytes.NewBufferString("")),
 		}}
 
 		ch, _ := New("https://example.com", Auth(dummy.Builder()))
@@ -32,7 +33,7 @@ var _ = Describe("Delete", func() {
 		It("deletes the credential", func() {
 			dummy := &DummyAuth{Response: &http.Response{
 				StatusCode: http.StatusNoContent,
-				Body:       ioutil.NopCloser(bytes.NewBufferString("")),
+				Body:       io.NopCloser(bytes.NewBufferString("")),
 			}}
 
 			ch, _ := New("https://example.com", Auth(dummy.Builder()))
@@ -45,7 +46,7 @@ var _ = Describe("Delete", func() {
 		It("returns an error", func() {
 			dummy := &DummyAuth{Response: &http.Response{
 				StatusCode: http.StatusNotFound,
-				Body:       ioutil.NopCloser(bytes.NewBufferString(`{"error":"The request could not be completed because the credential does not exist or you do not have sufficient authorization."}`)),
+				Body:       io.NopCloser(bytes.NewBufferString(`{"error":"The request could not be completed because the credential does not exist or you do not have sufficient authorization."}`)),
 			}}
 
 			ch, _ := New("https://example.com", Auth(dummy.Builder()))

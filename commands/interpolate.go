@@ -2,7 +2,6 @@ package commands
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"regexp"
@@ -25,7 +24,7 @@ func (c *InterpolateCommand) Execute([]string) error {
 		return errors.NewMissingInterpolateParametersError()
 	}
 
-	fileContents, err := ioutil.ReadFile(c.File)
+	fileContents, err := os.ReadFile(c.File)
 	if err != nil {
 		return err
 	}

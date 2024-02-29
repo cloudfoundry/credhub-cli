@@ -2,7 +2,7 @@ package credhub_test
 
 import (
 	"bytes"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -16,7 +16,7 @@ var _ = Describe("Certificates", func() {
 	It("requests to get all certificates", func() {
 		dummy := &DummyAuth{Response: &http.Response{
 			StatusCode: http.StatusOK,
-			Body:       ioutil.NopCloser(bytes.NewBufferString("")),
+			Body:       io.NopCloser(bytes.NewBufferString("")),
 		}}
 
 		ch, _ := New("https://example.com", Auth(dummy.Builder()))
@@ -30,7 +30,7 @@ var _ = Describe("Certificates", func() {
 	It("requests the certificates by name", func() {
 		dummy := &DummyAuth{Response: &http.Response{
 			StatusCode: http.StatusOK,
-			Body:       ioutil.NopCloser(bytes.NewBufferString("")),
+			Body:       io.NopCloser(bytes.NewBufferString("")),
 		}}
 
 		ch, _ := New("https://example.com", Auth(dummy.Builder()))
@@ -79,7 +79,7 @@ var _ = Describe("Certificates", func() {
 			]}`
 				dummyAuth := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusOK,
-					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
+					Body:       io.NopCloser(bytes.NewBufferString(responseString)),
 				}}
 
 				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
@@ -114,7 +114,7 @@ var _ = Describe("Certificates", func() {
 
 				dummyAuth := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusOK,
-					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
+					Body:       io.NopCloser(bytes.NewBufferString(responseString)),
 				}}
 
 				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
@@ -132,7 +132,7 @@ var _ = Describe("Certificates", func() {
 
 				dummyAuth := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusOK,
-					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
+					Body:       io.NopCloser(bytes.NewBufferString(responseString)),
 				}}
 
 				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
@@ -149,7 +149,7 @@ var _ = Describe("Certificates", func() {
 
 				dummyAuth := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusOK,
-					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
+					Body:       io.NopCloser(bytes.NewBufferString(responseString)),
 				}}
 
 				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))

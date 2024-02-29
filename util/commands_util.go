@@ -1,8 +1,6 @@
 package util
 
 import (
-	"io/ioutil"
-
 	"strings"
 
 	"os"
@@ -17,7 +15,7 @@ func ReadFileOrStringFromField(field string) (string, error) {
 		return strings.Replace(field, "\\n", "\n", -1), nil
 	}
 
-	dat, err := ioutil.ReadFile(field)
+	dat, err := os.ReadFile(field)
 	if err != nil {
 		return "", credhub_errors.NewFileLoadError()
 	}

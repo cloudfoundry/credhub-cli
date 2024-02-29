@@ -1,7 +1,6 @@
 package commands_test
 
 import (
-	"io/ioutil"
 	"net/http"
 	"os"
 
@@ -17,7 +16,7 @@ import (
 )
 
 func withTemporaryFile(wantingFile func(string)) error {
-	f, err := ioutil.TempFile("", "credhub_tests_")
+	f, err := os.CreateTemp("", "credhub_tests_")
 
 	if err != nil {
 		return err
@@ -279,7 +278,7 @@ var _ = Describe("Export", func() {
 
 						Expect(filename).To(BeAnExistingFile())
 
-						fileContents, _ := ioutil.ReadFile(filename)
+						fileContents, _ := os.ReadFile(filename)
 
 						Expect(string(fileContents)).To(Equal(jsonOutput))
 					})
@@ -306,7 +305,7 @@ var _ = Describe("Export", func() {
 
 						Expect(filename).To(BeAnExistingFile())
 
-						fileContents, _ := ioutil.ReadFile(filename)
+						fileContents, _ := os.ReadFile(filename)
 
 						Expect(string(fileContents)).To(Equal(noCredsYaml))
 					})

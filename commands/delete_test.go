@@ -1,8 +1,9 @@
 package commands_test
 
 import (
-	"code.cloudfoundry.org/credhub-cli/commands"
 	"net/http"
+
+	"code.cloudfoundry.org/credhub-cli/commands"
 
 	"code.cloudfoundry.org/credhub-cli/config"
 	. "github.com/onsi/ginkgo/v2"

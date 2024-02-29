@@ -1,9 +1,9 @@
 package credhub_test
 
 import (
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 
 	. "code.cloudfoundry.org/credhub-cli/credhub"
 	"code.cloudfoundry.org/credhub-cli/credhub/auth"
@@ -93,7 +93,7 @@ var _ = Describe("New()", func() {
 		}
 		var caCerts []string
 		for _, caCertFile := range caCertFiles {
-			caCertBytes, err := ioutil.ReadFile(fixturePath + caCertFile)
+			caCertBytes, err := os.ReadFile(fixturePath + caCertFile)
 			if err != nil {
 				Fail("Couldn't read certificate " + caCertFile + ": " + err.Error())
 			}

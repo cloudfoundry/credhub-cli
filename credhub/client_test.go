@@ -3,8 +3,8 @@ package credhub_test
 import (
 	"crypto/tls"
 	"crypto/x509"
-	"io/ioutil"
 	"net/http"
+	"os"
 	"runtime"
 	"time"
 
@@ -98,7 +98,7 @@ var _ = Describe("Client()", func() {
 			}
 
 			for _, caCertFile := range caCertFiles {
-				caCertBytes, err := ioutil.ReadFile(fixturePath + caCertFile)
+				caCertBytes, err := os.ReadFile(fixturePath + caCertFile)
 				if err != nil {
 					Fail("Couldn't read certificate " + caCertFile + ": " + err.Error())
 				}

@@ -2,7 +2,7 @@ package auth_test
 
 import (
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -78,7 +78,7 @@ var _ = Describe("OAuthStrategy", func() {
 
 			defer resp.Body.Close()
 
-			bytes, err := ioutil.ReadAll(resp.Body)
+			bytes, err := io.ReadAll(resp.Body)
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(bytes).To(Equal([]byte("success")))
@@ -192,7 +192,7 @@ var _ = Describe("OAuthStrategy", func() {
 				Expect(mockUaaClient.ClientSecret).To(Equal("client-secret"))
 				Expect(mockUaaClient.RefreshToken).To(Equal("old-refresh-token"))
 
-				body, err := ioutil.ReadAll(response.Body)
+				body, err := io.ReadAll(response.Body)
 
 				Expect(err).ToNot(HaveOccurred())
 				Expect(string(body)).To(Equal("Success!"))
@@ -276,7 +276,7 @@ var _ = Describe("OAuthStrategy", func() {
 
 				Expect(err).ToNot(HaveOccurred())
 
-				body, err := ioutil.ReadAll(response.Body)
+				body, err := io.ReadAll(response.Body)
 
 				Expect(err).ToNot(HaveOccurred())
 				Expect(body).To(MatchJSON(`{"error": "some other error"}`))

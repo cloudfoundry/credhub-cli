@@ -2,7 +2,7 @@ package commands
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 
 	"code.cloudfoundry.org/credhub-cli/config"
 	"code.cloudfoundry.org/credhub-cli/credhub/credentials"
@@ -33,7 +33,7 @@ func (cmd ExportCommand) Execute([]string) error {
 
 		return err
 	} else {
-		return ioutil.WriteFile(cmd.File, exportCreds.Bytes, 0644)
+		return os.WriteFile(cmd.File, exportCreds.Bytes, 0644)
 	}
 }
 

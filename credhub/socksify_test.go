@@ -2,7 +2,6 @@ package credhub_test
 
 import (
 	"fmt"
-	"io/ioutil"
 	"net"
 	"os"
 	"path/filepath"
@@ -46,10 +45,10 @@ var _ = Describe("Socksify", func() {
 				proxyDialer.DialerCall.Returns.DialFunc = proxy.DialFunc(func(x, y string) (net.Conn, error) {
 					return nil, errors.New("proxy dialer")
 				})
-				tempDir, err := ioutil.TempDir("", "")
+				tempDir, err := os.MkdirTemp("", "")
 				Expect(err).NotTo(HaveOccurred())
 				privateKeyPath := filepath.Join(tempDir, "test.key")
-				err = ioutil.WriteFile(privateKeyPath, []byte("some-key"), 0600)
+				err = os.WriteFile(privateKeyPath, []byte("some-key"), 0600)
 				Expect(err).NotTo(HaveOccurred())
 				os.Setenv("CREDHUB_PROXY", fmt.Sprintf("ssh+socks5://user@localhost:12345?private-key=%s", privateKeyPath))
 				dialFunc = credhub.SOCKS5DialFuncFromEnvironment(origDial, proxyDialer)

@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"math/rand"
 	"net/http"
 
@@ -37,7 +36,7 @@ var _ = Describe("Set", func() {
 
 			dummy := &DummyAuth{Response: &http.Response{
 				StatusCode: http.StatusOK,
-				Body: ioutil.NopCloser(bytes.NewBufferString(`{
+				Body: io.NopCloser(bytes.NewBufferString(`{
 		  "id": "some-credential",
 		  "name": "some-credential",
 		  "type": "some-type",
@@ -92,7 +91,7 @@ var _ = Describe("Set", func() {
 		It("sets overwrite mode when server version is older than 2.x", func() {
 			dummy := &DummyAuth{Response: &http.Response{
 				StatusCode: http.StatusOK,
-				Body:       ioutil.NopCloser(bytes.NewBufferString("{}")),
+				Body:       io.NopCloser(bytes.NewBufferString("{}")),
 			},
 				Error: nil,
 			}
@@ -104,7 +103,7 @@ var _ = Describe("Set", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			var requestBody map[string]interface{}
-			body, err := ioutil.ReadAll(dummy.Request.Body)
+			body, err := io.ReadAll(dummy.Request.Body)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(json.Unmarshal(body, &requestBody)).To(Succeed())
 
@@ -129,7 +128,7 @@ var _ = Describe("Set", func() {
 
 		It("returns an error when response body cannot be unmarshalled", func() {
 			dummy := &DummyAuth{Response: &http.Response{
-				Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
+				Body: io.NopCloser(bytes.NewBufferString("something-invalid")),
 			}}
 			ch, err := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.6.0"))
 			Expect(err).ToNot(HaveOccurred())
@@ -147,7 +146,7 @@ var _ = Describe("Set", func() {
 
 			dummy := &DummyAuth{Response: &http.Response{
 				StatusCode: http.StatusOK,
-				Body: ioutil.NopCloser(bytes.NewBufferString(`{
+				Body: io.NopCloser(bytes.NewBufferString(`{
 		  "id": "some-id",
 		  "name": "/example-certificate",
 		  "type": "certificate",
@@ -207,7 +206,7 @@ var _ = Describe("Set", func() {
 
 			dummy := &DummyAuth{Response: &http.Response{
 				StatusCode: http.StatusOK,
-				Body: ioutil.NopCloser(bytes.NewBufferString(`{
+				Body: io.NopCloser(bytes.NewBufferString(`{
 		  "id": "some-id",
 		  "name": "/example-password",
 		  "type": "password",
@@ -257,7 +256,7 @@ var _ = Describe("Set", func() {
 
 			dummy := &DummyAuth{Response: &http.Response{
 				StatusCode: http.StatusOK,
-				Body: ioutil.NopCloser(bytes.NewBufferString(`
+				Body: io.NopCloser(bytes.NewBufferString(`
 					{
 						"id": "67fc3def-bbfb-4953-83f8-4ab0682ad675",
 						"name": "/example-user",
@@ -316,7 +315,7 @@ var _ = Describe("Set", func() {
 
 			dummy := &DummyAuth{Response: &http.Response{
 				StatusCode: http.StatusOK,
-				Body: ioutil.NopCloser(bytes.NewBufferString(`
+				Body: io.NopCloser(bytes.NewBufferString(`
 					{
 						"id": "67fc3def-bbfb-4953-83f8-4ab0682ad676",
 						"name": "/example-rsa",
@@ -370,7 +369,7 @@ var _ = Describe("Set", func() {
 
 			dummy := &DummyAuth{Response: &http.Response{
 				StatusCode: http.StatusOK,
-				Body: ioutil.NopCloser(bytes.NewBufferString(`
+				Body: io.NopCloser(bytes.NewBufferString(`
 					{
 						"id": "67fc3def-bbfb-4953-83f8-4ab0682ad676",
 						"name": "/example-ssh",
@@ -435,7 +434,7 @@ var _ = Describe("Set", func() {
 
 			dummy := &DummyAuth{Response: &http.Response{
 				StatusCode: http.StatusOK,
-				Body: ioutil.NopCloser(bytes.NewBufferString(fmt.Sprintf(`
+				Body: io.NopCloser(bytes.NewBufferString(fmt.Sprintf(`
 					{
 						"id": "some-id",
 						"name": "/example-json",
@@ -481,7 +480,7 @@ var _ = Describe("Set", func() {
 			Expect(json.Unmarshal([]byte(metadataStr), &metadata)).To(Succeed())
 			dummy := &DummyAuth{Response: &http.Response{
 				StatusCode: http.StatusOK,
-				Body: ioutil.NopCloser(bytes.NewBufferString(`
+				Body: io.NopCloser(bytes.NewBufferString(`
 					{
 						"id": "some-id",
 						"name": "/example-value",
@@ -523,7 +522,7 @@ var _ = Describe("Set", func() {
 
 func getBody(body io.ReadCloser) map[string]interface{} {
 	var requestBody map[string]interface{}
-	bodyBytes, err := ioutil.ReadAll(body)
+	bodyBytes, err := io.ReadAll(body)
 	Expect(err).ToNot(HaveOccurred())
 	Expect(json.Unmarshal(bodyBytes, &requestBody)).To(Succeed())
 	return requestBody

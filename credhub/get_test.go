@@ -2,10 +2,11 @@ package credhub_test
 
 import (
 	"bytes"
-	"code.cloudfoundry.org/credhub-cli/credhub/credentials"
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
+
+	"code.cloudfoundry.org/credhub-cli/credhub/credentials"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -22,7 +23,7 @@ var _ = Describe("Get", func() {
 	Describe("GetLatestVersion()", func() {
 		It("requests the credential by name using the 'current' query parameter", func() {
 			dummyAuth := &DummyAuth{Response: &http.Response{
-				Body: ioutil.NopCloser(bytes.NewBufferString("")),
+				Body: io.NopCloser(bytes.NewBufferString("")),
 			}}
 
 			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
@@ -48,7 +49,7 @@ var _ = Describe("Get", func() {
     ]}`
 				dummyAuth := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusOK,
-					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
+					Body:       io.NopCloser(bytes.NewBufferString(responseString)),
 				}}
 
 				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
@@ -68,7 +69,7 @@ var _ = Describe("Get", func() {
 			It("returns an error", func() {
 				dummyAuth := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusOK,
-					Body:       ioutil.NopCloser(bytes.NewBufferString(`{"data":[]}`)),
+					Body:       io.NopCloser(bytes.NewBufferString(`{"data":[]}`)),
 				}}
 				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
 				_, err := ch.GetLatestVersion("/example-password")
@@ -81,7 +82,7 @@ var _ = Describe("Get", func() {
 	Describe("GetById()", func() {
 		It("requests the credential by id", func() {
 			dummyAuth := &DummyAuth{Response: &http.Response{
-				Body: ioutil.NopCloser(bytes.NewBufferString("")),
+				Body: io.NopCloser(bytes.NewBufferString("")),
 			}}
 
 			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
@@ -104,7 +105,7 @@ var _ = Describe("Get", func() {
     }`
 				dummyAuth := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusOK,
-					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
+					Body:       io.NopCloser(bytes.NewBufferString(responseString)),
 				}}
 
 				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
@@ -124,7 +125,7 @@ var _ = Describe("Get", func() {
 	Describe("GetAllVersions()", func() {
 		It("makes a request for all versions of a credential", func() {
 			dummyAuth := &DummyAuth{Response: &http.Response{
-				Body: ioutil.NopCloser(bytes.NewBufferString("")),
+				Body: io.NopCloser(bytes.NewBufferString("")),
 			}}
 
 			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
@@ -158,7 +159,7 @@ var _ = Describe("Get", func() {
     ]}`
 				dummyAuth := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusOK,
-					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
+					Body:       io.NopCloser(bytes.NewBufferString(responseString)),
 				}}
 
 				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
@@ -210,7 +211,7 @@ var _ = Describe("Get", func() {
     ]}`
 				dummyAuth := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusOK,
-					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
+					Body:       io.NopCloser(bytes.NewBufferString(responseString)),
 				}}
 
 				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
@@ -243,7 +244,7 @@ var _ = Describe("Get", func() {
 			It("returns an error", func() {
 				dummyAuth := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusOK,
-					Body:       ioutil.NopCloser(bytes.NewBufferString(`{"data":[]}`)),
+					Body:       io.NopCloser(bytes.NewBufferString(`{"data":[]}`)),
 				}}
 				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
 				_, err := ch.GetAllVersions("/example-password")
@@ -256,7 +257,7 @@ var _ = Describe("Get", func() {
 	Describe("GetNVersions()", func() {
 		It("makes a request for N versions of a credential", func() {
 			dummyAuth := &DummyAuth{Response: &http.Response{
-				Body: ioutil.NopCloser(bytes.NewBufferString("")),
+				Body: io.NopCloser(bytes.NewBufferString("")),
 			}}
 
 			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
@@ -290,7 +291,7 @@ var _ = Describe("Get", func() {
     ]}`
 				dummyAuth := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusOK,
-					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
+					Body:       io.NopCloser(bytes.NewBufferString(responseString)),
 				}}
 
 				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
@@ -342,7 +343,7 @@ var _ = Describe("Get", func() {
     ]}`
 				dummyAuth := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusOK,
-					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
+					Body:       io.NopCloser(bytes.NewBufferString(responseString)),
 				}}
 
 				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
@@ -375,7 +376,7 @@ var _ = Describe("Get", func() {
 			It("returns an error", func() {
 				dummyAuth := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusOK,
-					Body:       ioutil.NopCloser(bytes.NewBufferString(`{"data":[]}`)),
+					Body:       io.NopCloser(bytes.NewBufferString(`{"data":[]}`)),
 				}}
 				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
 				_, err := ch.GetNVersions("/example-password", 2)
@@ -390,7 +391,7 @@ var _ = Describe("Get", func() {
 
 				dummyAuth := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusOK,
-					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
+					Body:       io.NopCloser(bytes.NewBufferString(responseString)),
 				}}
 				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
 				_, err := ch.GetNVersions("/example-password", 2)
@@ -405,7 +406,7 @@ var _ = Describe("Get", func() {
 	Describe("GetLatestPassword()", func() {
 		It("requests the credential by name", func() {
 			dummyAuth := &DummyAuth{Response: &http.Response{
-				Body: ioutil.NopCloser(bytes.NewBufferString("")),
+				Body: io.NopCloser(bytes.NewBufferString("")),
 			}}
 
 			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
@@ -431,7 +432,7 @@ var _ = Describe("Get", func() {
     }]}`
 				dummyAuth := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusOK,
-					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
+					Body:       io.NopCloser(bytes.NewBufferString(responseString)),
 				}}
 
 				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
@@ -450,7 +451,7 @@ var _ = Describe("Get", func() {
 	Describe("GetLatestCertificate()", func() {
 		It("requests the credential by name", func() {
 			dummyAuth := &DummyAuth{Response: &http.Response{
-				Body: ioutil.NopCloser(bytes.NewBufferString("")),
+				Body: io.NopCloser(bytes.NewBufferString("")),
 			}}
 
 			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
@@ -480,7 +481,7 @@ var _ = Describe("Get", func() {
 }]}`
 				dummyAuth := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusOK,
-					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
+					Body:       io.NopCloser(bytes.NewBufferString(responseString)),
 				}}
 
 				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
@@ -502,7 +503,7 @@ var _ = Describe("Get", func() {
 	Describe("GetLatestUser()", func() {
 		It("requests the credential by name", func() {
 			dummyAuth := &DummyAuth{Response: &http.Response{
-				Body: ioutil.NopCloser(bytes.NewBufferString("")),
+				Body: io.NopCloser(bytes.NewBufferString("")),
 			}}
 
 			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
@@ -535,7 +536,7 @@ var _ = Describe("Get", func() {
 				}`
 				dummyAuth := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusOK,
-					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
+					Body:       io.NopCloser(bytes.NewBufferString(responseString)),
 				}}
 
 				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
@@ -558,7 +559,7 @@ var _ = Describe("Get", func() {
 	Describe("GetLatestRSA()", func() {
 		It("requests the credential by name", func() {
 			dummyAuth := &DummyAuth{Response: &http.Response{
-				Body: ioutil.NopCloser(bytes.NewBufferString("")),
+				Body: io.NopCloser(bytes.NewBufferString("")),
 			}}
 
 			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
@@ -591,7 +592,7 @@ var _ = Describe("Get", func() {
 
 				dummyAuth := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusOK,
-					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
+					Body:       io.NopCloser(bytes.NewBufferString(responseString)),
 				}}
 
 				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
@@ -613,7 +614,7 @@ var _ = Describe("Get", func() {
 	Describe("GetLatestSSH()", func() {
 		It("requests the credential by name", func() {
 			dummyAuth := &DummyAuth{Response: &http.Response{
-				Body: ioutil.NopCloser(bytes.NewBufferString("")),
+				Body: io.NopCloser(bytes.NewBufferString("")),
 			}}
 
 			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
@@ -647,7 +648,7 @@ var _ = Describe("Get", func() {
 
 				dummyAuth := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusOK,
-					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
+					Body:       io.NopCloser(bytes.NewBufferString(responseString)),
 				}}
 
 				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
@@ -670,7 +671,7 @@ var _ = Describe("Get", func() {
 	Describe("GetLatestJSON()", func() {
 		It("requests the credential by name", func() {
 			dummyAuth := &DummyAuth{Response: &http.Response{
-				Body: ioutil.NopCloser(bytes.NewBufferString("")),
+				Body: io.NopCloser(bytes.NewBufferString("")),
 			}}
 
 			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
@@ -707,7 +708,7 @@ var _ = Describe("Get", func() {
 
 				dummyAuth := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusOK,
-					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
+					Body:       io.NopCloser(bytes.NewBufferString(responseString)),
 				}}
 
 				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
@@ -739,7 +740,7 @@ var _ = Describe("Get", func() {
 	Describe("GetLatestValue()", func() {
 		It("requests the credential by name", func() {
 			dummyAuth := &DummyAuth{Response: &http.Response{
-				Body: ioutil.NopCloser(bytes.NewBufferString("")),
+				Body: io.NopCloser(bytes.NewBufferString("")),
 			}}
 
 			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
@@ -767,7 +768,7 @@ var _ = Describe("Get", func() {
 
 				dummyAuth := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusOK,
-					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
+					Body:       io.NopCloser(bytes.NewBufferString(responseString)),
 				}}
 
 				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
@@ -833,7 +834,7 @@ var _ = Describe("Get", func() {
 	DescribeTable("errors when response body is not json and/or cannot be decoded",
 		func(performAction func(*CredHub) error) {
 			dummyAuth := &DummyAuth{Response: &http.Response{
-				Body: ioutil.NopCloser(bytes.NewBufferString("<html>")),
+				Body: io.NopCloser(bytes.NewBufferString("<html>")),
 			}}
 			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
 			err := performAction(ch)
@@ -849,7 +850,7 @@ var _ = Describe("Get", func() {
 		func(performAction func(*CredHub) error) {
 			dummyAuth := &DummyAuth{Response: &http.Response{
 				StatusCode: http.StatusNotFound,
-				Body:       ioutil.NopCloser(bytes.NewBufferString(`{"error":"The request could not be completed because the credential does not exist or you do not have sufficient authorization."}`)),
+				Body:       io.NopCloser(bytes.NewBufferString(`{"error":"The request could not be completed because the credential does not exist or you do not have sufficient authorization."}`)),
 			}}
 			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
 			err := performAction(ch)

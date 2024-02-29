@@ -3,7 +3,6 @@ package config
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"time"
@@ -31,7 +30,7 @@ func ConfigPath() string {
 func ReadConfig() Config {
 	c := Config{}
 
-	data, err := ioutil.ReadFile(ConfigPath())
+	data, err := os.ReadFile(ConfigPath())
 	if err != nil {
 		if !os.IsNotExist(err) {
 			return c
@@ -101,7 +100,7 @@ func WriteConfig(c Config) error {
 	}
 
 	configPath := ConfigPath()
-	return ioutil.WriteFile(configPath, data, 0600)
+	return os.WriteFile(configPath, data, 0600)
 }
 
 func RemoveConfig() error {

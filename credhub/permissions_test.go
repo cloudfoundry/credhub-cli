@@ -3,7 +3,7 @@ package credhub_test
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 
@@ -30,7 +30,7 @@ var _ = Describe("Permissions", func() {
 
 				dummyAuth := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusOK,
-					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
+					Body:       io.NopCloser(bytes.NewBufferString(responseString)),
 				}}
 
 				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()), ServerVersion("1.9.0"))
@@ -64,7 +64,7 @@ var _ = Describe("Permissions", func() {
 
 				dummyAuth := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusOK,
-					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
+					Body:       io.NopCloser(bytes.NewBufferString(responseString)),
 				}}
 
 				ch, _ := New("https://example.com", Auth(dummyAuth.Builder()), ServerVersion("2.0.0"))
@@ -91,7 +91,7 @@ var _ = Describe("Permissions", func() {
 		It("correctly formats request", func() {
 			dummy := &DummyAuth{Response: &http.Response{
 				StatusCode: http.StatusCreated,
-				Body:       ioutil.NopCloser(bytes.NewBufferString("")),
+				Body:       io.NopCloser(bytes.NewBufferString("")),
 			}}
 			ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.1.2"))
 			_, _ = ch.GetPermissionByPathActor("/path", "some-actor")
@@ -113,7 +113,7 @@ var _ = Describe("Permissions", func() {
 
 				dummy := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusOK,
-					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
+					Body:       io.NopCloser(bytes.NewBufferString(responseString)),
 				}}
 				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.1.2"))
 
@@ -136,7 +136,7 @@ var _ = Describe("Permissions", func() {
 
 				dummy := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusNotFound,
-					Body:       ioutil.NopCloser(bytes.NewBufferString(`{"error": "The request could not be completed because the permission does not exist or you do not have sufficient authorization."}`)),
+					Body:       io.NopCloser(bytes.NewBufferString(`{"error": "The request could not be completed because the permission does not exist or you do not have sufficient authorization."}`)),
 				}}
 				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.1.2"))
 
@@ -148,7 +148,7 @@ var _ = Describe("Permissions", func() {
 			It("returns a CredHub error", func() {
 				dummy := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusInternalServerError,
-					Body:       ioutil.NopCloser(bytes.NewBufferString(`{"error": "some-error"}`)),
+					Body:       io.NopCloser(bytes.NewBufferString(`{"error": "some-error"}`)),
 				}}
 				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.1.2"))
 
@@ -163,7 +163,7 @@ var _ = Describe("Permissions", func() {
 			It("can add with V1 endpoint", func() {
 				dummy := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusCreated,
-					Body:       ioutil.NopCloser(bytes.NewBufferString("")),
+					Body:       io.NopCloser(bytes.NewBufferString("")),
 				}}
 				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("1.9.0"))
 
@@ -175,7 +175,7 @@ var _ = Describe("Permissions", func() {
 				url := dummy.Request.URL.String()
 				Expect(url).To(Equal("https://example.com/api/v1/permissions"))
 				Expect(dummy.Request.Method).To(Equal(http.MethodPost))
-				params, err := ioutil.ReadAll(dummy.Request.Body)
+				params, err := io.ReadAll(dummy.Request.Body)
 				Expect(err).NotTo(HaveOccurred())
 
 				expectedParams := `{
@@ -205,7 +205,7 @@ var _ = Describe("Permissions", func() {
 					}`
 				dummy = &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusCreated,
-					Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
+					Body:       io.NopCloser(bytes.NewBufferString(responseString)),
 				}}
 				ch, _ = New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
 
@@ -219,7 +219,7 @@ var _ = Describe("Permissions", func() {
 				url := dummy.Request.URL.String()
 				Expect(url).To(Equal("https://example.com/api/v2/permissions"))
 				Expect(dummy.Request.Method).To(Equal(http.MethodPost))
-				params, err := ioutil.ReadAll(dummy.Request.Body)
+				params, err := io.ReadAll(dummy.Request.Body)
 				Expect(err).NotTo(HaveOccurred())
 
 				expectedParams := `{
@@ -304,7 +304,7 @@ var _ = Describe("Permissions", func() {
 					}`
 			dummy := &DummyAuth{Response: &http.Response{
 				StatusCode: http.StatusCreated,
-				Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
+				Body:       io.NopCloser(bytes.NewBufferString(responseString)),
 			}}
 			ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
 
@@ -327,7 +327,7 @@ var _ = Describe("Permissions", func() {
 		It("correctly formats request", func() {
 			dummy := &DummyAuth{Response: &http.Response{
 				StatusCode: http.StatusOK,
-				Body:       ioutil.NopCloser(bytes.NewBufferString("")),
+				Body:       io.NopCloser(bytes.NewBufferString("")),
 			}}
 			ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.1.2"))
 			_, _ = ch.DeletePermission("1234")
@@ -354,7 +354,7 @@ var _ = Describe("Permissions", func() {
 					}`
 			dummy := &DummyAuth{Response: &http.Response{
 				StatusCode: http.StatusOK,
-				Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
+				Body:       io.NopCloser(bytes.NewBufferString(responseString)),
 			}}
 			ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.0.0"))
 			It("properly returns deleted permission", func() {

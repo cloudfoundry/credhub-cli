@@ -3,7 +3,7 @@ package credhub_test
 import (
 	"bytes"
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	. "code.cloudfoundry.org/credhub-cli/credhub"
@@ -17,7 +17,7 @@ var _ = Describe("Find", func() {
 	Describe("FindByPath()", func() {
 		It("requests credentials for a specified path", func() {
 			dummy := &DummyAuth{Response: &http.Response{
-				Body: ioutil.NopCloser(bytes.NewBufferString("")),
+				Body: io.NopCloser(bytes.NewBufferString("")),
 			}}
 
 			ch, _ := New("https://example.com", Auth(dummy.Builder()))
@@ -44,7 +44,7 @@ var _ = Describe("Find", func() {
 }`
 				dummy := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusOK,
-					Body:       ioutil.NopCloser(bytes.NewBufferString(expectedResponse)),
+					Body:       io.NopCloser(bytes.NewBufferString(expectedResponse)),
 				}}
 
 				ch, _ := New("https://example.com", Auth(dummy.Builder()))
@@ -77,7 +77,7 @@ var _ = Describe("Find", func() {
 			It("returns an error", func() {
 				dummy := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusOK,
-					Body:       ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
+					Body:       io.NopCloser(bytes.NewBufferString("something-invalid")),
 				}}
 
 				ch, _ := New("https://example.com", Auth(dummy.Builder()))
@@ -91,7 +91,7 @@ var _ = Describe("Find", func() {
 	Describe("FindByPartialName()", func() {
 		It("requests credentials for a specified partial name", func() {
 			dummy := &DummyAuth{Response: &http.Response{
-				Body: ioutil.NopCloser(bytes.NewBufferString("")),
+				Body: io.NopCloser(bytes.NewBufferString("")),
 			}}
 
 			ch, _ := New("https://example.com", Auth(dummy.Builder()))
@@ -118,7 +118,7 @@ var _ = Describe("Find", func() {
 }`
 				dummy := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusOK,
-					Body:       ioutil.NopCloser(bytes.NewBufferString(expectedResponse)),
+					Body:       io.NopCloser(bytes.NewBufferString(expectedResponse)),
 				}}
 
 				ch, _ := New("https://example.com", Auth(dummy.Builder()))
@@ -151,7 +151,7 @@ var _ = Describe("Find", func() {
 			It("returns an error", func() {
 				dummy := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusOK,
-					Body:       ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
+					Body:       io.NopCloser(bytes.NewBufferString("something-invalid")),
 				}}
 
 				ch, _ := New("https://example.com", Auth(dummy.Builder()))

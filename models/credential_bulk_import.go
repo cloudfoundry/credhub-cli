@@ -2,7 +2,7 @@ package models
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"os"
 	"strings"
 
 	"gopkg.in/yaml.v2"
@@ -17,7 +17,7 @@ type CredentialBulkImport struct {
 }
 
 func (credentialBulkImport *CredentialBulkImport) ReadFile(filepath string, importJSON bool) error {
-	data, err := ioutil.ReadFile(filepath)
+	data, err := os.ReadFile(filepath)
 	if err != nil {
 		return err
 	}

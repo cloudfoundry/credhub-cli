@@ -3,7 +3,7 @@ package credhub_test
 import (
 	"bytes"
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	. "code.cloudfoundry.org/credhub-cli/credhub"
@@ -41,7 +41,7 @@ var _ = Describe("Request()", func() {
 		Expect(mockAuth.Request.Method).To(Equal("PATCH"))
 		Expect(mockAuth.Request.URL.String()).To(Equal("http://example.com/api/v1/some-endpoint"))
 
-		body, err := ioutil.ReadAll(mockAuth.Request.Body)
+		body, err := io.ReadAll(mockAuth.Request.Body)
 
 		Expect(err).To(BeNil())
 		Expect(body).To(MatchJSON(`{"some-field": 1, "other-field": "blah"}`))
@@ -63,7 +63,7 @@ var _ = Describe("Request()", func() {
 			It("returns an error", func() {
 				dummy := &DummyAuth{Response: &http.Response{
 					StatusCode: 400,
-					Body:       ioutil.NopCloser(bytes.NewBufferString(`{"error" : "error occurred" }`)),
+					Body:       io.NopCloser(bytes.NewBufferString(`{"error" : "error occurred" }`)),
 				}}
 
 				ch, _ := New("https://example.com", Auth(dummy.Builder()))
@@ -78,14 +78,14 @@ var _ = Describe("Request()", func() {
 			It("returns the raw response json", func() {
 				dummy := &DummyAuth{Response: &http.Response{
 					StatusCode: 400,
-					Body:       ioutil.NopCloser(bytes.NewBufferString(`{"error" : "error occurred" }`)),
+					Body:       io.NopCloser(bytes.NewBufferString(`{"error" : "error occurred" }`)),
 				}}
 
 				ch, _ := New("https://example.com", Auth(dummy.Builder()))
 
 				r, err := ch.Request("GET", "/example-password", nil, nil, false)
 				Expect(err).ToNot(HaveOccurred())
-				resp, err := ioutil.ReadAll(r.Body)
+				resp, err := io.ReadAll(r.Body)
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(string(resp)).To(Equal(`{"error" : "error occurred" }`))
