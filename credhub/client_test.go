@@ -118,6 +118,7 @@ var _ = Describe("Client()", func() {
 
 			Expect(tlsConfig.InsecureSkipVerify).To(BeFalse())
 			Expect(tlsConfig.PreferServerCipherSuites).To(BeTrue())
+			//lint:ignore SA1019 - ignoring tlsCert.RootCAs.Subjects is deprecated ERR because cert does not come from SystemCertPool.
 			Expect(tlsConfig.RootCAs.Subjects()).To(ConsistOf(expectedRootCAs.Subjects()))
 		})
 	})
