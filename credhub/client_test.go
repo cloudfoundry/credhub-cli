@@ -28,6 +28,7 @@ var _ = Describe("Client()", func() {
 
 			client := ch.Client()
 			transport := client.Transport.(*http.Transport)
+			//lint:ignore SA1019 - the cloudfoundry socks5-proxy doesn't support dialcontext, which vastly complicates migrating here
 			dialer := transport.Dial
 
 			Expect(dialer).NotTo(BeNil())
@@ -142,6 +143,7 @@ var _ = Describe("Client()", func() {
 			client := ch.Client()
 
 			transport := client.Transport.(*http.Transport)
+			//lint:ignore SA1019 - the cloudfoundry socks5-proxy doesn't support dialcontext, which vastly complicates migrating here
 			dial := transport.Dial
 			Expect(dial).NotTo(BeNil())
 		})
