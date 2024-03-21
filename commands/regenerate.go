@@ -1,10 +1,11 @@
 package commands
 
 import (
+	"encoding/json"
+
 	"code.cloudfoundry.org/credhub-cli/credhub"
 	"code.cloudfoundry.org/credhub-cli/credhub/credentials"
 	"code.cloudfoundry.org/credhub-cli/errors"
-	"encoding/json"
 )
 
 type RegenerateCommand struct {

@@ -3,8 +3,8 @@ package credhub_test
 import (
 	"crypto/tls"
 	"crypto/x509"
-	"io/ioutil"
 	"net/http"
+	"os"
 	"runtime"
 	"time"
 
@@ -28,6 +28,7 @@ var _ = Describe("Client()", func() {
 
 			client := ch.Client()
 			transport := client.Transport.(*http.Transport)
+			//lint:ignore SA1019 - the cloudfoundry socks5-proxy doesn't support dialcontext, which vastly complicates migrating here
 			dialer := transport.Dial
 
 			Expect(dialer).NotTo(BeNil())
@@ -98,7 +99,7 @@ var _ = Describe("Client()", func() {
 			}
 
 			for _, caCertFile := range caCertFiles {
-				caCertBytes, err := ioutil.ReadFile(fixturePath + caCertFile)
+				caCertBytes, err := os.ReadFile(fixturePath + caCertFile)
 				if err != nil {
 					Fail("Couldn't read certificate " + caCertFile + ": " + err.Error())
 				}
@@ -117,7 +118,7 @@ var _ = Describe("Client()", func() {
 			Expect(client.Timeout).To(Equal(45 * time.Second))
 
 			Expect(tlsConfig.InsecureSkipVerify).To(BeFalse())
-			Expect(tlsConfig.PreferServerCipherSuites).To(BeTrue())
+			//lint:ignore SA1019 - ignoring tlsCert.RootCAs.Subjects is deprecated ERR because cert does not come from SystemCertPool.
 			Expect(tlsConfig.RootCAs.Subjects()).To(ConsistOf(expectedRootCAs.Subjects()))
 		})
 	})
@@ -133,7 +134,6 @@ var _ = Describe("Client()", func() {
 			Expect(client.Timeout).To(Equal(45 * time.Second))
 
 			Expect(tlsConfig.InsecureSkipVerify).To(BeTrue())
-			Expect(tlsConfig.PreferServerCipherSuites).To(BeTrue())
 		})
 	})
 
@@ -143,6 +143,7 @@ var _ = Describe("Client()", func() {
 			client := ch.Client()
 
 			transport := client.Transport.(*http.Transport)
+			//lint:ignore SA1019 - the cloudfoundry socks5-proxy doesn't support dialcontext, which vastly complicates migrating here
 			dial := transport.Dial
 			Expect(dial).NotTo(BeNil())
 		})

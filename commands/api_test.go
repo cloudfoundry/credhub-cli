@@ -1,7 +1,6 @@
 package commands_test
 
 import (
-	"io/ioutil"
 	"net/http"
 	"os"
 	"time"
@@ -332,7 +331,7 @@ var _ = Describe("API", func() {
 			Describe("ca certs", func() {
 				Context("with a single ca cert", func() {
 					It("saves the caCert in the config", func() {
-						testCa, err := ioutil.ReadFile("../test/server-tls-ca.pem")
+						testCa, err := os.ReadFile("../test/server-tls-ca.pem")
 						Expect(err).To(BeNil())
 
 						session := runCommand("api", "-s", theServer.URL(), "--ca-cert", "../test/server-tls-ca.pem")
@@ -345,9 +344,9 @@ var _ = Describe("API", func() {
 
 				Context("with multiple ca certs", func() {
 					It("saves the certs in the config", func() {
-						ca1, err := ioutil.ReadFile("../test/server-tls-ca.pem")
+						ca1, err := os.ReadFile("../test/server-tls-ca.pem")
 						Expect(err).To(BeNil())
-						ca2, err := ioutil.ReadFile("../test/extra-ca.pem")
+						ca2, err := os.ReadFile("../test/extra-ca.pem")
 						Expect(err).To(BeNil())
 
 						session := runCommand("api", "-s", theServer.URL(), "--ca-cert", "../test/server-tls-ca.pem", "--ca-cert", "../test/extra-ca.pem")
@@ -359,11 +358,11 @@ var _ = Describe("API", func() {
 				})
 
 				It("overwrites previously set certificates", func() {
-					serverCa, err := ioutil.ReadFile("../test/server-tls-ca.pem")
+					serverCa, err := os.ReadFile("../test/server-tls-ca.pem")
 					Expect(err).To(BeNil())
-					authCa, err := ioutil.ReadFile("../test/auth-tls-ca.pem")
+					authCa, err := os.ReadFile("../test/auth-tls-ca.pem")
 					Expect(err).To(BeNil())
-					extraCa, err := ioutil.ReadFile("../test/extra-ca.pem")
+					extraCa, err := os.ReadFile("../test/extra-ca.pem")
 					Expect(err).To(BeNil())
 
 					session := runCommand("api", "-s", server.URL(), "--ca-cert", "../test/server-tls-ca.pem", "--ca-cert", "../test/auth-tls-ca.pem", "--ca-cert", "../test/extra-ca.pem")
@@ -407,7 +406,7 @@ var _ = Describe("API", func() {
 					authServer = NewTlsServer("../test/server-tls-cert.pem", "../test/server-tls-key.pem")
 					SetupServers(server, authServer)
 
-					serverCa, err := ioutil.ReadFile("../test/server-tls-ca.pem")
+					serverCa, err := os.ReadFile("../test/server-tls-ca.pem")
 					Expect(err).To(BeNil())
 
 					session := runCommandWithEnv([]string{"CREDHUB_CA_CERT=../test/server-tls-ca.pem"}, "api", server.URL())

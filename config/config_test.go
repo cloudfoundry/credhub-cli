@@ -5,10 +5,8 @@ package config_test
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
-	"runtime"
 	"time"
 
 	"code.cloudfoundry.org/credhub-cli/config"
@@ -37,14 +35,10 @@ var _ = Describe("Config", func() {
 
 		var _ = BeforeEach(func() {
 			var err error
-			homeDir, err = ioutil.TempDir("", "credhub-cli-test")
+			homeDir, err = os.MkdirTemp("", "credhub-cli-test")
 			Expect(err).NotTo(HaveOccurred())
 
-			if runtime.GOOS == "windows" {
-				os.Setenv("USERPROFILE", homeDir)
-			} else {
-				os.Setenv("HOME", homeDir)
-			}
+			os.Setenv("HOME", homeDir)
 		})
 
 		var _ = AfterEach(func() {
@@ -73,7 +67,7 @@ var _ = Describe("Config", func() {
 			err := config.WriteConfig(cliConfig)
 			Expect(err).NotTo(HaveOccurred())
 
-			configFile, err := ioutil.ReadFile(path.Join(os.Getenv("HOME"), ".credhub", "config.json"))
+			configFile, err := os.ReadFile(path.Join(os.Getenv("HOME"), ".credhub", "config.json"))
 			Expect(err).NotTo(HaveOccurred())
 			Expect(string(configFile)).NotTo(ContainSubstring(someClientID))
 			Expect(string(configFile)).NotTo(ContainSubstring(someClientSecret))
@@ -104,7 +98,7 @@ var _ = Describe("Config", func() {
 			err := config.WriteConfig(cliConfig)
 			Expect(err).NotTo(HaveOccurred())
 
-			configFile, err := ioutil.ReadFile(path.Join(os.Getenv("HOME"), ".credhub", "config.json"))
+			configFile, err := os.ReadFile(path.Join(os.Getenv("HOME"), ".credhub", "config.json"))
 			Expect(err).NotTo(HaveOccurred())
 			Expect(string(configFile)).NotTo(ContainSubstring(fmt.Sprint(60 * time.Second)))
 		})
@@ -112,9 +106,9 @@ var _ = Describe("Config", func() {
 
 	Describe("#UpdateTrustedCAs", func() {
 		It("reads multiple certs", func() {
-			ca1, err := ioutil.ReadFile("../test/server-tls-ca.pem")
+			ca1, err := os.ReadFile("../test/server-tls-ca.pem")
 			Expect(err).To(BeNil())
-			ca2, err := ioutil.ReadFile("../test/auth-tls-ca.pem")
+			ca2, err := os.ReadFile("../test/auth-tls-ca.pem")
 			Expect(err).To(BeNil())
 
 			err = cfg.UpdateTrustedCAs([]string{"../test/server-tls-ca.pem", "../test/auth-tls-ca.pem"})
@@ -124,7 +118,7 @@ var _ = Describe("Config", func() {
 		})
 
 		It("overrides previous CAs", func() {
-			testCa, err := ioutil.ReadFile("../test/server-tls-ca.pem")
+			testCa, err := os.ReadFile("../test/server-tls-ca.pem")
 			Expect(err).To(BeNil())
 
 			cfg.CaCerts = []string{"cert1", "cert2"}
@@ -135,7 +129,7 @@ var _ = Describe("Config", func() {
 		})
 
 		It("handles certificate strings as well as files", func() {
-			ca1, err := ioutil.ReadFile("../test/server-tls-ca.pem")
+			ca1, err := os.ReadFile("../test/server-tls-ca.pem")
 			Expect(err).To(BeNil())
 			ca2 := "test-ca-string"
 
@@ -156,7 +150,7 @@ var _ = Describe("Config", func() {
 		})
 
 		It("returns an error if a file can't be read", func() {
-			invalidCaFile, err := ioutil.TempFile("", "no-read-access")
+			invalidCaFile, err := os.CreateTemp("", "no-read-access")
 			Expect(err).To(BeNil())
 			// write-only access
 			err = invalidCaFile.Chmod(0222)
@@ -166,9 +160,9 @@ var _ = Describe("Config", func() {
 			validCaString := "test-ca-string"
 			invalidCaFilePath := invalidCaFile.Name()
 
-			_, err = ioutil.ReadFile(validCaFilePath)
+			_, err = os.ReadFile(validCaFilePath)
 			Expect(err).To(BeNil())
-			_, err = ioutil.ReadFile(invalidCaFilePath)
+			_, err = os.ReadFile(invalidCaFilePath)
 			Expect(err).NotTo(BeNil())
 
 			err = cfg.UpdateTrustedCAs([]string{validCaFilePath, validCaString, invalidCaFilePath})

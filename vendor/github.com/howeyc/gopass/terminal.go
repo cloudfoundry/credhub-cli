@@ -1,3 +1,6 @@
+//go:build !solaris
+// +build !solaris
+
 /*
  * Copyright (c) 2012 Chris Howey
  *
@@ -13,8 +16,6 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-
-// +build !solaris
 
 package gopass
 

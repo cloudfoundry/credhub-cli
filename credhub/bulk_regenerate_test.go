@@ -3,7 +3,7 @@ package credhub_test
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	. "code.cloudfoundry.org/credhub-cli/credhub"
@@ -14,7 +14,7 @@ import (
 var _ = Describe("Bulk Regenerate", func() {
 	It("regenerates all certificates signed by the given ca ", func() {
 		dummyAuth := &DummyAuth{Response: &http.Response{
-			Body: ioutil.NopCloser(bytes.NewBufferString("")),
+			Body: io.NopCloser(bytes.NewBufferString("")),
 		}}
 
 		ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
@@ -25,7 +25,7 @@ var _ = Describe("Bulk Regenerate", func() {
 		Expect(dummyAuth.Request.Method).To(Equal(http.MethodPost))
 
 		var requestBody map[string]interface{}
-		body, _ := ioutil.ReadAll(dummyAuth.Request.Body)
+		body, _ := io.ReadAll(dummyAuth.Request.Body)
 		json.Unmarshal(body, &requestBody)
 
 		Expect(requestBody["signed_by"]).To(Equal("/example-ca"))
@@ -43,7 +43,7 @@ var _ = Describe("Bulk Regenerate", func() {
 
 			dummyAuth := &DummyAuth{Response: &http.Response{
 				StatusCode: http.StatusOK,
-				Body:       ioutil.NopCloser(bytes.NewBufferString(responseString)),
+				Body:       io.NopCloser(bytes.NewBufferString(responseString)),
 			}}
 
 			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))
@@ -59,7 +59,7 @@ var _ = Describe("Bulk Regenerate", func() {
 	Context("when response body cannot be unmarshalled", func() {
 		It("returns an error", func() {
 			dummyAuth := &DummyAuth{Response: &http.Response{
-				Body: ioutil.NopCloser(bytes.NewBufferString("something-invalid")),
+				Body: io.NopCloser(bytes.NewBufferString("something-invalid")),
 			}}
 
 			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()))

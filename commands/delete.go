@@ -1,10 +1,11 @@
 package commands
 
 import (
-	"code.cloudfoundry.org/credhub-cli/errors"
 	"fmt"
-	"gopkg.in/yaml.v2"
 	"os"
+
+	"code.cloudfoundry.org/credhub-cli/errors"
+	"gopkg.in/yaml.v2"
 )
 
 type DeleteCommand struct {

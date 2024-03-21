@@ -1,9 +1,10 @@
 package commands
 
 import (
-	"code.cloudfoundry.org/credhub-cli/credhub/credentials"
 	"encoding/json"
 	"strings"
+
+	"code.cloudfoundry.org/credhub-cli/credhub/credentials"
 
 	"code.cloudfoundry.org/credhub-cli/credhub"
 	"code.cloudfoundry.org/credhub-cli/credhub/credentials/generate"

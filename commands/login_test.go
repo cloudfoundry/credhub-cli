@@ -3,10 +3,9 @@ package commands_test
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"strings"
 	"time"
-
-	"io/ioutil"
 
 	"code.cloudfoundry.org/credhub-cli/config"
 	. "github.com/onsi/ginkgo/v2"
@@ -429,7 +428,7 @@ var _ = Describe("Login", func() {
 		})
 
 		It("saves caCert to config when it is provided", func() {
-			testCa, _ := ioutil.ReadFile("../test/server-tls-ca.pem")
+			testCa, _ := os.ReadFile("../test/server-tls-ca.pem")
 			session := runCommand("login", "-u", "user", "-p", "pass", "-s", apiServer.URL(), "--ca-cert", "../test/server-tls-ca.pem")
 
 			Expect(session).Should(Exit(0))
@@ -455,7 +454,7 @@ var _ = Describe("Login", func() {
 				),
 			)
 
-			serverCa, err := ioutil.ReadFile("../test/server-tls-ca.pem")
+			serverCa, err := os.ReadFile("../test/server-tls-ca.pem")
 			Expect(err).To(BeNil())
 
 			session := runCommandWithEnv([]string{"CREDHUB_CA_CERT=../test/server-tls-ca.pem"}, "login", "-s", server.URL(), "-u", "user", "-p", "pass")

@@ -6,11 +6,11 @@ import (
 )
 
 func NewNetworkError(e error) error {
-	return errors.New(fmt.Sprintf("Error connecting to the targeted API: %#v. Please validate your target and retry your request.", e.Error()))
+	return fmt.Errorf("Error connecting to the targeted API: %#v. Please validate your target and retry your request.", e.Error())
 }
 
 func NewAuthServerNetworkError(e error) error {
-	return errors.New(fmt.Sprintf("Error connecting to the auth server: %#v. Please validate your target and retry your request.", e.Error()))
+	return fmt.Errorf("Error connecting to the auth server: %#v. Please validate your target and retry your request.", e.Error())
 }
 
 func NewCatchAllError() error {

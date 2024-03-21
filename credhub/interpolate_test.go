@@ -3,7 +3,7 @@ package credhub_test
 import (
 	"bytes"
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	. "code.cloudfoundry.org/credhub-cli/credhub"
@@ -18,7 +18,7 @@ var _ = Describe("Interpolate", func() {
 			It("does not make any interpolation requests and returns the original VCAP_SERVICES body", func() {
 				dummy := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusOK,
-					Body:       ioutil.NopCloser(bytes.NewBufferString("{}")),
+					Body:       io.NopCloser(bytes.NewBufferString("{}")),
 				}}
 				ch, _ := New("https://example.com", Auth(dummy.Builder()))
 
@@ -35,7 +35,7 @@ var _ = Describe("Interpolate", func() {
 			validPayload := `{"my-server":[{"credentials":{"credhub-ref":"(//my-server/creds)"}}]}`
 			It("requests to interpolate the VCAP_SERVICES object", func() {
 				dummy := &DummyAuth{Response: &http.Response{
-					Body: ioutil.NopCloser(bytes.NewBufferString("")),
+					Body: io.NopCloser(bytes.NewBufferString("")),
 				}}
 
 				ch, _ := New("https://example.com", Auth(dummy.Builder()))
@@ -45,7 +45,7 @@ var _ = Describe("Interpolate", func() {
 				urlPath := dummy.Request.URL.Path
 				Expect(urlPath).To(Equal("/api/v1/interpolate"))
 				Expect(dummy.Request.Method).To(Equal(http.MethodPost))
-				Expect(ioutil.ReadAll(dummy.Request.Body)).To(MatchJSON(validPayload))
+				Expect(io.ReadAll(dummy.Request.Body)).To(MatchJSON(validPayload))
 			})
 
 			Context("when successful", func() {
@@ -53,7 +53,7 @@ var _ = Describe("Interpolate", func() {
 					interpolatedResponse := `{ "Your VCAP_SERVICES": "totally-interpolated" }`
 					dummy := &DummyAuth{Response: &http.Response{
 						StatusCode: http.StatusOK,
-						Body:       ioutil.NopCloser(bytes.NewBufferString(interpolatedResponse)),
+						Body:       io.NopCloser(bytes.NewBufferString(interpolatedResponse)),
 					}}
 
 					ch, _ := New("https://example.com", Auth(dummy.Builder()))
@@ -80,7 +80,7 @@ var _ = Describe("Interpolate", func() {
 			Context("when vcapServicesBody is invalid", func() {
 				It("returns an error", func() {
 					dummy := &DummyAuth{Response: &http.Response{
-						Body: ioutil.NopCloser(bytes.NewBufferString("")),
+						Body: io.NopCloser(bytes.NewBufferString("")),
 					}}
 
 					ch, _ := New("https://example.com", Auth(dummy.Builder()))

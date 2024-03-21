@@ -1,12 +1,13 @@
 package commands_test
 
 import (
+	"net/http"
+
 	"code.cloudfoundry.org/credhub-cli/config"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
-	"net/http"
 )
 
 var _ = Describe("Logout", func() {

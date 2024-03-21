@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -19,7 +19,7 @@ var _ = Describe("Generate", func() {
 	Describe("GenerateCertificate()", func() {
 		It("requests to generate the certificate", func() {
 			dummy := &DummyAuth{Response: &http.Response{
-				Body: ioutil.NopCloser(bytes.NewBufferString("")),
+				Body: io.NopCloser(bytes.NewBufferString("")),
 			}}
 
 			ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.6.0"))
@@ -33,7 +33,7 @@ var _ = Describe("Generate", func() {
 			Expect(dummy.Request.Method).To(Equal(http.MethodPost))
 
 			var requestBody map[string]interface{}
-			body, _ := ioutil.ReadAll(dummy.Request.Body)
+			body, _ := io.ReadAll(dummy.Request.Body)
 			json.Unmarshal(body, &requestBody)
 
 			Expect(requestBody["name"]).To(Equal("/example-certificate"))
@@ -44,7 +44,7 @@ var _ = Describe("Generate", func() {
 
 		It("requests to set the certificate with the correct overwrite mode if server version isn't less than 1.6.0", func() {
 			dummy := &DummyAuth{Response: &http.Response{
-				Body: ioutil.NopCloser(bytes.NewBufferString("")),
+				Body: io.NopCloser(bytes.NewBufferString("")),
 			}}
 
 			ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.6.0"))
@@ -60,7 +60,7 @@ var _ = Describe("Generate", func() {
 			Expect(dummy.Request.Method).To(Equal(http.MethodPost))
 
 			var requestBody map[string]interface{}
-			body, _ := ioutil.ReadAll(dummy.Request.Body)
+			body, _ := io.ReadAll(dummy.Request.Body)
 			json.Unmarshal(body, &requestBody)
 
 			Expect(requestBody["name"]).To(Equal("/example-certificate"))
@@ -73,7 +73,7 @@ var _ = Describe("Generate", func() {
 			It("returns the generated certificate", func() {
 				dummy := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusOK,
-					Body: ioutil.NopCloser(bytes.NewBufferString(`{
+					Body: io.NopCloser(bytes.NewBufferString(`{
       "id": "some-id",
       "name": "/example-certificate",
       "type": "certificate",
@@ -124,7 +124,7 @@ var _ = Describe("Generate", func() {
 			It("returns an error", func() {
 
 				dummy := &DummyAuth{Response: &http.Response{
-					Body: ioutil.NopCloser(bytes.NewBufferString("invalid-response")),
+					Body: io.NopCloser(bytes.NewBufferString("invalid-response")),
 				}}
 				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.6.0"))
 
@@ -143,7 +143,7 @@ var _ = Describe("Generate", func() {
 	Describe("GeneratePassword()", func() {
 		It("requests to generate the password", func() {
 			dummy := &DummyAuth{Response: &http.Response{
-				Body: ioutil.NopCloser(bytes.NewBufferString("")),
+				Body: io.NopCloser(bytes.NewBufferString("")),
 			}}
 
 			ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.6.0"))
@@ -158,7 +158,7 @@ var _ = Describe("Generate", func() {
 			Expect(dummy.Request.Method).To(Equal(http.MethodPost))
 
 			var requestBody map[string]interface{}
-			body, _ := ioutil.ReadAll(dummy.Request.Body)
+			body, _ := io.ReadAll(dummy.Request.Body)
 			json.Unmarshal(body, &requestBody)
 
 			Expect(requestBody["name"]).To(Equal("/example-password"))
@@ -171,7 +171,7 @@ var _ = Describe("Generate", func() {
 			It("returns the generated password", func() {
 				dummy := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusOK,
-					Body: ioutil.NopCloser(bytes.NewBufferString(`{
+					Body: io.NopCloser(bytes.NewBufferString(`{
 	      "id": "some-id",
 	      "name": "/example-password",
 	      "type": "password",
@@ -212,7 +212,7 @@ var _ = Describe("Generate", func() {
 			It("returns an error", func() {
 
 				dummy := &DummyAuth{Response: &http.Response{
-					Body: ioutil.NopCloser(bytes.NewBufferString("invalid-response")),
+					Body: io.NopCloser(bytes.NewBufferString("invalid-response")),
 				}}
 				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.6.0"))
 
@@ -227,7 +227,7 @@ var _ = Describe("Generate", func() {
 	Describe("GenerateUser()", func() {
 		It("requests to generate the user", func() {
 			dummy := &DummyAuth{Response: &http.Response{
-				Body: ioutil.NopCloser(bytes.NewBufferString("")),
+				Body: io.NopCloser(bytes.NewBufferString("")),
 			}}
 
 			ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.6.0"))
@@ -244,7 +244,7 @@ var _ = Describe("Generate", func() {
 			Expect(dummy.Request.Method).To(Equal(http.MethodPost))
 
 			var requestBody map[string]interface{}
-			body, _ := ioutil.ReadAll(dummy.Request.Body)
+			body, _ := io.ReadAll(dummy.Request.Body)
 			json.Unmarshal(body, &requestBody)
 
 			Expect(requestBody["name"]).To(Equal("/example-user"))
@@ -258,7 +258,7 @@ var _ = Describe("Generate", func() {
 			It("returns the generated user", func() {
 				dummy := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusOK,
-					Body: ioutil.NopCloser(bytes.NewBufferString(`
+					Body: io.NopCloser(bytes.NewBufferString(`
 					 {
   "id": "some-id",
   "name": "/example-user",
@@ -304,7 +304,7 @@ var _ = Describe("Generate", func() {
 			It("returns an error", func() {
 
 				dummy := &DummyAuth{Response: &http.Response{
-					Body: ioutil.NopCloser(bytes.NewBufferString("invalid-response")),
+					Body: io.NopCloser(bytes.NewBufferString("invalid-response")),
 				}}
 				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.6.0"))
 
@@ -319,7 +319,7 @@ var _ = Describe("Generate", func() {
 	Describe("GenerateRSA()", func() {
 		It("requests to generate the RSA", func() {
 			dummy := &DummyAuth{Response: &http.Response{
-				Body: ioutil.NopCloser(bytes.NewBufferString("")),
+				Body: io.NopCloser(bytes.NewBufferString("")),
 			}}
 
 			ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.6.0"))
@@ -334,7 +334,7 @@ var _ = Describe("Generate", func() {
 
 			Expect(dummy.Request.Method).To(Equal(http.MethodPost))
 
-			body, _ := ioutil.ReadAll(dummy.Request.Body)
+			body, _ := io.ReadAll(dummy.Request.Body)
 			Expect(body).To(MatchJSON(`
 			{
 				"name": "/example-rsa",
@@ -350,7 +350,7 @@ var _ = Describe("Generate", func() {
 			It("returns the generated RSA", func() {
 				dummy := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusOK,
-					Body: ioutil.NopCloser(bytes.NewBufferString(`
+					Body: io.NopCloser(bytes.NewBufferString(`
 					{
 					  "id": "some-id",
 					  "name": "/example-rsa",
@@ -397,7 +397,7 @@ var _ = Describe("Generate", func() {
 			It("returns an error", func() {
 
 				dummy := &DummyAuth{Response: &http.Response{
-					Body: ioutil.NopCloser(bytes.NewBufferString("invalid-response")),
+					Body: io.NopCloser(bytes.NewBufferString("invalid-response")),
 				}}
 				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.6.0"))
 
@@ -412,7 +412,7 @@ var _ = Describe("Generate", func() {
 	Describe("GenerateSSH()", func() {
 		It("requests to generate the SSH", func() {
 			dummy := &DummyAuth{Response: &http.Response{
-				Body: ioutil.NopCloser(bytes.NewBufferString("")),
+				Body: io.NopCloser(bytes.NewBufferString("")),
 			}}
 
 			ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.6.0"))
@@ -427,7 +427,7 @@ var _ = Describe("Generate", func() {
 
 			Expect(dummy.Request.Method).To(Equal(http.MethodPost))
 
-			body, _ := ioutil.ReadAll(dummy.Request.Body)
+			body, _ := io.ReadAll(dummy.Request.Body)
 			Expect(body).To(MatchJSON(`
 			{
 				"name": "/example-ssh",
@@ -443,7 +443,7 @@ var _ = Describe("Generate", func() {
 			It("returns the generated SSH", func() {
 				dummy := &DummyAuth{Response: &http.Response{
 					StatusCode: http.StatusOK,
-					Body: ioutil.NopCloser(bytes.NewBufferString(`
+					Body: io.NopCloser(bytes.NewBufferString(`
 					{
 					  "id": "some-id",
 					  "name": "/example-ssh",
@@ -490,7 +490,7 @@ var _ = Describe("Generate", func() {
 			It("returns an error", func() {
 
 				dummy := &DummyAuth{Response: &http.Response{
-					Body: ioutil.NopCloser(bytes.NewBufferString("invalid-response")),
+					Body: io.NopCloser(bytes.NewBufferString("invalid-response")),
 				}}
 				ch, _ := New("https://example.com", Auth(dummy.Builder()), ServerVersion("2.6.0"))
 

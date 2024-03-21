@@ -1,7 +1,6 @@
 package test
 
 import (
-	"io/ioutil"
 	"os"
 )
 
@@ -22,7 +21,7 @@ func RestoreEnv(credhubEnv map[string]string) {
 	}
 }
 func CreateTempDir(prefix string) string {
-	name, err := ioutil.TempDir("", prefix)
+	name, err := os.MkdirTemp("", prefix)
 	if err != nil {
 		panic(err)
 	}
@@ -31,7 +30,7 @@ func CreateTempDir(prefix string) string {
 
 func CreateCredentialFile(dir, filename string, contents string) string {
 	path := dir + "/" + filename
-	err := ioutil.WriteFile(path, []byte(contents), 0644)
+	err := os.WriteFile(path, []byte(contents), 0644)
 	if err != nil {
 		panic(err)
 	}

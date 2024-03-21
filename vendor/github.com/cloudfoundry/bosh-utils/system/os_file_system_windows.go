@@ -1,10 +1,9 @@
 package system
 
 // On Windows user is implemented via syscalls and does not require a C compiler
-import "os/user"
-
 import (
 	"os"
+	"os/user"
 	"path/filepath"
 	"strings"
 
