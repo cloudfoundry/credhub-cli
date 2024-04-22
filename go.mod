@@ -5,14 +5,14 @@ go 1.21.6
 require (
 	github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
 	github.com/cloudfoundry/bosh-cli/v7 v7.5.6
-	github.com/cloudfoundry/bosh-utils v0.0.457
+	github.com/cloudfoundry/bosh-utils v0.0.458
 	github.com/cloudfoundry/socks5-proxy v0.2.116
 	github.com/fatih/color v1.16.0
 	github.com/hashicorp/go-version v1.6.0
 	github.com/howeyc/gopass v0.0.0-20210920133722-c8aef6fb66ef
 	github.com/jessevdk/go-flags v1.5.0
 	github.com/onsi/ginkgo/v2 v2.17.1
-	github.com/onsi/gomega v1.32.0
+	github.com/onsi/gomega v1.33.0
 	golang.org/x/net v0.24.0
 	gopkg.in/yaml.v2 v2.4.0
 )
@@ -26,7 +26,7 @@ require (
 	github.com/go-task/slim-sprig v0.0.0-20230315185526-52ccab3ef572 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
-	github.com/google/pprof v0.0.0-20240409012703-83162a5b38cd // indirect
+	github.com/google/pprof v0.0.0-20240416155748-26353dc0451f // indirect
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
