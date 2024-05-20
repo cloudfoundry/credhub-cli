@@ -48,6 +48,8 @@ github.com/cloudfoundry/bosh-utils v0.0.461 h1:OsJ+0kP2yd+jGYqJPpISc6/wLaxXJNejC
 github.com/cloudfoundry/bosh-utils v0.0.461/go.mod h1:F1VS6oF25yVUs54XnpmcmVQCJHyc+D06YJciBpsitZ4=
 github.com/cloudfoundry/bosh-utils v0.0.465 h1:CKw0lVQQSv0PDq0nLgj9cagzyaqQ8VTTg9usJeOYLcw=
 github.com/cloudfoundry/bosh-utils v0.0.465/go.mod h1:Lauq8CeulQmm0GpprVd/qxEba65Jm6DxSxGWKIG0AOg=
+github.com/cloudfoundry/bosh-utils v0.0.466 h1:hSmdQqMeLQyx5D3+RdYR3PUxPXePFpXWo3+uqr57JSA=
+github.com/cloudfoundry/bosh-utils v0.0.466/go.mod h1:BChpPtnlPVU5TvbAYoSko3QcMs948gZYYx+jjlwBQy4=
 github.com/cloudfoundry/go-socks5 v0.0.0-20180221174514-54f73bdb8a8e h1:FQdRViaoDphGRfgrotl2QGsX1gbloe57dbGBS5CG6KY=
 github.com/cloudfoundry/go-socks5 v0.0.0-20180221174514-54f73bdb8a8e/go.mod h1:PXmcacyJB/pJjSxEl15IU6rEIKXrhZQRzsr0UTkgNNs=
 github.com/cloudfoundry/socks5-proxy v0.2.107 h1:uminKnlYtXkCBdzXh75ViyZxBuVJ3aCLMCj0ncBHe24=
