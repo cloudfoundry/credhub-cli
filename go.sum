@@ -14,6 +14,8 @@ github.com/cloudfoundry/bosh-cli/v7 v7.5.6 h1:hHwZAy3Ug5/6/UFcEceTM3qZJRvMN8oUEE
 github.com/cloudfoundry/bosh-cli/v7 v7.5.6/go.mod h1:uVqJPkiZc5+dRVr+6v7gwyXpv4Z6ehKtdeG5+pBVAyE=
 github.com/cloudfoundry/bosh-cli/v7 v7.5.7 h1:SGlJljHARV7FLlKLGIEYzbg4x5aAoeDrnsU8ilJEgl8=
 github.com/cloudfoundry/bosh-cli/v7 v7.5.7/go.mod h1:kb8mkneUiHLi6oWdsDrFU1knxRYF7LI9le2mCN5jENc=
+github.com/cloudfoundry/bosh-cli/v7 v7.6.0 h1:26pJa/wL7r0IrVlcBZyGLQ6SmnydAz2uqXs9VBcVLEg=
+github.com/cloudfoundry/bosh-cli/v7 v7.6.0/go.mod h1:UDdOJz1WyRjGsKy/jJUFgYYMqIX9Xuy/FY4eiAAvlhs=
 github.com/cloudfoundry/bosh-utils v0.0.421 h1:pkKM+95G1Z07bk6QtXLdDrma+1UEuzzfcj4h15PAW24=
 github.com/cloudfoundry/bosh-utils v0.0.421/go.mod h1:pfoSwMhbqYZ9vPq+6qGjOetYay+8qIuKtsL46evCj4s=
 github.com/cloudfoundry/bosh-utils v0.0.424 h1:ap9QL5FURJvhO9JVjlSDwqJ5D2GaFKW8yAXoM6D6yTQ=
@@ -52,6 +54,8 @@ github.com/cloudfoundry/bosh-utils v0.0.466 h1:hSmdQqMeLQyx5D3+RdYR3PUxPXePFpXWo
 github.com/cloudfoundry/bosh-utils v0.0.466/go.mod h1:BChpPtnlPVU5TvbAYoSko3QcMs948gZYYx+jjlwBQy4=
 github.com/cloudfoundry/bosh-utils v0.0.467 h1:PzKBVb8QXMysA2px2YQlc75cETYaJwg0ymCoQym0CwA=
 github.com/cloudfoundry/bosh-utils v0.0.467/go.mod h1:1FGfRwjekwAfJiikZ5u6DMP56h1Xy71HwQqaBonUYPM=
+github.com/cloudfoundry/bosh-utils v0.0.469 h1:NMGzu4hLndJ0LFgJX9JZq9tge7rdQ6hihuZdHYfv3OM=
+github.com/cloudfoundry/bosh-utils v0.0.469/go.mod h1:BHqmkQ0kyKLI+GMv2fj0FuwnM9y4TkhhRIcWJX/IMoQ=
 github.com/cloudfoundry/go-socks5 v0.0.0-20180221174514-54f73bdb8a8e h1:FQdRViaoDphGRfgrotl2QGsX1gbloe57dbGBS5CG6KY=
 github.com/cloudfoundry/go-socks5 v0.0.0-20180221174514-54f73bdb8a8e/go.mod h1:PXmcacyJB/pJjSxEl15IU6rEIKXrhZQRzsr0UTkgNNs=
 github.com/cloudfoundry/socks5-proxy v0.2.107 h1:uminKnlYtXkCBdzXh75ViyZxBuVJ3aCLMCj0ncBHe24=
@@ -129,6 +133,8 @@ github.com/google/pprof v0.0.0-20240509144519-723abb6459b7 h1:velgFPYr1X9TDwLIfk
 github.com/google/pprof v0.0.0-20240509144519-723abb6459b7/go.mod h1:kf6iHlnVGwgKolg33glAes7Yg/8iWP8ukqeldJSO7jw=
 github.com/google/pprof v0.0.0-20240525223248-4bfdf5a9a2af h1:kmjWCqn2qkEml422C2Rrd27c3VGxi6a/6HNq8QmHRKM=
 github.com/google/pprof v0.0.0-20240525223248-4bfdf5a9a2af/go.mod h1:K1liHPHnj73Fdn/EKuT8nrFqBihUSKXoLYU0BuatOYo=
+github.com/google/pprof v0.0.0-20240528025155-186aa0362fba h1:ql1qNgCyOB7iAEk8JTNM+zJrgIbnyCKX/wdlyPufP5g=
+github.com/google/pprof v0.0.0-20240528025155-186aa0362fba/go.mod h1:K1liHPHnj73Fdn/EKuT8nrFqBihUSKXoLYU0BuatOYo=
 github.com/hashicorp/go-version v1.6.0 h1:feTTfFNnjP967rlCxM/I9g701jU+RN74YKx2mOkIeek=
 github.com/hashicorp/go-version v1.6.0/go.mod h1:fltr4n8CU8Ke44wwGCBoEymUuxUHl09ZGVZPK5anwXA=
 github.com/hashicorp/go-version v1.7.0 h1:5tqGy27NaOTB8yJKUZELlFAS/LTKJkrmONwQKeRZfjY=
