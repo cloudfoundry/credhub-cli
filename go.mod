@@ -4,8 +4,8 @@ go 1.21.6
 
 require (
 	github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
-	github.com/cloudfoundry/bosh-cli/v7 v7.6.3
-	github.com/cloudfoundry/bosh-utils v0.0.483
+	github.com/cloudfoundry/bosh-cli/v7 v7.7.0
+	github.com/cloudfoundry/bosh-utils v0.0.484
 	github.com/cloudfoundry/socks5-proxy v0.2.121
 	github.com/fatih/color v1.17.0
 	github.com/hashicorp/go-version v1.7.0
