@@ -10,7 +10,7 @@ github.com/charlievieth/fs
 # github.com/cloudfoundry/bosh-cli/v7 v7.7.0
 ## explicit; go 1.21.0
 github.com/cloudfoundry/bosh-cli/v7/director/template
-# github.com/cloudfoundry/bosh-utils v0.0.484
+# github.com/cloudfoundry/bosh-utils v0.0.485
 ## explicit; go 1.21.0
 github.com/cloudfoundry/bosh-utils/errors
 github.com/cloudfoundry/bosh-utils/logger
@@ -65,7 +65,7 @@ github.com/mattn/go-colorable
 # github.com/mattn/go-isatty v0.0.20
 ## explicit; go 1.15
 github.com/mattn/go-isatty
-# github.com/onsi/ginkgo/v2 v2.20.0
+# github.com/onsi/ginkgo/v2 v2.20.1
 ## explicit; go 1.20
 github.com/onsi/ginkgo/v2
 github.com/onsi/ginkgo/v2/config
@@ -114,7 +114,7 @@ golang.org/x/crypto/internal/poly1305
 golang.org/x/crypto/ssh
 golang.org/x/crypto/ssh/internal/bcrypt_pbkdf
 golang.org/x/crypto/ssh/terminal
-# golang.org/x/exp v0.0.0-20240808152545-0cdaa3abc0fa
+# golang.org/x/exp v0.0.0-20240823005443-9b4947da3948
 ## explicit; go 1.20
 golang.org/x/exp/constraints
 golang.org/x/exp/slices
