@@ -10,8 +10,6 @@ ifndef VERSION
 VERSION = dev
 endif
 
-GOFLAGS := -o $(DEST) -ldflags "-X code.cloudfoundry.org/credhub-cli/version.Version=${VERSION}"
-
 all: test clean build
 
 clean:
@@ -21,7 +19,7 @@ format:
 	go fmt .
 
 ginkgo:
-	ginkgo -r -randomizeSuites -randomizeAllSpecs -race -p 2>&1
+	go run -mod=mod github.com/onsi/ginkgo/v2/ginkgo -r --randomize-suites --randomize-all --race -p 2>&1
 
 test: format ginkgo
 
@@ -29,4 +27,4 @@ ci: ginkgo
 
 build:
 	mkdir -p build
-	CGO_ENABLED=0 go build $(GOFLAGS)
+	CGO_ENABLED=0 go build -o $(DEST) -ldflags "-X code.cloudfoundry.org/credhub-cli/version.Version=${VERSION}"
