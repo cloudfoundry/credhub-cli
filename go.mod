@@ -6,15 +6,15 @@ toolchain go1.23.1
 
 require (
 	github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
-	github.com/cloudfoundry/bosh-cli/v7 v7.8.0
-	github.com/cloudfoundry/bosh-utils v0.0.499
-	github.com/cloudfoundry/socks5-proxy v0.2.126
-	github.com/fatih/color v1.17.0
+	github.com/cloudfoundry/bosh-cli/v7 v7.8.2
+	github.com/cloudfoundry/bosh-utils v0.0.500
+	github.com/cloudfoundry/socks5-proxy v0.2.130
+	github.com/fatih/color v1.18.0
 	github.com/hashicorp/go-version v1.7.0
 	github.com/howeyc/gopass v0.0.0-20210920133722-c8aef6fb66ef
 	github.com/jessevdk/go-flags v1.6.1
-	github.com/onsi/ginkgo/v2 v2.20.2
-	github.com/onsi/gomega v1.34.2
+	github.com/onsi/ginkgo/v2 v2.21.0
+	github.com/onsi/gomega v1.35.1
 	golang.org/x/net v0.30.0
 	gopkg.in/yaml.v2 v2.4.0
 )
@@ -29,7 +29,7 @@ require (
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
-	github.com/google/pprof v0.0.0-20241001023024-f4c0cfd0cf1d // indirect
+	github.com/google/pprof v0.0.0-20241101162523-b92577c0c142 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
