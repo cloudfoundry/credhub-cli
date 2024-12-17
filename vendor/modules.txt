@@ -7,10 +7,10 @@ github.com/bmatcuk/doublestar
 # github.com/charlievieth/fs v0.0.3
 ## explicit; go 1.18
 github.com/charlievieth/fs
-# github.com/cloudfoundry/bosh-cli/v7 v7.8.3
+# github.com/cloudfoundry/bosh-cli/v7 v7.8.4
 ## explicit; go 1.22.0
 github.com/cloudfoundry/bosh-cli/v7/director/template
-# github.com/cloudfoundry/bosh-utils v0.0.511
+# github.com/cloudfoundry/bosh-utils v0.0.515
 ## explicit; go 1.22.0
 github.com/cloudfoundry/bosh-utils/errors
 github.com/cloudfoundry/bosh-utils/logger
@@ -18,7 +18,7 @@ github.com/cloudfoundry/bosh-utils/system
 # github.com/cloudfoundry/go-socks5 v0.0.0-20240831012420-2590b55236ee
 ## explicit; go 1.21.0
 github.com/cloudfoundry/go-socks5
-# github.com/cloudfoundry/socks5-proxy v0.2.134
+# github.com/cloudfoundry/socks5-proxy v0.2.135
 ## explicit; go 1.22.0
 github.com/cloudfoundry/socks5-proxy
 # github.com/cppforlife/go-patch v0.2.0
@@ -157,7 +157,7 @@ golang.org/x/text/transform
 ## explicit; go 1.22.0
 golang.org/x/tools/cover
 golang.org/x/tools/go/ast/inspector
-# google.golang.org/protobuf v1.35.2
+# google.golang.org/protobuf v1.36.0
 ## explicit; go 1.21
 google.golang.org/protobuf/encoding/prototext
 google.golang.org/protobuf/encoding/protowire
@@ -177,6 +177,7 @@ google.golang.org/protobuf/internal/genid
 google.golang.org/protobuf/internal/impl
 google.golang.org/protobuf/internal/order
 google.golang.org/protobuf/internal/pragma
+google.golang.org/protobuf/internal/protolazy
 google.golang.org/protobuf/internal/set
 google.golang.org/protobuf/internal/strs
 google.golang.org/protobuf/internal/version
