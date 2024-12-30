@@ -38,6 +38,8 @@ github.com/cloudfoundry/bosh-cli/v7 v7.8.4 h1:MhnbVovwPUzAnI1ZKQWf7sKBXbDZ10YB+H
 github.com/cloudfoundry/bosh-cli/v7 v7.8.4/go.mod h1:m1iNscGLFJuC2rFW4L/pEiFXdkDDzyJc4AJizZGoIX8=
 github.com/cloudfoundry/bosh-cli/v7 v7.8.5 h1:aF7TduEgpyT7TWyc7seA7Use0uctH60xpt5twnAZFJ4=
 github.com/cloudfoundry/bosh-cli/v7 v7.8.5/go.mod h1:o5xS+mvVr2U1n8+0gD8jLkx1z5o8fh+fBo0r4JfA6nw=
+github.com/cloudfoundry/bosh-cli/v7 v7.8.6 h1:M6ZeocjmZzfJue999qLROsDnDAMsLWKNZe3y8qPYOFc=
+github.com/cloudfoundry/bosh-cli/v7 v7.8.6/go.mod h1:1jT81purm3sK9TRe4P4JIkE7yaInwIyFV986J9ltSI0=
 github.com/cloudfoundry/bosh-utils v0.0.421 h1:pkKM+95G1Z07bk6QtXLdDrma+1UEuzzfcj4h15PAW24=
 github.com/cloudfoundry/bosh-utils v0.0.421/go.mod h1:pfoSwMhbqYZ9vPq+6qGjOetYay+8qIuKtsL46evCj4s=
 github.com/cloudfoundry/bosh-utils v0.0.424 h1:ap9QL5FURJvhO9JVjlSDwqJ5D2GaFKW8yAXoM6D6yTQ=
@@ -122,6 +124,8 @@ github.com/cloudfoundry/bosh-utils v0.0.515 h1:hAQlg5mGVjHf3f4DKTyIA/wT4l91q7FOb
 github.com/cloudfoundry/bosh-utils v0.0.515/go.mod h1:Yl7mT/Fy99deXXwaZZVUTf9VC878kUuoTS3h1F9Dzho=
 github.com/cloudfoundry/bosh-utils v0.0.516 h1:WLBnFYA9x2XGy6ylirrjTtexcq5jl8arcbUApTocTto=
 github.com/cloudfoundry/bosh-utils v0.0.516/go.mod h1:Yl7mT/Fy99deXXwaZZVUTf9VC878kUuoTS3h1F9Dzho=
+github.com/cloudfoundry/bosh-utils v0.0.518 h1:qHF9i+9Sk2pRT66bV7QIejEKSnz4T8svT9XY6grEBKg=
+github.com/cloudfoundry/bosh-utils v0.0.518/go.mod h1:9rYAuhb5ytCiypBvb0kZx204nhMMyEUin3jUlZEapBQ=
 github.com/cloudfoundry/go-socks5 v0.0.0-20180221174514-54f73bdb8a8e h1:FQdRViaoDphGRfgrotl2QGsX1gbloe57dbGBS5CG6KY=
 github.com/cloudfoundry/go-socks5 v0.0.0-20180221174514-54f73bdb8a8e/go.mod h1:PXmcacyJB/pJjSxEl15IU6rEIKXrhZQRzsr0UTkgNNs=
 github.com/cloudfoundry/go-socks5 v0.0.0-20240831012420-2590b55236ee h1:88ruSYvCUKX2YcF2CMYVTmPGITvNdRbzaBRk2c/iMds=
@@ -178,6 +182,7 @@ github.com/cppforlife/go-patch v0.2.0 h1:Y14MnCQjDlbw7WXT4k+u6DPAA9XnygN4BfrSpI/
 github.com/cppforlife/go-patch v0.2.0/go.mod h1:67a7aIi94FHDZdoeGSJRRFDp66l9MhaAG1yGxpUoFD8=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
+github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc h1:U9qPSI2PIWSS1VwoXQT9A3Wy9MM3WgvqSxFWenqJduM=
 github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
@@ -344,7 +349,10 @@ github.com/onsi/gomega v1.36.0 h1:Pb12RlruUtj4XUuPUqeEWc6j5DkVVVA49Uf6YLfC95Y=
 github.com/onsi/gomega v1.36.0/go.mod h1:PvZbdDc8J6XJEpDK4HCuRBm8a6Fzp9/DmhC9C7yFlog=
 github.com/onsi/gomega v1.36.1 h1:bJDPBO7ibjxcbHMgSCoo4Yj18UWbKDlLwX1x9sybDcw=
 github.com/onsi/gomega v1.36.1/go.mod h1:PvZbdDc8J6XJEpDK4HCuRBm8a6Fzp9/DmhC9C7yFlog=
+github.com/onsi/gomega v1.36.2 h1:koNYke6TVk6ZmnyHrCXba/T/MoLBXFjeC1PtvYgw0A8=
+github.com/onsi/gomega v1.36.2/go.mod h1:DdwyADRjrc825LhMEkD76cHR5+pUnjhUN8GlHlRPHzY=
 github.com/pkg/diff v0.0.0-20210226163009-20ebb0f2a09e/go.mod h1:pJLUxLENpZxwdsKMEsNbx1VGcRFpLqf3715MtcvvzbA=
+github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 h1:Jamvg5psRIccs7FGNTlIRMkT8wgtp5eCXdBlqhYGL6U=
 github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
