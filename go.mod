@@ -6,8 +6,8 @@ toolchain go1.23.1
 
 require (
 	github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
-	github.com/cloudfoundry/bosh-cli/v7 v7.8.6
-	github.com/cloudfoundry/bosh-utils v0.0.521
+	github.com/cloudfoundry/bosh-cli/v7 v7.8.7
+	github.com/cloudfoundry/bosh-utils v0.0.522
 	github.com/cloudfoundry/socks5-proxy v0.2.138
 	github.com/fatih/color v1.18.0
 	github.com/hashicorp/go-version v1.7.0
@@ -40,6 +40,6 @@ require (
 	golang.org/x/term v0.28.0 // indirect
 	golang.org/x/text v0.21.0 // indirect
 	golang.org/x/tools v0.29.0 // indirect
-	google.golang.org/protobuf v1.36.2 // indirect
+	google.golang.org/protobuf v1.36.3 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
