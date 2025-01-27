@@ -134,6 +134,8 @@ github.com/cloudfoundry/bosh-utils v0.0.521 h1:kP4oZuVsdDy5ypnytedP2B4ummJqSbJmn
 github.com/cloudfoundry/bosh-utils v0.0.521/go.mod h1:czOtSwBiyWGS96zWhl/wtOaZb692nM53JQJW8DDIbR8=
 github.com/cloudfoundry/bosh-utils v0.0.522 h1:yjGsGagOFFibXV/FXBzrS99hy7k+8cX6nls8SgmYEKE=
 github.com/cloudfoundry/bosh-utils v0.0.522/go.mod h1:czOtSwBiyWGS96zWhl/wtOaZb692nM53JQJW8DDIbR8=
+github.com/cloudfoundry/bosh-utils v0.0.524 h1:txU6oC0Cb9UyYvzReWuBYXpS1YGt+cjM9ttl3Ftxvnk=
+github.com/cloudfoundry/bosh-utils v0.0.524/go.mod h1:TgTCOZSIVWIxcr+F7DXMTUVNSoNOtCDz1c+aSjrmzwI=
 github.com/cloudfoundry/go-socks5 v0.0.0-20180221174514-54f73bdb8a8e h1:FQdRViaoDphGRfgrotl2QGsX1gbloe57dbGBS5CG6KY=
 github.com/cloudfoundry/go-socks5 v0.0.0-20180221174514-54f73bdb8a8e/go.mod h1:PXmcacyJB/pJjSxEl15IU6rEIKXrhZQRzsr0UTkgNNs=
 github.com/cloudfoundry/go-socks5 v0.0.0-20240831012420-2590b55236ee h1:88ruSYvCUKX2YcF2CMYVTmPGITvNdRbzaBRk2c/iMds=
@@ -190,6 +192,8 @@ github.com/cloudfoundry/socks5-proxy v0.2.137 h1:iz5ywofD9KLUKfEYV2CSVn96zYMHNVz
 github.com/cloudfoundry/socks5-proxy v0.2.137/go.mod h1:I12V00wkUGsmAFtG2mVDH8ch2esicDRmGS280LOCAyY=
 github.com/cloudfoundry/socks5-proxy v0.2.138 h1:D+0ygKOQ9G7W+VKiF5up9hFEtzqgL07F5my4aUV6GqU=
 github.com/cloudfoundry/socks5-proxy v0.2.138/go.mod h1:WEgvcP1o7xObApPiZ9jFKCsP5NlSK9GxXdHr+et3Oa8=
+github.com/cloudfoundry/socks5-proxy v0.2.139 h1:Sn3DxheZusaFFYmSZ2xeVZRCnxJnVeoo/tMnyqOSh28=
+github.com/cloudfoundry/socks5-proxy v0.2.139/go.mod h1:FPGri2G7IWHMlMAL2PGPBP5hPBGbuyHxIHO6G/+bPaQ=
 github.com/cppforlife/go-patch v0.2.0 h1:Y14MnCQjDlbw7WXT4k+u6DPAA9XnygN4BfrSpI/19RU=
 github.com/cppforlife/go-patch v0.2.0/go.mod h1:67a7aIi94FHDZdoeGSJRRFDp66l9MhaAG1yGxpUoFD8=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
@@ -284,6 +288,8 @@ github.com/google/pprof v0.0.0-20241206021119-61a79c692802 h1:US08AXzP0bLurpzFUV
 github.com/google/pprof v0.0.0-20241206021119-61a79c692802/go.mod h1:vavhavw2zAxS5dIdcRluK6cSGGPlZynqzFM8NdvU144=
 github.com/google/pprof v0.0.0-20241210010833-40e02aabc2ad h1:a6HEuzUHeKH6hwfN/ZoQgRgVIWFJljSWa/zetS2WTvg=
 github.com/google/pprof v0.0.0-20241210010833-40e02aabc2ad/go.mod h1:vavhavw2zAxS5dIdcRluK6cSGGPlZynqzFM8NdvU144=
+github.com/google/pprof v0.0.0-20250125003558-7fdb3d7e6fa0 h1:my2ucqBZmv+cWHIhZNSIYKzgN8EBGyHdC7zD5sASRAg=
+github.com/google/pprof v0.0.0-20250125003558-7fdb3d7e6fa0/go.mod h1:vavhavw2zAxS5dIdcRluK6cSGGPlZynqzFM8NdvU144=
 github.com/hashicorp/go-version v1.6.0 h1:feTTfFNnjP967rlCxM/I9g701jU+RN74YKx2mOkIeek=
 github.com/hashicorp/go-version v1.6.0/go.mod h1:fltr4n8CU8Ke44wwGCBoEymUuxUHl09ZGVZPK5anwXA=
 github.com/hashicorp/go-version v1.7.0 h1:5tqGy27NaOTB8yJKUZELlFAS/LTKJkrmONwQKeRZfjY=
@@ -577,6 +583,8 @@ google.golang.org/protobuf v1.36.2 h1:R8FeyR1/eLmkutZOM5CWghmo5itiG9z0ktFlTVLuTm
 google.golang.org/protobuf v1.36.2/go.mod h1:9fA7Ob0pmnwhb644+1+CVWFRbNajQ6iRojtC/QF5bRE=
 google.golang.org/protobuf v1.36.3 h1:82DV7MYdb8anAVi3qge1wSnMDrnKK7ebr+I0hHRN1BU=
 google.golang.org/protobuf v1.36.3/go.mod h1:9fA7Ob0pmnwhb644+1+CVWFRbNajQ6iRojtC/QF5bRE=
+google.golang.org/protobuf v1.36.4 h1:6A3ZDJHn/eNqc1i+IdefRzy/9PokBTPvcqMySR7NNIM=
+google.golang.org/protobuf v1.36.4/go.mod h1:9fA7Ob0pmnwhb644+1+CVWFRbNajQ6iRojtC/QF5bRE=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c h1:Hei/4ADfdWqJk1ZMxUNpqntNwaWcugrBjAiHlqqRiVk=
 gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c/go.mod h1:JHkPIbrfpd72SG/EVd6muEfDQjcINNoR0C8j2r3qZ4Q=
