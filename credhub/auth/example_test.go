@@ -7,7 +7,7 @@ import (
 	"code.cloudfoundry.org/credhub-cli/credhub/auth"
 )
 
-func ExampleOAuth() {
+func ExampleAuth() {
 	_ = func() {
 		// To retrieve the access token from the CredHub client, use type assertion
 		ch, err := credhub.New(
