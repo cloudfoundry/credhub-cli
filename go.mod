@@ -6,8 +6,8 @@ toolchain go1.24.0
 
 require (
 	github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
-	github.com/cloudfoundry/bosh-cli/v7 v7.9.3
-	github.com/cloudfoundry/bosh-utils v0.0.534
+	github.com/cloudfoundry/bosh-cli/v7 v7.9.4
+	github.com/cloudfoundry/bosh-utils v0.0.536
 	github.com/cloudfoundry/socks5-proxy v0.2.145
 	github.com/fatih/color v1.18.0
 	github.com/hashicorp/go-version v1.7.0
@@ -29,7 +29,7 @@ require (
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
-	github.com/google/pprof v0.0.0-20250302191652-9094ed2288e7 // indirect
+	github.com/google/pprof v0.0.0-20250315033105-103756e64e1d // indirect
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
