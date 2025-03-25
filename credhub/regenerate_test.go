@@ -71,4 +71,62 @@ var _ = Describe("Regenerate", func() {
 			Expect(err).To(HaveOccurred())
 		})
 	})
+
+	It("regenerates the specified credential with a different key length using the /data endpoint", func() {
+		dummyAuth := &DummyAuth{Response: &http.Response{
+			Body: io.NopCloser(bytes.NewBufferString("")),
+		}}
+
+		ch, _ := New("https://example.com", Auth(dummyAuth.Builder()), ServerVersion("2.12.110"))
+		ch.Regenerate("/example-certificate", regenerate.Certificate{ KeyLength: 4096 })
+		url := dummyAuth.Request.URL.String()
+		Expect(url).To(Equal("https://example.com/api/v1/data"))
+		Expect(dummyAuth.Request.Method).To(Equal(http.MethodPost))
+
+		var requestBody map[string]interface{}
+		body, _ := io.ReadAll(dummyAuth.Request.Body)
+		json.Unmarshal(body, &requestBody)
+
+		Expect(requestBody["name"]).To(Equal("/example-certificate"))
+		Expect(requestBody["regenerate"]).To(Equal(true))
+		Expect(int(requestBody["parameters"].(map[string]interface{})["key_length"].(float64))).To(Equal(4096))
+	})
+
+	Context("when successful", func() {
+		It("returns the new credential", func() {
+			responseString := `{
+	  "id": "some-id",
+	  "name": "/example-certificate",
+	  "type": "certificate",
+	  "value": "<redacted>",
+	  "version_created_at": "2017-01-05T01:01:01Z"
+	}`
+			dummyAuth := &DummyAuth{Response: &http.Response{
+				StatusCode: http.StatusOK,
+				Body:       io.NopCloser(bytes.NewBufferString(responseString)),
+			}}
+
+			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()), ServerVersion("2.12.110"))
+			cred, err := ch.Regenerate("/example-certificate", regenerate.Certificate{ KeyLength: 4096 })
+			Expect(err).To(BeNil())
+			Expect(cred.Id).To(Equal("some-id"))
+			Expect(cred.Name).To(Equal("/example-certificate"))
+			Expect(cred.Type).To(Equal("certificate"))
+			Expect(cred.Value.(string)).To(Equal("<redacted>"))
+			Expect(cred.VersionCreatedAt).To(Equal("2017-01-05T01:01:01Z"))
+		})
+	})
+
+	Context("when response body cannot be unmarshalled", func() {
+		It("returns an error", func() {
+			dummyAuth := &DummyAuth{Response: &http.Response{
+				Body: io.NopCloser(bytes.NewBufferString("something-invalid")),
+			}}
+
+			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()), ServerVersion("2.12.110"))
+			_, err := ch.Regenerate("/example-certificate", regenerate.Certificate{ KeyLength: 4096 })
+
+			Expect(err).To(HaveOccurred())
+		})
+	})
 })
