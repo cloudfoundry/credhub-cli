@@ -55,9 +55,8 @@ var _ = Describe("Regenerate", func() {
 
 			session := runCommand("regenerate", "--name", "my-password-stuffs", "--output-json")
 
-			content := string(session.Out.Contents())
 			Eventually(session).Should(Exit(0))
-			Expect(content).To(MatchJSON(fmt.Sprintf(defaultResponseJSON, "password", "my-password-stuffs", `"<redacted>"`, `{}`)))
+			Expect(string(session.Out.Contents())).To(MatchJSON(fmt.Sprintf(defaultResponseJSON, "password", "my-password-stuffs", `"<redacted>"`, `{}`)))
 		})
 
 		It("prints error when server returns an error", func() {
@@ -166,8 +165,7 @@ metadata:
 			session := runCommand("regenerate", "--name", "/my-certificate", "--output-json")
 
 			Eventually(session).Should(Exit(0))
-			content := string(session.Out.Contents())
-			Expect(content).To(MatchJSON(fmt.Sprintf(defaultResponseJSON, "certificate", "/my-certificate", `"<redacted>"`, `{}`)))
+			Expect(string(session.Out.Contents())).To(MatchJSON(fmt.Sprintf(defaultResponseJSON, "certificate", "/my-certificate", `"<redacted>"`, `{}`)))
 		})
 		It("prints error when server returns an error", func() {
 			server.RouteToHandler("POST", "/api/v1/data",
