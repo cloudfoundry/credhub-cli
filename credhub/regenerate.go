@@ -11,8 +11,9 @@ import (
 type RegenerateOption func(options *RegenerateOptions) error
 
 type regenerateRequest struct {
-	Name       string `json:"name"`
-	Regenerate bool   `json:"regenerate"`
+	Name       string      `json:"name"`
+	Regenerate bool        `json:"regenerate"`
+	Parameters interface{} `json:"parameters,omitempty"`
 	RegenerateOptions
 }
 
@@ -21,12 +22,13 @@ type RegenerateOptions struct {
 }
 
 // Regenerate generates and returns a new credential version using the same parameters as the existing credential. The returned credential may be of any type.
-func (ch *CredHub) Regenerate(name string, options ...RegenerateOption) (credentials.Credential, error) {
+func (ch *CredHub) Regenerate(name string, gen interface{}, options ...RegenerateOption) (credentials.Credential, error) {
 	var cred credentials.Credential
 
 	request := regenerateRequest{
 		Name:       name,
 		Regenerate: true,
+		Parameters: gen,
 	}
 
 	for _, option := range options {

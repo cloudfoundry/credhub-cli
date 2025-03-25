@@ -11,6 +11,7 @@ import (
 	"encoding/json"
 
 	. "code.cloudfoundry.org/credhub-cli/credhub"
+	"code.cloudfoundry.org/credhub-cli/credhub/credentials/regenerate"
 )
 
 var _ = Describe("Regenerate", func() {
@@ -20,8 +21,7 @@ var _ = Describe("Regenerate", func() {
 		}}
 
 		ch, _ := New("https://example.com", Auth(dummyAuth.Builder()), ServerVersion("2.6.0"))
-
-		ch.Regenerate("/example-password")
+		ch.Regenerate("/example-password", regenerate.Password{})
 		url := dummyAuth.Request.URL.String()
 		Expect(url).To(Equal("https://example.com/api/v1/data"))
 		Expect(dummyAuth.Request.Method).To(Equal(http.MethodPost))
@@ -49,8 +49,7 @@ var _ = Describe("Regenerate", func() {
 			}}
 
 			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()), ServerVersion("2.6.0"))
-
-			cred, err := ch.Regenerate("/example-password")
+			cred, err := ch.Regenerate("/example-password", regenerate.Password{})
 			Expect(err).To(BeNil())
 			Expect(cred.Id).To(Equal("some-id"))
 			Expect(cred.Name).To(Equal("/example-password"))
@@ -67,7 +66,7 @@ var _ = Describe("Regenerate", func() {
 			}}
 
 			ch, _ := New("https://example.com", Auth(dummyAuth.Builder()), ServerVersion("2.6.0"))
-			_, err := ch.Regenerate("/example-password")
+			_, err := ch.Regenerate("/example-password", regenerate.Password{})
 
 			Expect(err).To(HaveOccurred())
 		})

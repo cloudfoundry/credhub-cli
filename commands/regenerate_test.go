@@ -55,8 +55,9 @@ var _ = Describe("Regenerate", func() {
 
 			session := runCommand("regenerate", "--name", "my-password-stuffs", "--output-json")
 
+			content := string(session.Out.Contents())
 			Eventually(session).Should(Exit(0))
-			Expect(string(session.Out.Contents())).To(MatchJSON(fmt.Sprintf(defaultResponseJSON, "password", "my-password-stuffs", `"<redacted>"`, `{}`)))
+			Expect(content).To(MatchJSON(fmt.Sprintf(defaultResponseJSON, "password", "my-password-stuffs", `"<redacted>"`, `{}`)))
 		})
 
 		It("prints error when server returns an error", func() {
@@ -146,6 +147,69 @@ metadata:
 		})
 	})
 
+	Describe("Regenerate certificate", func() {
+		It("prints the regenerated certificate secret in yaml format", func() {
+			setupRegenerateServer("certificate", "/my-certificate", `"nu-potatoes"`, `{}`)
+			setupGetLatestVersionServerWithoutMetadata("certificate", "/my-certificate")
+
+			session := runCommand("regenerate", "--name", "/my-certificate")
+
+			Eventually(session).Should(Exit(0))
+			Eventually(session.Out).Should(Say("name: /my-certificate"))
+			Eventually(session.Out).Should(Say("type: certificate"))
+			Eventually(session.Out).Should(Say("value: <redacted>"))
+		})
+		It("prints the regenerated certificate secret in json format", func() {
+			setupRegenerateServer("certificate", "/my-certificate", `"nu-potatoes"`, `{}`)
+			setupGetLatestVersionServerWithoutMetadata("certificate", "/my-certificate")
+
+			session := runCommand("regenerate", "--name", "/my-certificate", "--output-json")
+
+			Eventually(session).Should(Exit(0))
+			content := string(session.Out.Contents())
+			Expect(content).To(MatchJSON(fmt.Sprintf(defaultResponseJSON, "certificate", "/my-certificate", `"<redacted>"`, `{}`)))
+		})
+		It("prints error when server returns an error", func() {
+			server.RouteToHandler("POST", "/api/v1/data",
+				CombineHandlers(
+					VerifyJSON(fmt.Sprintf(regenerateCredentialRequestJson, "/my-certificate")),
+					RespondWith(http.StatusBadRequest, `{"error":"The certificate could not be regenerated because the value was statically set. Only generated certificates may be regenerated."}`),
+				),
+			)
+			setupGetLatestVersionServerWithoutMetadata("certificate", "/my-certificate")
+
+			session := runCommand("regenerate", "--name", "/my-certificate")
+
+			Eventually(session).Should(Exit(1))
+			Expect(string(session.Err.Contents())).To(ContainSubstring("The certificate could not be regenerated because the value was statically set. Only generated certificates may be regenerated."))
+		})
+		It("regenerates a certificate with different key length", func() {
+			setupRegenerateServer("certificate", "/my-certificate", `"nu-potatoes"`, `{"key_length": 4096}`)
+			setupGetLatestVersionServerWithoutMetadata("certificate", "/my-certificate")
+
+			session := runCommand("regenerate", "--name", "/my-certificate", "--key-length", "4096")
+
+			Eventually(session).Should(Exit(0))
+			Eventually(session.Out).Should(Say("name: /my-certificate"))
+			Eventually(session.Out).Should(Say("type: certificate"))
+			Eventually(session.Out).Should(Say("value: <redacted>"))
+		})
+		It("does not regenerate a certificate due to invalid key length", func() {
+			server.RouteToHandler("POST", "/api/v1/data",
+				CombineHandlers(
+					VerifyJSON(fmt.Sprintf(regenerateCredentialRequestWithParamsJson, "/my-certificate", `{"key_length":4711}`)),
+					RespondWith(http.StatusBadRequest, `{"error":"The provided key length is not supported. Valid values include '2048', '3072' and '4096'."}`),
+				),
+			)
+			setupGetLatestVersionServerWithoutMetadata("certificate", "/my-certificate")
+
+			session := runCommand("regenerate", "--name", "/my-certificate", "--key-length", "4711")
+
+			Eventually(session).Should(Exit(1))
+			Expect(string(session.Err.Contents())).To(ContainSubstring("The provided key length is not supported. Valid values include '2048', '3072' and '4096'."))
+		})
+	})
+
 	Describe("help", func() {
 		ItBehavesLikeHelp("regenerate", "r", func(session *Session) {
 			Expect(session.Err).To(Say("regenerate"))
@@ -155,15 +219,22 @@ metadata:
 		It("has short flags", func() {
 			Expect(commands.RegenerateCommand{}).To(SatisfyAll(
 				commands.HaveFlag("name", "n"),
+				commands.HaveFlag("key-length", "k"),
 			))
 		})
 	})
 })
 
 func setupRegenerateServer(keyType, name, value, params string) {
+	var credentialRequestJson string
+	if params == "{}" {
+		credentialRequestJson = fmt.Sprintf(regenerateCredentialRequestJson, name)
+	} else {
+		credentialRequestJson = fmt.Sprintf(regenerateCredentialRequestWithParamsJson, name, params)
+	}
 	server.RouteToHandler("POST", "/api/v1/data",
 		CombineHandlers(
-			VerifyJSON(fmt.Sprintf(regenerateCredentialRequestJson, name)),
+			VerifyJSON(credentialRequestJson),
 			RespondWith(http.StatusOK, fmt.Sprintf(defaultResponseJSON, keyType, name, value, params)),
 		),
 	)
@@ -171,6 +242,7 @@ func setupRegenerateServer(keyType, name, value, params string) {
 
 const regenerateCredentialRequestJson = `{"name":"%s", "regenerate":true}`
 const regenerateRequestJSONWithMetadata = `{"name":"%s", "regenerate":true, "metadata":%s}`
+const regenerateCredentialRequestWithParamsJson = `{"name":"%s", "regenerate":true, "parameters":%s}`
 const regenerateResponseJSONWithMetadata = `{"type":"%s","id":"` + uuid + `","name":"%s","version_created_at":"` + timestamp + `","value":%s,"metadata":%s}`
 const getLatestVersionResponseJSONWithMetadata = `{ "data": [ { "id": "` + uuid + `", "name": "%s", "type": "%s", "value": "some-password", "metadata": %s, "version_created_at": "` + timestamp + `" } ]}`
 const getLatestVersionResponseJSONWithoutMetadata = `{ "data": [ { "id": "` + uuid + `", "name": "%s", "type": "%s", "value": "some-password", "version_created_at": "` + timestamp + `" } ]}`
