@@ -3,7 +3,7 @@ package credentials_test
 import (
 	"encoding/json"
 
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 
 	. "code.cloudfoundry.org/credhub-cli/credhub/credentials"
 
@@ -455,12 +455,12 @@ version_created_at: '2017-01-01T04:07:18Z'`
 name: /example-ssh
 type: ssh
 value:
-  private_key: some-private-key
-  public_key: some-public-key
-  public_key_fingerprint: some-public-key-fingerprint
+    private_key: some-private-key
+    public_key: some-public-key
+    public_key_fingerprint: some-public-key-fingerprint
 metadata:
-  some:
-    example: metadata
+    some:
+        example: metadata
 version_created_at: "2017-01-01T04:07:18Z"
 `
 

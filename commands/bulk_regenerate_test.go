@@ -45,9 +45,9 @@ var _ = Describe("Bulk-regenerate", func() {
 
 			Eventually(session).Should(Exit(0))
 			Eventually(string(session.Out.Contents())).Should(Equal(`regenerated_credentials:
-- cert1
-- cert2
-- cert3
+    - cert1
+    - cert2
+    - cert3
 
 `))
 		})
