@@ -131,7 +131,7 @@ var _ = Describe("Get", func() {
 			Eventually(session.Out).Should(Say("type: value"))
 			Eventually(session.Out).Should(Say("value: potatoes"))
 			Eventually(session.Out).Should(Say(`metadata:
-  some: metadata`))
+    some: metadata`))
 		})
 
 		Context("with --quiet flag", func() {
@@ -169,8 +169,8 @@ var _ = Describe("Get", func() {
 				Eventually(session).Should(Exit(0))
 				contents := string(bytes.TrimSpace(session.Out.Contents()))
 				Eventually(contents).Should(Equal(`versions:
-- potatoes
-- tomatoes`))
+    - potatoes
+    - tomatoes`))
 			})
 		})
 
@@ -231,7 +231,7 @@ tomatoes`))
 			Eventually(session.Out).Should(Say("type: password"))
 			Eventually(session.Out).Should(Say("value: potatoes"))
 			Eventually(session.Out).Should(Say(`metadata:
-  some: metadata`))
+    some: metadata`))
 		})
 
 		It("gets a secret by ID", func() {
@@ -296,16 +296,16 @@ tomatoes`))
 
 				Eventually(session).Should(Exit(0))
 				Eventually(session.Out).Should(Say(`versions:
-- id: ` + uuid + `
-  name: my-password
-  type: password
-  value: old-password
-  version_created_at: "` + timestamp + `"
-- id: ` + uuid + `
-  name: my-password
-  type: password
-  value: new-password
-  version_created_at: "` + timestamp + `"
+    - id: ` + uuid + `
+      name: my-password
+      type: password
+      value: old-password
+      version_created_at: "` + timestamp + `"
+    - id: ` + uuid + `
+      name: my-password
+      type: password
+      value: new-password
+      version_created_at: "` + timestamp + `"
 `))
 
 			})
@@ -327,8 +327,8 @@ tomatoes`))
 				Eventually(session).Should(Exit(0))
 				contents := string(bytes.TrimSpace(session.Out.Contents()))
 				Eventually(contents).Should(Equal(`versions:
-- new-password
-- old-password`))
+    - new-password
+    - old-password`))
 			})
 		})
 
@@ -351,12 +351,11 @@ tomatoes`))
 			Eventually(session.Out).Should(Say("name: json-secret"))
 			Eventually(session.Out).Should(Say("type: json"))
 			Eventually(session.Out).Should(Say(`value:
-  an:
-  - array
-  foo: bar
-  nested:
-    a: 1`))
-
+    an:
+        - array
+    foo: bar
+    nested:
+        a: 1`))
 		})
 
 		It("gets a json secret with metadata", func() {
@@ -375,13 +374,13 @@ tomatoes`))
 			Eventually(session.Out).Should(Say("name: json-secret"))
 			Eventually(session.Out).Should(Say("type: json"))
 			Eventually(session.Out).Should(Say(`value:
-  an:
-  - array
-  foo: bar
-  nested:
-    a: 1`))
+    an:
+        - array
+    foo: bar
+    nested:
+        a: 1`))
 			Eventually(session.Out).Should(Say(`metadata:
-  some: metadata`))
+    some: metadata`))
 		})
 
 		Context("with --output-json flag", func() {
@@ -456,10 +455,10 @@ tomatoes`))
 				Eventually(session).Should(Exit(0))
 				contents := string(bytes.TrimSpace(session.Out.Contents()))
 				Eventually(contents).Should(Equal(`an:
-- array
+    - array
 foo: bar
 nested:
-  a: 1`))
+    a: 1`))
 			})
 		})
 
@@ -478,8 +477,8 @@ nested:
 				Eventually(session).Should(Exit(0))
 				contents := string(bytes.TrimSpace(session.Out.Contents()))
 				Eventually(contents).Should(Equal(`versions:
-- secret: newSecret
-- secret: oldSecret`))
+    - secret: newSecret
+    - secret: oldSecret`))
 			})
 		})
 	})
@@ -524,7 +523,7 @@ nested:
 			Eventually(session.Out).Should(Say("certificate: my-cert"))
 			Eventually(session.Out).Should(Say("private_key: my-priv"))
 			Eventually(session.Out).Should(Say(`metadata:
-  some: metadata`))
+    some: metadata`))
 		})
 
 		Context("with --key flag", func() {
@@ -606,12 +605,12 @@ private_key: '----begin----my-priv-----end------'`))
 
 				Eventually(session).Should(Exit(0))
 				Eventually(string(bytes.TrimSpace(session.Out.Contents()))).Should(Equal(`versions:
-- ca: '----begin----my-new-ca-----end------'
-  certificate: '----begin----my-new-cert-----end------'
-  private_key: '----begin----my-new-priv-----end------'
-- ca: '----begin----my-old-ca-----end------'
-  certificate: '----begin----my-old-cert-----end------'
-  private_key: '----begin----my-old-priv-----end------'`))
+    - ca: '----begin----my-new-ca-----end------'
+      certificate: '----begin----my-new-cert-----end------'
+      private_key: '----begin----my-new-priv-----end------'
+    - ca: '----begin----my-old-ca-----end------'
+      certificate: '----begin----my-old-cert-----end------'
+      private_key: '----begin----my-old-priv-----end------'`))
 			})
 		})
 
@@ -680,7 +679,7 @@ private_key: |-
 			Eventually(session.Out).Should(Say("private_key: some-private-key"))
 			Eventually(session.Out).Should(Say("public_key: some-public-key"))
 			Eventually(session.Out).Should(Say(`metadata:
-  some: metadata`))
+    some: metadata`))
 		})
 
 		Context("with --quiet flag", func() {
@@ -728,10 +727,10 @@ private_key: |-
 				Eventually(session).Should(Exit(0))
 				contents := string(bytes.TrimSpace(session.Out.Contents()))
 				Eventually(contents).Should(Equal(`versions:
-- private_key: new-private-key
-  public_key: new-public-key
-- private_key: old-private-key
-  public_key: old-public-key`))
+    - private_key: new-private-key
+      public_key: new-public-key
+    - private_key: old-private-key
+      public_key: old-public-key`))
 			})
 		})
 
@@ -796,7 +795,7 @@ private_key: |-
 			Eventually(session.Out).Should(Say(`password_hash: passw0rd-H4\$h`))
 			Eventually(session.Out).Should(Say("username: my-username"))
 			Eventually(session.Out).Should(Say(`metadata:
-  some: metadata`))
+    some: metadata`))
 		})
 
 		Context("with --quiet flag", func() {

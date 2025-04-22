@@ -59,7 +59,11 @@ var _ = Describe("Find", func() {
 				}`
 				// language=YAML
 				responseTable :=
-					`credentials:\n- name: dan.password\n  version_created_at: "2016-09-06T23:26:58Z"\n- name: deploy1/dan/id.key\n  version_created_at: "2016-09-06T23:26:58Z"`
+					`credentials:
+    - name: dan.password
+      version_created_at: "2016-09-06T23:26:58Z"
+    - name: deploy1/dan/id.key
+      version_created_at: "2016-09-06T23:26:58Z"`
 
 				server.RouteToHandler("GET", "/api/v1/data",
 					CombineHandlers(
@@ -124,7 +128,13 @@ var _ = Describe("Find", func() {
 				}`
 				// language=YAML
 				responseTable :=
-					`credentials:\n- name: deploy123/dan.password\n  version_created_at: "2016-09-06T23:26:58Z"\n- name: deploy123/dan.key\n  version_created_at: "2016-09-06T23:26:58Z"\n- name: deploy123/dan/id.key\n  version_created_at: "2016-09-06T23:26:58Z"`
+					`credentials:
+    - name: deploy123/dan.password
+      version_created_at: "2016-09-06T23:26:58Z"
+    - name: deploy123/dan.key
+      version_created_at: "2016-09-06T23:26:58Z"
+    - name: deploy123/dan/id.key
+      version_created_at: "2016-09-06T23:26:58Z"`
 
 				server.RouteToHandler("GET", "/api/v1/data",
 					CombineHandlers(

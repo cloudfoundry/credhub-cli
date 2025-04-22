@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 
 	"code.cloudfoundry.org/credhub-cli/credhub/credentials"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 type exportCredential struct {

@@ -79,10 +79,10 @@ var _ = Describe("Set", func() {
 			Eventually(session).Should(Exit(0), string(session.Err.Contents()))
 			metadataOutput := `
 metadata:
-  array:
-  - metadata
-  some:
-    example: metadata`
+    array:
+        - metadata
+    some:
+        example: metadata`
 			Expect(string(session.Out.Contents())).To(ContainSubstring(metadataOutput))
 		})
 
@@ -140,10 +140,10 @@ metadata:
 			Eventually(session).Should(Exit(0))
 			metadataOutput := `
 metadata:
-  array:
-  - metadata
-  some:
-    example: metadata`
+    array:
+        - metadata
+    some:
+        example: metadata`
 			Eventually(string(session.Out.Contents())).Should(ContainSubstring(metadataOutput))
 		})
 
@@ -202,10 +202,10 @@ metadata:
 			Eventually(session).Should(Exit(0))
 			metadataOutput := `
 metadata:
-  array:
-  - metadata
-  some:
-    example: metadata`
+    array:
+        - metadata
+    some:
+        example: metadata`
 			Eventually(string(session.Out.Contents())).Should(ContainSubstring(metadataOutput))
 		})
 
@@ -277,10 +277,10 @@ metadata:
 			Eventually(session).Should(Exit(0), string(session.Err.Contents()))
 			metadataOutput := `
 metadata:
-  array:
-  - metadata
-  some:
-    example: metadata`
+    array:
+        - metadata
+    some:
+        example: metadata`
 			Expect(string(session.Out.Contents())).To(ContainSubstring(metadataOutput))
 		})
 
@@ -357,10 +357,10 @@ metadata:
 			Eventually(session).Should(Exit(0), string(session.Err.Contents()))
 			metadataOutput := `
 metadata:
-  array:
-  - metadata
-  some:
-    example: metadata`
+    array:
+        - metadata
+    some:
+        example: metadata`
 			Expect(string(session.Out.Contents())).To(ContainSubstring(metadataOutput))
 		})
 
@@ -443,10 +443,10 @@ metadata:
 			Eventually(session).Should(Exit(0), string(session.Err.Contents()))
 			metadataOutput := `
 metadata:
-  array:
-  - metadata
-  some:
-    example: metadata`
+    array:
+        - metadata
+    some:
+        example: metadata`
 			Eventually(string(session.Out.Contents())).Should(ContainSubstring(metadataOutput))
 		})
 
@@ -545,10 +545,10 @@ metadata:
 			Eventually(session).Should(Exit(0), string(session.Err.Contents()))
 			metadataOutput := `
 metadata:
-  array:
-  - metadata
-  some:
-    example: metadata`
+    array:
+        - metadata
+    some:
+        example: metadata`
 			Eventually(string(session.Out.Contents())).Should(ContainSubstring(metadataOutput))
 		})
 

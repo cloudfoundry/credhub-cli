@@ -81,16 +81,16 @@ var _ = Describe("Export", func() {
 			}`
 
 			responseTable := `credentials:
-- name: /path/to/cred
-  type: value
-  value: foo
-  metadata:
-    some: thing
-- name: /path/to/cred
-  type: value
-  value: foo
-  metadata:
-    some: thing`
+    - name: /path/to/cred
+      type: value
+      value: foo
+      metadata:
+        some: thing
+    - name: /path/to/cred
+      type: value
+      value: foo
+      metadata:
+        some: thing`
 
 			server.AppendHandlers(
 				CombineHandlers(
@@ -199,18 +199,18 @@ var _ = Describe("Export", func() {
 				}]}`
 
 			responseTable := `credentials:
-- name: /path/to/cert
-  type: certificate
-  value:
-    ca_name: /path/to/cert_ca
-    certificate: some_cert
-    private_key: private_key
-- name: /path/to/cert_ca
-  type: certificate
-  value:
-    ca: some_ca
-    certificate: some_cert
-    private_key: private_key`
+    - name: /path/to/cert
+      type: certificate
+      value:
+        ca_name: /path/to/cert_ca
+        certificate: some_cert
+        private_key: private_key
+    - name: /path/to/cert_ca
+      type: certificate
+      value:
+        ca: some_ca
+        certificate: some_cert
+        private_key: private_key`
 
 			server.AppendHandlers(
 				CombineHandlers(

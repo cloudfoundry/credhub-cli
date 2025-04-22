@@ -123,9 +123,9 @@ var _ = Describe("Set Permission", func() {
 				Eventually(session).Should(Exit(0))
 				Eventually(session.Out).Should(Say("actor: some-actor"))
 				Eventually(session.Out).Should(Say(`operations:
-- read
-- write
-- delete`))
+    - read
+    - write
+    - delete`))
 				Eventually(session.Out).Should(Say("path: .*'/some-path'.*"))
 				Eventually(session.Out).Should(Say("uuid: " + uuid))
 			})
@@ -153,9 +153,9 @@ var _ = Describe("Set Permission", func() {
 				Eventually(session).Should(Exit(0))
 				Eventually(session.Out).Should(Say("actor: some-actor"))
 				Eventually(session.Out).Should(Say(`operations:
-- read
-- write
-- delete`))
+    - read
+    - write
+    - delete`))
 				Eventually(session.Out).Should(Say("path: .*'/some-path'.*"))
 				Eventually(session.Out).Should(Say("uuid: " + uuid))
 			})

@@ -94,10 +94,10 @@ var _ = Describe("Regenerate", func() {
 					Eventually(session).Should(Exit(0))
 					metadataOutput := `
 metadata:
-  array:
-  - metadata
-  some:
-    example: metadata`
+    array:
+        - metadata
+    some:
+        example: metadata`
 					Eventually(string(session.Out.Contents())).Should(ContainSubstring(metadataOutput))
 				})
 			})
@@ -115,10 +115,10 @@ metadata:
 				Eventually(session).Should(Exit(0))
 				metadataOutput := `
 metadata:
-  array:
-  - metadata
-  some:
-    example: metadata`
+    array:
+        - metadata
+    some:
+        example: metadata`
 				Eventually(string(session.Out.Contents())).Should(ContainSubstring(metadataOutput))
 			})
 
