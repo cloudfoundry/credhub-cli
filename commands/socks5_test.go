@@ -13,7 +13,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/armon/go-socks5"
+	"github.com/cloudfoundry/go-socks5"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gexec"
