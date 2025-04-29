@@ -159,7 +159,6 @@ var _ = Describe("Login", func() {
 				setConfigAuthUrl(uaaServer.URL())
 				session := runCommandWithStdin(strings.NewReader("user\npass\n"), "login")
 				Eventually(session.Out).Should(Say("username:"))
-				Eventually(session.Out).Should(Say(`password: \*\*\*\*`))
 				Eventually(session.Wait("10s").Out).Should(Say("Login Successful"))
 				Eventually(session).Should(Exit(0))
 			})

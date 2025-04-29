@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"bufio"
 	"fmt"
 
 	"os"
@@ -11,7 +12,7 @@ import (
 	"code.cloudfoundry.org/credhub-cli/credhub/auth/uaa"
 	"code.cloudfoundry.org/credhub-cli/errors"
 	"code.cloudfoundry.org/credhub-cli/util"
-	"github.com/howeyc/gopass"
+	"golang.org/x/term"
 )
 
 type LoginCommand struct {
@@ -209,7 +210,7 @@ func promptForMissingCredentials(cmd *LoginCommand, uaa *uaa.Client) error {
 				return err
 			}
 			fmt.Printf("%s : ", md.PasscodePrompt())
-			code, err := gopass.GetPasswdMasked()
+			code, err := getPasswordMasked()
 			if err != nil {
 				return err
 			}
@@ -223,8 +224,18 @@ func promptForMissingCredentials(cmd *LoginCommand, uaa *uaa.Client) error {
 	}
 	if cmd.Password == "" {
 		fmt.Printf("password: ")
-		pass, _ := gopass.GetPasswdMasked()
+		pass, _ := getPasswordMasked()
 		cmd.Password = string(pass)
 	}
 	return nil
+}
+
+func getPasswordMasked() ([]byte, error) {
+	stdin := os.Stdin
+	if term.IsTerminal(int(stdin.Fd())) {
+		return term.ReadPassword(int(stdin.Fd()))
+	}
+	r := bufio.NewReader(stdin)
+	line, _, err := r.ReadLine()
+	return line, err
 }

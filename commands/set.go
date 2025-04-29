@@ -13,7 +13,6 @@ import (
 	"code.cloudfoundry.org/credhub-cli/credhub/credentials/values"
 	"code.cloudfoundry.org/credhub-cli/errors"
 	"code.cloudfoundry.org/credhub-cli/util"
-	"github.com/howeyc/gopass"
 )
 
 type SetCommand struct {
@@ -63,7 +62,7 @@ func (c *SetCommand) setFieldsFromInteractiveUserInput() {
 
 	if c.Password == "" && (c.Type == "password" || c.Type == "user") {
 		fmt.Printf("password: ")
-		pass, _ := gopass.GetPasswdMasked()
+		pass, _ := getPasswordMasked()
 		c.Password = string(pass)
 	}
 }
