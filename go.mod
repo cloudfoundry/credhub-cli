@@ -5,10 +5,10 @@ go 1.23.0
 toolchain go1.24.0
 
 require (
-	github.com/cloudfoundry/bosh-cli/v7 v7.9.5
-	github.com/cloudfoundry/bosh-utils v0.0.543
+	github.com/cloudfoundry/bosh-cli/v7 v7.9.6
+	github.com/cloudfoundry/bosh-utils v0.0.544
 	github.com/cloudfoundry/go-socks5 v0.0.0-20250423223041-4ad5fea42851
-	github.com/cloudfoundry/socks5-proxy v0.2.151
+	github.com/cloudfoundry/socks5-proxy v0.2.152
 	github.com/fatih/color v1.18.0
 	github.com/hashicorp/go-version v1.7.0
 	github.com/jessevdk/go-flags v1.6.1
@@ -23,10 +23,10 @@ require (
 	github.com/bmatcuk/doublestar v1.3.4 // indirect
 	github.com/charlievieth/fs v0.0.3 // indirect
 	github.com/cppforlife/go-patch v0.2.0 // indirect
-	github.com/go-logr/logr v1.4.2 // indirect
+	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
-	github.com/google/pprof v0.0.0-20250501235452-c0086092b71a // indirect
+	github.com/google/pprof v0.0.0-20250602020802-c6617b811d0e // indirect
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
