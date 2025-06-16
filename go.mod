@@ -5,10 +5,10 @@ go 1.23.0
 toolchain go1.24.0
 
 require (
-	github.com/cloudfoundry/bosh-cli/v7 v7.9.6
+	github.com/cloudfoundry/bosh-cli/v7 v7.9.7
 	github.com/cloudfoundry/bosh-utils v0.0.545
 	github.com/cloudfoundry/go-socks5 v0.0.0-20250423223041-4ad5fea42851
-	github.com/cloudfoundry/socks5-proxy v0.2.153
+	github.com/cloudfoundry/socks5-proxy v0.2.154
 	github.com/fatih/color v1.18.0
 	github.com/hashicorp/go-version v1.7.0
 	github.com/jessevdk/go-flags v1.6.1
