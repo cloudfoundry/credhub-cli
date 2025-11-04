@@ -46,11 +46,12 @@ func TestCommands(t *testing.T) {
 }
 
 var (
-	commandPath string
-	homeDir     string
-	server      *Server
-	authServer  *Server
-	credhubEnv  map[string]string
+	commandPath       string
+	homeDir           string
+	server            *Server
+	authServer        *Server
+	exampleAuthServer *Server
+	credhubEnv        map[string]string
 )
 
 var _ = BeforeEach(func() {
@@ -67,6 +68,9 @@ var _ = BeforeEach(func() {
 	server = NewTlsServer("../test/server-tls-cert.pem", "../test/server-tls-key.pem")
 	authServer = NewTlsServer("../test/auth-tls-cert.pem", "../test/auth-tls-key.pem")
 
+	exampleAuthServer = NewServer()
+	exampleAuthServer.RouteToHandler("GET", "/info", RespondWith(http.StatusNotFound, ""))
+
 	SetupServers(server, authServer)
 
 	session := runCommand("api", server.URL(), "--ca-cert", "../test/server-tls-ca.pem", "--ca-cert", "../test/auth-tls-ca.pem")
@@ -80,6 +84,7 @@ var _ = BeforeEach(func() {
 var _ = AfterEach(func() {
 	server.Close()
 	authServer.Close()
+	exampleAuthServer.Close()
 	os.RemoveAll(homeDir)
 })
 
