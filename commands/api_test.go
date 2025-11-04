@@ -174,7 +174,7 @@ var _ = Describe("API", func() {
 
 				cfg := config.ReadConfig()
 
-				Expect(cfg.AuthURL).To(Equal("https://example.com"))
+				Expect(cfg.AuthURL).To(Equal(exampleAuthServer.URL()))
 				Expect(len(cfg.CaCerts)).To(Equal(0))
 			})
 
@@ -242,7 +242,7 @@ var _ = Describe("API", func() {
 
 					cfg := config.ReadConfig()
 					Expect(cfg.ApiURL).To(Equal(theServer.URL()))
-					Expect(cfg.AuthURL).To(Equal("https://example.com"))
+					Expect(cfg.AuthURL).To(Equal(exampleAuthServer.URL()))
 					Expect(cfg.InsecureSkipVerify).To(Equal(false))
 				})
 
@@ -429,7 +429,7 @@ var _ = Describe("API", func() {
 				httpServer.RouteToHandler("GET", "/info",
 					RespondWith(http.StatusOK, `{
 						"app":{"name":"CredHub"},
-						"auth-server":{"url":"https://example.com"}
+						"auth-server":{"url":"`+exampleAuthServer.URL()+`"}
 						}`),
 				)
 			})
@@ -480,7 +480,7 @@ func setUpServer(aServer *Server) string {
 	aServer.RouteToHandler("GET", "/info",
 		RespondWith(http.StatusOK, `{
 					"app":{"name":"CredHub"},
-					"auth-server":{"url":"https://example.com"}
+					"auth-server":{"url":"`+exampleAuthServer.URL()+`"}
 					}`),
 	)
 
