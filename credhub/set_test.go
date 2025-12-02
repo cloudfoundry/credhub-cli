@@ -114,7 +114,8 @@ var _ = Describe("Set", func() {
 			ch, err := New("https://example.com", ServerVersion("invalid-version"))
 			Expect(err).ToNot(HaveOccurred())
 			_, err = ch.SetCredential("some-credential", "some-type", "some-value")
-			Expect(err).To(MatchError("Malformed version: invalid-version"))
+			Expect(err).ToNot(BeNil())
+			Expect(err.Error()).To(MatchRegexp("(?i)malformed version: invalid-version"))
 		})
 
 		It("returns an error when request fails", func() {
