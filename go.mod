@@ -12,6 +12,7 @@ require (
 	github.com/jessevdk/go-flags v1.6.1
 	github.com/onsi/ginkgo/v2 v2.27.2
 	github.com/onsi/gomega v1.38.2
+	go.yaml.in/yaml/v4 v4.0.0-rc.3
 	golang.org/x/net v0.47.0
 	golang.org/x/term v0.37.0
 	gopkg.in/yaml.v3 v3.0.1
@@ -26,12 +27,9 @@ require (
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/google/pprof v0.0.0-20251114195745-4902fdda35c8 // indirect
-	github.com/kr/pretty v0.3.1 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/nxadm/tail v1.4.11 // indirect
-	github.com/rogpeppe/go-internal v1.13.1 // indirect
-	go.uber.org/automaxprocs v1.6.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/crypto v0.45.0 // indirect
 	golang.org/x/mod v0.30.0 // indirect

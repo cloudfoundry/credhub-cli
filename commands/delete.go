@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/credhub-cli/errors"
-	"gopkg.in/yaml.v3"
+	"go.yaml.in/yaml/v3"
 )
 
 type DeleteCommand struct {
