@@ -15,7 +15,6 @@ require (
 	go.yaml.in/yaml/v3 v3.0.4
 	golang.org/x/net v0.49.0
 	golang.org/x/term v0.39.0
-	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
