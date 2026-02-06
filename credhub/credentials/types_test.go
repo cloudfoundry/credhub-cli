@@ -3,13 +3,11 @@ package credentials_test
 import (
 	"encoding/json"
 
-	"gopkg.in/yaml.v3"
-
 	. "code.cloudfoundry.org/credhub-cli/credhub/credentials"
-
 	"code.cloudfoundry.org/credhub-cli/credhub/credentials/values"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"go.yaml.in/yaml/v3"
 )
 
 var _ = Describe("Types", func() {
