@@ -1,6 +1,6 @@
 module code.cloudfoundry.org/credhub-cli
 
-go 1.24.9
+go 1.25.7
 
 require (
 	github.com/cloudfoundry/bosh-cli/v7 v7.9.17
