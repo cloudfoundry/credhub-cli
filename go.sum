@@ -2,12 +2,10 @@ github.com/Masterminds/semver/v3 v3.4.0 h1:Zog+i5UMtVoCU8oKka5P7i9q9HgrJeGzI9SA1
 github.com/Masterminds/semver/v3 v3.4.0/go.mod h1:4V+yj/TJE1HU9XfppCwVMZq3I84lprf4nC11bSS5beM=
 github.com/bmatcuk/doublestar v1.3.4 h1:gPypJ5xD31uhX6Tf54sDPUOBXTqKH4c9aPY66CyQrS0=
 github.com/bmatcuk/doublestar v1.3.4/go.mod h1:wiQtGV+rzVYxB7WIlirSN++5HPtPlXEo9MEoZQC/PmE=
-github.com/charlievieth/fs v0.0.3 h1:3lZQXTj4PbE81CVPwALSn+JoyCNXkZgORHN6h2XHGlg=
-github.com/charlievieth/fs v0.0.3/go.mod h1:hD4sRzto1Hw8zCua76tNVKZxaeZZr1RiKftjAJQRLLo=
-github.com/cloudfoundry/bosh-cli/v7 v7.9.19 h1:H97nJOuHjK6YCUoQdnpQqNXEruO4GqQlVbvMV9tW+VA=
-github.com/cloudfoundry/bosh-cli/v7 v7.9.19/go.mod h1:bXcsdfYP3B1vMMNuGdgXDgfMUTHuiTwVGwrcNAm0REA=
-github.com/cloudfoundry/bosh-utils v0.0.597 h1:M5Zg5WBK5cV5lZjbinjn+pU7DrsD+iirXoUcfkPCjgc=
-github.com/cloudfoundry/bosh-utils v0.0.597/go.mod h1:FHfMGmxFQOcPZOgrk1ZrlJloT25mOU0K/N8eGksP8AU=
+github.com/cloudfoundry/bosh-cli/v7 v7.10.1 h1:3mJUsUcag2f5gmN0XxLmVhXPZwaJr3LlH/+PM5MuFnw=
+github.com/cloudfoundry/bosh-cli/v7 v7.10.1/go.mod h1:GIkD6hKyXo1iyvmIiUqH/xXuB6o/b7Ljfbw2DuxfjkQ=
+github.com/cloudfoundry/bosh-utils v0.0.600 h1:poqFe6XMmTY4cr+jWPWXfSnJYxkiMLoF09i25zFPvK8=
+github.com/cloudfoundry/bosh-utils v0.0.600/go.mod h1:eVBf2aLTYESPvfA316aKx/AgqbwyU88goc50SLPY08s=
 github.com/cloudfoundry/go-socks5 v0.0.0-20250423223041-4ad5fea42851 h1:oy59UYcspoP44ggE8DM3kjxl1+sTFd802bbZlBBhBMk=
 github.com/cloudfoundry/go-socks5 v0.0.0-20250423223041-4ad5fea42851/go.mod h1:72EEm1oq5oXqGfu9XGtaRPWEcAFYd/P10cMNln0QhA8=
 github.com/cloudfoundry/socks5-proxy v0.2.171 h1:2UM5JFFTgCzplvVo1CSPMWxMWKwUkxxhfxpfktoD4Fw=
@@ -16,8 +14,8 @@ github.com/cppforlife/go-patch v0.2.0 h1:Y14MnCQjDlbw7WXT4k+u6DPAA9XnygN4BfrSpI/
 github.com/cppforlife/go-patch v0.2.0/go.mod h1:67a7aIi94FHDZdoeGSJRRFDp66l9MhaAG1yGxpUoFD8=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/fatih/color v1.18.0 h1:S8gINlzdQ840/4pfAwic/ZE0djQEH3wM94VfqLTZcOM=
-github.com/fatih/color v1.18.0/go.mod h1:4FelSpRwEGDpQ12mAdzqdOukCy4u8WUtOY6lkT/6HfU=
+github.com/fatih/color v1.19.0 h1:Zp3PiM21/9Ld6FzSKyL5c/BULoe/ONr9KlbYVOfG8+w=
+github.com/fatih/color v1.19.0/go.mod h1:zNk67I0ZUT1bEGsSGyCZYZNrHuTkJJB+r6Q9VuMi0LE=
 github.com/fsnotify/fsnotify v1.6.0 h1:n+5WquG0fcWoWp6xPWfHdbskMCQaFnG6PfBrh1Ky4HY=
 github.com/fsnotify/fsnotify v1.6.0/go.mod h1:sl3t1tCWJFWoRz9R8WJCbQihKKwmorjAbSClcnxKAGw=
 github.com/gkampitakis/ciinfo v0.3.2 h1:JcuOPk8ZU7nZQjdUhctuhQofk7BGHuIy0c9Ez8BNhXs=
