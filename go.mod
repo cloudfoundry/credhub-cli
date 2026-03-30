@@ -4,11 +4,11 @@ go 1.25.7
 
 require (
 	github.com/cloudfoundry/bosh-cli/v7 v7.10.1
-	github.com/cloudfoundry/bosh-utils v0.0.600
+	github.com/cloudfoundry/bosh-utils v0.0.605
 	github.com/cloudfoundry/go-socks5 v0.0.0-20250423223041-4ad5fea42851
 	github.com/cloudfoundry/socks5-proxy v0.2.171
 	github.com/fatih/color v1.19.0
-	github.com/hashicorp/go-version v1.8.0
+	github.com/hashicorp/go-version v1.9.0
 	github.com/jessevdk/go-flags v1.6.1
 	github.com/onsi/ginkgo/v2 v2.28.1
 	github.com/onsi/gomega v1.39.1
