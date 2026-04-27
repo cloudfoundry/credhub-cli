@@ -4,7 +4,7 @@ github.com/Masterminds/semver/v3
 # github.com/bmatcuk/doublestar v1.3.4
 ## explicit; go 1.12
 github.com/bmatcuk/doublestar
-# github.com/cloudfoundry/bosh-cli/v7 v7.10.2
+# github.com/cloudfoundry/bosh-cli/v7 v7.10.3
 ## explicit; go 1.25.0
 github.com/cloudfoundry/bosh-cli/v7/director/template
 # github.com/cloudfoundry/bosh-utils v0.0.607
@@ -50,12 +50,12 @@ github.com/jessevdk/go-flags
 # github.com/mattn/go-colorable v0.1.14
 ## explicit; go 1.18
 github.com/mattn/go-colorable
-# github.com/mattn/go-isatty v0.0.21
+# github.com/mattn/go-isatty v0.0.22
 ## explicit; go 1.21
 github.com/mattn/go-isatty
 # github.com/nxadm/tail v1.4.11
 ## explicit; go 1.13
-# github.com/onsi/ginkgo/v2 v2.28.1
+# github.com/onsi/ginkgo/v2 v2.28.2
 ## explicit; go 1.24.0
 github.com/onsi/ginkgo/v2
 github.com/onsi/ginkgo/v2/config
