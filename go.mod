@@ -4,21 +4,21 @@ go 1.25.7
 
 require (
 	github.com/cloudfoundry/bosh-cli/v7 v7.10.3
-	github.com/cloudfoundry/bosh-utils v0.0.607
+	github.com/cloudfoundry/bosh-utils v0.0.608
 	github.com/cloudfoundry/go-socks5 v0.0.0-20250423223041-4ad5fea42851
-	github.com/cloudfoundry/socks5-proxy v0.2.173
+	github.com/cloudfoundry/socks5-proxy v0.2.174
 	github.com/fatih/color v1.19.0
 	github.com/hashicorp/go-version v1.9.0
 	github.com/jessevdk/go-flags v1.6.1
-	github.com/onsi/ginkgo/v2 v2.28.2
-	github.com/onsi/gomega v1.39.1
+	github.com/onsi/ginkgo/v2 v2.28.3
+	github.com/onsi/gomega v1.40.0
 	go.yaml.in/yaml/v3 v3.0.4
 	golang.org/x/net v0.53.0
 	golang.org/x/term v0.42.0
 )
 
 require (
-	github.com/Masterminds/semver/v3 v3.4.0 // indirect
+	github.com/Masterminds/semver/v3 v3.5.0 // indirect
 	github.com/bmatcuk/doublestar v1.3.4 // indirect
 	github.com/cppforlife/go-patch v0.2.0 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
