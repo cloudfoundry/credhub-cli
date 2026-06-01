@@ -7,7 +7,7 @@ github.com/bmatcuk/doublestar
 # github.com/cloudfoundry/bosh-cli/v7 v7.10.5
 ## explicit; go 1.25.0
 github.com/cloudfoundry/bosh-cli/v7/director/template
-# github.com/cloudfoundry/bosh-utils v0.0.612
+# github.com/cloudfoundry/bosh-utils v0.0.615
 ## explicit; go 1.25.0
 github.com/cloudfoundry/bosh-utils/errors
 github.com/cloudfoundry/bosh-utils/logger
@@ -47,7 +47,7 @@ github.com/hashicorp/go-version
 # github.com/jessevdk/go-flags v1.6.1
 ## explicit; go 1.20
 github.com/jessevdk/go-flags
-# github.com/mattn/go-colorable v0.1.14
+# github.com/mattn/go-colorable v0.1.15
 ## explicit; go 1.18
 github.com/mattn/go-colorable
 # github.com/mattn/go-isatty v0.0.22
