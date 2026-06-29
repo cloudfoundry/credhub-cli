@@ -4,14 +4,14 @@ go 1.25.7
 
 require (
 	github.com/cloudfoundry/bosh-cli/v7 v7.10.6
-	github.com/cloudfoundry/bosh-utils v0.0.623
+	github.com/cloudfoundry/bosh-utils v0.0.624
 	github.com/cloudfoundry/go-socks5 v0.0.0-20250423223041-4ad5fea42851
-	github.com/cloudfoundry/socks5-proxy v0.2.179
+	github.com/cloudfoundry/socks5-proxy v0.2.180
 	github.com/fatih/color v1.19.0
 	github.com/hashicorp/go-version v1.9.0
 	github.com/jessevdk/go-flags v1.6.1
-	github.com/onsi/ginkgo/v2 v2.31.0
-	github.com/onsi/gomega v1.42.0
+	github.com/onsi/ginkgo/v2 v2.32.0
+	github.com/onsi/gomega v1.42.1
 	go.yaml.in/yaml/v3 v3.0.4
 	golang.org/x/net v0.56.0
 	golang.org/x/term v0.44.0
@@ -33,7 +33,7 @@ require (
 	golang.org/x/sync v0.21.0 // indirect
 	golang.org/x/sys v0.46.0 // indirect
 	golang.org/x/text v0.38.0 // indirect
-	golang.org/x/tools v0.46.0 // indirect
+	golang.org/x/tools v0.47.0 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
