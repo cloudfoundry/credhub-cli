@@ -9,6 +9,11 @@ import (
 )
 
 func userHomeDir() string {
+	home := os.Getenv("CREDHUB_HOME")
+	if home != "" {
+		return home
+	}
+
 	home := os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
 	if home == "" {
 		home = os.Getenv("USERPROFILE")

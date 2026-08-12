@@ -4,6 +4,7 @@
 package config_test
 
 import (
+	"os"
 	"syscall"
 
 	"code.cloudfoundry.org/credhub-cli/config"
@@ -34,5 +35,39 @@ var _ = Describe("Config (windows specific)", func() {
 		Expect(err).ToNot(HaveOccurred())
 
 		Expect(attrs & syscall.FILE_ATTRIBUTE_HIDDEN).To(Equal(uint32(syscall.FILE_ATTRIBUTE_HIDDEN)))
+	})
+
+	Describe("CREDHUB_HOME", func() {
+		var originalCredhubHome string
+		var originalUserProfile string
+		var hadCredhubHome bool
+
+		BeforeEach(func() {
+			originalCredhubHome, hadCredhubHome = os.LookupEnv("CREDHUB_HOME")
+			originalUserProfile = os.Getenv("USERPROFILE")
+		})
+
+		AfterEach(func() {
+			if hadCredhubHome {
+				os.Setenv("CREDHUB_HOME", originalCredhubHome)
+			} else {
+				os.Unsetenv("CREDHUB_HOME")
+			}
+			os.Setenv("USERPROFILE", originalUserProfile)
+		})
+
+		It("uses CREDHUB_HOME instead of USERPROFILE when set", func() {
+			os.Setenv("USERPROFILE", `C:\Users\original-user`)
+			os.Setenv("CREDHUB_HOME", `C:\custom\credhub\home`)
+
+			Expect(config.ConfigDir()).To(Equal(`C:\custom\credhub\home\.credhub`))
+		})
+
+		It("falls back to USERPROFILE when CREDHUB_HOME is not set", func() {
+			os.Setenv("USERPROFILE", `C:\Users\original-user`)
+			os.Unsetenv("CREDHUB_HOME")
+
+			Expect(config.ConfigDir()).To(Equal(`C:\Users\original-user\.credhub`))
+		})
 	})
 })

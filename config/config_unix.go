@@ -8,7 +8,11 @@ import (
 )
 
 func userHomeDir() string {
-	return os.Getenv("HOME")
+	home := os.Getenv("CREDHUB_HOME")
+	if home == "" {
+		home = os.Getenv("HOME")
+	}
+	return home
 }
 
 func makeDirectory() error {
