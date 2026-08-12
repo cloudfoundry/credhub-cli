@@ -47,4 +47,8 @@ CredHub CLI can be used to manage credentials stored in a CredHub server. You mu
 
 To see the API calls made by each CLI command, `export CREDHUB_DEBUG=true`.
 
+#### Config Location:
+
+By default, the CLI stores its configuration (`config.json`) in a `.credhub` directory inside the current user's home directory (`$HOME` on Linux/macOS, `%USERPROFILE%` on Windows). Set `CREDHUB_HOME` to override this and store the configuration under a different directory instead.
+
 [1]:https://docs.cloudfoundry.org/api/credhub/
