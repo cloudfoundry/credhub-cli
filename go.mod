@@ -3,8 +3,8 @@ module code.cloudfoundry.org/credhub-cli
 go 1.25.7
 
 require (
-	github.com/cloudfoundry/bosh-cli/v7 v7.10.9
-	github.com/cloudfoundry/bosh-utils v0.0.636
+	github.com/cloudfoundry/bosh-cli/v7 v7.10.10
+	github.com/cloudfoundry/bosh-utils v0.0.643
 	github.com/cloudfoundry/go-socks5 v0.0.0-20250423223041-4ad5fea42851
 	github.com/cloudfoundry/socks5-proxy v0.2.185
 	github.com/fatih/color v1.19.0
