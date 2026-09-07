@@ -4,9 +4,9 @@ go 1.26.0
 
 require (
 	github.com/cloudfoundry/bosh-cli/v7 v7.10.10
-	github.com/cloudfoundry/bosh-utils v0.0.647
+	github.com/cloudfoundry/bosh-utils v0.0.648
 	github.com/cloudfoundry/go-socks5 v0.0.0-20250423223041-4ad5fea42851
-	github.com/cloudfoundry/socks5-proxy v0.2.186
+	github.com/cloudfoundry/socks5-proxy v0.2.187
 	github.com/fatih/color v1.19.0
 	github.com/hashicorp/go-version v1.9.0
 	github.com/jessevdk/go-flags v1.6.1
@@ -24,7 +24,7 @@ require (
 	github.com/go-logr/logr v1.4.4 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
-	github.com/google/pprof v0.0.0-20260903180319-d6c3cb2f37ec // indirect
+	github.com/google/pprof v0.0.0-20260906184651-6331bc6350fe // indirect
 	github.com/mattn/go-colorable v0.1.15 // indirect
 	github.com/mattn/go-isatty v0.0.24 // indirect
 	github.com/nxadm/tail v1.4.11 // indirect
