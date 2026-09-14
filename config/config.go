@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"path"
+	"path/filepath"
 	"time"
 
 	"code.cloudfoundry.org/credhub-cli/util"
@@ -20,11 +20,11 @@ type Config struct {
 }
 
 func ConfigDir() string {
-	return path.Join(userHomeDir(), ".credhub")
+	return filepath.Join(userHomeDir(), ".credhub")
 }
 
 func ConfigPath() string {
-	return path.Join(ConfigDir(), "config.json")
+	return filepath.Join(ConfigDir(), "config.json")
 }
 
 func ReadConfig() Config {
