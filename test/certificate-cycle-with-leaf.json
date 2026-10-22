@@ -1,0 +1,31 @@
+{
+  "credentials": [
+    {
+      "name": "/leaf_cert",
+      "type": "certificate",
+      "value": {
+        "ca_name": "/cert_a",
+        "certificate": "leaf-cert-certificate",
+        "private_key": "leaf-cert-private-key"
+      }
+    },
+    {
+      "name": "/cert_a",
+      "type": "certificate",
+      "value": {
+        "ca_name": "/cert_b",
+        "certificate": "cert-a-certificate",
+        "private_key": "cert-a-private-key"
+      }
+    },
+    {
+      "name": "/cert_b",
+      "type": "certificate",
+      "value": {
+        "ca_name": "/cert_a",
+        "certificate": "cert-b-certificate",
+        "private_key": "cert-b-private-key"
+      }
+    }
+  ]
+}
