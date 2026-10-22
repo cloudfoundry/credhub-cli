@@ -33,7 +33,24 @@ func (cmd ExportCommand) Execute([]string) error {
 
 		return err
 	} else {
-		return os.WriteFile(cmd.File, exportCreds.Bytes, 0644)
+		file, err := os.OpenFile(cmd.File, os.O_WRONLY|os.O_CREATE, 0600)
+		if err != nil {
+			return err
+		}
+		// Restrict access before truncating or writing an existing file.
+		if err := file.Chmod(0600); err != nil {
+			file.Close()
+			return err
+		}
+		if err := file.Truncate(0); err != nil {
+			file.Close()
+			return err
+		}
+		if _, err := file.Write(exportCreds.Bytes); err != nil {
+			file.Close()
+			return err
+		}
+		return file.Close()
 	}
 }
 

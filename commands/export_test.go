@@ -3,6 +3,7 @@ package commands_test
 import (
 	"net/http"
 	"os"
+	"path/filepath"
 
 	"runtime"
 
@@ -15,19 +16,8 @@ import (
 	. "github.com/onsi/gomega/ghttp"
 )
 
-func withTemporaryFile(wantingFile func(string)) error {
-	f, err := os.CreateTemp("", "credhub_tests_")
-
-	if err != nil {
-		return err
-	}
-
-	name := f.Name()
-
-	f.Close()
-	wantingFile(name)
-
-	return os.Remove(name)
+func withNewTemporaryFile(wantingFile func(string)) {
+	wantingFile(filepath.Join(GinkgoT().TempDir(), "credentials"))
 }
 
 var _ = Describe("Export", func() {
@@ -259,9 +249,106 @@ var _ = Describe("Export", func() {
 		})
 
 		Context("when given a file", func() {
+			DescribeTable("overwrites an existing file with owner-only permissions", func(outputJSON bool, mode os.FileMode) {
+				filename := filepath.Join(GinkgoT().TempDir(), "credentials")
+				Expect(os.WriteFile(filename, []byte("original contents"), mode)).To(Succeed())
+				if runtime.GOOS != "windows" {
+					Expect(os.Chmod(filename, mode)).To(Succeed())
+				}
+				server.AppendHandlers(CombineHandlers(
+					VerifyRequest("GET", "/api/v1/data", "path="),
+					RespondWith(http.StatusOK, `{"credentials":[]}`),
+				))
+				args := []string{"export", "-f", filename}
+				want := "credentials: []\n"
+				if outputJSON {
+					args = append(args, "--output-json")
+					want = `{"Credentials":[]}`
+				}
+
+				Eventually(runCommand(args...)).Should(Exit(0))
+				contents, err := os.ReadFile(filename)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(string(contents)).To(Equal(want))
+				info, err := os.Stat(filename)
+				Expect(err).NotTo(HaveOccurred())
+				if runtime.GOOS != "windows" {
+					Expect(info.Mode().Perm()).To(Equal(os.FileMode(0600)))
+				}
+			},
+				Entry("for a world-readable YAML file", false, os.FileMode(0644)),
+				Entry("for a private YAML file", false, os.FileMode(0600)),
+				Entry("for a world-readable JSON file", true, os.FileMode(0644)),
+				Entry("for a private JSON file", true, os.FileMode(0600)),
+			)
+
+			DescribeTable("writes through a destination symlink with owner-only permissions", func(targetExists bool) {
+				if runtime.GOOS == "windows" {
+					Skip("Creating symlinks requires additional privileges on Windows")
+				}
+				dir := GinkgoT().TempDir()
+				target := filepath.Join(dir, "target")
+				filename := filepath.Join(dir, "credentials")
+				if targetExists {
+					Expect(os.WriteFile(target, []byte("original contents"), 0644)).To(Succeed())
+				}
+				Expect(os.Symlink(target, filename)).To(Succeed())
+				server.AppendHandlers(CombineHandlers(
+					VerifyRequest("GET", "/api/v1/data", "path="),
+					RespondWith(http.StatusOK, `{"credentials":[]}`),
+				))
+
+				Eventually(runCommand("export", "-f", filename)).Should(Exit(0))
+
+				contents, err := os.ReadFile(target)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(string(contents)).To(Equal("credentials: []\n"))
+				info, err := os.Stat(target)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(info.Mode().Perm()).To(Equal(os.FileMode(0600)))
+				linkTarget, err := os.Readlink(filename)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(linkTarget).To(Equal(target))
+			},
+				Entry("with an existing target", true),
+				Entry("with a missing target", false),
+			)
+
+			DescribeTable("creates export files with owner-only permissions", func(outputJSON bool) {
+				if runtime.GOOS == "windows" {
+					Skip("Unix permission bits do not apply on Windows")
+				}
+				dir := GinkgoT().TempDir()
+				filename := filepath.Join(dir, "credentials")
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest("GET", "/api/v1/data", "path="),
+						RespondWith(http.StatusOK, `{"credentials":[]}`),
+					),
+				)
+				args := []string{"export", "-f", filename}
+				want := "credentials: []\n"
+				if outputJSON {
+					args = append(args, "--output-json")
+					want = `{"Credentials":[]}`
+				}
+
+				Eventually(runCommand(args...)).Should(Exit(0))
+
+				info, err := os.Stat(filename)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(info.Mode().Perm()).To(Equal(os.FileMode(0600)))
+				contents, err := os.ReadFile(filename)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(string(contents)).To(Equal(want))
+			},
+				Entry("for a new YAML file", false),
+				Entry("for a new JSON file", true),
+			)
+
 			Context("when given output-json flag", func() {
 				It("writes the JSON to that file", func() {
-					withTemporaryFile(func(filename string) {
+					withNewTemporaryFile(func(filename string) {
 						noCredsJSON := `{ "credentials" : [] }`
 						jsonOutput := `{"Credentials":[]}`
 
@@ -287,7 +374,7 @@ var _ = Describe("Export", func() {
 
 			Context("when not given output-json flag", func() {
 				It("writes the YAML to that file", func() {
-					withTemporaryFile(func(filename string) {
+					withNewTemporaryFile(func(filename string) {
 						noCredsJSON := `{ "credentials" : [] }`
 						noCredsYaml := `credentials: []
 `
