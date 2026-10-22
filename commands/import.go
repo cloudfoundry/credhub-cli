@@ -2,7 +2,9 @@ package commands
 
 import (
 	"fmt"
+	"slices"
 	"strconv"
+	"strings"
 
 	"code.cloudfoundry.org/credhub-cli/credhub"
 
@@ -91,7 +93,7 @@ func (c *ImportCommand) setCredentials(bulkImport models.CredentialBulkImport) e
 	}
 
 	for signedCert := range certsWithCaName {
-		err := c.importCert(signedCert, certsWithCaName, bulkImport.Credentials, &errorInfo)
+		err := c.importCert(signedCert, certsWithCaName, bulkImport.Credentials, &errorInfo, map[string]bool{})
 		if err != nil {
 			return err
 		}
@@ -146,19 +148,61 @@ func (c *ImportCommand) setCredentialInCredHub(name, credType string, value, met
 	return nil
 }
 
-func (c *ImportCommand) importCert(cert string, certs map[string]CaAndIndex, credentials []map[string]interface{}, errorInfo *ErrorInfo) error {
+// importCert imports cert after its pending CA. onPath holds the certs currently being resolved, so a ca_name that leads back to one of them is a cycle.
+func (c *ImportCommand) importCert(cert string, certs map[string]CaAndIndex, credentials []map[string]interface{}, errorInfo *ErrorInfo, onPath map[string]bool) error {
 	caAndIndex, certNotImported := certs[cert]
 	if !certNotImported {
 		return nil
 	}
 	_, caNotImported := certs[caAndIndex.Ca]
-	if caNotImported {
-		err := c.importCert(caAndIndex.Ca, certs, credentials, errorInfo)
+	// A cert naming itself is not an ordering dependency; the server decides whether it is valid.
+	if caNotImported && caAndIndex.Ca != cert {
+		if onPath[caAndIndex.Ca] {
+			failCircularCaNames(caAndIndex.Ca, certs, errorInfo)
+			return nil
+		}
+		onPath[cert] = true
+		err := c.importCert(caAndIndex.Ca, certs, credentials, errorInfo, onPath)
+		delete(onPath, cert)
 		if err != nil {
 			return err
+		}
+		if _, stillPending := certs[cert]; !stillPending {
+			return nil
 		}
 	}
 	delete(certs, cert)
 	credential := credentials[caAndIndex.Index]
 	return c.setCredentialInCredHub(cert, credential["type"].(string), credential["value"], credential["metadata"], errorInfo, caAndIndex.Index)
+}
+
+// maxCycleShown bounds how many members each cycle error lists, so output grows linearly with the cycle's size.
+const maxCycleShown = 10
+
+// failCircularCaNames reports every member of the ca_name cycle through start as failed and removes them from the pending set.
+// The cycle is listed starting from the member that appears first in the import file, so the message is stable.
+func failCircularCaNames(start string, certs map[string]CaAndIndex, errorInfo *ErrorInfo) {
+	members := []string{start}
+	for next := certs[start].Ca; next != start; next = certs[next].Ca {
+		members = append(members, next)
+	}
+	first := 0
+	for i, member := range members {
+		if certs[member].Index < certs[members[first]].Index {
+			first = i
+		}
+	}
+	ordered := append(slices.Clone(members[first:]), members[:first]...)
+	cycle := strings.Join(ordered, " -> ") + " -> " + ordered[0]
+	if len(ordered) > maxCycleShown {
+		cycle = fmt.Sprintf("%s -> ... -> %s (%d certificates)", strings.Join(ordered[:maxCycleShown], " -> "), ordered[0], len(ordered))
+	}
+
+	for _, member := range ordered {
+		failure := fmt.Sprintf("Credential '%s' at index %d could not be set: circular ca_name reference: %s", member, certs[member].Index, cycle)
+		fmt.Println(failure + "\n")
+		errorInfo.ImportErrors = append(errorInfo.ImportErrors, " - "+failure)
+		errorInfo.Failed++
+		delete(certs, member)
+	}
 }
