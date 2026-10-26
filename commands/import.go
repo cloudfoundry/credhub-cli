@@ -2,7 +2,9 @@ package commands
 
 import (
 	"fmt"
+	"slices"
 	"strconv"
+	"strings"
 
 	"code.cloudfoundry.org/credhub-cli/credhub"
 
@@ -91,7 +93,7 @@ func (c *ImportCommand) setCredentials(bulkImport models.CredentialBulkImport) e
 	}
 
 	for signedCert := range certsWithCaName {
-		err := c.importCert(signedCert, certsWithCaName, bulkImport.Credentials, &errorInfo)
+		err := c.importCert(signedCert, certsWithCaName, bulkImport.Credentials, &errorInfo, nil)
 		if err != nil {
 			return err
 		}
@@ -146,19 +148,49 @@ func (c *ImportCommand) setCredentialInCredHub(name, credType string, value, met
 	return nil
 }
 
-func (c *ImportCommand) importCert(cert string, certs map[string]CaAndIndex, credentials []map[string]interface{}, errorInfo *ErrorInfo) error {
+// path holds the certs currently being resolved, outermost first, so a ca_name that leads back to one of them is a cycle.
+func (c *ImportCommand) importCert(cert string, certs map[string]CaAndIndex, credentials []map[string]interface{}, errorInfo *ErrorInfo, path []string) error {
 	caAndIndex, certNotImported := certs[cert]
 	if !certNotImported {
 		return nil
 	}
 	_, caNotImported := certs[caAndIndex.Ca]
-	if caNotImported {
-		err := c.importCert(caAndIndex.Ca, certs, credentials, errorInfo)
+	// A cert naming itself is not an ordering dependency; the server decides whether it is valid.
+	if caNotImported && caAndIndex.Ca != cert {
+		if start := slices.Index(path, caAndIndex.Ca); start >= 0 {
+			failCircularCaNames(append(slices.Clone(path[start:]), cert), certs, errorInfo)
+			return nil
+		}
+		err := c.importCert(caAndIndex.Ca, certs, credentials, errorInfo, append(path, cert))
 		if err != nil {
 			return err
+		}
+		if _, stillPending := certs[cert]; !stillPending {
+			return nil
 		}
 	}
 	delete(certs, cert)
 	credential := credentials[caAndIndex.Index]
 	return c.setCredentialInCredHub(cert, credential["type"].(string), credential["value"], credential["metadata"], errorInfo, caAndIndex.Index)
+}
+
+// failCircularCaNames reports every member of a ca_name cycle as failed and removes them from the pending set.
+// The cycle is listed starting from the member that appears first in the import file, so the message is stable.
+func failCircularCaNames(members []string, certs map[string]CaAndIndex, errorInfo *ErrorInfo) {
+	first := 0
+	for i, member := range members {
+		if certs[member].Index < certs[members[first]].Index {
+			first = i
+		}
+	}
+	ordered := append(slices.Clone(members[first:]), members[:first]...)
+	cycle := strings.Join(append(slices.Clone(ordered), ordered[0]), " -> ")
+
+	for _, member := range ordered {
+		failure := fmt.Sprintf("Credential '%s' at index %d could not be set: circular ca_name reference: %s", member, certs[member].Index, cycle)
+		fmt.Println(failure + "\n")
+		errorInfo.ImportErrors = append(errorInfo.ImportErrors, " - "+failure)
+		errorInfo.Failed++
+		delete(certs, member)
+	}
 }
