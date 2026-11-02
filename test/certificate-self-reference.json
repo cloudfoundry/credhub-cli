@@ -1,0 +1,13 @@
+{
+  "credentials": [
+    {
+      "name": "/self_ca",
+      "type": "certificate",
+      "value": {
+        "ca_name": "/self_ca",
+        "certificate": "self-ca-certificate",
+        "private_key": "self-ca-private-key"
+      }
+    }
+  ]
+}

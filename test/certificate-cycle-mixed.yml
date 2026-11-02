@@ -1,0 +1,25 @@
+credentials:
+  - name: /valid_leaf
+    type: certificate
+    value:
+      ca_name: /root_ca
+      certificate: valid-leaf-certificate
+      private_key: valid-leaf-private-key
+  - name: /cert_a
+    type: certificate
+    value:
+      ca_name: /cert_b
+      certificate: cert-a-certificate
+      private_key: cert-a-private-key
+  - name: /cert_b
+    type: certificate
+    value:
+      ca_name: /cert_a
+      certificate: cert-b-certificate
+      private_key: cert-b-private-key
+  - name: /root_ca
+    type: certificate
+    value:
+      ca: root-ca
+      certificate: root-ca-certificate
+      private_key: root-ca-private-key

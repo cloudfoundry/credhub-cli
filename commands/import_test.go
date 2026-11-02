@@ -306,7 +306,121 @@ Failed to set: 0
 
 		})
 	})
+
+	Describe("when the ca_name graph contains a cycle", func() {
+		for _, format := range []struct {
+			name string
+			ext  string
+			args []string
+		}{
+			{name: "yaml", ext: ".yml"},
+			{name: "json", ext: ".json", args: []string{"-j"}},
+		} {
+			format := format
+			importFixture := func(base string) *Session {
+				return runCommand(append([]string{"import", "-f", "../test/" + base + format.ext}, format.args...)...)
+			}
+
+			Describe("when importing "+format.name, func() {
+				It("reports a two-certificate cycle as failed without setting either", func() {
+					session := importFixture("certificate-cycle-two")
+
+					Eventually(session).Should(Exit(1))
+					Expect(receivedSetRequests()).To(Equal(0))
+					Expect(string(session.Out.Contents())).To(ContainSubstring(`Import complete.
+Successfully set: 0
+Failed to set: 2
+`))
+					Expect(string(session.Out.Contents())).To(ContainSubstring(`Credential '/cert_a' at index 0 could not be set: circular ca_name reference: /cert_a -> /cert_b -> /cert_a`))
+					Expect(string(session.Out.Contents())).To(ContainSubstring(`Credential '/cert_b' at index 1 could not be set: circular ca_name reference: /cert_a -> /cert_b -> /cert_a`))
+					Expect(string(session.Err.Contents())).To(ContainSubstring(`One or more credentials failed to import`))
+				})
+
+				It("reports a three-certificate cycle as failed without setting any", func() {
+					session := importFixture("certificate-cycle-three")
+
+					Eventually(session).Should(Exit(1))
+					Expect(receivedSetRequests()).To(Equal(0))
+					Expect(string(session.Out.Contents())).To(ContainSubstring(`Import complete.
+Successfully set: 0
+Failed to set: 3
+`))
+					Expect(string(session.Out.Contents())).To(ContainSubstring(`Credential '/cert_a' at index 0 could not be set: circular ca_name reference: /cert_a -> /cert_b -> /cert_c -> /cert_a`))
+					Expect(string(session.Out.Contents())).To(ContainSubstring(`Credential '/cert_b' at index 1 could not be set: circular ca_name reference: /cert_a -> /cert_b -> /cert_c -> /cert_a`))
+					Expect(string(session.Out.Contents())).To(ContainSubstring(`Credential '/cert_c' at index 2 could not be set: circular ca_name reference: /cert_a -> /cert_b -> /cert_c -> /cert_a`))
+				})
+
+				It("imports the valid chain and reports the cycle in the same file", func() {
+					setupSetServer("/root_ca", "certificate", `{"ca":"root-ca","certificate":"root-ca-certificate","private_key":"root-ca-private-key"}`)
+					setupSetServer("/valid_leaf", "certificate", `{"ca_name":"/root_ca","certificate":"valid-leaf-certificate","private_key":"valid-leaf-private-key"}`)
+
+					session := importFixture("certificate-cycle-mixed")
+
+					Eventually(session).Should(Exit(1))
+					Expect(receivedSetRequests()).To(Equal(2))
+					Expect(string(session.Out.Contents())).To(ContainSubstring(`Import complete.
+Successfully set: 2
+Failed to set: 2
+`))
+					Expect(string(session.Out.Contents())).To(ContainSubstring(`Credential '/cert_a' at index 1 could not be set: circular ca_name reference: /cert_a -> /cert_b -> /cert_a`))
+					Expect(string(session.Out.Contents())).To(ContainSubstring(`Credential '/cert_b' at index 2 could not be set: circular ca_name reference: /cert_a -> /cert_b -> /cert_a`))
+				})
+
+				It("sends a leaf signed by a cycle member to the server and reports its rejection", func() {
+					setupPutBadRequestServer(`{"type":"certificate","name":"/leaf_cert","value":{"ca_name":"/cert_a","certificate":"leaf-cert-certificate","private_key":"leaf-cert-private-key"}}`)
+
+					session := importFixture("certificate-cycle-with-leaf")
+
+					Eventually(session).Should(Exit(1))
+					Expect(receivedSetRequests()).To(Equal(1))
+					Expect(string(session.Out.Contents())).To(ContainSubstring(`Import complete.
+Successfully set: 0
+Failed to set: 3
+`))
+					Expect(string(session.Out.Contents())).To(ContainSubstring(`Credential '/leaf_cert' at index 0 could not be set: test error`))
+					Expect(string(session.Out.Contents())).To(ContainSubstring(`Credential '/cert_a' at index 1 could not be set: circular ca_name reference: /cert_a -> /cert_b -> /cert_a`))
+					Expect(string(session.Out.Contents())).To(ContainSubstring(`Credential '/cert_b' at index 2 could not be set: circular ca_name reference: /cert_a -> /cert_b -> /cert_a`))
+				})
+			})
+
+			Describe("when importing "+format.name+" a certificate whose ca_name is its own name", func() {
+				It("leaves the decision to the server and imports it when the server accepts", func() {
+					setupSetServer("/self_ca", "certificate", `{"ca_name":"/self_ca","certificate":"self-ca-certificate","private_key":"self-ca-private-key"}`)
+
+					session := importFixture("certificate-self-reference")
+
+					Eventually(session).Should(Exit(0))
+					Expect(receivedSetRequests()).To(Equal(1))
+					Expect(string(session.Out.Contents())).To(Equal(`Import complete.
+Successfully set: 1
+Failed to set: 0
+`))
+				})
+
+				It("reports the server's rejection as an ordinary failure, not a cycle", func() {
+					setupPutBadRequestServer(`{"type":"certificate","name":"/self_ca","value":{"ca_name":"/self_ca","certificate":"self-ca-certificate","private_key":"self-ca-private-key"}}`)
+
+					session := importFixture("certificate-self-reference")
+
+					Eventually(session).Should(Exit(1))
+					Expect(receivedSetRequests()).To(Equal(1))
+					Expect(string(session.Out.Contents())).To(ContainSubstring(`Credential '/self_ca' at index 0 could not be set: test error`))
+					Expect(string(session.Out.Contents())).NotTo(ContainSubstring(`circular`))
+				})
+			})
+		}
+	})
 })
+
+func receivedSetRequests() int {
+	count := 0
+	for _, request := range server.ReceivedRequests() {
+		if request.Method == "PUT" && request.URL.Path == "/api/v1/data" {
+			count++
+		}
+	}
+	return count
+}
 
 func setUpImportRequests() {
 	setupSetServer("/test/password", "password", `"test-password-value"`)
