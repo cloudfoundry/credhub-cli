@@ -4,9 +4,9 @@ go 1.26.11
 
 require (
 	github.com/cloudfoundry/bosh-cli/v7 v7.11.3
-	github.com/cloudfoundry/bosh-utils v0.0.676
+	github.com/cloudfoundry/bosh-utils v0.0.677
 	github.com/cloudfoundry/go-socks5 v0.0.0-20250423223041-4ad5fea42851
-	github.com/cloudfoundry/socks5-proxy v0.2.197
+	github.com/cloudfoundry/socks5-proxy v0.2.198
 	github.com/fatih/color v1.19.0
 	github.com/hashicorp/go-version v1.9.0
 	github.com/jessevdk/go-flags v1.6.1
